@@ -1,0 +1,35 @@
+---
+// src/components/ui/card/Card.astro - la carte blanche flottante, surface de base du theme.
+// Variante glass pour les cartes translucides posees sur le hero sombre, et un mode
+// interactive qui souleve la carte au survol (cartes cliquables, grilles de features).
+import type { HTMLAttributes, HTMLTag } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const card = tv({
+  base: "flex flex-col gap-6 rounded-card py-6",
+  variants: {
+    variant: {
+      default: "border-border bg-card text-card-foreground border shadow-float",
+      glass: "glass text-white",
+    },
+    interactive: {
+      true: "transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lift",
+    },
+  },
+  defaultVariants: { variant: "default" },
+});
+
+type CardVariants = VariantProps<typeof card>;
+
+type Props = HTMLAttributes<"div"> &
+  CardVariants & {
+    // article ou section quand la carte est un contenu autonome.
+    as?: HTMLTag;
+  };
+
+const { as: Tag = "div", variant, interactive, class: className, ...rest } = Astro.props;
+---
+
+<Tag class={card({ variant, interactive, class: className })} data-slot="card" {...rest}>
+  <slot />
+</Tag>

@@ -1,0 +1,15 @@
+---
+// src/components/ui/dropdown/DropdownSeparator.astro - filet horizontal entre deux groupes d'entrees du menu.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const dropdownSeparator = tv({
+  base: "border-border -mx-2 my-1.5 border-t",
+});
+
+type Props = HTMLAttributes<"hr">;
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<hr class={dropdownSeparator({ class: className })} data-slot="dropdown-separator" {...rest} />

@@ -1,0 +1,46 @@
+---
+// src/components/ui/dropdown/Dropdown.astro - racine du menu deroulant : un <details> natif, ouvert sans JavaScript, ferme au clic exterieur et a Escape par un script court.
+// Se compose avec DropdownTrigger (le <summary>) puis DropdownMenu, qui
+// contient DropdownItem / DropdownLabel / DropdownSeparator.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+import "../_overlay.css";
+
+export const dropdown = tv({
+  base: "group relative inline-block",
+});
+
+type Props = HTMLAttributes<"details">;
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<details class={dropdown({ class: className })} data-slot="dropdown" {...rest}>
+  <slot />
+</details>
+
+<script>
+  // Fermeture au clic exterieur (pointerdown, fiable sur iOS) et a Escape,
+  // avec retour du focus sur le declencheur. Une seule delegation au document
+  // pour toutes les instances ; elle survit aux view transitions.
+  const SELECTOR = "details[data-slot='dropdown']";
+
+  function closeAll(except: Element | null): void {
+    document.querySelectorAll<HTMLDetailsElement>(`${SELECTOR}[open]`).forEach((item) => {
+      if (item !== except) item.removeAttribute("open");
+    });
+  }
+
+  document.addEventListener("pointerdown", (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    closeAll(target?.closest(SELECTOR) ?? null);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    const open = document.querySelector<HTMLDetailsElement>(`${SELECTOR}[open]`);
+    if (!open) return;
+    open.removeAttribute("open");
+    open.querySelector<HTMLElement>("summary")?.focus();
+  });
+</script>

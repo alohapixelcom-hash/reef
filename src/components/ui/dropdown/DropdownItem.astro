@@ -1,0 +1,33 @@
+---
+// src/components/ui/dropdown/DropdownItem.astro - une entree du menu : <a> si href est fourni, sinon <button>, rangee tactile de 44px minimum.
+// Un eventuel svg passe dans le slot est calibre et assourdi automatiquement.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const dropdownItem = tv({
+  base: [
+    "flex min-h-11 w-full cursor-pointer items-center gap-2.5 rounded-2xl px-3 py-2 text-left",
+    "text-foreground text-sm font-medium",
+    "hover:bg-muted transition-colors duration-150",
+    "[&>svg]:text-muted-foreground [&>svg]:size-4 [&>svg]:shrink-0",
+  ],
+});
+
+type Props = (HTMLAttributes<"a"> | HTMLAttributes<"button">) & {
+  href?: string;
+};
+
+const { href, class: className, ...rest } = Astro.props;
+const Tag = href ? "a" : "button";
+const typeAttr: "button" | undefined = href ? undefined : "button";
+---
+
+<Tag
+  {...rest}
+  href={href}
+  type={typeAttr}
+  class={dropdownItem({ class: className })}
+  data-slot="dropdown-item"
+>
+  <slot />
+</Tag>

@@ -1,0 +1,33 @@
+---
+// src/components/ui/dropdown/DropdownMenu.astro - le panneau flottant du menu : carte flottante alignee sous le declencheur, apparition via .overlay-pop.
+// Pattern disclosure volontaire (pas de role="menu") : la navigation clavier
+// reste le Tab natif, honnete et robuste pour des listes de liens.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const dropdownMenu = tv({
+  base: [
+    "overlay-pop absolute top-[calc(100%+0.5rem)] z-50",
+    "flex min-w-56 flex-col gap-0.5 p-2",
+    "bg-card text-card-foreground rounded-card border border-border shadow-lift backdrop-blur-xl",
+  ],
+  variants: {
+    align: {
+      // L'origine de l'echelle suit l'ancrage : un menu aligne a droite doit
+      // se deplier depuis son coin droit, la ou se trouve le bouton qui vient
+      // d'etre presse, sinon il a l'air de tomber d'ailleurs.
+      start: "left-0 [--overlay-origin:top_left]",
+      end: "right-0 [--overlay-origin:top_right]",
+    },
+  },
+  defaultVariants: { align: "start" },
+});
+
+type Props = HTMLAttributes<"div"> & VariantProps<typeof dropdownMenu>;
+
+const { align, class: className, ...rest } = Astro.props;
+---
+
+<div class={dropdownMenu({ align, class: className })} data-slot="dropdown-menu" {...rest}>
+  <slot />
+</div>

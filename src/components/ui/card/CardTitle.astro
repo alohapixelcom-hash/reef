@@ -1,0 +1,20 @@
+---
+// src/components/ui/card/CardTitle.astro - titre de carte dans la grotesque d'affichage, en gras, h3 par defaut.
+import type { HTMLAttributes, HTMLTag } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const cardTitle = tv({
+  base: "font-display text-xl font-extrabold tracking-tight text-balance",
+});
+
+type Props = HTMLAttributes<"h3"> & {
+  // h2, h4 ou div selon la place de la carte dans la hierarchie de la page.
+  as?: HTMLTag;
+};
+
+const { as: Tag = "h3", class: className, ...rest } = Astro.props;
+---
+
+<Tag class={cardTitle({ class: className })} data-slot="card-title" {...rest}>
+  <slot />
+</Tag>

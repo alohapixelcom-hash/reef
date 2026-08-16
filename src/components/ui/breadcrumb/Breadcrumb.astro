@@ -1,0 +1,69 @@
+---
+// src/components/ui/breadcrumb/Breadcrumb.astro - fil d'ariane : nav + ol, separateurs chevron, dernier maillon rendu en aria-current="page".
+// items va du plus general au plus precis ; un maillon sans href, ou le
+// dernier, devient la page courante, non cliquable.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const breadcrumb = tv({
+  slots: {
+    root: "w-full",
+    list: "flex flex-wrap items-center gap-x-1.5 text-sm",
+    item: "flex items-center gap-x-1.5",
+    link: "inline-flex min-h-11 items-center text-muted-foreground transition-colors duration-150 hover:text-foreground",
+    page: "inline-flex min-h-11 items-center font-semibold text-foreground",
+    separator: "size-3.5 shrink-0 text-muted-foreground/50",
+  },
+});
+
+type Crumb = {
+  label: string;
+  href?: string;
+};
+
+type Props = HTMLAttributes<"nav"> & {
+  items: Crumb[];
+  // Nom accessible du nav, en anglais par defaut comme la copie de demo.
+  label?: string;
+};
+
+const { items, label = "Breadcrumb", class: className, ...rest } = Astro.props;
+const { root, list, item, link, page, separator } = breadcrumb();
+---
+
+<nav class={root({ class: className })} data-slot="breadcrumb" aria-label={label} {...rest}>
+  <ol class={list()}>
+    {
+      items.map((crumb, index) => {
+        const isLast = index === items.length - 1;
+        return (
+          <li class={item()}>
+            {crumb.href && !isLast ? (
+              <a class={link()} href={crumb.href}>
+                {crumb.label}
+              </a>
+            ) : (
+              <span class={page()} aria-current={isLast ? "page" : undefined}>
+                {crumb.label}
+              </span>
+            )}
+            {!isLast && (
+              <svg
+                class={separator()}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="m9 18 6-6-6-6"></path>
+              </svg>
+            )}
+          </li>
+        );
+      })
+    }
+  </ol>
+</nav>

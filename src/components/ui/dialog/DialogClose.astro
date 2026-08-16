@@ -1,0 +1,62 @@
+---
+// src/components/ui/dialog/DialogClose.astro - bouton de fermeture du dialog : croix 44px calee en haut a droite par defaut, ou pilule en flux si un contenu est passe en slot.
+// <DialogClose /> rend la croix ; <DialogClose>Cancel</DialogClose> rend un
+// bouton secondaire pour le DialogFooter. Ferme via data-dialog-close.
+import type { HTMLAttributes } from "astro/types";
+import type { VariantProps } from "tailwind-variants";
+import { button } from "../button";
+
+type ButtonVariants = VariantProps<typeof button>;
+
+type Props = HTMLAttributes<"button"> & {
+  label?: string;
+  variant?: ButtonVariants["variant"];
+  size?: ButtonVariants["size"];
+};
+
+const iconOnly = !Astro.slots.has("default");
+
+const {
+  label = "Close dialog",
+  variant = iconOnly ? "ghost" : "outline",
+  size = iconOnly ? "icon" : "md",
+  class: className,
+  ...rest
+} = Astro.props;
+
+const classes = button({
+  variant,
+  size,
+  class: [
+    iconOnly && "text-muted-foreground hover:text-foreground absolute top-4 right-4",
+    className,
+  ],
+});
+---
+
+<button
+  type="button"
+  class={classes}
+  data-slot="dialog-close"
+  data-dialog-close
+  aria-label={iconOnly ? label : undefined}
+  {...rest}
+>
+  {
+    iconOnly ? (
+      <svg
+        class="size-5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <path d="M18 6 6 18M6 6l12 12" />
+      </svg>
+    ) : (
+      <slot />
+    )
+  }
+</button>

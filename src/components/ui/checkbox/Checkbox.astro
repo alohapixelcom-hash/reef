@@ -1,0 +1,47 @@
+---
+// src/components/ui/checkbox/Checkbox.astro - case a cocher 100% CSS, zero JS.
+// L'input natif reste dans le DOM (sr-only + peer), la coche est un pseudo-element
+// dessine en bordures pivotees. class va a la racine, le reste des props a l'input.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const checkbox = tv({
+  slots: {
+    root: [
+      "group flex min-h-11 w-fit cursor-pointer items-center gap-3 select-none",
+      "has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60",
+    ],
+    control: [
+      "relative flex shrink-0 items-center justify-center rounded-md border border-border bg-card",
+      "transition-[background-color,border-color] duration-200 group-hover:border-foreground/30",
+      "ring-offset-background peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2",
+      "peer-checked:border-primary peer-checked:bg-primary",
+      "after:-translate-y-px after:rotate-45 after:border-r-2 after:border-b-2 after:border-primary-foreground",
+      "after:opacity-0 after:transition-opacity after:duration-150 after:content-['']",
+      "peer-checked:after:opacity-100",
+    ],
+    text: "text-foreground",
+  },
+  variants: {
+    size: {
+      sm: { control: "size-4 after:h-2 after:w-1", text: "text-sm" },
+      md: { control: "size-5 after:h-2.5 after:w-1.5", text: "text-[0.95rem]" },
+    },
+  },
+  defaultVariants: { size: "md" },
+});
+
+type CheckboxVariants = VariantProps<typeof checkbox>;
+
+type Props = Omit<HTMLAttributes<"input">, "size" | "type"> & CheckboxVariants;
+
+const { size, class: className, ...rest } = Astro.props;
+const { root, control, text } = checkbox({ size });
+const hasText = Astro.slots.has("default");
+---
+
+<label class={root({ class: className })} data-slot="checkbox">
+  <input type="checkbox" class="peer sr-only" {...rest} />
+  <span class={control()} aria-hidden="true"></span>
+  {hasText && <span class={text()}><slot /></span>}
+</label>

@@ -1,0 +1,17 @@
+---
+// src/components/ui/card/CardFooter.astro - pied de carte : actions et meta alignees en ligne.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const cardFooter = tv({
+  base: "flex items-center gap-3 px-6",
+});
+
+type Props = HTMLAttributes<"div">;
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<div class={cardFooter({ class: className })} data-slot="card-footer" {...rest}>
+  <slot />
+</div>

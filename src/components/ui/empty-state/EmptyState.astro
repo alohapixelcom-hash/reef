@@ -1,0 +1,81 @@
+---
+// src/components/ui/empty-state/EmptyState.astro - l'ecran vide.
+//
+// Un tableau sans ligne, une recherche sans resultat, une boite de reception a
+// zero : ce sont les trois moments ou un produit parait casse alors qu'il
+// fonctionne. Un ecran vide bien ecrit dit trois choses, dans cet ordre :
+// ce qu'il n'y a pas, pourquoi, et quoi faire maintenant.
+//
+// L'illustration est un motif de vagues genere en SVG : aucune image a servir,
+// net a toutes les densites, et il se retinte tout seul avec la palette.
+import { Icon, type IconName } from "@components/svg/icons";
+import { emptyState, type EmptyStateVariants } from "./emptyState";
+
+type Props = EmptyStateVariants & {
+  /** Ce qu'il n'y a pas. Une phrase, jamais un mot seul. */
+  title: string;
+  /** Pourquoi c'est vide, et ce que ca implique. Optionnel mais recommande. */
+  description?: string;
+  /** L'icone posee au centre du motif. */
+  icon?: IconName;
+  class?: string;
+};
+
+const { title, description, icon = "search", tone, class: className } = Astro.props;
+const { root, art, ring, heading, lede, actions } = emptyState({ tone });
+
+// Trois cercles concentriques : le motif de vagues du theme, reduit a son
+// squelette. Les rayons sont volontairement irreguliers, un espacement egal
+// ferait cible de tir.
+const rings = [34, 52, 74];
+---
+
+<div class={root({ class: className })} data-slot="empty-state">
+  <div class={art()} aria-hidden="true">
+    <svg viewBox="0 0 160 160" class="size-full" fill="none">
+      {
+        rings.map((r, i) => (
+          <circle
+            cx="80"
+            cy="80"
+            r={r}
+            class={ring()}
+            style={`opacity:${0.5 - i * 0.14}`}
+            stroke="currentColor"
+            stroke-width="1.5"
+          />
+        ))
+      }
+      {/* Deux vagues qui traversent, la signature du theme. */}
+      <path
+        d="M18 96c14-14 28-14 42 0s28 14 42 0 28-14 42 0"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.35"
+      />
+      <path
+        d="M22 112c12-10 24-10 36 0s24 10 36 0 24-10 36 0"
+        stroke="currentColor"
+        stroke-width="1.75"
+        stroke-linecap="round"
+        opacity="0.2"
+      />
+    </svg>
+    <span
+      class="text-muted-foreground absolute inset-0 flex items-center justify-center"
+      aria-hidden="true"
+    >
+      <Icon name={icon} size={30} />
+    </span>
+  </div>
+
+  <p class={heading()}>{title}</p>
+  {description && <p class={lede()}>{description}</p>}
+
+  {/* Le slot recoit le bouton d'action. Un ecran vide sans issue est une
+      impasse : s'il n'y a rien a faire, autant ne pas montrer d'ecran. */}
+  <div class={actions()}>
+    <slot />
+  </div>
+</div>
