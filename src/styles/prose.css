@@ -132,20 +132,19 @@
   }
 
   /* La citation change de VOIX, pas seulement de marge : elle passe dans la
-   * serif italique de la maison, celle du mot d'accent. C'est la seule autre
-   * place ou elle a le droit d'apparaitre, et c'est ce qui dit "ce n'est plus
-   * moi qui parle" mieux qu'un filet seul.
+   * grotesque d'affichage, un corps au-dessus du texte courant, derriere un
+   * filet corail. C'est ce qui dit "ce n'est plus moi qui parle" mieux qu'un
+   * filet seul.
    *
-   * Le point technique compte autant que le point de gout : Instrument Sans
-   * n'est chargee qu'en romain. Un font-style: italic pose dessus produirait
-   * une oblique fabriquee par le navigateur, qui penche les lettres sans les
-   * redessiner et se voit immediatement. */
+   * Pas d'italique : l'italique d'accent est bannie de toute la famille, et
+   * Space Grotesk n'a pas de coupe italique - un font-style: italic pose
+   * dessus produirait une oblique fabriquee par le navigateur, qui penche les
+   * lettres sans les redessiner et se voit immediatement. */
   .prose :where(blockquote) {
     margin-inline: 0;
     padding-inline-start: 1.15em;
     border-inline-start: 2px solid color-mix(in oklab, var(--color-primary) 60%, transparent);
-    font-family: var(--font-serif);
-    font-style: italic;
+    font-family: var(--font-display);
     font-size: 1.24em;
     line-height: 1.45;
     color: color-mix(in oklab, var(--color-foreground) 88%, transparent);
@@ -368,11 +367,11 @@
     margin-inline-end: 0.09em;
     margin-block-start: 0.02em;
     color: var(--color-primary);
-    /* En serif italique et non en grotesque grasse : une lettrine de trois
-     * lignes en Space Grotesk 700 est un pave noir qui ecrase le paragraphe,
-     * la ou l'italique de la maison ouvre le texte. */
-    font-family: var(--font-serif);
-    font-style: italic;
+    /* En grotesque d'affichage, graisse basse : une lettrine de trois lignes
+     * en Space Grotesk 700 est un pave noir qui ecrase le paragraphe. A 400,
+     * le grand corps corail suffit a ouvrir le texte, sans italique fabriquee
+     * (la famille n'a plus de police italique d'accent). */
+    font-family: var(--font-display);
     font-size: 3.4em;
     font-weight: 400;
     line-height: 0.78;
