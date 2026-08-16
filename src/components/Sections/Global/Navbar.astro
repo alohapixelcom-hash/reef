@@ -1,0 +1,423 @@
+---
+// src/components/Sections/Global/Navbar.astro - la barre flottante : marque, quatre rubriques, recherche, langue, theme, tiroir mobile et etat retracte au scroll.
+//
+// Une barre de blog n'a pas de mega-menu. Le lecteur arrive par un article
+// partage, jamais par l'accueil : la barre doit lui dire ou il a atterri et lui
+// offrir quatre sorties lisibles, pas deployer un panneau au survol.
+//
+// data-shrunk est pose par le script du bas et lu par trois endroits : le CSS
+// local (la pilule se resserre), et materials.css, dont la regle
+// [data-header][data-shrunk="true"]::after degrade le contenu la ou la barre le
+// recouvre vraiment. Renommer cet attribut casse le fondu de bord.
+import { Icon } from "@components/svg/icons";
+import { Button } from "@components/ui/button";
+import { LocaleSwitcher } from "@components/ui/locale-switcher";
+import { Sheet, SheetClose, SheetHeader, SheetTitle, SheetTrigger } from "@components/ui/sheet";
+import { ThemeToggle } from "@components/ui/theme-toggle";
+import { getNavData, getSiteRoutes } from "@config/navData.json.ts";
+import siteData from "@config/siteData.json";
+import { getLocale, useTranslations } from "@i18n";
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const navData = getNavData(locale);
+const routes = getSiteRoutes(locale);
+
+// Etat actif : correspondance exacte ou par prefixe, pour qu'un billet allume
+// "Posts". La racine ne compte jamais comme prefixe, sinon elle serait active
+// sur toutes les pages du site.
+const path = Astro.url.pathname;
+const isActive = (href: string): boolean =>
+  path === href || (href !== routes.home && path.startsWith(href));
+
+// Lien de nav : il herite de la couleur de la barre au lieu de la fixer, ce qui
+// le laisse lisible en clair comme en sombre sans une seule variante dark:.
+const navLink = [
+  "inline-flex min-h-11 items-center rounded-pill px-3.5",
+  "font-sans text-[0.9rem] font-medium whitespace-nowrap text-current",
+  "transition-colors duration-200 hover:bg-current/8",
+].join(" ");
+
+// L'inscription vit dans le pied de page, present sur toutes les pages : une
+// ancre suffit et ne depend d'aucune langue.
+const subscribeHref = "#newsletter";
+---
+
+{/* Le lien d'evitement est le premier element focalisable du document. Il ne
+    se voit qu'au clavier, ou il est la premiere chose dont on a besoin. */}
+<a
+  href="#content"
+  class="bg-primary text-primary-foreground font-display sr-only rounded-pill px-5 py-3 text-sm font-bold focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-100"
+>
+  {t.common.skipToContent}
+</a>
+
+{/* La barre respecte l'encoche (safe-area) et traverse les navigations sans
+    etre reconstruite : elle ne clignote pas et garde son etat retracte. */}
+<header
+  class="fixed inset-x-0 z-50 [top:max(0.75rem,env(safe-area-inset-top))]"
+  data-header
+  transition:persist
+>
+  <div class="container-page" data-header-track>
+    <nav
+      class="glass-light text-foreground rounded-pill flex items-center gap-2 py-2.5 pr-2.5 pl-5"
+      aria-label={t.nav.mainLabel}
+      data-navbar
+    >
+      <a
+        href={routes.home}
+        class="flex shrink-0 items-center gap-2 text-current"
+        aria-label={t.nav.brandHome}
+        data-header-brand
+      >
+        <Icon name="wave" size={20} class="text-primary" />
+        <span class="font-display text-lg font-semibold tracking-tight">{siteData.name}</span>
+      </a>
+
+      <ul class="mx-auto hidden items-center gap-0.5 lg:flex">
+        {
+          navData.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={[navLink, isActive(item.href) && "bg-current/8 font-semibold"]}
+                aria-current={isActive(item.href) ? "page" : undefined}
+              >
+                {item.text}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="ml-auto flex items-center gap-1 lg:ml-0">
+        <a
+          href={routes.search}
+          class="hover:bg-current/8 grid size-11 place-items-center rounded-pill text-current transition-colors duration-200"
+          aria-label={t.nav.search}
+        >
+          <Icon name="search" size={19} />
+        </a>
+        <LocaleSwitcher class="hidden sm:flex" />
+        <ThemeToggle class="text-current hover:bg-current/8" label={t.nav.toggleTheme} />
+        <Button href={subscribeHref} variant="primary" size="sm" class="hidden sm:inline-flex">
+          {t.nav.subscribe}
+        </Button>
+        <SheetTrigger
+          for="mobile-nav"
+          variant="ghost"
+          size="icon"
+          class="text-current hover:bg-current/8 lg:hidden"
+          aria-label={t.nav.openMenu}
+        >
+          <Icon name="menu" size={21} />
+        </SheetTrigger>
+      </div>
+    </nav>
+  </div>
+</header>
+
+{/* Le tiroir : meme <dialog> natif que Dialog, et son geste de fermeture est
+    deja branche par la primitive. Rien a cabler ici. */}
+<Sheet id="mobile-nav" side="right" describedby={null}>
+  <SheetClose />
+  <SheetHeader>
+    <SheetTitle id="mobile-nav-title" class="flex items-center gap-2">
+      <Icon name="wave" size={20} class="text-primary" />
+      {siteData.name}
+    </SheetTitle>
+  </SheetHeader>
+
+  <nav aria-label={t.nav.mobileLabel}>
+    <ul class="flex flex-col">
+      {
+        [...navData, { text: t.nav.authors, href: routes.authors }, { text: t.nav.search, href: routes.search }].map(
+          (item) => (
+            <li>
+              <a
+                href={item.href}
+                class="font-display text-foreground hover:bg-muted flex min-h-12 items-center rounded-card px-3 text-lg font-semibold"
+                aria-current={isActive(item.href) ? "page" : undefined}
+              >
+                {item.text}
+              </a>
+            </li>
+          ),
+        )
+      }
+    </ul>
+  </nav>
+
+  <div class="mt-auto flex flex-col gap-4">
+    <Button href={subscribeHref} variant="primary" size="lg">{t.nav.subscribe}</Button>
+    {/* Sur mobile le selecteur vit dans le tiroir : la barre garde sa place
+        pour le menu et l'abonnement, qui comptent davantage a cette largeur. */}
+    <LocaleSwitcher variant="inline" class="self-center sm:hidden" />
+  </div>
+</Sheet>
+
+<script>
+  // Retrait au scroll. Deux seuils differents (96 px pour se retracter, 32 px
+  // pour se redeployer) : avec un seuil unique, s'arreter pile dessus fait
+  // clignoter la barre a chaque micro-mouvement de la molette.
+  const SHRINK_AT = 96;
+  const GROW_AT = 32;
+
+  // Habillage de la barre. Le verre clair est calibre pour un fond de page :
+  // pose sur la scene sombre du premier ecran il devient une plaque laiteuse,
+  // et l'encre qu'il porte y perd tout son contraste. Tant que la scene passe
+  // sous la barre, celle-ci prend donc le verre sombre a texte blanc, et elle
+  // revient au verre clair des que du contenu normal la remplace.
+  //
+  // Le rendu serveur part en verre clair, lisible sur toutes les pages sans
+  // scene : la bascule est un enrichissement, jamais une condition de
+  // lisibilite.
+  const DEEP = ["glass", "text-white"];
+  const PLAIN = ["glass-light", "text-foreground"];
+
+  let observer: IntersectionObserver | null = null;
+  let onScroll: (() => void) | null = null;
+
+  // En dessous de cette largeur, une pilule qui se resserre n'a plus l'air
+  // compacte, elle a l'air perdue au milieu de l'ecran. Sur telephone la barre
+  // garde donc toute la largeur disponible et ne joue que sur sa hauteur.
+  const MIN_COMPACT = 420;
+
+  let onResize: (() => void) | null = null;
+
+  /**
+   * Largeur exacte dont la barre a besoin une fois resserree.
+   *
+   * Pourquoi mesurer au lieu d'ecrire un nombre : une largeur en dur ne peut
+   * pas etre juste. Elle depend de la langue affichee, de la police une fois
+   * chargee, du nombre d'entrees de menu et de la taille de texte reglee dans
+   * le systeme. Trop large, le mouvement ne se voit pas ; trop etroite, les
+   * boutons de droite sortent de la pilule de verre et flottent dans le vide.
+   * Alors on demande au navigateur.
+   */
+  function measureCompact(header: HTMLElement, nav: HTMLElement, track: HTMLElement): number {
+    const restore = header.dataset.shrunk;
+    // On mesure dans l'etat resserre (le mot-marque y est plus petit), et sans
+    // transition, sinon on mesure une image intermediaire de l'animation.
+    header.dataset.measuring = "true";
+    header.dataset.shrunk = "true";
+
+    const navStyle = getComputedStyle(nav);
+    const gap = parseFloat(navStyle.columnGap) || 0;
+    let width =
+      parseFloat(navStyle.paddingLeft) +
+      parseFloat(navStyle.paddingRight) +
+      parseFloat(navStyle.borderLeftWidth) +
+      parseFloat(navStyle.borderRightWidth);
+
+    // getClientRects() vide = element replie par une media query : il ne prend
+    // pas de place et ne doit pas peser dans le calcul.
+    const kids = [...nav.children].filter(
+      (el): el is HTMLElement => el instanceof HTMLElement && el.getClientRects().length > 0,
+    );
+    kids.forEach((el, i) => {
+      width += el.getBoundingClientRect().width + (i > 0 ? gap : 0);
+    });
+
+    // La piste porte son propre rembourrage lateral, et max-width compte les
+    // bordures : sans lui, la barre serait mesuree trop etroite de deux marges.
+    const trackStyle = getComputedStyle(track);
+    width += parseFloat(trackStyle.paddingLeft) + parseFloat(trackStyle.paddingRight);
+
+    if (restore === undefined) delete header.dataset.shrunk;
+    else header.dataset.shrunk = restore;
+    delete header.dataset.measuring;
+
+    return Math.ceil(Math.max(width, MIN_COMPACT));
+  }
+
+  /** Pose l'un des deux habillages, en retirant l'autre. */
+  function paint(nav: HTMLElement, deep: boolean): void {
+    nav.classList.remove(...(deep ? PLAIN : DEEP));
+    nav.classList.add(...(deep ? DEEP : PLAIN));
+  }
+
+  function init(): void {
+    // Les view transitions rejouent ce module : on detache l'ecouteur precedent
+    // avant d'en poser un neuf, sinon ils s'empilent a chaque navigation.
+    observer?.disconnect();
+    observer = null;
+    if (onScroll) {
+      window.removeEventListener("scroll", onScroll);
+      onScroll = null;
+    }
+    if (onResize) {
+      window.removeEventListener("resize", onResize);
+      onResize = null;
+    }
+    const header = document.querySelector<HTMLElement>("[data-header]");
+    if (!header) return;
+    const nav = header.querySelector<HTMLElement>("[data-navbar]");
+    const track = header.querySelector<HTMLElement>("[data-header-track]");
+
+    let ticking = false;
+    let sizing = false;
+
+    const size = (): void => {
+      sizing = false;
+      if (!nav || !track) return;
+      header.style.setProperty("--header-compact", `${measureCompact(header, nav, track)}px`);
+    };
+
+    const apply = (): void => {
+      ticking = false;
+      const y = window.scrollY;
+      const shrunk = header.dataset.shrunk === "true";
+      if (!shrunk && y > SHRINK_AT) header.dataset.shrunk = "true";
+      else if (shrunk && y < GROW_AT) header.dataset.shrunk = "false";
+    };
+
+    onScroll = (): void => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(apply);
+    };
+    onResize = (): void => {
+      if (sizing) return;
+      sizing = true;
+      requestAnimationFrame(size);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
+    size();
+    // Les polices d'affichage arrivent apres le premier rendu et changent la
+    // largeur des libelles : on remesure une fois qu'elles sont posees.
+    document.fonts?.ready.then(size).catch(() => {});
+    apply();
+
+    if (!nav) return;
+    // Seule une scene collee en haut de page assombrit la barre. Une bande
+    // sombre plus bas (l'invitation a s'abonner) passe sous la barre en cours
+    // de defilement : la faire basculer la ferait clignoter deux fois par
+    // page, pour un gain nul.
+    const scene = document.querySelector<HTMLElement>("[data-deep-scene]");
+    const top = scene ? scene.getBoundingClientRect().top + window.scrollY : Infinity;
+    if (!scene || top > 200) {
+      paint(nav, false);
+      return;
+    }
+    observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[entries.length - 1];
+        if (entry) paint(nav, entry.isIntersecting);
+      },
+      // La marge negative decale la ligne de declenchement a la hauteur reelle
+      // de la barre : elle bascule quand la scene quitte la BARRE, pas quand
+      // elle quitte la fenetre.
+      { rootMargin: "-84px 0px 0px 0px" },
+    );
+    observer.observe(scene);
+  }
+
+  init();
+  document.addEventListener("astro:page-load", init);
+</script>
+
+<style is:global>
+  /* .glass-light est calibree pour un fond clair : en theme sombre, la barre se
+   * re-ancre sur les tokens pour rester lisible. */
+  .dark [data-navbar].glass-light {
+    background: color-mix(in oklab, var(--reef-background) 76%, transparent);
+    border-color: var(--reef-border);
+  }
+
+  /* --- Barre retractable ---------------------------------------------------
+   * En haut de page : pleine largeur du conteneur, respiration genereuse. Des
+   * que le visiteur descend : la piste se resserre, la pilule se compacte et se
+   * rapproche du bord. Une seule courbe pour les trois, pour que le mouvement
+   * se lise comme un seul geste et non comme trois animations concurrentes. */
+  /* --- Le jeu entre la barre et le cadre -----------------------------------
+   * La scene du hero est posee dans un cadre arrondi qui laisse une marge de
+   * 0.5rem a 1rem contre le bord de la fenetre. La barre, elle, etait fixee a
+   * 1rem du haut : a partir de la borne md, les deux valeurs devenaient egales
+   * et le bord haut de la pilule venait se coller pile sur le bord haut du
+   * cadre. Deux bords arrondis qui se touchent, ca ne se lit pas comme une
+   * superposition, ca se lit comme un defaut d'alignement.
+   *
+   * La barre descend donc d'un cran de plus que le cadre a chaque borne, ce
+   * qui laisse toujours un jeu visible entre les deux. L'encoche l'emporte
+   * toujours : env() reste dans le max(). */
+  [data-header] {
+    top: max(1.25rem, env(safe-area-inset-top));
+  }
+
+  @media (min-width: 40rem) {
+    [data-header] {
+      top: max(1.5rem, env(safe-area-inset-top));
+    }
+  }
+
+  @media (min-width: 48rem) {
+    [data-header] {
+      top: max(1.75rem, env(safe-area-inset-top));
+    }
+  }
+
+  [data-header] {
+    transition: top 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  [data-header][data-shrunk="true"] {
+    top: max(0.375rem, env(safe-area-inset-top));
+  }
+
+  [data-header-track] {
+    transition: max-width 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  /* La largeur resserree est MESUREE, pas choisie : --header-compact est pose
+   * par le script du bas, apres avoir demande au navigateur la place que prend
+   * reellement le contenu de la barre. Le repli 100% est volontaire : si le
+   * script ne tourne pas, la barre garde sa largeur pleine et ne perd que son
+   * mouvement, au lieu de laisser ses boutons deborder du verre. */
+  [data-header][data-shrunk="true"] [data-header-track] {
+    max-width: min(100%, var(--header-compact, 100%));
+  }
+
+  /* Le temps d'une mesure, aucune transition : sinon on mesure une image
+   * intermediaire de l'animation et la barre se fige a la mauvaise largeur. */
+  [data-header][data-measuring],
+  [data-header][data-measuring] * {
+    transition: none !important;
+  }
+
+  [data-navbar] {
+    transition:
+      padding 420ms cubic-bezier(0.22, 0.61, 0.36, 1),
+      background-color 300ms,
+      border-color 300ms,
+      box-shadow 300ms,
+      color 300ms;
+  }
+
+  [data-header][data-shrunk="true"] [data-navbar] {
+    padding-block: 0.3125rem;
+    padding-left: 0.875rem;
+    padding-right: 0.375rem;
+  }
+
+  /* Le mot-marque suit le mouvement, discretement. */
+  [data-header-brand] span {
+    transition: font-size 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  [data-header][data-shrunk="true"] [data-header-brand] span {
+    font-size: 1rem;
+  }
+
+  /* Personne ne doit subir ce mouvement s'il a demande le calme. */
+  @media (prefers-reduced-motion: reduce) {
+    [data-header],
+    [data-header-track],
+    [data-navbar],
+    [data-header-brand] span {
+      transition: none;
+    }
+  }
+</style>

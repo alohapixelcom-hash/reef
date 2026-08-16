@@ -1,0 +1,116 @@
+---
+// src/components/Sections/Global/SectionHeader.astro - en-tete de section : surtitre, titre a mot d'accent, chapeau.
+//
+// Le surtitre de Reef n'est pas une pastille : c'est un intitule de rubrique de
+// magazine, en petites capitales espacees, precede d'un filet corail. Une
+// pastille dit "interface", un filet dit "publication", et c'est exactement la
+// distance qui separe ce theme de son grand frere.
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const sectionHeader = tv({
+  slots: {
+    root: "flex w-full flex-col gap-4",
+    eyebrow:
+      "font-sans text-muted-foreground flex items-center gap-3 text-xs font-medium tracking-[0.18em] uppercase",
+    rule: "bg-primary inline-block h-px w-8 shrink-0",
+    // Pas de text-foreground ici, et ce n'est pas un oubli.
+    //
+    // tv() fait passer les classes d'un slot dans tailwind-merge, qui ne
+    // connait pas l'echelle maison text-display-*. Il la range donc avec les
+    // couleurs de texte, voit un conflit avec text-foreground, et garde la
+    // derniere : la taille disparaissait purement et simplement du markup en
+    // dessous de la borne ou la variante md:/sm: prend le relais. Le titre
+    // d'une page interieure sortait a 16 px sur telephone, plus petit que son
+    // propre chapeau, et rien dans le CSS compile ne le signalait.
+    //
+    // La couleur est de toute facon heritee du body, et les scenes sombres
+    // reaffectent le role pour leur sous-arbre : la retirer ne change aucun
+    // rendu et supprime le conflit a la source.
+    heading: "font-display text-display-sm md:text-display-md max-w-3xl",
+    lede: "text-muted-foreground measure-wide text-lg leading-relaxed",
+  },
+  variants: {
+    align: {
+      // Un blog se lit en colonne : le fer a gauche est le defaut, et le centre
+      // reste disponible pour les bandeaux pleine largeur.
+      left: { root: "items-start text-left" },
+      center: { root: "items-center text-center", eyebrow: "justify-center" },
+    },
+  },
+  defaultVariants: { align: "left" },
+});
+
+type Props = VariantProps<typeof sectionHeader> & {
+  title: string;
+  /** Le mot du titre passe en italique corail. Un seul par titre, toujours. */
+  accentWord?: string;
+  /** Intitule de rubrique au-dessus du titre : nomme la section, jamais une phrase. */
+  eyebrow?: string;
+  /** Une ou deux phrases sous le titre, assourdies. */
+  lede?: string;
+  /** Niveau de titre reel, pour respecter la hierarchie de la page. */
+  as?: "h1" | "h2" | "h3";
+  /** Id pose sur le titre, pratique pour aria-labelledby cote section. */
+  headingId?: string;
+  class?: string;
+};
+
+const {
+  title,
+  accentWord,
+  eyebrow,
+  lede,
+  align,
+  as: Tag = "h2",
+  headingId,
+  class: className,
+  // L'annotation ": Props" n'est pas decorative. Des qu'un composant declare une
+  // prop nommee "as", l'outillage TypeScript d'Astro le prend pour un composant
+  // polymorphe et retombe sur des props non typees. Annoter la destructuration
+  // reconnecte le contrat, sans changer l'API du composant.
+}: Props = Astro.props;
+
+const { root, eyebrow: eyebrowClass, rule, heading, lede: ledeClass } = sectionHeader({ align });
+
+// Decoupe le titre autour du mot accentue, insensible a la casse. Si le mot est
+// absent du titre, le titre est rendu tel quel : un traducteur qui reformule ne
+// casse rien, il perd seulement l'accent.
+const accent = accentWord?.trim() ?? "";
+const at = accent ? title.toLowerCase().indexOf(accent.toLowerCase()) : -1;
+const before = at >= 0 ? title.slice(0, at) : title;
+const word = at >= 0 ? title.slice(at, at + accent.length) : "";
+const after = at >= 0 ? title.slice(at + accent.length) : "";
+---
+
+<div class={root({ class: className })} data-slot="section-header">
+  {/* Le filet corail est pose meme quand la section n'a pas de surtitre. Une
+      page dont certaines sections s'ouvrent sur un filet et d'autres sur un
+      titre nu se lit comme deux mises en page cousues ensemble : le filet est
+      la ponctuation qui annonce une section, et une ponctuation intermittente
+      n'en est pas une. */}
+  {
+    eyebrow ? (
+      <p class={eyebrowClass()}>
+        <span class={rule()} aria-hidden="true" />
+        {eyebrow}
+      </p>
+    ) : (
+      <span class={rule({ class: "h-0.5 w-12 rounded-pill" })} aria-hidden="true" />
+    )
+  }
+  <Tag id={headingId} class={heading()}>
+    {
+      word ? (
+        <Fragment>
+          {before}
+          <span class="accent-script">{word}</span>
+          {after}
+        </Fragment>
+      ) : (
+        title
+      )
+    }
+  </Tag>
+  {lede && <p class={ledeClass()}>{lede}</p>}
+  <slot />
+</div>

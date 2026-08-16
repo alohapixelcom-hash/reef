@@ -1,0 +1,258 @@
+---
+// src/components/Sections/Home/Hero.astro - le premier ecran : une scene encadree, une colonne de texte a gauche, la pile des dernieres notes a droite.
+//
+// Ce que ce hero corrige
+// ----------------------
+// La version precedente etait une page de texte : un titre, un chapeau, deux
+// boutons, et a droite une liste de trois titres alignes sur un filet. Tout y
+// etait juste et rien n'y etait une image. Un lecteur qui arrive decide en une
+// seconde, et une seconde ne suffit pas a lire trois titres : elle suffit a
+// reconnaitre une forme.
+//
+// La forme, ici, c'est une pile de fiches en perspective. C'est la seule
+// matiere que possede un blog : ses articles. Reef n'a pas de capture d'ecran
+// et n'en aura jamais, donc l'objet a regarder est fabrique avec ce qui existe
+// deja, du texte compose, et il reste net a toutes les densites d'ecran.
+//
+// La scene reste sombre dans les deux themes (.deep-scene, voir global.css).
+// Un cadre qui blanchit en mode clair perd ses halos et ses lueurs de bordure :
+// il perd donc l'image, et le premier ecran redevient une page de texte.
+import { topicTone, type TopicAccent } from "@components/Cards/topicTone";
+import { Icon } from "@components/svg/icons";
+import { Button } from "@components/ui/button";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { fmt, getLocale, useTranslations } from "@i18n";
+
+interface RecentEntry {
+  href: string;
+  title: string;
+  /** Date deja mise en forme dans la langue de la page. */
+  date: string;
+  /** La meme date en ISO, pour l'attribut datetime. */
+  iso: string;
+  /** Nom du sujet, deja traduit par la page. */
+  topic: string;
+  /** L'accent declare par le sujet, traduit en tokens par topicTone. */
+  accent: TopicAccent;
+  minutes: number;
+}
+
+interface Props {
+  /** Les trois dernieres notes. La page les fournit, le hero ne les cherche pas. */
+  recent?: RecentEntry[];
+  /** Trois nombres qui disent combien il y a a lire : notes, sujets, langues. */
+  ledger?: readonly number[];
+}
+
+const { recent = [], ledger = [] } = Astro.props;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+
+// Decoupe du titre autour du mot accentue, insensible a la casse.
+const title = t.home.heroTitle;
+const accent = t.home.heroAccent;
+const at = title.toLowerCase().indexOf(accent.toLowerCase());
+const before = at >= 0 ? title.slice(0, at) : title;
+const word = at >= 0 ? title.slice(at, at + accent.length) : "";
+const after = at >= 0 ? title.slice(at + accent.length) : "";
+
+// La pile se lit du fond vers l'avant : la note la plus ancienne est la plus
+// haute et la plus enfoncee, la plus recente est devant et entiere. On inverse
+// donc l'ordre a l'affichage, pas dans les donnees.
+//
+// Le chevauchement ne mange QUE le rembourrage bas des fiches du fond, jamais
+// une ligne de texte : une fiche coupee au milieu d'un mot ne se lit pas comme
+// une pile, elle se lit comme un defaut d'affichage. La profondeur vient donc
+// du recul en Z, du decalage lateral et de l'opacite, pas d'un empilement
+// serre.
+//
+// L'opacite des fiches du fond ne descend pas plus bas que 0.84, et c'est une
+// contrainte de lisibilite et non de gout : en dessous, la date et le sujet
+// passaient sous le rapport de contraste de 4.5 alors qu'ils restent sur de
+// vrais liens. Le recul se lit deja dans le Z et le decalage lateral.
+const deck = [...recent].slice(0, 3).reverse();
+// Recul en Z et decalage lateral de chaque fiche, passes en variables plutot
+// qu'en transform tout fait : le composant a besoin de les appliquer sur grand
+// ecran seulement, et une media query ne peut pas atteindre un attribut style.
+const depth = [
+  { z: "-110px", x: "2.2rem", o: "0.84" },
+  { z: "-55px", x: "1.1rem", o: "0.93" },
+  { z: "0px", x: "0rem", o: "1" },
+];
+---
+
+{/* Le fond de page sur lequel la scene est posee. C'est lui qui fait exister le
+    cadre : sans marge autour, le coin arrondi n'aurait rien contre quoi se
+    detacher, et la scene redeviendrait un bandeau pleine largeur. */}
+<div class="bg-background p-2 sm:p-3 md:p-4" data-slot="home-hero">
+  <section
+    class="deep-scene rounded-panel relative isolate overflow-hidden"
+    aria-labelledby="hero-title"
+    data-deep-scene
+  >
+    {/* Deux halos poses en dur, pas dans le degrade de fond : un degrade est
+        uniforme, donc plat, alors qu'un halo a un centre, donc une direction.
+        C'est la direction qui fait la profondeur. Ils derivent en 26 et 34
+        secondes, assez lentement pour qu'on ne les voie pas bouger et assez
+        pour que la scene ne soit pas une image fixe. */}
+    <div
+      class="animate-drift pointer-events-none absolute -top-2/5 -right-1/4 size-[42rem] rounded-full opacity-30 blur-3xl"
+      style="background: radial-gradient(circle, var(--color-coral-500) 0%, transparent 68%)"
+      aria-hidden="true"
+    >
+    </div>
+    <div
+      class="animate-drift-slow pointer-events-none absolute -bottom-1/4 -left-1/5 size-[38rem] rounded-full opacity-60 blur-3xl"
+      style="background: radial-gradient(circle, var(--color-reef-500) 0%, transparent 70%)"
+      aria-hidden="true"
+    >
+    </div>
+
+    {/* La grille compte trois enfants et non deux : le texte, la pile, puis le
+        compteur. Sur telephone ils se suivent dans cet ordre, ce qui fait
+        remonter la pile juste sous les boutons et met une IMAGE dans le
+        premier ecran au lieu de sept lignes de texte. Sur grand ecran le
+        compteur retrouve sa place sous le texte, et la pile occupe les deux
+        rangees de la colonne de droite. */}
+    <div
+      class="container-page relative z-10 grid gap-10 pt-28 pb-14 sm:gap-14 sm:pt-32 md:pt-40 md:pb-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:grid-rows-[auto_auto] lg:gap-x-16 lg:gap-y-10 lg:pt-44 lg:pb-24"
+    >
+      {/* --- Colonne de gauche : ce qu'on dit ----------------------------- */}
+      <div class="flex flex-col items-start lg:col-start-1 lg:row-start-1 lg:self-end">
+        <p
+          class="text-muted-foreground flex items-center gap-3 text-xs font-medium tracking-[0.18em] uppercase"
+        >
+          <span class="bg-primary inline-block h-px w-8 shrink-0" aria-hidden="true"></span>
+          {t.home.eyebrow}
+        </p>
+
+        <h1 id="hero-title" class="font-display text-display-lg lg:text-display-xl mt-6 max-w-3xl">
+          {
+            word ? (
+              <Fragment>
+                {before}
+                <span class="accent-script">{word}</span>
+                {after}
+              </Fragment>
+            ) : (
+              title
+            )
+          }
+        </h1>
+
+        <p class="text-muted-foreground measure-wide mt-6 leading-relaxed md:text-lg lg:text-xl">
+          {t.home.heroLede}
+        </p>
+
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <Button href={routes.posts} variant="primary" size="lg">
+            {t.home.heroPrimary}
+            <Icon name="arrow-right" size={18} />
+          </Button>
+          <Button href={routes.about} variant="outline" size="lg">{t.home.heroSecondary}</Button>
+        </div>
+      </div>
+
+      {/* --- Colonne de droite : ce qu'on donne a lire --------------------
+          La pile penche en perspective sur grand ecran seulement. Sur un
+          telephone, une fiche inclinee de quinze degres devient illisible bien
+          avant d'etre jolie : les cartes s'y empilent a plat, avec le meme
+          chevauchement. */}
+      {
+        deck.length > 0 && (
+          <div
+            class="relative [perspective:1500px] lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:self-center"
+            aria-label={t.home.heroRecent}
+          >
+            <div class="flex flex-col [transform-style:preserve-3d] lg:[transform:rotateY(-15deg)_rotateX(7deg)_rotate(-1.5deg)]">
+              {deck.map((entry, i) => {
+                const tone = topicTone[entry.accent];
+                const front = i === deck.length - 1;
+                const readLabel =
+                  entry.minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: entry.minutes });
+                return (
+                  <article
+                    class:list={[
+                      "glass rounded-card relative overflow-hidden px-5 pt-5 sm:px-6 sm:pt-6",
+                      front ? "pb-5 sm:pb-6" : "pb-6 lg:pb-11",
+                      i > 0 && "-mt-6",
+                      // Le recul ne s'applique qu'a partir de lg. Sur un
+                      // telephone, la perspective rapetisse les fiches du fond
+                      // et les pousse hors de la gouttiere : on garde le
+                      // meme empilement, a plat.
+                      "lg:[transform:translateZ(var(--deck-z))_translateX(var(--deck-x))]",
+                    ]}
+                    style={`--deck-z: ${depth[i]?.z}; --deck-x: ${depth[i]?.x}; opacity: ${depth[i]?.o}; z-index: ${i + 1}`}
+                  >
+                    <span
+                      class:list={["absolute inset-x-0 top-0 h-0.5", tone.rule]}
+                      aria-hidden="true"
+                    />
+                    <p class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <span class:list={["rounded-pill px-2.5 py-1 text-xs font-medium", tone.chip]}>
+                        {entry.topic}
+                      </span>
+                      <time class="text-muted-foreground text-xs" datetime={entry.iso}>
+                        {entry.date}
+                      </time>
+                    </p>
+                    {/* Deux lignes au plus pour les fiches du fond, et le
+                        rembourrage bas des fiches du fond est calcule pour que
+                        le chevauchement n'en mange aucune. Il est plus genereux
+                        que l'ecart de marge parce que la fiche de devant est
+                        plus PROCHE : la perspective l'agrandit, et elle
+                        recouvre donc plus que ce que la mise en page a plat
+                        laisse prevoir. D'ou la marge supplementaire a partir de
+                        lg seulement, la ou la perspective existe. Une seule ligne
+                        paraissait plus propre et coupait les titres anglais au
+                        milieu d'un mot : un titre a rallonge dans une vitrine
+                        se lit comme un bug, pas comme une contrainte. */}
+                    <h2
+                      class:list={[
+                        "font-display mt-3 leading-snug font-bold text-balance",
+                        front ? "text-xl sm:text-2xl" : "line-clamp-2 text-lg",
+                      ]}
+                    >
+                      <a
+                        href={entry.href}
+                        class="hover:text-primary transition-colors duration-200 after:absolute after:inset-0 after:content-['']"
+                      >
+                        {entry.title}
+                      </a>
+                    </h2>
+                    {front && (
+                      <p class="text-muted-foreground mt-4 flex items-center gap-2 text-xs">
+                        <Icon name="clock" size={14} />
+                        {readLabel}
+                      </p>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        )
+      }
+
+      {/* Trois nombres, et rien d'autre : ils repondent a la seule question
+          qu'un lecteur se pose avant de cliquer, "y a-t-il de quoi lire". Un
+          chiffre le dit plus vite qu'une phrase de promesse. */}
+      {
+        ledger.length > 0 && (
+          <dl class="border-border flex flex-wrap gap-x-10 gap-y-4 border-t pt-6 lg:col-start-1 lg:row-start-2 lg:self-start">
+            {t.home.heroLedger.map((label, i) => (
+              <div class="flex flex-col gap-0.5">
+                <dd class="font-display text-3xl leading-none font-bold md:text-4xl">
+                  {ledger[i] ?? 0}
+                </dd>
+                <dt class="text-muted-foreground text-xs tracking-[0.14em] uppercase">{label}</dt>
+              </div>
+            ))}
+          </dl>
+        )
+      }
+    </div>
+  </section>
+</div>

@@ -1,0 +1,199 @@
+---
+// src/components/Sections/Global/Footer.astro - pied de page : marque, inscription a la lettre, trois colonnes de liens, selecteur de langue et mentions.
+//
+// Le pied de page de Reef reste sur le papier chaud du site au lieu de basculer
+// en aplat sombre comme celui d'Aloha. Un blog qui se termine par une grande
+// dalle noire annonce une page de vente ; ici la page se ferme comme un ourlet.
+//
+// Les colonnes viennent de getFooterData : trois seulement, et chaque entree
+// mene a une page que le theme construit vraiment. Un pied de page de blog qui
+// aligne les six colonnes d'un SaaS finit en depot de liens morts.
+import { Icon, type IconName } from "@components/svg/icons";
+import { Button } from "@components/ui/button";
+import { Input } from "@components/ui/input";
+import { LocaleSwitcher } from "@components/ui/locale-switcher";
+import { getFooterData, getSiteRoutes } from "@config/navData.json.ts";
+import siteData from "@config/siteData.json";
+import { fmt, getLocale, useTranslations } from "@i18n";
+
+type Props = {
+  /**
+   * Faux quand la page porte deja sa propre bande d'inscription (l'accueil).
+   * Le pied de page lui cede alors le formulaire ET l'ancre #newsletter :
+   * deux formulaires identiques a deux ecrans d'ecart ne doublent pas les
+   * inscriptions, ils donnent l'impression d'une page recopiee.
+   */
+  newsletter?: boolean;
+};
+
+const { newsletter = true }: Props = Astro.props;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const columns = getFooterData(locale);
+const routes = getSiteRoutes(locale);
+
+// L'annee est calculee au build : le theme n'embarque pas une date qui vieillit
+// dans un fichier de config.
+const year = new Date().getFullYear();
+
+// Rangee d'icones : uniquement le set maison, et chaque lien porte un nom
+// accessible, parce qu'une icone seule n'en a aucun.
+const social: { label: string; href: string; icon: IconName }[] = [
+  ...(siteData.author.twitter
+    ? [
+        {
+          label: fmt(t.footer.followOn, { name: siteData.author.name, network: "X" }),
+          href: `https://x.com/${siteData.author.twitter}`,
+          icon: "arrow-up-right" as IconName,
+        },
+      ]
+    : []),
+  { label: t.footer.emailStudio, href: `mailto:${siteData.author.email}`, icon: "mail" },
+  { label: t.footer.subscribeRss, href: routes.rss, icon: "rss" },
+];
+
+// Le titre de la lettre porte le mot d'accent : la decoupe se fait ici plutot
+// que d'ecrire un <span> dans chaque dictionnaire, ce qui obligerait un
+// traducteur a manipuler du HTML pour traduire une phrase.
+const title = t.newsletter.title;
+const accent = t.newsletter.accent;
+const at = title.toLowerCase().indexOf(accent.toLowerCase());
+const before = at >= 0 ? title.slice(0, at) : title;
+const word = at >= 0 ? title.slice(at, at + accent.length) : "";
+const after = at >= 0 ? title.slice(at + accent.length) : "";
+
+const creditHref = siteData.author.twitter
+  ? `https://x.com/${siteData.author.twitter}`
+  : `mailto:${siteData.author.email}`;
+
+const columnLink =
+  "text-muted-foreground hover:text-foreground inline-flex min-h-11 items-center text-[0.95rem] transition-colors duration-150";
+---
+
+<footer class="bg-surface border-border border-t" data-slot="footer">
+  <div class="container-page py-16 md:py-20">
+    <div class="grid gap-12 lg:grid-cols-12 lg:gap-10">
+      <div class="flex max-w-md flex-col gap-6 lg:col-span-5">
+        <a href={routes.home} class="flex items-center gap-2" aria-label={t.nav.brandHome}>
+          <Icon name="wave" size={22} class="text-primary" />
+          <span class="font-display text-xl font-semibold tracking-tight">{siteData.name}</span>
+        </a>
+        <p class="text-muted-foreground text-[0.95rem] leading-relaxed">{t.footer.tagline}</p>
+
+        {/* --- Inscription a la lettre ------------------------------------
+            Formulaire de DEMONSTRATION : il n'envoie rien. Il n'a ni action ni
+            point d'arrivee, volontairement, parce que le theme ne choisit pas
+            de prestataire d'emailing a la place de son acheteur. Pour le
+            brancher : poser action="..." et method="post" vers l'URL de
+            formulaire de votre fournisseur (Buttondown, Listmonk, EmailOctopus,
+            Mailchimp), et verifier le nom attendu pour le champ email. Le
+            balisage, les libelles et les etats de reponse sont deja ecrits. */}
+        {
+          newsletter && (
+            <section class="flex flex-col gap-3" id="newsletter" aria-labelledby="newsletter-title">
+              <h2 id="newsletter-title" class="font-display text-xl font-bold tracking-tight">
+                {word ? (
+                  <Fragment>
+                    {before}
+                    <span class="accent-script">{word}</span>
+                    {after}
+                  </Fragment>
+                ) : (
+                  title
+                )}
+              </h2>
+              <p class="text-muted-foreground text-sm leading-relaxed">{t.newsletter.lede}</p>
+              <form class="mt-1 flex flex-col gap-3 sm:flex-row" name="newsletter">
+                <label class="sr-only" for="footer-newsletter-email">
+                  {t.newsletter.emailLabel}
+                </label>
+                <Input
+                  id="footer-newsletter-email"
+                  class="sm:flex-1"
+                  type="email"
+                  name="email"
+                  placeholder={t.newsletter.placeholder}
+                  autocomplete="email"
+                  spellcheck="false"
+                  aria-describedby="footer-newsletter-note"
+                  required
+                />
+                <Button type="submit" variant="primary" class="sm:shrink-0">
+                  {t.newsletter.submit}
+                </Button>
+              </form>
+              <p id="footer-newsletter-note" class="text-muted-foreground text-xs">
+                {t.newsletter.note}
+              </p>
+            </section>
+          )
+        }
+      </div>
+
+      <div class="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-6 lg:col-start-7">
+        {
+          columns.map((column) => (
+            <div class="flex flex-col gap-2">
+              <h3 class="font-sans text-muted-foreground/70 text-xs font-medium tracking-[0.18em] uppercase">
+                {column.title}
+              </h3>
+              <ul class="flex flex-col">
+                {column.links.map((link) => (
+                  <li>
+                    <a href={link.href} class={columnLink}>
+                      {link.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div
+      class="border-border mt-14 flex flex-col gap-6 border-t pt-8 sm:flex-row sm:items-end sm:justify-between"
+    >
+      <div class="text-muted-foreground flex flex-col gap-1 text-sm">
+        <p>&copy; {year} {siteData.name}. {t.footer.rights}</p>
+        <p>{t.footer.builtWith}</p>
+        <p>
+          {t.footer.themeBy}{" "}
+          <a href={creditHref} class="text-foreground font-semibold hover:underline">
+            {siteData.author.name}
+          </a>
+        </p>
+      </div>
+
+      <ul class="flex flex-wrap items-center gap-2">
+        <li class="mr-1">
+          <LocaleSwitcher variant="inline" />
+        </li>
+        {
+          social.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-label={item.label}
+                class="border-border text-muted-foreground hover:bg-muted hover:text-foreground rounded-pill grid size-11 place-items-center border transition-colors duration-150"
+              >
+                <Icon name={item.icon} size={17} />
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a
+            href="#content"
+            class="border-border text-muted-foreground hover:bg-muted hover:text-foreground rounded-pill inline-flex min-h-11 items-center gap-2 border px-4 text-sm transition-colors duration-150"
+          >
+            <Icon name="chevron-up" size={16} />
+            {t.footer.backToTop}
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</footer>
