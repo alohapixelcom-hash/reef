@@ -14,8 +14,9 @@ fictive : l'acheteur remplace Reef Notes et garde Reef.
 
 La direction artistique est froide et faite pour la lecture : neutre encre
 bleu nuit, corail en action, aigue-marine reef en second accent, Space Grotesk
-en affichage et Instrument Sans en corps, Instrument Serif pour le mot
-d'accent. Le thème est sombre et français par défaut.
+en affichage et Instrument Sans en corps ; le mot d'accent garde la police du
+titre, en corail, souligné d'une vague corail (la marque Aloha Pixel est une
+vague). Le thème est sombre et français par défaut.
 
 ## 1. Ce que le dépôt contient, mesuré
 
