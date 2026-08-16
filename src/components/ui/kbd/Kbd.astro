@@ -1,0 +1,22 @@
+---
+// src/components/ui/kbd/Kbd.astro - touche clavier : petite capsule au bord bas epaissi
+// qui donne le relief de la touche, sans ombre ni couleur brute.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const kbd = tv({
+  base: [
+    "inline-flex h-6 min-w-6 items-center justify-center rounded-lg px-1.5 align-middle",
+    "border-border bg-muted border border-b-2",
+    "text-muted-foreground font-sans text-[0.7rem] font-semibold",
+  ],
+});
+
+type Props = HTMLAttributes<"kbd">;
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<kbd class={kbd({ class: className })} data-slot="kbd" {...rest}>
+  <slot />
+</kbd>

@@ -1,0 +1,28 @@
+---
+// src/components/ui/list/List.astro - liste a puces du theme : chaque ListItem porte une
+// coche dans une pastille teintee. role="list" retabli, car Tailwind retire list-style.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const list = tv({
+  base: "flex list-none flex-col",
+  variants: {
+    spacing: {
+      compact: "gap-2",
+      default: "gap-3",
+      relaxed: "gap-4",
+    },
+  },
+  defaultVariants: { spacing: "default" },
+});
+
+type ListVariants = VariantProps<typeof list>;
+
+type Props = HTMLAttributes<"ul"> & ListVariants;
+
+const { spacing, class: className, ...rest } = Astro.props;
+---
+
+<ul class={list({ spacing, class: className })} role="list" data-slot="list" {...rest}>
+  <slot />
+</ul>

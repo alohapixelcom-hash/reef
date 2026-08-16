@@ -1,0 +1,36 @@
+---
+// src/components/ui/input/Input.astro - champ texte en pilule, la base de toute saisie.
+// Sa config tv() est exportee : les formulaires de section (newsletter, contact)
+// la reutilisent au lieu de recopier des classes.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const input = tv({
+  base: [
+    "block w-full min-w-0 rounded-pill border border-border bg-card text-card-foreground",
+    "caret-primary placeholder:text-muted-foreground/80",
+    "transition-[border-color,background-color] duration-200",
+    "hover:border-foreground/25",
+    "aria-invalid:border-primary",
+    "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-border",
+    "file:me-3 file:border-0 file:bg-transparent file:font-display file:font-bold file:text-foreground",
+  ],
+  variants: {
+    size: {
+      sm: "h-9 px-4 text-sm",
+      md: "h-11 px-5 text-[0.95rem]",
+      lg: "h-13 px-6 text-base",
+    },
+  },
+  defaultVariants: { size: "md" },
+});
+
+type InputVariants = VariantProps<typeof input>;
+
+// L'attribut HTML size (un nombre) cede la place au variant size du theme.
+type Props = Omit<HTMLAttributes<"input">, "size"> & InputVariants;
+
+const { size, class: className, type = "text", ...rest } = Astro.props;
+---
+
+<input type={type} class={input({ size, class: className })} data-slot="input" {...rest} />

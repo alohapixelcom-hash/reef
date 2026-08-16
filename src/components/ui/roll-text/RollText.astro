@@ -1,0 +1,50 @@
+---
+// src/components/ui/roll-text/RollText.astro - lien dont les lettres roulent vers le haut au survol et au focus clavier, en CSS pur.
+// Chaque lettre est doublee d'un clone place juste dessous ; la bande interne
+// clippe, la translation revele le clone avec un delai en vague. Un sr-only
+// porte le nom accessible, la version animee est aria-hidden.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const rollText = tv({
+  slots: {
+    root: "group/roll relative inline-flex min-h-11 items-center",
+    strip: "flex overflow-hidden",
+    letter: [
+      "relative inline-block",
+      "transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+      "group-hover/roll:-translate-y-full group-focus-visible/roll:-translate-y-full",
+    ],
+    clone: "absolute top-full left-0",
+  },
+});
+
+type Props = (HTMLAttributes<"a"> | HTMLAttributes<"span">) & {
+  text: string;
+  // Rend un <a> si href est fourni, sinon un <span> a poser dans un lien.
+  href?: string;
+};
+
+const { text, href, class: className, ...rest } = Astro.props;
+const Tag = href ? "a" : "span";
+
+// Espaces convertis en insecables : un inline-block vide s'effondrerait.
+// Le delai par lettre est plafonne pour que les textes longs restent vifs.
+const letters = [...text].map((char, index) => ({
+  char: char === " " ? " " : char,
+  delay: Math.min(index * 20, 400),
+}));
+
+const { root, strip, letter, clone } = rollText();
+---
+
+<Tag href={href} class={root({ class: className })} data-slot="roll-text" {...rest}>
+  <span class="sr-only">{text}</span>
+  <span class={strip()} aria-hidden="true">
+    {
+      letters.map(({ char, delay }) => (
+        <span class={letter()} style={delay > 0 ? `transition-delay: ${delay}ms` : undefined}>{char}<span class={clone()}>{char}</span></span>
+      ))
+    }
+  </span>
+</Tag>

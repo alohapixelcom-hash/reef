@@ -1,0 +1,82 @@
+---
+// src/components/ui/sheet/Sheet.astro - panneau lateral : le meme <dialog> natif que Dialog, ancre a un bord et pleine hauteur, qui glisse depuis la droite ou la gauche.
+// Meme controleur (_dialog.ts) et memes conventions : DialogTrigger l'ouvre
+// via for={id}, les parties DialogHeader/Title/Description/Footer/Close se
+// composent a l'interieur (re-exportees en Sheet* par ./index.ts), et les
+// aria pointent vers `${id}-title` / `${id}-description`.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+import "../_overlay.css";
+
+export const sheet = tv({
+  base: [
+    "m-0 h-dvh max-h-none w-[min(92vw,26rem)] max-w-none p-0",
+    "bg-card text-card-foreground border-border shadow-lift backdrop-blur-xl",
+    "overflow-y-auto overscroll-contain",
+    // touch-action: pan-y laisse le contenu defiler verticalement tout en
+    // reservant l'horizontale au geste de fermeture. Sans cette ligne, le
+    // navigateur decide seul et le geste devient inconstant.
+    "touch-pan-y",
+    "[transition:transform_0.35s_cubic-bezier(0.32,0.72,0,1)] data-dragging:transition-none",
+  ],
+  variants: {
+    side: {
+      right: "ml-auto rounded-l-panel border-l",
+      left: "mr-auto rounded-r-panel border-r",
+    },
+  },
+  defaultVariants: { side: "right" },
+});
+
+type Props = HTMLAttributes<"dialog"> &
+  VariantProps<typeof sheet> & {
+    id: string;
+    labelledby?: string;
+    describedby?: string | null;
+  };
+
+const {
+  id,
+  side = "right",
+  labelledby = `${id}-title`,
+  describedby = `${id}-description`,
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<dialog
+  id={id}
+  class={sheet({ side, class: className })}
+  data-slot="sheet"
+  data-side={side}
+  aria-labelledby={labelledby}
+  aria-describedby={describedby ?? undefined}
+  {...rest}
+>
+  {/* La poignee ne sert pas a attraper : tout le panneau est saisissable.
+      Elle sert a dire qu'il est saisissable, ce qu'aucune animation ne peut
+      annoncer avant que le geste ait ete tente. Invisible au pointeur fin,
+      ou le geste n'existe pas. */}
+  <div
+    class:list={[
+      "pointer-events-none absolute inset-y-0 flex items-center px-2",
+      side === "right" ? "left-0" : "right-0",
+      "[@media(pointer:fine)]:hidden",
+    ]}
+    aria-hidden="true"
+  >
+    <span class="bg-foreground/15 h-12 w-1 rounded-pill"></span>
+  </div>
+
+  <div class="relative flex min-h-full flex-col gap-6 p-6 sm:p-8" data-slot="sheet-content">
+    <slot />
+  </div>
+</dialog>
+
+<script>
+  import { initDialogs } from "../_dialog";
+  import { initSheetGestures } from "./sheet-gesture";
+  initDialogs();
+  initSheetGestures();
+</script>

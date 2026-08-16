@@ -1,0 +1,47 @@
+---
+// src/components/ui/radio/Radio.astro - bouton radio 100% CSS, zero JS.
+// Meme mecanique que Checkbox (sr-only + peer), le point est un pseudo-element.
+// Le name du groupe arrive par les props et atterrit sur l'input natif.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const radio = tv({
+  slots: {
+    root: [
+      "group flex min-h-11 w-fit cursor-pointer items-center gap-3 select-none",
+      "has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60",
+    ],
+    control: [
+      "relative flex shrink-0 items-center justify-center rounded-full border border-border bg-card",
+      "transition-[background-color,border-color] duration-200 group-hover:border-foreground/30",
+      "ring-offset-background peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2",
+      "peer-checked:border-primary peer-checked:bg-primary",
+      "after:rounded-full after:bg-primary-foreground after:opacity-0 after:scale-0",
+      "after:transition-[opacity,scale] after:duration-150 after:content-['']",
+      "peer-checked:after:opacity-100 peer-checked:after:scale-100",
+    ],
+    text: "text-foreground",
+  },
+  variants: {
+    size: {
+      sm: { control: "size-4 after:size-1.5", text: "text-sm" },
+      md: { control: "size-5 after:size-2", text: "text-[0.95rem]" },
+    },
+  },
+  defaultVariants: { size: "md" },
+});
+
+type RadioVariants = VariantProps<typeof radio>;
+
+type Props = Omit<HTMLAttributes<"input">, "size" | "type"> & RadioVariants;
+
+const { size, class: className, ...rest } = Astro.props;
+const { root, control, text } = radio({ size });
+const hasText = Astro.slots.has("default");
+---
+
+<label class={root({ class: className })} data-slot="radio">
+  <input type="radio" class="peer sr-only" {...rest} />
+  <span class={control()} aria-hidden="true"></span>
+  {hasText && <span class={text()}><slot /></span>}
+</label>

@@ -1,0 +1,70 @@
+---
+// src/components/ui/reveal/Reveal.astro - wrapper d'apparition : masque son contenu puis declenche animate-rise a l'entree dans le viewport.
+// Le masquage n'est pose que par le script : sans JavaScript rien n'est
+// jamais cache. Reduced-motion affiche directement, sans deplacement.
+import type { HTMLTag, Polymorphic } from "astro/types";
+
+type Props<Tag extends HTMLTag = "div"> = Polymorphic<{ as: Tag }> & {
+  // Delai avant l'animation, en millisecondes.
+  delay?: number;
+};
+
+// Balise de rendu, div par defaut ; "section", "li", etc. selon le contexte.
+const { as: Tag = "div", delay = 0, class: className, ...rest } = Astro.props;
+---
+
+<Tag
+  class={className}
+  data-slot="reveal"
+  data-reveal
+  data-reveal-delay={delay > 0 ? delay : undefined}
+  {...rest}
+>
+  <slot />
+</Tag>
+
+<style is:global>
+  /* Etat masque pose par le script juste avant l'observation : si le script
+   * ne tourne pas, l'attribut n'existe pas et le contenu reste visible. */
+  [data-reveal-hidden] {
+    opacity: 0;
+  }
+</style>
+
+<script>
+  // Un seul IntersectionObserver partage pour toutes les instances ; chaque
+  // element est revele une fois puis desobserve. Re-init apres chaque view
+  // transition via astro:page-load.
+  let observer: IntersectionObserver | null = null;
+
+  function show(el: HTMLElement): void {
+    const delay = Number(el.dataset.revealDelay ?? 0);
+    if (delay > 0) el.style.animationDelay = `${delay}ms`;
+    // animate-rise est en fill both : l'opacite 0 tient pendant le delai.
+    el.classList.add("animate-rise");
+    el.removeAttribute("data-reveal-hidden");
+  }
+
+  function init(): void {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.querySelectorAll<HTMLElement>("[data-reveal]:not([data-reveal-ready])").forEach((el) => {
+      el.setAttribute("data-reveal-ready", "");
+      if (reduce || !("IntersectionObserver" in window)) return;
+      observer ??= new IntersectionObserver(
+        (entries, io) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            io.unobserve(entry.target);
+            if (entry.target instanceof HTMLElement) show(entry.target);
+          });
+        },
+        { threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
+      );
+      el.setAttribute("data-reveal-hidden", "");
+      observer.observe(el);
+    });
+  }
+
+  init();
+  document.addEventListener("astro:page-load", init);
+</script>
