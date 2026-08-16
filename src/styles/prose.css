@@ -1,0 +1,380 @@
+/* src/styles/prose.css - la colonne de lecture de Reef : la classe .prose, ses variantes et le bloc de code.
+ * ---------------------------------------------------------------------------
+ * Importee par global.css, pas par les pages : elle n'existe pas seule et son
+ * ordre dans la cascade compte. Elle vit dans un fichier separe parce que
+ * global.css passait les 400 lignes du depot, et parce que c'est LA piece que
+ * l'acheteur ouvrira pour regler son propre confort de lecture.
+ *
+ * Ecrite a la main, SANS @tailwindcss/typography. Le plugin est un bon defaut
+ * generique, mais il impose ses variables de couleur, sa mesure et ses marges :
+ * des qu'on veut une colonne en 68ch, une chasse optique par taille ou une
+ * lettrine, on passe son temps a le contredire a coups de !important. Trois
+ * cents lignes lisibles valent mieux qu'une dependance desactivee a moitie.
+ *
+ * Toutes les regles internes passent par :where() : leur specificite reste
+ * celle de la classe seule, donc n'importe quel utilitaire Tailwind pose sur un
+ * enfant gagne sans se battre. C'est ce qui rend la colonne editable.
+ * ------------------------------------------------------------------------- */
+
+@layer components {
+  .prose {
+    /* Trois variables locales pilotent le rythme. Les surcharger sur un parent
+     * suffit a fabriquer une variante (colonne d'archive plus serree, encart
+     * plus aere) sans reecrire une seule regle. */
+    --prose-flow: 1.35em;
+    --prose-lead: 1.75;
+    --prose-rule: color-mix(in oklab, var(--color-foreground) 14%, transparent);
+
+    /* La mesure est le seul reglage non negociable d'une colonne de texte :
+     * au-dela d'environ 75 signes, l'oeil rate la ligne suivante et relit la
+     * meme. 68ch, en caracteres et pas en pixels, parce que c'est le nombre de
+     * signes qui fatigue et non la largeur de l'ecran. */
+    max-inline-size: var(--measure-prose);
+    font-family: var(--font-sans);
+    line-height: var(--prose-lead);
+    text-wrap: pretty;
+    /* Chiffres proportionnels : dans une phrase, un nombre doit avoir la
+     * largeur de ses signes, pas celle d'une colonne. Les tableaux plus bas
+     * repassent en tabulaire, ou c'est l'inverse qui est vrai. */
+    font-variant-numeric: proportional-nums;
+  }
+
+  /* La ponctuation ouvrante deborde dans la marge et le bord gauche du bloc
+   * redevient droit a l'oeil. Safari sait le faire, les autres l'ignorent
+   * proprement : rien ne casse dans les deux cas, donc rien a compenser. */
+  @supports (hanging-punctuation: first) {
+    .prose {
+      hanging-punctuation: first last;
+    }
+  }
+
+  /* Rythme vertical : un seul sens de marge, du haut vers le bas, pour que deux
+   * blocs voisins ne negocient jamais leur ecart. Les titres font exception et
+   * reprennent une marge haute, parce qu'un titre appartient a ce qui suit. */
+  .prose :where(p, ul, ol, dl, blockquote, pre, figure, table, hr, details) {
+    margin-block: 0 var(--prose-flow);
+  }
+
+  /* Les marges des titres sont en em : elles suivent la taille du titre, donc
+   * un h2 respire deux fois plus qu'un h4 sans qu'on ait a le chiffrer. */
+  .prose :where(h2, h3, h4) {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  .prose :where(h2) {
+    margin-block: 2.1em 0.55em;
+    font-size: 1.55em;
+    line-height: 1.2;
+    letter-spacing: var(--tracking-optique-lg);
+  }
+
+  .prose :where(h3) {
+    margin-block: 1.9em 0.5em;
+    font-size: 1.25em;
+    line-height: 1.3;
+  }
+
+  .prose :where(h4) {
+    margin-block: 1.7em 0.45em;
+    font-size: 1.05em;
+    line-height: 1.4;
+  }
+
+  /* Un lien de texte courant se souligne, sinon il n'est pas un lien : la
+   * couleur seule echoue au test du daltonisme. Le souligne est decale et
+   * affine pour passer SOUS les jambages au lieu de les traverser, ce qu'un
+   * text-decoration par defaut ne fait jamais correctement. */
+  .prose :where(a) {
+    color: inherit;
+    text-decoration-line: underline;
+    text-decoration-color: color-mix(in oklab, var(--color-primary) 55%, transparent);
+    text-decoration-thickness: max(1px, 0.055em);
+    text-underline-offset: 0.19em;
+    text-decoration-skip-ink: auto;
+    transition:
+      color 0.18s ease,
+      text-decoration-color 0.18s ease;
+  }
+
+  .prose :where(a:hover) {
+    color: var(--color-primary);
+    text-decoration-color: currentcolor;
+  }
+
+  .prose :where(strong) {
+    font-weight: 650;
+  }
+
+  .prose :where(ul, ol) {
+    padding-inline-start: 1.35em;
+  }
+
+  .prose :where(ul) {
+    list-style: disc;
+  }
+
+  .prose :where(ol) {
+    list-style: decimal;
+  }
+
+  .prose :where(li)::marker {
+    color: color-mix(in oklab, var(--color-primary) 70%, var(--color-foreground));
+  }
+
+  .prose :where(li + li) {
+    margin-block-start: 0.4em;
+  }
+
+  .prose :where(li > ul, li > ol) {
+    margin-block: 0.4em 0;
+  }
+
+  /* La citation change de VOIX, pas seulement de marge : elle passe dans la
+   * serif italique de la maison, celle du mot d'accent. C'est la seule autre
+   * place ou elle a le droit d'apparaitre, et c'est ce qui dit "ce n'est plus
+   * moi qui parle" mieux qu'un filet seul.
+   *
+   * Le point technique compte autant que le point de gout : Instrument Sans
+   * n'est chargee qu'en romain. Un font-style: italic pose dessus produirait
+   * une oblique fabriquee par le navigateur, qui penche les lettres sans les
+   * redessiner et se voit immediatement. */
+  .prose :where(blockquote) {
+    margin-inline: 0;
+    padding-inline-start: 1.15em;
+    border-inline-start: 2px solid color-mix(in oklab, var(--color-primary) 60%, transparent);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.24em;
+    line-height: 1.45;
+    color: color-mix(in oklab, var(--color-foreground) 88%, transparent);
+  }
+
+  .prose :where(blockquote cite) {
+    display: block;
+    margin-block-start: 0.6em;
+    font-family: var(--font-sans);
+    font-size: 0.62em;
+    font-style: normal;
+    letter-spacing: var(--tracking-optique-xs);
+    color: var(--color-muted-foreground);
+  }
+
+  /* Le code en ligne : assez de fond pour se detacher, assez peu de hauteur
+   * pour ne pas ecarter les lignes du paragraphe qui l'accueille. */
+  .prose :where(:not(pre) > code) {
+    padding: 0.12em 0.36em;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background: var(--color-muted);
+    font-family: var(--font-mono, ui-monospace, "SF Mono", Menlo, Consolas, monospace);
+    font-size: 0.86em;
+    font-variant-ligatures: none;
+    overflow-wrap: break-word;
+  }
+
+  /* Le bloc de code : Shiki pose deja les couleurs, on ne s'occupe que du
+   * cadre, du rayon et du debordement. overflow-x reste utile meme si
+   * shikiConfig.wrap est a true (astro.config.mjs) : une ligne sans espace,
+   * une URL longue ou un tableau ASCII debordent quand meme. */
+  .prose :where(pre) {
+    overflow-x: auto;
+    padding: 1.05rem 1.2rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    font-size: 0.85em;
+    line-height: 1.7;
+    font-variant-ligatures: none;
+    tab-size: 2;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .prose :where(pre code) {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    font-size: inherit;
+  }
+
+  /* Deux themes Shiki sont emis (github-light et github-dark-dimmed) : les
+   * couleurs claires arrivent en style inline, les sombres dans des variables
+   * --shiki-dark-*. Sans ce bloc, le bloc de code reste clair sur une page
+   * sombre, ce qui est la premiere chose qu'on remarque et la derniere qu'on
+   * pardonne. !important est obligatoire ici : rien d'autre ne bat un attribut
+   * style. Pose hors de .prose pour couvrir aussi le code des pages exemples. */
+  .dark .astro-code,
+  .dark .astro-code span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+    font-style: var(--shiki-dark-font-style) !important;
+    font-weight: var(--shiki-dark-font-weight) !important;
+    text-decoration: var(--shiki-dark-text-decoration) !important;
+  }
+
+  /* Le tableau devient un bloc defilant : sur un telephone, c'est la seule
+   * facon de garder une colonne de lecture etroite sans couper le tableau.
+   * Contrepartie assumee : les colonnes se calent sur leur contenu au lieu de
+   * s'etirer sur toute la mesure. */
+  .prose :where(table) {
+    display: block;
+    overflow-x: auto;
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: 0.92em;
+    /* Des chiffres tabulaires, sinon une colonne de nombres ondule. */
+    font-variant-numeric: tabular-nums lining-nums;
+    scrollbar-width: thin;
+  }
+
+  .prose :where(th, td) {
+    padding: 0.55em 0.85em;
+    border-block-end: 1px solid var(--prose-rule);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  /* L'en-tete de tableau est une etiquette d'interface, pas du texte courant :
+   * capitales espacees et graisse moyenne suffisent a le dire, sans changer de
+   * police. Le theme n'a plus qu'une famille de texte, et c'est une economie
+   * de plus de 40 ko sur la premiere page. */
+  .prose :where(thead th) {
+    font-size: 0.78em;
+    font-weight: 600;
+    letter-spacing: var(--tracking-optique-xs);
+    text-transform: uppercase;
+    color: var(--color-muted-foreground);
+  }
+
+  .prose :where(tbody tr:last-child :where(th, td)) {
+    border-block-end: 0;
+  }
+
+  .prose :where(hr) {
+    margin-block: 2.6em;
+    border: 0;
+    block-size: 1px;
+    background: var(--prose-rule);
+  }
+
+  .prose :where(img, video) {
+    display: block;
+    max-inline-size: 100%;
+    block-size: auto;
+    border-radius: var(--radius-card);
+  }
+
+  .prose :where(figure) {
+    margin-inline: 0;
+  }
+
+  .prose :where(figcaption) {
+    margin-block-start: 0.7em;
+    font-family: var(--font-sans);
+    font-size: 0.78em;
+    line-height: 1.5;
+    letter-spacing: var(--tracking-optique-xs);
+    color: var(--color-muted-foreground);
+    text-wrap: pretty;
+  }
+
+  /* L'echappatoire a la mesure : une capture d'ecran ou un tableau large posent
+   * .prose-wide et debordent proprement des deux cotes, sans jamais depasser la
+   * fenetre. --measure-wide existe dans tokens.css exactement pour ce cas. */
+  .prose :where(.prose-wide) {
+    --prose-wide-size: min(var(--measure-wide), 100vw - 2.5rem);
+
+    inline-size: var(--prose-wide-size);
+    max-inline-size: none;
+    margin-inline: calc(50% - var(--prose-wide-size) / 2);
+  }
+
+  /* --- Notes de bas de page (remark-gfm) ---------------------------------
+   * L'appel de note est une petite etiquette, pas un lien de texte courant :
+   * pas de souligne, et line-height a 0 sur le <sup> pour que la ligne qui
+   * l'accueille garde exactement la meme hauteur que ses voisines. */
+  .prose :where(sup) {
+    line-height: 0;
+  }
+
+  .prose :where([data-footnote-ref]) {
+    padding-inline: 0.12em;
+    color: var(--color-primary);
+    font-family: var(--font-sans);
+    font-size: 0.72em;
+    font-variant-numeric: lining-nums;
+    text-decoration: none;
+  }
+
+  .prose :where([data-footnotes]) {
+    margin-block-start: 3em;
+    padding-block-start: 1.4em;
+    border-block-start: 1px solid var(--prose-rule);
+    font-size: 0.9em;
+    color: var(--color-muted-foreground);
+  }
+
+  .prose :where([data-footnotes] li) {
+    scroll-margin-block-start: var(--anchor-offset);
+  }
+
+  /* Apres un saut vers une note, le lecteur doit voir LAQUELLE il a ouverte.
+   * Sans ce reperage, il retombe au milieu d'une liste et cherche. */
+  .prose :where([data-footnotes] li:target) {
+    background: color-mix(in oklab, var(--color-primary) 12%, transparent);
+    border-radius: 0.375rem;
+    box-shadow: 0 0 0 0.4em color-mix(in oklab, var(--color-primary) 12%, transparent);
+  }
+
+  .prose :where([data-footnote-backref]) {
+    margin-inline-start: 0.35em;
+    text-decoration: none;
+  }
+
+  .prose :where(mark) {
+    padding-inline: 0.15em;
+    border-radius: 0.25rem;
+    background: color-mix(in oklab, var(--color-primary) 22%, transparent);
+    color: inherit;
+  }
+
+  .prose :where(abbr[title]) {
+    text-decoration: underline dotted;
+    text-underline-offset: 0.2em;
+    cursor: help;
+  }
+
+  /* Les deux gardes de bord, poses en DERNIER a dessein : toutes les regles
+   * ci-dessus ont la meme specificite (une classe), donc seul l'ordre les
+   * departage. Ecrits plus haut, un h2 en tete d'article reprendrait sa marge
+   * de 2.1em et decollerait du titre de la page. */
+  .prose > :where(:first-child) {
+    margin-block-start: 0;
+  }
+
+  .prose > :where(:last-child),
+  .prose :where(li) > :where(:last-child) {
+    margin-block-end: 0;
+  }
+
+  /* Lettrine, sur demande : .prose-dropcap sur le conteneur et le premier
+   * paragraphe ouvre sur trois lignes. Optionnelle parce qu'une lettrine sur un
+   * billet de trois paragraphes est un costume trop grand, et parce qu'elle
+   * n'a de sens que si le texte commence vraiment par une lettre. */
+  .prose-dropcap > p:first-of-type::first-letter {
+    float: inline-start;
+    margin-inline-end: 0.09em;
+    margin-block-start: 0.02em;
+    color: var(--color-primary);
+    /* En serif italique et non en grotesque grasse : une lettrine de trois
+     * lignes en Space Grotesk 700 est un pave noir qui ecrase le paragraphe,
+     * la ou l'italique de la maison ouvre le texte. */
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 3.4em;
+    font-weight: 400;
+    line-height: 0.78;
+  }
+}

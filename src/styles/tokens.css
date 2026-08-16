@@ -1,0 +1,286 @@
+/* ---------------------------------------------------------------------------
+ * Reef - couche de tokens (Tailwind v4, CSS-first)
+ *
+ * Trois etages, dans cet ordre, et le markup ne touche jamais qu'au troisieme :
+ *   1. Palette brute      : --color-ink-*, --color-coral-*  (des noms de couleurs)
+ *   2. Alias semantiques  : --color-background, --color-primary  (des roles)
+ *   3. Utilitaires        : bg-background, text-primary  (ce que tu ecris)
+ *
+ * Rebrander le theme = editer l'etage 1. Rien d'autre ne bouge.
+ *
+ * --- Ce qui distingue Reef de son grand frere Aloha ------------------------
+ * Aloha vend un produit : fond ocean vert, scene WebGL, aplats de vente.
+ * Reef fait lire : la meme eau mais la nuit, un second accent aigue-marine au
+ * lieu du lagon vert, et une echelle de titres qui laisse vivre le paragraphe
+ * juste dessous. Meme maison, meme corail, meme grotesque d'affichage, autre
+ * metier.
+ *
+ * Le neutre est FROID, et c'est une correction assumee.
+ *
+ * Il a d'abord ete chaud, brun sur papier creme, au motif qu'un blog en gris
+ * pur "a l'air d'un document exporte". L'argument tient sur le papier et tombe
+ * a l'ecran : la page entiere virait au beige, le corail y perdait son statut
+ * d'accent (deux voisins chauds ne se distinguent plus) et le theme ne
+ * ressemblait plus a la famille, qui est une famille d'eau. Un neutre bleute
+ * fait exactement le travail qu'on demandait au brun, sans rien voler au
+ * corail : il recule, et il laisse la seule couleur chaude de la page etre
+ * celle qui compte.
+ * ------------------------------------------------------------------------- */
+
+@theme {
+  /* --- Palette : Encre ---------------------------------------------------
+   * Le noir de Reef est un bleu tres sombre, jamais un gris neutre et jamais
+   * un brun : c'est de l'eau profonde, pas de la terre. La saturation monte a
+   * mesure qu'on descend, ce qui donne un fond sombre allume de l'interieur
+   * plutot qu'un fond eteint. */
+  --color-ink-50: #f3f6fa;
+  --color-ink-100: #e6ecf3;
+  --color-ink-200: #ccd7e5;
+  --color-ink-300: #a3b4ca;
+  --color-ink-400: #758aa7;
+  --color-ink-500: #526583;
+  --color-ink-600: #3d4d67;
+  --color-ink-700: #2e3b50;
+  --color-ink-800: #1f2939;
+  --color-ink-900: #141b27;
+  --color-ink-950: #0a0f17;
+
+  /* --- Palette : Papier --------------------------------------------------
+   * Le fond clair, qui n'est plus le mode par defaut mais qui doit rester
+   * juste. Il porte une pointe de bleu, pas de jaune : quelques points de
+   * teinte suffisent a poser le repos qu'on cherche, et ils vont dans le meme
+   * sens que le reste du theme au lieu de le contredire. */
+  --color-paper-50: #fbfcfe;
+  --color-paper-100: #f2f5fa;
+  --color-paper-200: #e4eaf3;
+
+  /* --- Palette : Corail --------------------------------------------------
+   * L'accent de la maison, commun aux cinq themes du catalogue. C'est le fil
+   * qui dit qu'Aloha, Reef, Swell, Koa et Kai sortent du meme atelier. */
+  --color-coral-50: #fff5f2;
+  --color-coral-100: #ffe8e1;
+  --color-coral-200: #ffd2c6;
+  --color-coral-300: #ffb29d;
+  --color-coral-400: #ff7a59;
+  --color-coral-500: #f95c36;
+  --color-coral-600: #e6411c;
+  --color-coral-700: #c13314;
+  --color-coral-800: #9d2d15;
+  --color-coral-900: #822b18;
+
+  /* --- Palette : Recif ---------------------------------------------------
+   * Le second accent : une aigue-marine franche, plus bleue que le lagon
+   * d'Aloha, qui est vert. Les deux themes sont voisins et doivent se
+   * distinguer d'un coup d'oeil, pas apres comparaison.
+   *
+   * Il sert aux sujets, aux etats "publie" et aux liens deja lus. Jamais en
+   * concurrence avec le corail sur un meme appel a l'action : une page qui a
+   * deux couleurs d'action n'en a aucune. */
+  --color-reef-300: #7fd8f0;
+  --color-reef-400: #3fc0e0;
+  --color-reef-500: #1a9fc4;
+  --color-reef-600: #147ea0;
+
+  /* --- Typographie -------------------------------------------------------
+   * Aucune serif de texte ici, et c'est le point de depart de la refonte.
+   *
+   * Reef etait compose en Fraunces + Newsreader : deux serifs, l'attelage
+   * qu'on retrouve sur un site genere sur deux. Une police n'est pas une
+   * decision de gout, c'est une signature : si la signature est celle de tout
+   * le monde, le theme n'a pas de signature. Le catalogue est passe a une
+   * grotesque d'affichage + une grotesque de texte, ce qui rapproche Reef de
+   * ses freres au lieu de l'en eloigner.
+   *
+   * Space Grotesk en affichage : une grotesque a terminaisons coupees, des
+   * chiffres qui ont du caractere et une chasse serree qui tient les tres
+   * grands titres sans se liquefier. Elle a une voix, contrairement aux
+   * geometriques neutres.
+   * Instrument Sans en corps : hauteur d'x genereuse, formes ouvertes,
+   * dessinee pour l'ecran. C'est elle qu'on lit pendant huit minutes.
+   * Instrument Serif en 400 italique, et UNIQUEMENT pour le mot d'accent d'un
+   * grand titre : c'est le tic de la maison, partage avec Aloha, Swell, Koa et
+   * Kai. Un seul mot par titre, jamais un paragraphe. */
+  --font-display: "Space Grotesk Variable", "Space Grotesk", system-ui, sans-serif;
+  --font-sans: "Instrument Sans Variable", "Instrument Sans", system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-script: "Instrument Serif", Georgia, serif;
+
+  /* Echelle d'affichage FLUIDE (clamp). Resserree d'un cran par rapport a la
+   * version serif : a corps egal, Space Grotesk occupe environ un dixieme de
+   * largeur de plus que Fraunces, et sa hauteur d'x est plus haute. Garder les
+   * anciennes valeurs faisait deborder les titres de trois mots sur une ligne
+   * de plus. La chasse suit le meme mouvement : une grotesque encaisse une
+   * chasse plus negative qu'une serif a fort contraste, qui, elle, se colle. */
+  --text-display-sm: clamp(1.75rem, 1.4rem + 1.4vw, 2.35rem);
+  --text-display-sm--line-height: 1.1;
+  --text-display-sm--letter-spacing: -0.03em;
+  --text-display-md: clamp(2.1rem, 1.55rem + 2.3vw, 3.2rem);
+  --text-display-md--line-height: 1.04;
+  --text-display-md--letter-spacing: -0.035em;
+  --text-display-lg: clamp(2.45rem, 1.65rem + 3.4vw, 4.35rem);
+  --text-display-lg--line-height: 1;
+  --text-display-lg--letter-spacing: -0.04em;
+  --text-display-xl: clamp(2.7rem, 1.65rem + 4.4vw, 5.5rem);
+  --text-display-xl--line-height: 0.95;
+  --text-display-xl--letter-spacing: -0.045em;
+
+  /* Chasse optique : la chasse depend de la taille, jamais du composant. */
+  --tracking-optique-xs: 0.014em;
+  --tracking-optique-sm: 0.007em;
+  --tracking-optique-lg: -0.012em;
+
+  /* --- Rayons ------------------------------------------------------------
+   * Reef arrondit moins qu'Aloha. Un blog trop arrondi fait application ; un
+   * blog aux angles francs fait publication. Les boutons restent en pilule,
+   * c'est la signature de la maison. */
+  --radius-card: 0.875rem;
+  --radius-panel: 1.25rem;
+  --radius-pill: 999px;
+
+  /* --- Mesure ------------------------------------------------------------
+   * La largeur de la colonne de lecture, en caracteres et pas en pixels :
+   * c'est le nombre de signes par ligne qui fatigue, pas la largeur d'ecran.
+   * 68ch est le point ou la ligne reste confortable sans devenir hachee. */
+  --measure-prose: 68ch;
+  --measure-wide: 82ch;
+
+  /* --- Animations --------------------------------------------------------- */
+  --animate-rise: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-pulse-slow: pulse-slow 4s ease-in-out infinite;
+}
+
+/* ---------------------------------------------------------------------------
+ * Etage 2 : les alias semantiques.
+ * Le markup ecrit bg-background / text-foreground / bg-primary, et ne connait
+ * ni "ink" ni "coral". Le mode sombre ne fait que reaffecter ces variables.
+ * ------------------------------------------------------------------------- */
+@theme inline {
+  --color-background: var(--reef-background);
+  --color-foreground: var(--reef-foreground);
+  --color-muted: var(--reef-muted);
+  --color-muted-foreground: var(--reef-muted-foreground);
+  --color-card: var(--reef-card);
+  --color-card-foreground: var(--reef-card-foreground);
+  --color-primary: var(--reef-primary);
+  --color-primary-foreground: var(--reef-primary-foreground);
+  --color-accent: var(--reef-accent);
+  --color-accent-foreground: var(--reef-accent-foreground);
+  --color-border: var(--reef-border);
+  --color-ring: var(--reef-ring);
+  --color-surface: var(--reef-surface);
+  /* Le voile des superpositions. Il a besoin d'un alias a lui : les primitives
+   * partagees entre les themes de la maison ne doivent jamais citer le nom
+   * d'une couleur de marque, sinon elles cessent d'etre portables. */
+  --color-scrim: var(--reef-scrim);
+
+  /* Les ombres passent par inline, donc par var() : c'est la seule facon
+   * qu'elles ont de changer entre le clair et le sombre. Tailwind v4 fige les
+   * valeurs declarees dans @theme au moment du build. */
+  --shadow-float: var(--reef-shadow-float);
+  --shadow-lift: var(--reef-shadow-lift);
+  --shadow-glass: var(--reef-shadow-glass);
+}
+
+:root {
+  --reef-background: var(--color-paper-50);
+  --reef-foreground: var(--color-ink-950);
+  --reef-muted: var(--color-paper-100);
+  --reef-muted-foreground: var(--color-ink-600);
+  --reef-card: #ffffff;
+  --reef-card-foreground: var(--color-ink-950);
+  --reef-primary: var(--color-coral-500);
+  --reef-primary-foreground: #ffffff;
+  --reef-accent: var(--color-reef-500);
+  --reef-accent-foreground: #ffffff;
+  --reef-border: color-mix(in oklab, var(--color-ink-950) 12%, transparent);
+  --reef-ring: var(--color-coral-500);
+  --reef-surface: var(--color-paper-100);
+  --reef-scrim: var(--color-ink-950);
+
+  /* En clair, une ombre portee suffit, teintee de l'encre du theme et jamais
+   * noire : une ombre neutre sur un fond bleute le grise, et la page perd le
+   * peu de teinte qui la relie au reste de la maison. Les trois valeurs
+   * derivent de --color-ink-950 (10 15 23), pas d'un gris trouve au hasard. */
+  --reef-shadow-float: 0 1px 2px rgb(10 15 23 / 0.05), 0 6px 20px -6px rgb(10 15 23 / 0.12);
+  --reef-shadow-lift:
+    0 2px 4px rgb(10 15 23 / 0.06), 0 18px 40px -14px rgb(10 15 23 / 0.22),
+    0 20px 50px -22px rgb(249 92 54 / 0.18);
+  --reef-shadow-glass:
+    0 1px 0 0 rgb(255 255 255 / 0.5) inset, 0 10px 34px -10px rgb(10 15 23 / 0.24);
+}
+
+.dark {
+  --reef-background: var(--color-ink-950);
+  --reef-foreground: var(--color-paper-50);
+  --reef-muted: var(--color-ink-900);
+  --reef-muted-foreground: var(--color-ink-300);
+  --reef-card: color-mix(in oklab, var(--color-ink-900) 80%, transparent);
+  --reef-card-foreground: var(--color-paper-50);
+  --reef-primary: var(--color-coral-400);
+  --reef-primary-foreground: var(--color-ink-950);
+  --reef-accent: var(--color-reef-400);
+  --reef-accent-foreground: var(--color-ink-950);
+  --reef-border: color-mix(in oklab, var(--color-paper-50) 15%, transparent);
+  --reef-ring: var(--color-coral-400);
+  --reef-surface: var(--color-ink-900);
+  --reef-scrim: var(--color-ink-950);
+
+  /* --- Direction artistique du sombre -------------------------------------
+   * Basculer les couleurs ne suffit pas. Une ombre portee ne se voit pas sur
+   * du sombre : elle assombrit un fond deja sombre et la carte cesse de
+   * flotter. Le sombre demande d'autres outils : bordures lumineuses, lueurs
+   * internes, halos plus satures et moins etendus. C'est ce qui separe "un
+   * theme avec un interrupteur" de "deux themes en un". */
+  --reef-shadow-float:
+    0 0 0 1px color-mix(in oklab, var(--color-paper-50) 8%, transparent),
+    0 1px 0 0 color-mix(in oklab, var(--color-paper-50) 7%, transparent) inset,
+    0 14px 36px -18px rgb(0 0 0 / 0.7);
+  --reef-shadow-lift:
+    0 0 0 1px color-mix(in oklab, var(--color-coral-400) 24%, transparent),
+    0 1px 0 0 color-mix(in oklab, var(--color-paper-50) 10%, transparent) inset,
+    0 22px 58px -24px color-mix(in oklab, var(--color-coral-400) 30%, transparent),
+    0 18px 46px -22px rgb(0 0 0 / 0.75);
+  --reef-shadow-glass:
+    0 1px 0 0 rgb(255 255 255 / 0.09) inset,
+    0 0 0 1px color-mix(in oklab, var(--color-paper-50) 9%, transparent),
+    0 14px 44px -16px rgb(0 0 0 / 0.6);
+}
+
+/* Les images sont eclatantes sur fond clair et criardes sur fond sombre : un
+ * demi-ton de saturation en moins et un voile de la couleur de fond les font
+ * appartenir a la page au lieu d'y etre posees. */
+.dark img:not([data-no-dim]),
+.dark video:not([data-no-dim]) {
+  filter: saturate(0.92) brightness(0.96);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
