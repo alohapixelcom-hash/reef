@@ -1,0 +1,77 @@
+---
+// src/components/ui/avatar/Avatar.astro - avatar rond : image recadree, initiales en secours.
+// Les initiales vivent sous l'image : visibles pendant le chargement et si src manque,
+// sans un octet de JS. Passer alt="" quand le nom est deja affiche a cote de l'avatar.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const avatar = tv({
+  slots: {
+    root: "bg-muted relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-pill select-none",
+    image: "absolute inset-0 size-full object-cover",
+    fallback: "text-muted-foreground font-display font-bold uppercase",
+  },
+  variants: {
+    size: {
+      sm: { root: "size-8", fallback: "text-[0.65rem]" },
+      md: { root: "size-10", fallback: "text-xs" },
+      lg: { root: "size-12", fallback: "text-sm" },
+      xl: { root: "size-16", fallback: "text-lg" },
+    },
+    // Lisere couleur de fond, pour les rangees d'avatars qui se chevauchent (-space-x-2).
+    outlined: {
+      true: { root: "ring-background ring-2" },
+    },
+  },
+  defaultVariants: { size: "md" },
+});
+
+type AvatarVariants = VariantProps<typeof avatar>;
+
+type Props = HTMLAttributes<"span"> &
+  AvatarVariants & {
+    // Nom complet : sert aux initiales et au nom accessible par defaut.
+    name: string;
+    src?: string;
+    alt?: string;
+  };
+
+const { name, src, alt, size, outlined, class: className, ...rest } = Astro.props;
+const { root, image, fallback } = avatar({ size, outlined });
+
+const initials = name
+  .trim()
+  .split(/\s+/)
+  .map((part) => part[0])
+  .filter(Boolean)
+  .slice(0, 2)
+  .join("")
+  .toUpperCase();
+
+const label = alt ?? name;
+---
+
+<span
+  class={root({ class: className })}
+  role={label ? "img" : undefined}
+  aria-label={label || undefined}
+  aria-hidden={label ? undefined : "true"}
+  data-slot="avatar"
+  {...rest}
+>
+  <span class={fallback()} aria-hidden="true" data-slot="avatar-fallback">
+    {initials}
+  </span>
+  {
+    src && (
+      <img
+        class={image()}
+        src={src}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        data-slot="avatar-image"
+      />
+    )
+  }
+</span>

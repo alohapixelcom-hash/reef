@@ -1,0 +1,47 @@
+---
+// src/components/ui/cta-button/CtaButton.astro - un Button enveloppe d'un halo degrade anime : le CTA signature des heros et des bandeaux de fin de page.
+// Le halo gere la montee d'opacite au survol et au focus ; sa pulsation vit
+// sur un calque interne (animate-pulse-slow) pour ne pas se battre avec la
+// transition d'opacite. class est transmise au Button interieur.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+import { Button, button } from "../button";
+
+export const ctaButton = tv({
+  slots: {
+    root: "group/cta relative inline-flex",
+    halo: [
+      "pointer-events-none absolute -inset-1.5 rounded-pill",
+      "opacity-70 transition-opacity duration-300",
+      "group-hover/cta:opacity-100 group-focus-within/cta:opacity-100",
+    ],
+    pulse: [
+      "absolute inset-0 rounded-pill blur-lg",
+      "bg-linear-to-r from-primary via-accent to-primary",
+      "animate-pulse-slow",
+    ],
+  },
+});
+
+type ButtonVariants = VariantProps<typeof button>;
+
+type Props = (HTMLAttributes<"a"> | HTMLAttributes<"button">) &
+  ButtonVariants & {
+    href?: string;
+  };
+
+// hero + lg par defaut : le halo est pense pour le bouton blanc du hero
+// sombre, mais variant/size restent libres (primary sur fond clair, etc.).
+const { href, variant = "hero", size = "lg", class: className, ...rest } = Astro.props;
+const { root, halo, pulse } = ctaButton();
+const buttonClass = ["relative", className].filter(Boolean).join(" ");
+---
+
+<span class={root()} data-slot="cta-button">
+  <span class={halo()} aria-hidden="true">
+    <span class={pulse()}></span>
+  </span>
+  <Button href={href} variant={variant} size={size} class={buttonClass} {...rest}>
+    <slot />
+  </Button>
+</span>

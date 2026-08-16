@@ -1,0 +1,17 @@
+---
+// src/components/ui/dialog/DialogHeader.astro - en-tete du dialog : empile DialogTitle et DialogDescription, reserve la place de la croix de fermeture.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const dialogHeader = tv({
+  base: "flex flex-col gap-2 pr-10",
+});
+
+type Props = HTMLAttributes<"div">;
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<div class={dialogHeader({ class: className })} data-slot="dialog-header" {...rest}>
+  <slot />
+</div>

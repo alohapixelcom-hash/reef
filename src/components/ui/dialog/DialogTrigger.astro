@@ -1,0 +1,27 @@
+---
+// src/components/ui/dialog/DialogTrigger.astro - bouton pilule qui ouvre le <dialog> cible : <DialogTrigger for="waitlist">Join the waitlist</DialogTrigger>.
+// Reutilise la config tv() du Button canonique au lieu de recopier ses
+// classes. Fonctionne aussi pour une Sheet : les deux partagent _dialog.ts.
+import type { HTMLAttributes } from "astro/types";
+import type { VariantProps } from "tailwind-variants";
+import { button } from "../button";
+
+type Props = HTMLAttributes<"button"> &
+  VariantProps<typeof button> & {
+    for: string;
+  };
+
+const { for: forId, variant, size, class: className, ...rest } = Astro.props;
+---
+
+<button
+  type="button"
+  class={button({ variant, size, class: className })}
+  data-slot="dialog-trigger"
+  data-dialog-trigger={forId}
+  aria-haspopup="dialog"
+  aria-controls={forId}
+  {...rest}
+>
+  <slot />
+</button>

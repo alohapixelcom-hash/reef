@@ -1,0 +1,61 @@
+---
+// src/components/ui/dialog/Dialog.astro - racine du dialog modal : un <dialog> natif, carte flottante centree sur scrim ocean.
+// L'id est requis : DialogTrigger l'ouvre via data-dialog-trigger={id}, et les
+// aria pointent par convention vers `${id}-title` et `${id}-description`
+// (des ids a poser sur DialogTitle et DialogDescription). Un dialog sans
+// description passe describedby={null}. Focus, Escape et inert : natifs.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+import "../_overlay.css";
+
+export const dialog = tv({
+  base: [
+    "m-auto w-[92vw] p-0",
+    "bg-card text-card-foreground rounded-panel border border-border shadow-lift",
+    "backdrop-blur-xl",
+    "max-h-[min(85dvh,46rem)] overflow-y-auto overscroll-contain",
+  ],
+  variants: {
+    size: {
+      sm: "max-w-sm",
+      md: "max-w-lg",
+      lg: "max-w-2xl",
+    },
+  },
+  defaultVariants: { size: "md" },
+});
+
+type Props = HTMLAttributes<"dialog"> &
+  VariantProps<typeof dialog> & {
+    id: string;
+    labelledby?: string;
+    describedby?: string | null;
+  };
+
+const {
+  id,
+  size,
+  labelledby = `${id}-title`,
+  describedby = `${id}-description`,
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<dialog
+  id={id}
+  class={dialog({ size, class: className })}
+  data-slot="dialog"
+  aria-labelledby={labelledby}
+  aria-describedby={describedby ?? undefined}
+  {...rest}
+>
+  <div class="relative flex flex-col gap-5 p-6 sm:p-8" data-slot="dialog-content">
+    <slot />
+  </div>
+</dialog>
+
+<script>
+  import { initDialogs } from "../_dialog";
+  initDialogs();
+</script>

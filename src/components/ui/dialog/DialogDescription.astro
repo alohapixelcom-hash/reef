@@ -1,0 +1,18 @@
+---
+// src/components/ui/dialog/DialogDescription.astro - sous-titre du dialog : texte assourdi, id a faire correspondre a l'aria-describedby de la racine.
+// Convention : id={`${dialogId}-description`}.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const dialogDescription = tv({
+  base: "text-muted-foreground text-sm leading-relaxed sm:text-[0.95rem]",
+});
+
+type Props = HTMLAttributes<"p">;
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<p class={dialogDescription({ class: className })} data-slot="dialog-description" {...rest}>
+  <slot />
+</p>

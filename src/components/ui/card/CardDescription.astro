@@ -1,0 +1,18 @@
+---
+// src/components/ui/card/CardDescription.astro - sous-titre de carte, sourdine et compact.
+// Sur une carte glass, passer class="text-white/70" pour rester lisible sur fond sombre.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const cardDescription = tv({
+  base: "text-muted-foreground text-sm leading-relaxed",
+});
+
+type Props = HTMLAttributes<"p">;
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<p class={cardDescription({ class: className })} data-slot="card-description" {...rest}>
+  <slot />
+</p>

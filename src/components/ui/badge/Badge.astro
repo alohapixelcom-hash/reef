@@ -1,0 +1,34 @@
+---
+// src/components/ui/badge/Badge.astro - pastille pilule pour statuts, categories et eyebrows.
+// coral est la pastille de marque, pleine et la plus forte ; lagoon reste une teinte douce,
+// fidele a la regle du theme : le lagon ne concurrence jamais le corail.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const badge = tv({
+  base: [
+    "inline-flex w-fit shrink-0 items-center gap-1.5 rounded-pill px-3 py-1",
+    "font-display text-xs font-bold whitespace-nowrap",
+    "[&>svg]:size-3.5 [&>svg]:shrink-0",
+  ],
+  variants: {
+    variant: {
+      default: "bg-muted text-muted-foreground",
+      coral: "bg-primary text-primary-foreground",
+      lagoon: "bg-accent/15 text-foreground",
+      outline: "border-border text-muted-foreground border bg-transparent",
+    },
+  },
+  defaultVariants: { variant: "default" },
+});
+
+type BadgeVariants = VariantProps<typeof badge>;
+
+type Props = HTMLAttributes<"span"> & BadgeVariants;
+
+const { variant, class: className, ...rest } = Astro.props;
+---
+
+<span class={badge({ variant, class: className })} data-slot="badge" {...rest}>
+  <slot />
+</span>

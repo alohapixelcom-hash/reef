@@ -1,0 +1,21 @@
+---
+// src/components/ui/dialog/DialogTitle.astro - titre du dialog : grotesque d'affichage en gras serre, id a faire correspondre a l'aria-labelledby de la racine.
+// Convention : id={`${dialogId}-title`}. Le niveau reel est reglable via as
+// pour respecter la hierarchie de la page (h2 par defaut).
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const dialogTitle = tv({
+  base: "font-display text-card-foreground text-2xl font-extrabold tracking-tight text-balance sm:text-3xl",
+});
+
+type Props = HTMLAttributes<"h2"> & {
+  as?: "h2" | "h3";
+};
+
+const { as: Tag = "h2", class: className, ...rest } = Astro.props;
+---
+
+<Tag class={dialogTitle({ class: className })} data-slot="dialog-title" {...rest}>
+  <slot />
+</Tag>

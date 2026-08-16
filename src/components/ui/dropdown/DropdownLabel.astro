@@ -1,0 +1,17 @@
+---
+// src/components/ui/dropdown/DropdownLabel.astro - intitule de section dans le menu : petites capitales assourdies, non interactif.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const dropdownLabel = tv({
+  base: "text-muted-foreground px-3 pt-2 pb-1 text-xs font-semibold tracking-[0.14em] uppercase",
+});
+
+type Props = HTMLAttributes<"p">;
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<p class={dropdownLabel({ class: className })} data-slot="dropdown-label" {...rest}>
+  <slot />
+</p>

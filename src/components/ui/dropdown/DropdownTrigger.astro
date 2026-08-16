@@ -1,0 +1,33 @@
+---
+// src/components/ui/dropdown/DropdownTrigger.astro - le <summary> du menu : pilule issue de la config tv() du Button, marqueur natif masque, chevron qui pivote a l'ouverture.
+// L'etat ouvert/ferme est annonce nativement par summary : aucun aria manuel.
+import type { HTMLAttributes } from "astro/types";
+import type { VariantProps } from "tailwind-variants";
+import { button } from "../button";
+
+type Props = HTMLAttributes<"summary"> & VariantProps<typeof button>;
+
+const { variant = "outline", size = "md", class: className, ...rest } = Astro.props;
+
+const classes = button({
+  variant,
+  size,
+  class: ["list-none [&::-webkit-details-marker]:hidden", className],
+});
+---
+
+<summary class={classes} data-slot="dropdown-trigger" {...rest}>
+  <slot />
+  <svg
+    class="size-4 transition-transform duration-200 group-open:rotate-180"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="m6 9 6 6 6-6"></path>
+  </svg>
+</summary>

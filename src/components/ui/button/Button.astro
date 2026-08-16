@@ -1,0 +1,91 @@
+---
+// src/components/ui/button/Button.astro - primitive canonique du theme.
+// Rend un <a> si href est fourni, sinon un <button>. Toujours en pilule.
+// Sa config tv() est exportee : les autres composants la reutilisent
+// (liens de pagination, CTA de nav) au lieu de recopier des classes.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const button = tv({
+  base: [
+    "inline-flex items-center justify-center gap-2 rounded-pill font-display font-bold",
+    "cursor-pointer whitespace-nowrap select-none",
+    "transition-[transform,box-shadow,background-color,color] duration-200",
+    // L'enfoncement doit se voir a l'instant ou le doigt touche, pas 200 ms
+    // apres : des qu'un retour se fait attendre, la sensation de manipulation
+    // directe s'effondre. On garde donc une entree tres courte et une sortie
+    // normale, ce qui donne un appui net et un relachement doux.
+    "active:scale-[0.97] active:duration-[90ms]",
+    "disabled:pointer-events-none disabled:opacity-50",
+  ],
+  variants: {
+    variant: {
+      // Blanc + texte ocean : le bouton signature pose sur le hero sombre.
+      // Fond blanc constant, donc encre constante : text-foreground passe au
+      // blanc en mode sombre et le bouton devient illisible. primary-foreground
+      // vaut l'ocean profond dans les deux modes, c'est le seul choix sur.
+      hero: "bg-white text-primary-foreground shadow-lift hover:-translate-y-0.5",
+      // Corail : l'action principale sur fond clair.
+      primary: "bg-primary text-primary-foreground shadow-float hover:-translate-y-0.5 hover:shadow-lift",
+      // Ocean profond : l'action secondaire forte.
+      dark: "bg-foreground text-background hover:-translate-y-0.5 hover:shadow-lift",
+      // Contour discret pour les actions tertiaires.
+      outline: "border border-border bg-transparent text-foreground hover:bg-muted",
+      // Translucide, pour la nav en verre.
+      glass: "glass text-white hover:bg-white/20",
+      ghost: "text-foreground hover:bg-muted",
+      link: "text-primary underline-offset-4 hover:underline",
+    },
+    size: {
+      sm: "h-9 px-4 text-sm",
+      md: "h-11 px-6 text-[0.95rem]",
+      lg: "h-13 px-8 text-base",
+      xl: "h-15 px-10 text-lg",
+      icon: "size-11",
+    },
+  },
+  defaultVariants: { variant: "primary", size: "md" },
+});
+
+type ButtonVariants = VariantProps<typeof button>;
+
+type Props = (HTMLAttributes<"button"> | HTMLAttributes<"a">) &
+  ButtonVariants & {
+    href?: string;
+    /**
+     * Force une vraie navigation au lieu d'une transition cote client.
+     * Indispensable des que la cible n'est pas une page du site : une
+     * redirection vers un prestataire de paiement, un telechargement,
+     * une route d'API. Sans cela le routeur tente de charger la reponse
+     * comme du HTML et la navigation echoue en silence.
+     *
+     * La prop existe plutot que de laisser poser data-astro-reload a la
+     * main : cet attribut n'est valide que sur <a>, <form> et <area>, et
+     * l'ecrire sur un composant declenche un avertissement legitime.
+     */
+    reload?: boolean;
+  };
+
+const { href, reload, variant, size, class: className, ...restProps } = Astro.props;
+const Tag = href ? "a" : "button";
+// Le spread sur une balise dynamique exige l'intersection des deux sacs
+// d'attributs (le compilateur ne peut pas suivre la correlation Tag/props).
+const rest = restProps as HTMLAttributes<"button"> & HTMLAttributes<"a">;
+
+// data-astro-reload passe par un objet plutot que d'etre ecrit en clair.
+// L'attribut n'est valide que sur <a>, et le linter ne peut pas savoir que
+// Tag vaut "a" quand href est fourni : ecrit en clair il declencherait un
+// avertissement permanent sur un composant pourtant correct. La garde
+// href && reload garantit qu'il n'atterrit jamais sur un <button>.
+const reloadAttr = href && reload ? { "data-astro-reload": true } : {};
+---
+
+<Tag
+  href={href}
+  class={button({ variant, size, class: className })}
+  data-slot="button"
+  {...reloadAttr}
+  {...rest}
+>
+  <slot />
+</Tag>
