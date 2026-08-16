@@ -19,6 +19,23 @@ dated entry.
   `action` and stays that way until a buyer wires it to an endpoint. Not a
   bug; recorded so nobody "fixes" it.
 
+## 2026-08-16 - wave accent
+
+The accent word of headings dropped its separate font.
+
+- The separate accent font is gone (package, import, tokens): the
+  italic-serif accent word is banned across the whole family - it had become
+  the marker of generated sites, not a signature.
+- The accent word keeps the heading font, stays coral, and carries a coral
+  WAVE underline (`--accent-wave`, the Aloha Pixel brand mark is a wave).
+  One wave per mode: coral-500 stroke in light, coral-400 in dark and in the
+  deep scene, matching the primary.
+- Blockquote, dropcap and the giant card initials moved from the serif to
+  the display grotesque; `--font-serif`/`--font-script` remain as aliases of
+  `--font-display`. Two fonts load instead of three.
+- Docs updated: README, AGENTS, SPEC, THIRD-PARTY, the tailwind rule and
+  this wiki.
+
 ## 2026-08-16 - art direction redone
 
 The theme's look was rebuilt around reading.

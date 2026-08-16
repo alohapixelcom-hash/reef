@@ -37,10 +37,12 @@ Inside `@theme`: three colour ramps and the non-colour tokens.
   aquamarine (reef-500 `#1a9fc4`, reef-400 `#3fc0e0`) that marks topics, links
   and quiet states, never a flat background under long text.
 - **Typography**: `--font-display` Space Grotesk (headings), `--font-sans`
-  Instrument Sans (body and interface), `--font-serif` and `--font-script`
-  Besley (variable italic only, the one accent word of each big title). The
-  display scale runs to 5.5rem; all three variable families load the weight
-  axis only.
+  Instrument Sans (body and interface); only these two fonts load.
+  `--font-serif` and `--font-script` are compatibility aliases of the display
+  font: the accent word of a big title keeps the heading font and carries a
+  coral wave underline (`--accent-wave`, one per mode since the primary coral
+  changes between light and dark), never an italic serif. The display scale
+  runs to 5.5rem; both variable families load the weight axis only.
 - **Radii**: card 0.875rem, panel 1.25rem, pill 999px. Buttons are pills; cards
   and panels are gently rounded, which reads as calm on a page of prose.
 - **Brand animations**: rise, marquee, pulse-slow (`--animate-*` at
