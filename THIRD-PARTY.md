@@ -12,20 +12,21 @@ node_modules metadata, assets listed with find over public/ and src/).
 
 ## Fonts
 
-Three typefaces, all delivered as npm packages by the Fontsource project and
+Two typefaces, both delivered as npm packages by the Fontsource project and
 self-hosted at build time. No font is fetched from a third-party CDN at
-runtime. All three are under the SIL Open Font License 1.1, which permits
+runtime. Both are under the SIL Open Font License 1.1, which permits
 bundling, self-hosting and commercial use.
 
 | Typeface | Package | Version | License | Role |
 |---|---|---|---|---|
-| Space Grotesk (variable) | @fontsource-variable/space-grotesk | 5.3.0 | OFL-1.1 | Display headings (font-display) |
+| Space Grotesk (variable) | @fontsource-variable/space-grotesk | 5.3.0 | OFL-1.1 | Display headings (font-display), including the accent word |
 | Instrument Sans (variable) | @fontsource-variable/instrument-sans | 5.3.0 | OFL-1.1 | Body text and interface labels (font-sans) |
-| Besley (variable) | @fontsource-variable/besley | 5.3.0 | OFL-1.1 | The single italic accent word, variable italic only (font-serif, font-script) |
 
-The three imports live at the top of src/layouts/BaseHead.astro. Each package
+The imports live at the top of src/layouts/BaseHead.astro. Each package
 carries its own LICENSE file in node_modules; the license fields above were
-read from the packages' own metadata.
+read from the packages' own metadata. The accent word of a big title loads no
+extra font: it keeps the heading font and carries a coral wave underline
+(--accent-wave, an original inline SVG covered by the theme LICENSE).
 
 ## Icons
 
@@ -65,7 +66,6 @@ licenses. Versions are the ones resolved in pnpm-lock.yaml at the date above.
 | tailwind-merge | MIT | Class merging inside tv |
 | @fontsource-variable/space-grotesk | OFL-1.1 | Space Grotesk files |
 | @fontsource-variable/instrument-sans | OFL-1.1 | Instrument Sans files |
-| @fontsource-variable/besley | OFL-1.1 | Besley files (variable italic) |
 
 There is no React, no animation library and no WebGL dependency in Reef. The
 whole theme is .astro, and every effect on the page is CSS.
