@@ -1,0 +1,56 @@
+---
+// src/pages/[...locale]/privacy.astro - la politique de confidentialite, servie depuis src/config/legalData.json.ts.
+//
+// Cette page existe parce que le pied de page y mene : getFooterData et
+// getSiteRoutes declarent /privacy/, et un lien de pied de page qui tombe sur
+// un 404 est le premier defaut qu'un acheteur remarque. Le gabarit est celui
+// des mentions legales, la copie vient de la config.
+import LegalArticle from "@components/Sections/Legal/LegalArticle.astro";
+import Footer from "@components/Sections/Global/Footer.astro";
+import Navbar from "@components/Sections/Global/Navbar.astro";
+import PageHero from "@components/Sections/Global/PageHero.astro";
+import { getLegalData } from "@config/legalData.json.ts";
+import { getLocale, localePaths, localizePath, useTranslations } from "@i18n";
+import { breadcrumbList } from "@js/schema";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+export const getStaticPaths = localePaths;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const doc = getLegalData(locale).privacy;
+
+const base = Astro.site ?? Astro.url;
+const crumbs = breadcrumbList([
+  { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
+  { name: doc.title, url: new URL(localizePath("/privacy/", locale), base).href },
+]);
+---
+
+<BaseLayout title={doc.title} description={doc.description}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
+  </Fragment>
+
+  <Navbar />
+
+  <main id="content">
+    <PageHero
+      eyebrow={t.legal.eyebrow}
+      title={doc.title}
+      lede={doc.description}
+      crumbs={[{ label: doc.title }]}
+    />
+
+    <LegalArticle
+      sections={doc.sections}
+      updated={doc.lastUpdated}
+      updatedTemplate={t.legal.lastUpdated}
+      tocLabel={t.legal.toc}
+      backToTopLabel={t.legal.backToTop}
+      {locale}
+    />
+  </main>
+
+  <Footer />
+</BaseLayout>

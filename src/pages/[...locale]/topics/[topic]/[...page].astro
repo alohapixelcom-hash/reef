@@ -1,0 +1,106 @@
+---
+// src/pages/[...locale]/topics/[topic]/[...page].astro - l'archive d'un sujet, paginee par neuf.
+//
+// Une entree par langue ET par sujet. Le segment d'URL passe par entrySlug :
+// l'id de collection vaut "en/typography", et l'ecrire tel quel donnerait
+// /topics/en/typography/, une URL que personne n'a demandee.
+import PostGrid from "@components/Sections/Archive/PostGrid.astro";
+import TopicNav from "@components/Sections/Archive/TopicNav.astro";
+import Footer from "@components/Sections/Global/Footer.astro";
+import Navbar from "@components/Sections/Global/Navbar.astro";
+import PageHero from "@components/Sections/Global/PageHero.astro";
+import { defaultLocale, fmt, getLocale, localizePath, locales, useTranslations } from "@i18n";
+import { entrySlug } from "@i18n/content";
+import { getResolvedPosts, getSortedTopics } from "@js/posts";
+import { breadcrumbList } from "@js/schema";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import type { GetStaticPaths, Page } from "astro";
+import type { CollectionEntry } from "astro:content";
+import type { ResolvedPost } from "@js/posts";
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const groups = await Promise.all(
+    locales.map(async (locale) => {
+      const posts = await getResolvedPosts(locale);
+      const topics = await getSortedTopics(locale);
+
+      return topics.flatMap((topic) => {
+        const slug = entrySlug(topic.id);
+        const inTopic = posts.filter((entry) => entry.topicSlug === slug);
+        return paginate(inTopic, {
+          pageSize: 9,
+          params: { locale: locale === defaultLocale ? undefined : locale, topic: slug },
+          props: { topic, topics },
+        });
+      });
+    }),
+  );
+  return groups.flat();
+}) satisfies GetStaticPaths;
+
+type Props = {
+  page: Page<ResolvedPost>;
+  topic: CollectionEntry<"topics">;
+  topics: CollectionEntry<"topics">[];
+};
+
+const { page, topic, topics } = Astro.props;
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+
+const slug = entrySlug(topic.id);
+const heading = fmt(t.archive.topicTitle, { topic: topic.data.name });
+const title =
+  page.currentPage > 1
+    ? `${heading}, ${fmt(t.archive.pageSuffix, { n: page.currentPage })}`
+    : heading;
+const description = topic.data.description;
+
+const base = Astro.site ?? Astro.url;
+const crumbs = breadcrumbList([
+  { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
+  { name: t.topics.metaTitle, url: new URL(localizePath("/topics/", locale), base).href },
+  { name: topic.data.name, url: new URL(localizePath(`/topics/${slug}/`, locale), base).href },
+]);
+
+const noindex = page.currentPage > 1;
+---
+
+<BaseLayout {title} {description} {noindex}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
+  </Fragment>
+
+  <Navbar />
+
+  <main id="content">
+    <PageHero
+      eyebrow={t.topics.eyebrow}
+      title={heading}
+      accentWord={topic.data.name}
+      lede={topic.data.description}
+      crumbs={[
+        { label: t.topics.metaTitle, href: localizePath("/topics/", locale) },
+        { label: topic.data.name },
+      ]}
+    >
+      <TopicNav {topics} {locale} activeSlug={slug} class="mt-2" />
+    </PageHero>
+
+    <PostGrid
+      posts={page.data}
+      {locale}
+      basePath={localizePath(`/topics/${slug}`, locale)}
+      currentPage={page.currentPage}
+      totalPages={page.lastPage}
+      total={page.total}
+      headingLevel="h2"
+      emptyTitle={t.topics.emptyTitle}
+      emptyDescription={t.topics.emptyLede}
+      emptyCtaLabel={t.archive.emptyCta}
+      emptyCtaHref={localizePath("/blog/", locale)}
+    />
+  </main>
+
+  <Footer />
+</BaseLayout>

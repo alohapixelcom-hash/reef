@@ -1,0 +1,98 @@
+---
+// src/pages/[...locale]/blog/[...page].astro - l'archive complete, paginee par neuf : en-tete, pastilles de sujets et grille.
+//
+// La page 1 vit a /blog/, les suivantes a /blog/2/ ; en francais /fr/blog/ et
+// /fr/blog/2/. Une passe de pagination PAR LANGUE, parce que deux langues n'ont
+// pas forcement le meme nombre de billets publies et donc pas le meme nombre de
+// pages.
+//
+// getStaticPaths est hissee hors du frontmatter : elle ne voit que les imports
+// du module, jamais une constante declaree au-dessus d'elle. Tout ce dont elle a
+// besoin doit donc etre importe ou calcule a l'interieur.
+import PostGrid from "@components/Sections/Archive/PostGrid.astro";
+import TopicNav from "@components/Sections/Archive/TopicNav.astro";
+import Footer from "@components/Sections/Global/Footer.astro";
+import Navbar from "@components/Sections/Global/Navbar.astro";
+import PageHero from "@components/Sections/Global/PageHero.astro";
+import { defaultLocale, fmt, getLocale, localizePath, locales, useTranslations } from "@i18n";
+import { getResolvedPosts, getSortedTopics } from "@js/posts";
+import { breadcrumbList } from "@js/schema";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import type { GetStaticPaths, Page } from "astro";
+import type { CollectionEntry } from "astro:content";
+import type { ResolvedPost } from "@js/posts";
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const pages = await Promise.all(
+    locales.map(async (locale) => {
+      const posts = await getResolvedPosts(locale);
+      const topics = await getSortedTopics(locale);
+      return paginate(posts, {
+        pageSize: 9,
+        params: { locale: locale === defaultLocale ? undefined : locale },
+        props: { topics },
+      });
+    }),
+  );
+  return pages.flat();
+}) satisfies GetStaticPaths;
+
+type Props = {
+  page: Page<ResolvedPost>;
+  topics: CollectionEntry<"topics">[];
+};
+
+const { page, topics } = Astro.props;
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+
+const title =
+  page.currentPage > 1
+    ? `${t.archive.metaTitle}, ${fmt(t.archive.pageSuffix, { n: page.currentPage })}`
+    : t.archive.metaTitle;
+const description = t.archive.metaDescription;
+
+const base = Astro.site ?? Astro.url;
+const crumbs = breadcrumbList([
+  { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
+  { name: t.archive.metaTitle, url: new URL(localizePath("/blog/", locale), base).href },
+]);
+
+// Les pages 2 et suivantes ne meritent pas d'etre indexees : elles n'ont pas de
+// contenu propre, et Google preferera toujours la page 1 ou le billet lui-meme.
+const noindex = page.currentPage > 1;
+---
+
+<BaseLayout {title} {description} {noindex}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
+  </Fragment>
+
+  <Navbar />
+
+  <main id="content">
+    <PageHero
+      eyebrow={t.archive.eyebrow}
+      title={t.archive.title}
+      accentWord={t.archive.accent}
+      lede={t.archive.lede}
+      crumbs={[{ label: t.archive.metaTitle }]}
+    >
+      <TopicNav {topics} {locale} class="mt-2" />
+    </PageHero>
+
+    <PostGrid
+      posts={page.data}
+      {locale}
+      basePath={localizePath("/blog", locale)}
+      currentPage={page.currentPage}
+      totalPages={page.lastPage}
+      total={page.total}
+      headingLevel="h2"
+      emptyCtaLabel={t.topics.allTopics}
+      emptyCtaHref={localizePath("/topics/", locale)}
+    />
+  </main>
+
+  <Footer />
+</BaseLayout>

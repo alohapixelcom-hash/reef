@@ -1,0 +1,116 @@
+---
+// src/pages/[...locale]/index.astro - l'accueil editorial : ouverture, billet a la une, notes recentes, sujets, signatures, mot du studio et invitation a s'abonner.
+//
+// L'accueil d'un blog n'est pas une page de vente : il n'y a ni preuve sociale,
+// ni tarifs, ni bandeau de logos. Un lecteur arrive pour savoir s'il y a quelque
+// chose a lire, et la reponse doit tenir dans le premier ecran et demi.
+//
+// Toutes les listes sont calculees ICI, une seule fois. Les sections recoivent
+// des tableaux deja tries : aucune d'elles ne relit une collection, donc rien ne
+// peut trier differemment d'une section a l'autre.
+import Footer from "@components/Sections/Global/Footer.astro";
+import Navbar from "@components/Sections/Global/Navbar.astro";
+import FeaturedPost from "@components/Sections/Home/FeaturedPost.astro";
+import Hero from "@components/Sections/Home/Hero.astro";
+import LatestPosts from "@components/Sections/Home/LatestPosts.astro";
+import NewsletterInvite from "@components/Sections/Home/NewsletterInvite.astro";
+import StudioNote from "@components/Sections/Home/StudioNote.astro";
+import TopicStrip from "@components/Sections/Home/TopicStrip.astro";
+import WritersStrip from "@components/Sections/Home/WritersStrip.astro";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import siteData from "@config/siteData.json";
+import { formatDate, getLocale, localePaths, locales, localizePath, useTranslations } from "@i18n";
+import { getLocalizedCollection } from "@i18n/content";
+import { getResolvedPosts, getSortedTopics } from "@js/posts";
+import { organization, website } from "@js/schema";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+// Une seule page source, une sortie par langue : / et /fr/.
+export const getStaticPaths = localePaths;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+
+const posts = await getResolvedPosts(locale);
+
+// Le garde-fou "un seul billet a la une" vit ici : le schema ne peut pas
+// compter les autres fichiers, mais la page les voit tous. Si personne n'a
+// leve le drapeau, le plus recent prend la place.
+const featured = posts.find((entry) => entry.post.data.featured) ?? posts.at(0);
+const latest = posts.filter((entry) => entry !== featured).slice(0, 6);
+
+// Les trois dernieres notes pour la pile du hero. On les prend dans la liste
+// complete et non dans `latest` : le billet a la une est le plus recent, et un
+// lecteur qui arrive doit le voir ici aussi, pas seulement plus bas dans la
+// page. Chaque fiche porte son sujet et son temps de lecture, ce qui en fait un
+// objet compose plutot qu'une ligne de titre alignee sur un filet.
+const heroRoutes = getSiteRoutes(locale);
+const recent = posts.slice(0, 3).map((entry) => ({
+  href: `${heroRoutes.posts}${entry.slug}/`,
+  title: entry.post.data.title,
+  date: formatDate(entry.post.data.pubDate, locale),
+  iso: entry.post.data.pubDate.toISOString().slice(0, 10),
+  topic: entry.topic.data.name,
+  accent: entry.topic.data.accent,
+  minutes: entry.minutes,
+}));
+
+const topics = await getSortedTopics(locale);
+const authors = (await getLocalizedCollection("authors", locale)).sort((a, b) =>
+  a.data.name.localeCompare(b.data.name),
+);
+
+// Un seul passage sur les billets pour les deux compteurs : compter dans les
+// sections obligerait a leur passer la liste complete, qu'elles n'affichent pas.
+const topicCounts: Record<string, number> = {};
+const authorCounts: Record<string, number> = {};
+for (const entry of posts) {
+  topicCounts[entry.topicSlug] = (topicCounts[entry.topicSlug] ?? 0) + 1;
+  authorCounts[entry.authorSlug] = (authorCounts[entry.authorSlug] ?? 0) + 1;
+}
+
+// Le compte de ce qu'il y a a lire, dans l'ordre des libelles de heroLedger :
+// notes publiees, fils, langues servies. Compte ici comme le reste, pour que
+// le hero n'ait aucune collection a relire.
+const ledger = [posts.length, topics.length, locales.length] as const;
+
+const title = t.home.metaTitle;
+const description = t.home.metaDescription;
+
+const base = Astro.site ?? Astro.url;
+const siteUrl = new URL(localizePath("/", locale), base).href;
+const schemas = [
+  organization({
+    name: siteData.name,
+    url: siteUrl,
+    sameAs: siteData.author.twitter ? [`https://x.com/${siteData.author.twitter}`] : undefined,
+  }),
+  website({ name: siteData.name, url: siteUrl, description }),
+];
+---
+
+<BaseLayout {title} {description}>
+  <Fragment slot="head">
+    {
+      schemas.map((node) => (
+        <script is:inline type="application/ld+json" set:html={JSON.stringify(node)} />
+      ))
+    }
+  </Fragment>
+
+  <Navbar />
+
+  <main id="content">
+    <Hero {recent} {ledger} />
+    {featured && <FeaturedPost entry={featured} />}
+    {latest.length > 0 && <LatestPosts posts={latest} />}
+    <TopicStrip {topics} counts={topicCounts} />
+    <WritersStrip {authors} counts={authorCounts} />
+    <StudioNote />
+    <NewsletterInvite />
+  </main>
+
+  {/* La bande d'inscription de l'accueil porte deja l'ancre et le formulaire :
+      le pied de page n'en remet pas un second deux ecrans plus bas. */}
+  <Footer newsletter={false} />
+</BaseLayout>

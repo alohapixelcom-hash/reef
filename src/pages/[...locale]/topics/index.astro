@@ -1,0 +1,79 @@
+---
+// src/pages/[...locale]/topics/index.astro - l'index des sujets : une carte par fil, avec le nombre de billets publies derriere chacun.
+import TopicCard from "@components/Cards/TopicCard.astro";
+import Footer from "@components/Sections/Global/Footer.astro";
+import Navbar from "@components/Sections/Global/Navbar.astro";
+import PageHero from "@components/Sections/Global/PageHero.astro";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { getLocale, localePaths, localizePath, useTranslations } from "@i18n";
+import { entrySlug } from "@i18n/content";
+import { getResolvedPosts, getSortedTopics } from "@js/posts";
+import { breadcrumbList } from "@js/schema";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+export const getStaticPaths = localePaths;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+
+const topics = await getSortedTopics(locale);
+const posts = await getResolvedPosts(locale);
+
+const counts: Record<string, number> = {};
+for (const entry of posts) counts[entry.topicSlug] = (counts[entry.topicSlug] ?? 0) + 1;
+
+const title = t.topics.metaTitle;
+const description = t.topics.metaDescription;
+
+const base = Astro.site ?? Astro.url;
+const crumbs = breadcrumbList([
+  { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
+  { name: t.topics.metaTitle, url: new URL(localizePath("/topics/", locale), base).href },
+]);
+---
+
+<BaseLayout {title} {description}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
+  </Fragment>
+
+  <Navbar />
+
+  <main id="content">
+    <PageHero
+      eyebrow={t.topics.eyebrow}
+      title={t.topics.title}
+      accentWord={t.topics.accent}
+      lede={t.topics.lede}
+      crumbs={[{ label: t.topics.metaTitle }]}
+    />
+
+    <section class="container-page py-14 md:py-20" aria-label={t.topics.allTopics}>
+      {/* Un flux centre et non une grille : le nombre de sujets d'un blog n'est
+          jamais un multiple du nombre de colonnes, et une grille laisse alors
+          un trou a droite de la derniere rangee. */}
+      <ul class="flex flex-wrap justify-center gap-5">
+        {
+          topics.map((topic) => {
+            const slug = entrySlug(topic.id);
+            return (
+              <li class="flex w-full sm:w-[calc(50%-0.625rem)] lg:w-[calc(33.333%-0.834rem)]">
+                <TopicCard
+                  {topic}
+                  {locale}
+                  href={`${routes.topics}${slug}/`}
+                  count={counts[slug] ?? 0}
+                  as="h2"
+                  class="w-full"
+                />
+              </li>
+            );
+          })
+        }
+      </ul>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
