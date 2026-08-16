@@ -1,0 +1,35 @@
+/* src/styles/motion/index.css - point d'entree du catalogue motion, importe les cinq familles. */
+
+/* ---------------------------------------------------------------------------
+ * Catalogue motion Aloha - CSS pur, zero dependance, zero JavaScript.
+ *
+ * Conventions valables pour tout le catalogue :
+ *   - Chaque utilitaire s'appelle animate-<nom> et embarque ses @keyframes.
+ *   - Les entrees et sorties jouent une fois avec fill "both" : un delai pose
+ *     en amont ne devoile jamais l'etat final, ce qui rend les cascades
+ *     triviales (style="animation-delay: 120ms" sur chaque enfant).
+ *   - Les boucles (float, glow-pulse, sway...) sont lentes et de faible
+ *     amplitude : elles decorent, elles ne crient pas.
+ *   - Tout se retouche a l'element, sans toucher au catalogue :
+ *     [animation-duration:1.2s] pour le tempo, et les curseurs
+ *     --motion-travel / --motion-scale / --motion-float / --motion-parallax
+ *     pour l'amplitude.
+ *   - prefers-reduced-motion est coupe une fois pour toutes dans global.css.
+ *     Seul scroll.css porte une garde locale : un timeline view() ignore
+ *     animation-duration, la coupe globale ne suffit donc pas la-bas.
+ * ------------------------------------------------------------------------- */
+
+@import "./fades.css";
+@import "./slides.css";
+@import "./zooms.css";
+@import "./attention.css";
+@import "./materials.css";
+@import "./scroll.css";
+
+/* Les trois courbes maison. La sortie expo est la meme que animate-rise dans
+ * tokens.css et signe toutes les entrees ; la spring ne sert qu'aux pops. */
+:root {
+  --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --motion-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}

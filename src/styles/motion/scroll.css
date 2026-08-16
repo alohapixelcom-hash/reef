@@ -1,0 +1,196 @@
+/* src/styles/motion/scroll.css - variantes pilotees par le scroll : le defilement remplace l'horloge. */
+
+/* Chaque utilitaire rejoue une animation du catalogue sur un timeline
+ * view() : la progression suit la traversee du viewport par l'element,
+ * sans une ligne de JavaScript ni aucun observer.
+ *
+ * Double garde, volontairement locale a ce fichier :
+ *   - @supports : sans timeline scroll-driven, aucune animation n'est posee
+ *     et l'element reste simplement visible. Rien a polyfiller.
+ *   - @media (prefers-reduced-motion: no-preference) : un timeline view()
+ *     ignore animation-duration, la coupe globale de global.css ne peut donc
+ *     pas neutraliser ces effets. Ce n'est pas un doublon du garde-fou.
+ *
+ * Le rythme se regle par animation-range : "entry 0% cover 30%" termine
+ * l'effet tot dans la traversee. A ajuster en inline pour un cas precis. */
+
+@utility animate-scroll-fade-in {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: fade-in linear both;
+      animation-duration: auto;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+}
+
+/* Le quatuor directionnel, derive plus ample qu'a l'horloge : le geste doit
+ * rester lisible quand c'est la molette qui donne le tempo. */
+@utility animate-scroll-fade-up {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      --motion-travel: 2.5rem;
+      animation: fade-up linear both;
+      animation-duration: auto;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+}
+
+@utility animate-scroll-fade-down {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      --motion-travel: 2.5rem;
+      animation: fade-down linear both;
+      animation-duration: auto;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+}
+
+@utility animate-scroll-fade-left {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      --motion-travel: 2.5rem;
+      animation: fade-left linear both;
+      animation-duration: auto;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+}
+
+@utility animate-scroll-fade-right {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      --motion-travel: 2.5rem;
+      animation: fade-right linear both;
+      animation-duration: auto;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+}
+
+@utility animate-scroll-zoom-in {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      --motion-scale: 0.92;
+      animation: zoom-in linear both;
+      animation-duration: auto;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+}
+
+@utility animate-scroll-blur-in {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: blur-in linear both;
+      animation-duration: auto;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+}
+
+/* Reveal masque au fil du scroll, pour les grands chiffres de preuve. */
+@utility animate-scroll-reveal-up {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: reveal-up linear both;
+      animation-duration: auto;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+  }
+}
+
+/* Parallaxe : l'element glisse a contre-courant sur toute sa traversee.
+ * --motion-parallax regle l'amplitude (3rem par defaut). A reserver aux
+ * couches decoratives, jamais au texte a lire. */
+@utility animate-scroll-parallax-up {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: parallax-y linear both;
+      animation-duration: auto;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+/* Meme trajectoire, jouee a l'envers : la couche descend au lieu de monter. */
+@utility animate-scroll-parallax-down {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: parallax-y linear both reverse;
+      animation-duration: auto;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+/* Apparait a l'entree, s'efface a la sortie : pour un element qui ne doit
+ * vivre qu'au centre de l'ecran (mockup epingle, citation). */
+@utility animate-scroll-fade-through {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: fade-through linear both;
+      animation-duration: auto;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+/* Barre de progression de lecture : scaleX suit le scroll de la page
+ * entiere via scroll(root). Reste invisible (scaleX 0) tant que le
+ * navigateur ne sait pas la piloter : elle est purement decorative. */
+@utility animate-scroll-progress {
+  transform: scaleX(0);
+  transform-origin: left center;
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: scroll()) {
+      animation: scroll-progress linear both;
+      animation-duration: auto;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+
+/* Keyframes propres au scroll ; les autres variantes reutilisent fade-*,
+ * zoom-in, blur-in et reveal-up definis dans les familles a l'horloge. */
+@keyframes parallax-y {
+  from {
+    transform: translateY(var(--motion-parallax, 3rem));
+  }
+  to {
+    transform: translateY(calc(-1 * var(--motion-parallax, 3rem)));
+  }
+}
+
+@keyframes fade-through {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  25%,
+  75% {
+    opacity: 1;
+  }
+}
+
+@keyframes scroll-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

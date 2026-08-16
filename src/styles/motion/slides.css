@@ -1,0 +1,141 @@
+/* src/styles/motion/slides.css - famille glissement : panneaux entiers et reveals masques, sans fondu. */
+
+/* Ici le suffixe est le cote d'ou l'element arrive (in) ou vers lequel il
+ * part (out). Le trajet fait 100% de la taille de l'element : c'est la
+ * famille des drawers, des toasts et des bandeaux, pas celle des titres.
+ * Une sortie laisse l'element dans le flux : le retirer sur animationend. */
+
+@utility animate-slide-in-top {
+  animation: slide-in-top 0.5s var(--motion-ease-out) both;
+}
+
+@utility animate-slide-in-bottom {
+  animation: slide-in-bottom 0.5s var(--motion-ease-out) both;
+}
+
+@utility animate-slide-in-left {
+  animation: slide-in-left 0.5s var(--motion-ease-out) both;
+}
+
+@utility animate-slide-in-right {
+  animation: slide-in-right 0.5s var(--motion-ease-out) both;
+}
+
+@utility animate-slide-out-top {
+  animation: slide-out-top 0.4s var(--motion-ease-in) both;
+}
+
+@utility animate-slide-out-bottom {
+  animation: slide-out-bottom 0.4s var(--motion-ease-in) both;
+}
+
+@utility animate-slide-out-left {
+  animation: slide-out-left 0.4s var(--motion-ease-in) both;
+}
+
+@utility animate-slide-out-right {
+  animation: slide-out-right 0.4s var(--motion-ease-in) both;
+}
+
+/* Reveals par decoupe : le contenu se devoile derriere un masque immobile.
+ * reveal-up monte depuis le bord bas, reveal-right balaie de gauche a droite
+ * (souligne, image de carte, cellule de tableau de preuve). */
+@utility animate-reveal-up {
+  animation: reveal-up 0.8s var(--motion-ease-out) both;
+}
+
+@utility animate-reveal-right {
+  animation: reveal-right 0.9s var(--motion-ease-out) both;
+}
+
+@keyframes slide-in-top {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-bottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out-top {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes slide-out-bottom {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes slide-out-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes slide-out-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(0.75rem);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes reveal-right {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}

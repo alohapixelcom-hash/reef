@@ -1,0 +1,249 @@
+/* src/styles/motion/attention.css - famille attention : boucles decoratives et micro-signaux. */
+
+/* Tout ce qui boucle ici est lent et de faible amplitude : ces utilitaires
+ * decorent (points de statut, cartes glass du hero, fleches de CTA), ils ne
+ * crient jamais. shake et wiggle jouent une fois, sur un evenement. */
+
+/* Rebond discret, pour l'indicateur "scroll down" du hero. */
+@utility animate-bounce-subtle {
+  animation: bounce-subtle 2.4s ease-in-out infinite;
+}
+
+/* Refus ou erreur de formulaire : reposer la classe a chaque nouvel essai. */
+@utility animate-shake {
+  animation: shake 0.5s linear both;
+}
+
+/* Petit salut rotatif, pour un emoji ou un sticker au survol. */
+@utility animate-wiggle {
+  animation: wiggle 0.9s ease-in-out both;
+}
+
+/* Levitation douce, pour les cartes glass posees sur le hero.
+ * --motion-float regle l'amplitude (0.5rem par defaut). */
+@utility animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Meme levitation, plus ample et plus lente : a melanger avec animate-float
+ * et des delais pour desynchroniser un groupe de cartes. */
+@utility animate-float-slow {
+  --motion-float: 0.875rem;
+  animation: float 10s ease-in-out infinite;
+}
+
+/* Balancement d'enseigne, pivot en pied : stickers et badges suspendus. */
+@utility animate-sway {
+  transform-origin: 50% 100%;
+  animation: sway 6.5s ease-in-out infinite;
+}
+
+/* Rotation continue tres lente, pour un anneau ou un texte circulaire. */
+@utility animate-spin-slow {
+  animation: spin-slow 16s linear infinite;
+}
+
+/* Appel du pied horizontal, pour la fleche d'un lien "See how it works". */
+@utility animate-nudge {
+  animation: nudge 1.8s ease-in-out infinite;
+}
+
+/* Onde sonar : a poser sur l'echo (copie absolue) derriere un point de
+ * statut, jamais sur le point lui-meme. */
+@utility animate-ping-soft {
+  animation: ping-soft 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Double battement, pour un compteur ou un indicateur "live". */
+@utility animate-heartbeat {
+  animation: heartbeat 1.9s ease-in-out infinite;
+}
+
+/* Halo respirant : suit --color-primary, donc corail en clair comme en
+ * sombre. Un seul par ecran, sur le CTA que la page veut vraiment vendre. */
+@utility animate-glow-pulse {
+  animation: glow-pulse 3.2s ease-in-out infinite;
+}
+
+/* Fait voyager un degrade dans son propre fond. Se marie avec
+ * .text-gradient-shore ou tout fond en linear-gradient. */
+@utility animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease-in-out infinite;
+}
+
+@keyframes bounce-subtle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.4rem);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-0.45rem);
+  }
+  30% {
+    transform: translateX(0.4rem);
+  }
+  45% {
+    transform: translateX(-0.3rem);
+  }
+  60% {
+    transform: translateX(0.2rem);
+  }
+  75% {
+    transform: translateX(-0.1rem);
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-4deg);
+  }
+  40% {
+    transform: rotate(3deg);
+  }
+  60% {
+    transform: rotate(-2deg);
+  }
+  80% {
+    transform: rotate(1deg);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(calc(-1 * var(--motion-float, 0.5rem)));
+  }
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-2deg);
+  }
+  75% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(0.3rem);
+  }
+}
+
+@keyframes ping-soft {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70%,
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes heartbeat {
+  0%,
+  28%,
+  56%,
+  100% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.08);
+  }
+  42% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 18px -8px color-mix(in oklab, var(--color-primary) 35%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 34px -4px color-mix(in oklab, var(--color-primary) 65%, transparent);
+  }
+}
+
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Derive des halos. Amplitude volontairement minuscule et periode tres longue :
+ * une lueur parfaitement immobile se lit comme une image, une lueur qui bouge
+ * un peu se lit comme une lumiere. On ne doit pas pouvoir la voir bouger en
+ * fixant l'ecran, seulement sentir que la scene est vivante.
+ *
+ * Sous la barre des 0.2 Hz, une oscillation devient inconfortable pour les
+ * personnes sensibles au mouvement : ces deux-la tournent en 26 et 34 s, donc
+ * bien en dessous, et le garde-fou prefers-reduced-motion les coupe de toute
+ * facon.
+ * ------------------------------------------------------------------------- */
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-3%, 4%, 0) scale(1.08);
+  }
+}
+
+@keyframes drift-slow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.05);
+  }
+  50% {
+    transform: translate3d(4%, -3%, 0) scale(1);
+  }
+}
+
+.animate-drift {
+  animation: drift 26s ease-in-out infinite;
+}
+
+.animate-drift-slow {
+  animation: drift-slow 34s ease-in-out infinite;
+}
