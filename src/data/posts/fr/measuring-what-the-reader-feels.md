@@ -49,7 +49,7 @@ function record(metric) {
   const a = metric.attribution;
   queue.push({
     name: metric.name,
-    // Le CLS est sans unite : on le stocke mis a l'echelle pour n'envoyer que des entiers.
+    // Le CLS est sans unité : on le stocke mis a l'echelle pour n'envoyer que des entiers.
     value: Math.round(metric.name === "CLS" ? metric.value * 1000 : metric.value),
     rating: metric.rating,
     path: location.pathname,
