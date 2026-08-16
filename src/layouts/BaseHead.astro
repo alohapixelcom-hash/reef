@@ -8,14 +8,13 @@
 // remarque dans le premier paragraphe. Le fichier ne part que si une italique
 // est reellement peinte, et il ne bloque rien (font-display: swap).
 //
-// Besley n'entre que par sa coupe italique variable (une Clarendon) : c'est
-// son seul usage dans le theme (le mot d'accent d'un grand titre, la citation,
-// la lettrine). Importer le paquet entier chargerait un romain que personne
-// n'affiche.
+// Deux familles chargees, pas une de plus : Space Grotesk (affichage) et
+// Instrument Sans (texte). Le mot d'accent des titres garde la police du titre
+// et porte une vague corail soulignee (--accent-wave, tokens.css) : aucune
+// serif ni italique d'accent n'est chargee.
 import "@fontsource-variable/space-grotesk";
 import "@fontsource-variable/instrument-sans";
 import "@fontsource-variable/instrument-sans/wght-italic.css";
-import "@fontsource-variable/besley/wght-italic.css";
 import siteData from "@config/siteData.json";
 import siteSettings from "@config/siteSettings.json";
 import { defaultLocale, getAlternates, getLocale, localeMeta, localizePath } from "@i18n";
