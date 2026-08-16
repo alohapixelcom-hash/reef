@@ -1,0 +1,37 @@
+---
+// src/components/svg/icons/Icon.astro - rend une icone du set par son nom, en trait 2 a bouts ronds.
+// Le nom est type : un nom inconnu casse le build, jamais la page. La couleur
+// vient du texte parent via currentColor, la taille par la prop size (20 par defaut).
+import type { HTMLAttributes } from "astro/types";
+import { icons, type IconName } from "./icons";
+
+type Props = HTMLAttributes<"svg"> & {
+  name: IconName;
+  size?: number;
+};
+
+const { name, size = 20, class: className, ...rest } = Astro.props;
+const paths = icons[name];
+
+// Decorative par defaut : masquee des lecteurs d'ecran. Si le parent fournit
+// un aria-label ou un aria-labelledby, l'icone devient une image nommee.
+const labelled = "aria-label" in rest || "aria-labelledby" in rest;
+---
+
+<svg
+  viewBox="0 0 24 24"
+  width={size}
+  height={size}
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  role={labelled ? "img" : undefined}
+  aria-hidden={labelled ? undefined : "true"}
+  class={className}
+  data-slot="icon"
+  {...rest}
+>
+  {paths.map((d) => <path d={d}></path>)}
+</svg>
