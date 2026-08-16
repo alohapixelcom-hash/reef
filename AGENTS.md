@@ -30,11 +30,12 @@ is named **Reef**. A buyer replaces Reef Notes and keeps Reef.
 
 Astro 7 (static output, no adapter), Tailwind CSS 4 (CSS-first config, no
 tailwind.config.js), tailwind-variants, @astrojs/mdx (Markdown and MDX posts)
-and @astrojs/sitemap, Fontsource for Space Grotesk, Instrument Sans and
-Besley. Node >= 22.12, pnpm. Demo copy is bilingual, for a fictional
+and @astrojs/sitemap, Fontsource for Space Grotesk and Instrument Sans (the
+only two fonts: the accent word keeps the heading font under a coral wave
+underline). Node >= 22.12, pnpm. Demo copy is bilingual, for a fictional
 publication named Reef Notes.
 
-**No React, no WebGL, no animation library.** Reef has zero islands and ten
+**No React, no WebGL, no animation library.** Reef has zero islands and nine
 runtime dependencies. Every effect on the page is CSS. Adding a framework to
 this repo is a design failure, not a feature.
 
@@ -93,7 +94,8 @@ node src/js/pagination.selfcheck.ts
    CSS before any `<script>`. There is no React and no island in this theme.
 7. Buttons are pills (rounded-pill). Cards float (bg-card rounded-card
    shadow-float). Sections breathe (py-24 md:py-32). Exactly one accent-script
-   word per big title.
+   word per big title: it keeps the heading font, turns coral and carries the
+   coral wave underline (--accent-wave). Never an italic serif.
 8. Bilingual is mandatory: `export const getStaticPaths = localePaths;` on
    every page under [...locale]/ (dynamic routes multiply it), every internal
    href through `localizePath()`, and the French is written, not translated. A
