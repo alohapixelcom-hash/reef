@@ -1,0 +1,6 @@
+{
+  "name": "Typography",
+  "description": "Type is most of a website, and most of the work is invisible: measure, rhythm, loading strategy, the fallback nobody bothered to design. What we ship, and what it costs in kilobytes.",
+  "accent": "ink",
+  "order": 3
+}
