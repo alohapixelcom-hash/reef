@@ -1,0 +1,17 @@
+---
+// src/components/ui/table/TableRow.astro - <tr> : filet bas et transition de fond au survol.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const tableRow = tv({
+  base: "border-border border-b transition-colors",
+});
+
+type Props = HTMLAttributes<"tr">;
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<tr class={tableRow({ class: className })} data-slot="table-row" {...rest}>
+  <slot />
+</tr>

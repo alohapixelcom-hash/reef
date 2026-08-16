@@ -1,0 +1,99 @@
+---
+// src/components/ui/tabs/Tabs.astro - racine des onglets : relie TabList, Tab et TabPanel par leur value, genere les ids aria et gere fleches, Home et End au clavier.
+// Sans JavaScript, le panneau marque selected reste visible et les autres
+// restent masques : le contenu principal n'est jamais perdu.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const tabs = tv({
+  base: "w-full",
+});
+
+type Props = HTMLAttributes<"div">;
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<div class={tabs({ class: className })} data-slot="tabs" {...rest}>
+  <slot />
+</div>
+
+<script>
+  // Cablage aria (ids generes depuis value) + activation au clic et au
+  // clavier, en delegation : un seul jeu d'ecouteurs au document pour toutes
+  // les instances, re-init apres chaque view transition via astro:page-load.
+  const ROOT = "[data-slot='tabs']";
+  const TAB = "[data-slot='tab']";
+  const PANEL = "[data-slot='tab-panel']";
+  let uid = 0;
+
+  function partsOf(root: HTMLElement): { tabList: HTMLElement[]; panels: HTMLElement[] } {
+    // closest(ROOT) filtre les instances imbriquees : chaque racine ne pilote
+    // que ses propres onglets.
+    const tabList = Array.from(root.querySelectorAll<HTMLElement>(TAB)).filter(
+      (el) => el.closest(ROOT) === root,
+    );
+    const panels = Array.from(root.querySelectorAll<HTMLElement>(PANEL)).filter(
+      (el) => el.closest(ROOT) === root,
+    );
+    return { tabList, panels };
+  }
+
+  function select(root: HTMLElement, active: HTMLElement, focus = false): void {
+    const { tabList, panels } = partsOf(root);
+    tabList.forEach((tab) => {
+      const selected = tab === active;
+      tab.setAttribute("aria-selected", String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+    });
+    panels.forEach((panel) => {
+      panel.hidden = panel.dataset.value !== active.dataset.value;
+    });
+    if (focus) active.focus();
+  }
+
+  function init(): void {
+    document.querySelectorAll<HTMLElement>(`${ROOT}:not([data-tabs-ready])`).forEach((root) => {
+      root.setAttribute("data-tabs-ready", "");
+      const base = root.id || `reef-tabs-${++uid}`;
+      const { tabList, panels } = partsOf(root);
+      tabList.forEach((tab) => {
+        tab.id = `${base}-tab-${tab.dataset.value ?? ""}`;
+        tab.setAttribute("aria-controls", `${base}-panel-${tab.dataset.value ?? ""}`);
+      });
+      panels.forEach((panel) => {
+        panel.id = `${base}-panel-${panel.dataset.value ?? ""}`;
+        panel.setAttribute("aria-labelledby", `${base}-tab-${panel.dataset.value ?? ""}`);
+      });
+      const current = tabList.find((tab) => tab.getAttribute("aria-selected") === "true") ?? tabList[0];
+      if (current) select(root, current);
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    const tab = event.target instanceof Element ? event.target.closest<HTMLElement>(TAB) : null;
+    const root = tab?.closest<HTMLElement>(ROOT);
+    if (tab && root) select(root, tab);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    const tab = event.target instanceof Element ? event.target.closest<HTMLElement>(TAB) : null;
+    const root = tab?.closest<HTMLElement>(ROOT);
+    if (!tab || !root) return;
+    const { tabList } = partsOf(root);
+    const index = tabList.indexOf(tab);
+    let next = index;
+    if (event.key === "ArrowLeft") next = (index - 1 + tabList.length) % tabList.length;
+    if (event.key === "ArrowRight") next = (index + 1) % tabList.length;
+    if (event.key === "Home") next = 0;
+    if (event.key === "End") next = tabList.length - 1;
+    const target = tabList[next];
+    if (!target) return;
+    event.preventDefault();
+    select(root, target, true);
+  });
+
+  init();
+  document.addEventListener("astro:page-load", init);
+</script>

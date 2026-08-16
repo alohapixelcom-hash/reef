@@ -1,0 +1,22 @@
+---
+// src/components/ui/table/TableHead.astro - <th> d'en-tete de colonne : petites capitales
+// Grotesque d'affichage en sourdine, scope="col" par defaut pour les lecteurs d'ecran.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const tableHead = tv({
+  base: [
+    "h-12 px-4 text-left align-middle whitespace-nowrap",
+    "font-display text-xs font-bold tracking-wider uppercase",
+    "text-muted-foreground",
+  ],
+});
+
+type Props = HTMLAttributes<"th">;
+
+const { scope = "col", class: className, ...rest } = Astro.props;
+---
+
+<th class={tableHead({ class: className })} scope={scope} data-slot="table-head" {...rest}>
+  <slot />
+</th>

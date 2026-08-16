@@ -1,0 +1,80 @@
+---
+// src/components/ui/stagger-reveal/StaggerReveal.astro - apparition en cascade : masque ses enfants directs puis les fait monter l'un apres l'autre a l'entree dans le viewport.
+// step regle l'ecart entre enfants (delai incremental), delay le depart.
+// Sans JavaScript rien n'est masque ; reduced-motion affiche tout direct.
+import type { HTMLTag, Polymorphic } from "astro/types";
+
+type Props<Tag extends HTMLTag = "div"> = Polymorphic<{ as: Tag }> & {
+  // Ecart entre deux enfants, en millisecondes.
+  step?: number;
+  // Delai de depart du premier enfant, en millisecondes.
+  delay?: number;
+};
+
+// Balise de rendu, div par defaut ; "ul" pour une grille de cartes, etc.
+const { as: Tag = "div", step = 90, delay = 0, class: className, ...rest } = Astro.props;
+---
+
+<Tag
+  class={className}
+  data-slot="stagger-reveal"
+  data-stagger
+  data-stagger-step={step}
+  data-stagger-delay={delay > 0 ? delay : undefined}
+  {...rest}
+>
+  <slot />
+</Tag>
+
+<style is:global>
+  /* Etat masque pose par le script sur les enfants juste avant l'observation :
+   * sans script, l'attribut n'existe pas et tout reste visible. */
+  [data-stagger-hidden] {
+    opacity: 0;
+  }
+</style>
+
+<script>
+  // On observe la racine, pas les enfants : la cascade part d'un seul coup
+  // des que le groupe entre dans le viewport, avec un delai incremental.
+  let observer: IntersectionObserver | null = null;
+
+  function show(root: HTMLElement): void {
+    const step = Number(root.dataset.staggerStep ?? 90);
+    const base = Number(root.dataset.staggerDelay ?? 0);
+    Array.from(root.children).forEach((child, index) => {
+      if (!(child instanceof HTMLElement)) return;
+      child.style.animationDelay = `${base + index * step}ms`;
+      // animate-rise est en fill both : l'opacite 0 tient pendant le delai.
+      child.classList.add("animate-rise");
+      child.removeAttribute("data-stagger-hidden");
+    });
+  }
+
+  function init(): void {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document
+      .querySelectorAll<HTMLElement>("[data-stagger]:not([data-stagger-ready])")
+      .forEach((root) => {
+        root.setAttribute("data-stagger-ready", "");
+        if (reduce || !("IntersectionObserver" in window)) return;
+        observer ??= new IntersectionObserver(
+          (entries, io) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              io.unobserve(entry.target);
+              if (entry.target instanceof HTMLElement) show(entry.target);
+            });
+          },
+          { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
+        );
+        Array.from(root.children).forEach((child) => {
+          if (child instanceof HTMLElement) child.setAttribute("data-stagger-hidden", "");
+        });
+        observer.observe(root);
+      });
+  }
+
+  init();
+  document.addEventListener("astro:page-load", init);
+</script>

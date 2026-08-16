@@ -1,0 +1,97 @@
+---
+// src/components/ui/theme-toggle/ThemeToggle.astro - bouton pilule qui bascule la classe .dark sur <html> et persiste le choix dans localStorage.
+// Va de pair avec ThemeInit, place dans le <head> pour eviter tout flash.
+// Icone soleil en mode clair, lune en mode sombre ; etat expose via
+// aria-pressed, resynchronise apres chaque navigation.
+import type { HTMLAttributes } from "astro/types";
+import type { VariantProps } from "tailwind-variants";
+import { button } from "../button";
+
+type ButtonVariants = VariantProps<typeof button>;
+
+type Props = HTMLAttributes<"button"> & {
+  label?: string;
+  variant?: ButtonVariants["variant"];
+  size?: ButtonVariants["size"];
+};
+
+const {
+  label = "Toggle dark mode",
+  variant = "ghost",
+  size = "icon",
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<button
+  type="button"
+  class={button({ variant, size, class: className })}
+  data-slot="theme-toggle"
+  data-theme-toggle
+  aria-label={label}
+  aria-pressed="false"
+  {...rest}
+>
+  <svg
+    class="size-5 dark:hidden"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="4"></circle>
+    <path
+      d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32 1.41-1.41"
+    ></path>
+  </svg>
+  <svg
+    class="hidden size-5 dark:block"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+  </svg>
+</button>
+
+<script>
+  // Bascule + persistance, en delegation : un seul listener pour toutes les
+  // instances (header et pied de page par exemple), et une resynchronisation
+  // de aria-pressed au chargement puis apres chaque view transition.
+  const KEY = "reef-theme";
+
+  function isDark(): boolean {
+    return document.documentElement.classList.contains("dark");
+  }
+
+  function sync(): void {
+    document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]").forEach((toggle) => {
+      toggle.setAttribute("aria-pressed", String(isDark()));
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    const target =
+      event.target instanceof Element ? event.target.closest("[data-theme-toggle]") : null;
+    if (!target) return;
+    const next = !isDark();
+    document.documentElement.classList.toggle("dark", next);
+    document.documentElement.style.colorScheme = next ? "dark" : "light";
+    try {
+      localStorage.setItem(KEY, next ? "dark" : "light");
+    } catch (error) {
+      /* stockage indisponible : la bascule reste effective pour la page */
+    }
+    sync();
+  });
+
+  sync();
+  document.addEventListener("astro:page-load", sync);
+</script>

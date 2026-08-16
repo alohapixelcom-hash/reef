@@ -1,0 +1,17 @@
+---
+// src/components/ui/table/TableHeader.astro - <thead> : garantit le filet sous la ligne d'en-tete.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const tableHeader = tv({
+  base: "[&_tr]:border-border [&_tr]:border-b",
+});
+
+type Props = HTMLAttributes<"thead">;
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<thead class={tableHeader({ class: className })} data-slot="table-header" {...rest}>
+  <slot />
+</thead>

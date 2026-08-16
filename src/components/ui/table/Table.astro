@@ -1,0 +1,27 @@
+---
+// src/components/ui/table/Table.astro - table de donnees dans un conteneur overflow-x :
+// elle scrolle sur mobile au lieu de casser la mise en page. class va au <table>,
+// containerClass au conteneur qui scrolle.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const table = tv({
+  slots: {
+    container: "relative w-full overflow-x-auto",
+    root: "w-full caption-bottom text-sm",
+  },
+});
+
+type Props = HTMLAttributes<"table"> & {
+  containerClass?: string;
+};
+
+const { containerClass, class: className, ...rest } = Astro.props;
+const { container, root } = table();
+---
+
+<div class={container({ class: containerClass })} data-slot="table-container">
+  <table class={root({ class: className })} data-slot="table" {...rest}>
+    <slot />
+  </table>
+</div>

@@ -1,0 +1,26 @@
+---
+// src/components/ui/tabs/TabList.astro - le rail des onglets : role tablist en pilule sur fond muted, nomme par la prop label obligatoire.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const tabList = tv({
+  base: "inline-flex max-w-full flex-wrap items-center gap-1 rounded-pill bg-muted p-1.5",
+});
+
+type Props = HTMLAttributes<"div"> & {
+  // Nom accessible du groupe d'onglets, par exemple "Product views".
+  label: string;
+};
+
+const { label, class: className, ...rest } = Astro.props;
+---
+
+<div
+  class={tabList({ class: className })}
+  data-slot="tab-list"
+  role="tablist"
+  aria-label={label}
+  {...rest}
+>
+  <slot />
+</div>

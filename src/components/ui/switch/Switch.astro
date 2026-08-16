@@ -1,0 +1,52 @@
+---
+// src/components/ui/switch/Switch.astro - interrupteur 100% CSS, zero JS.
+// Checkbox natif avec role="switch" (sr-only + peer), le pouce est un pseudo-element
+// qui glisse en translate-x. Actif = corail, comme tous les etats actifs du theme.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const switchControl = tv({
+  slots: {
+    root: [
+      "group flex min-h-11 w-fit cursor-pointer items-center gap-3 select-none",
+      "has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60",
+    ],
+    track: [
+      "relative inline-flex shrink-0 items-center rounded-pill bg-foreground/20 p-0.5",
+      "transition-colors duration-200",
+      "ring-offset-background peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2",
+      "peer-checked:bg-primary",
+      "after:rounded-full after:bg-white after:shadow-float",
+      "after:transition-transform after:duration-200 after:content-['']",
+    ],
+    text: "text-foreground",
+  },
+  variants: {
+    size: {
+      sm: {
+        track: "h-5 w-9 after:size-4 peer-checked:after:translate-x-4",
+        text: "text-sm",
+      },
+      md: {
+        track: "h-6 w-11 after:size-5 peer-checked:after:translate-x-5",
+        text: "text-[0.95rem]",
+      },
+    },
+  },
+  defaultVariants: { size: "md" },
+});
+
+type SwitchVariants = VariantProps<typeof switchControl>;
+
+type Props = Omit<HTMLAttributes<"input">, "size" | "type" | "role"> & SwitchVariants;
+
+const { size, class: className, ...rest } = Astro.props;
+const { root, track, text } = switchControl({ size });
+const hasText = Astro.slots.has("default");
+---
+
+<label class={root({ class: className })} data-slot="switch">
+  <input type="checkbox" role="switch" class="peer sr-only" {...rest} />
+  <span class={track()} aria-hidden="true"></span>
+  {hasText && <span class={text()}><slot /></span>}
+</label>
