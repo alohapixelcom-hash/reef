@@ -1,0 +1,109 @@
+LICENSE - license for the Reef theme (free to download, protected against redistribution): one license per developer, unlimited end products, no redistribution as a theme.
+
+ALOHA THEME LICENSE AGREEMENT
+Version 1.0, August 2026
+Copyright (c) 2026 Aloha Pixel. All rights reserved.
+
+This agreement is between Aloha Pixel ("we", "us") and you, the person or
+company that purchased a license for the Reef theme (the "Theme"). By
+downloading, installing or using the Theme you accept these terms. If you do
+not accept them, do not use the Theme.
+
+1. WHAT THE THEME IS
+
+The Theme is the source code, styles, components, scripts, documentation and
+demo content distributed under the name "Reef". Fonts and other third-party
+components bundled with the Theme are listed in THIRD-PARTY.md and remain
+governed by their own licenses; this agreement covers everything else.
+
+2. WHAT YOU MAY DO
+
+Subject to this agreement, we grant you a non-exclusive, non-transferable,
+worldwide, perpetual license to:
+
+a. Use the Theme to build an unlimited number of end products, for yourself,
+   your company or your clients. An "end product" is a website or web
+   application whose purpose is its own content or service, not the Theme
+   itself: a SaaS marketing site, a product site, a company site, a client
+   project.
+b. Modify the Theme without limit: rebrand it, restructure it, delete from it,
+   extend it. Modified code stays subject to this agreement.
+c. Deploy end products commercially or non-commercially, on any number of
+   domains, with no attribution required.
+d. Keep the Theme source in the private repositories of the end products that
+   use it, accessible to the people working on those products.
+
+3. ONE LICENSE PER DEVELOPER
+
+Each license covers one developer: one person who edits the Theme source.
+A team of three people editing the source needs three licenses. People who
+only view the deployed end product, write content in it, or review work
+without editing the Theme source do not need a license. A license is tied to
+a person, not a machine: your licensed developer may work on any number of
+computers.
+
+4. WHAT YOU MAY NOT DO
+
+a. Redistribute the Theme as a theme. You may not resell, sublicense, share,
+   publish or give away the Theme, in whole or in substantial part, as a
+   theme, template, starter, boilerplate, UI kit, component library or
+   similar developer-facing product, whether free or paid, modified or not.
+   This is the one thing this license protects.
+b. Publish the Theme source in a public repository or any location where
+   people without a license can obtain it. Open sourcing an end product that
+   embeds the Theme requires removing the Theme or contacting us for a
+   written exception.
+c. Extract components, styles or documentation from the Theme to build a
+   competing developer-facing product.
+d. Transfer or resell your license, except that a company may reassign a
+   seat from a developer who leaves to the developer who replaces them.
+e. Use the Theme in an end product whose primary value is the Theme itself,
+   such as a site generator that outputs Reef-based sites for third parties
+   without each recipient holding a license.
+
+5. DEMO CONTENT
+
+The demo copy, the fictional publication "Reef Notes", its fictional authors
+and articles are part of the Theme and are provided for
+demonstration. Replace them in production; do not present fictional
+testimonials or ratings as real.
+
+6. UPDATES AND SUPPORT
+
+Your purchase includes access to updates of the major version you bought.
+Support, when offered, is provided on a reasonable-effort basis and is not a
+guaranteed service level. We may release new major versions under separate
+terms.
+
+7. NO WARRANTY
+
+The Theme is provided "as is", without warranty of any kind, express or
+implied, including but not limited to warranties of merchantability, fitness
+for a particular purpose and non-infringement. You are responsible for
+testing the Theme for your use case before deploying it. We do not warrant
+that the Theme is error free or that it will meet your requirements.
+
+8. LIMITATION OF LIABILITY
+
+To the maximum extent permitted by law, Aloha Pixel shall not be liable for
+any indirect, incidental, special, consequential or exemplary damages arising
+from the use of or inability to use the Theme. Our total aggregate liability
+under this agreement shall not exceed the amount you paid for your license.
+
+9. TERMINATION
+
+This license terminates automatically if you materially breach it, in
+particular section 4. Upon termination you must stop distributing the Theme
+and destroy your copies of the source; end products already deployed before
+the breach may remain deployed. Sections 7, 8 and 10 survive termination.
+
+10. GENERAL
+
+This agreement is the entire agreement between us regarding the Theme. If a
+provision is held unenforceable, the rest remains in effect. Failure to
+enforce a provision is not a waiver of it. You may not use our names,
+trademarks or logos except to state, factually, that your product was built
+with the Theme.
+
+Questions and exceptions: contact Aloha Pixel through the address on your
+purchase receipt.
