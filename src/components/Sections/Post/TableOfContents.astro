@@ -1,0 +1,214 @@
+---
+// src/components/Sections/Post/TableOfContents.astro - sommaire h2/h3 : <details> replie en tete d'article sur telephone, rail collant dans la marge sur grand ecran.
+//
+// Trois decisions valent d'etre dites.
+//
+// 1. Un article court n'a pas de sommaire. En dessous de trois entrees, la
+//    carte du texte est plus longue a lire que le texte : le composant ne rend
+//    alors rien du tout, et la grille de PostBody se referme d'elle-meme.
+//
+// 2. Deux noeuds, pas un. Le meme element ne peut pas etre un <details> replie
+//    sur telephone et un rail deplie sur grand ecran : l'etat d'un <details>
+//    est un attribut du DOM, aucune media query ne l'ouvre. Le forcer par
+//    ::details-content marcherait sur les moteurs recents seulement, et un
+//    sommaire invisible ailleurs coute plus cher que dix lignes dupliquees.
+//    Un seul des deux existe a la fois (display: none), donc l'arbre
+//    d'accessibilite ne voit jamais deux navigations du meme nom.
+//
+// 3. La bascule est a 80rem, la meme que la grille de PostBody. Les deux
+//    valeurs doivent rester d'accord : c'est la seule chose a verifier ici.
+import { Icon } from "@components/svg/icons";
+import { getLocale, useTranslations } from "@i18n";
+import type { MarkdownHeading } from "astro";
+
+type Props = {
+  /** Les titres rendus par render() d'Astro, dans l'ordre du document. */
+  headings: MarkdownHeading[];
+  /** En dessous de ce nombre d'entrees, aucun sommaire n'est rendu. */
+  min?: number;
+  class?: string;
+};
+
+const { headings, min = 3, class: className } = Astro.props;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+
+// h2 et h3 seulement. Le h1 est le titre de la page, il n'est pas une etape ;
+// le h4 est un aparte, et un sommaire qui le liste cesse d'etre une carte.
+const items = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+---
+
+{
+  items.length >= min && (
+    <div class:list={["toc mb-8 xl:mb-0", className]} data-slot="toc">
+      {/* Telephone et tablette : un <details> replie, en tete d'article. */}
+      <details class="toc-box border-border bg-surface rounded-card border xl:hidden">
+        <summary class="toc-summary font-display text-foreground text-sm font-semibold">
+          {t.post.toc}
+          <Icon name="chevron-down" size={18} class="toc-chevron text-muted-foreground" />
+        </summary>
+        <nav aria-label={t.post.tocLabel} class="px-4 pb-3">
+          <ol class="toc-list">
+            {items.map((item) => (
+              <li class:list={["toc-item", item.depth === 3 && "toc-item-sub"]}>
+                <a class="toc-link" href={`#${item.slug}`} data-toc-link={item.slug}>
+                  {item.text}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      </details>
+
+      {/* Grand ecran : le rail colle dans la marge droite, sans boite ni fond.
+          C'est une table des matieres de livre, pas un panneau d'interface. */}
+      <nav class="toc-rail hidden xl:block" aria-label={t.post.tocLabel}>
+        <p class="font-sans text-muted-foreground mb-3 text-xs font-medium tracking-[0.18em] uppercase">
+          {t.post.toc}
+        </p>
+        <ol class="toc-list">
+          {items.map((item) => (
+            <li class:list={["toc-item", item.depth === 3 && "toc-item-sub"]}>
+              <a class="toc-link" href={`#${item.slug}`} data-toc-link={item.slug}>
+                {item.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </div>
+  )
+}
+
+<style>
+  .toc-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    /* 44 px de cible tactile, la regle du depot, atteinte par le padding et
+       pas par une hauteur fixe : le libelle peut passer sur deux lignes. */
+    padding: 0.85rem 1rem;
+    min-block-size: 2.75rem;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  /* Le triangle par defaut ne se style pas ; il est remplace par le chevron du
+     jeu d'icones, qui tourne a l'ouverture. */
+  .toc-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .toc-chevron {
+    flex-shrink: 0;
+    transition: rotate 0.2s ease;
+  }
+
+  .toc-box[open] .toc-chevron {
+    rotate: 180deg;
+  }
+
+  .toc-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Le filet continu a gauche de la liste est la colonne vertebrale du
+     sommaire : chaque entree en possede un segment, et le segment de l'entree
+     courante passe au corail. Rien ne bouge, rien ne se decale, une seule
+     couleur change. */
+  .toc-link {
+    display: flex;
+    align-items: center;
+    border-inline-start: 2px solid var(--color-border);
+    padding-inline-start: 0.9rem;
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--color-muted-foreground);
+    text-decoration: none;
+    text-wrap: pretty;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .toc-item-sub .toc-link {
+    padding-inline-start: 1.9rem;
+    font-size: 0.8rem;
+  }
+
+  .toc-link:hover {
+    color: var(--color-foreground);
+    border-inline-start-color: color-mix(in oklab, var(--color-foreground) 35%, transparent);
+  }
+
+  /* aria-current est pose par l'observateur, jamais au rendu : sans script, le
+     sommaire reste un sommaire, il ne ment simplement pas sur la position. */
+  .toc-link[aria-current] {
+    color: var(--color-foreground);
+    border-inline-start-color: var(--color-primary);
+    font-weight: 500;
+  }
+
+  /* Dans le <details>, chaque entree tient la cible tactile de 44 px. */
+  .toc-box .toc-link {
+    min-block-size: 2.75rem;
+    padding-block: 0.4rem;
+  }
+
+  /* Dans le rail, le pointeur est fin et la place est comptee : on resserre. */
+  .toc-rail .toc-link {
+    padding-block: 0.4rem;
+  }
+</style>
+
+<script>
+  // Observateur du sommaire : allume l'entree du titre en cours de lecture.
+  // C'est le seul JavaScript de la page d'article.
+  //
+  // Coupe net en mouvement reduit : un reperage qui se deplace tout seul reste
+  // du mouvement, meme quand il ne dure que 150 ms.
+  //
+  // La bande d'observation (-15% en haut, -70% en bas) fait qu'un titre devient
+  // courant en atteignant le premier tiers de l'ecran, et pas en touchant le
+  // bord : sinon l'entree s'allume avant que le lecteur ne voie la section.
+  const READY = "data-toc-ready";
+
+  function initToc(): void {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const root = document.querySelector<HTMLElement>(`[data-slot="toc"]:not([${READY}])`);
+    if (!root) return;
+    root.setAttribute(READY, "");
+
+    const links = Array.from(root.querySelectorAll<HTMLAnchorElement>("[data-toc-link]"));
+    const targets = [...new Set(links.map((link) => link.dataset.tocLink))]
+      .map((id) => (id ? document.getElementById(id) : null))
+      .filter((element): element is HTMLElement => element !== null);
+    if (targets.length === 0) return;
+
+    // Les deux copies du sommaire (repliee et rail) portent le meme jeu de
+    // liens : une seule boucle les tient d'accord.
+    const light = (id: string): void => {
+      for (const link of links) {
+        if (link.dataset.tocLink === id) link.setAttribute("aria-current", "location");
+        else link.removeAttribute("aria-current");
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) if (entry.isIntersecting) light(entry.target.id);
+      },
+      { rootMargin: "-15% 0px -70% 0px" },
+    );
+    for (const target of targets) observer.observe(target);
+    document.addEventListener("astro:before-swap", () => observer.disconnect(), { once: true });
+  }
+
+  initToc();
+  document.addEventListener("astro:page-load", initToc);
+</script>

@@ -1,0 +1,343 @@
+---
+// src/components/Sections/Search/Search.astro - la recherche du blog : index JSON construit au build, filtrage dans le navigateur, zero dependance et zero requete.
+//
+// Le parti pris qui change tout : la liste complete est rendue PAR LE SERVEUR.
+// Le script ne fabrique aucun noeud, il masque ceux qui ne correspondent pas et
+// reordonne les autres avec la propriete CSS order. Trois consequences :
+//
+//   1. Sans JavaScript, la page reste un index de tout le blog, utilisable.
+//   2. Le premier rendu ne depend d'aucun script : rien ne clignote.
+//   3. Il n'y a pas deux gabarits de resultat a maintenir, un en Astro et un en
+//      chaines de caracteres dans le script. C'est la moitie des bugs evitee.
+//
+// L'index embarque ne porte que ce sur quoi on cherche (titre, description,
+// sujet, tags, slug, langue) : le corps des billets ferait un fichier de
+// plusieurs centaines de kilo-octets pour un gain nul sur un blog de cette
+// taille, et le lecteur le paierait a chaque visite.
+import { Icon } from "@components/svg/icons";
+import { Button } from "@components/ui/button";
+import { Kbd } from "@components/ui/kbd";
+import { Searchbox } from "@components/ui/searchbox";
+import { EmptyState } from "@components/ui/empty-state";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { fmt, getLocale, useTranslations } from "@i18n";
+import type { ResolvedPost } from "@js/posts";
+
+type Props = {
+  posts: ResolvedPost[];
+};
+
+const { posts } = Astro.props;
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+
+// L'index : un enregistrement par billet, uniquement les champs cherchables.
+const index = posts.map(({ post, topic, slug }) => ({
+  slug,
+  locale,
+  title: post.data.title,
+  description: post.data.description,
+  topic: topic.data.name,
+  tags: post.data.tags,
+}));
+
+// JSON dans un <script type="application/json"> : la seule sequence qui peut en
+// sortir est "</script>" apparue dans un titre. On neutralise tous les "<",
+// JSON.parse les relit a l'identique.
+const indexJson = JSON.stringify(index).replaceAll("<", "\\u003c");
+
+const promptLabel = fmt(t.search.prompt, { count: posts.length });
+---
+
+<section class="container-page py-12 md:py-16" data-slot="search" data-search>
+  <div class="measure-wide flex flex-col gap-3">
+    <Searchbox
+      id="search-input"
+      size="lg"
+      name="q"
+      autocomplete="off"
+      autocapitalize="none"
+      spellcheck="false"
+      placeholder={t.search.placeholder}
+      aria-label={t.search.label}
+      aria-controls="search-results"
+    >
+      {/* Le bouton d'effacement n'existe que quand il y a quelque chose a
+          effacer : il est revele par le script, pas cache par lui. */}
+      <button
+        type="button"
+        class="text-muted-foreground hover:text-foreground hidden size-9 place-items-center rounded-pill transition-colors duration-150"
+        aria-label={t.search.clear}
+        data-search-clear
+      >
+        <Icon name="x" size={18} />
+      </button>
+    </Searchbox>
+
+    <p class="text-muted-foreground flex flex-wrap items-center gap-2 font-sans text-xs">
+      <Kbd>/</Kbd>
+      {t.search.shortcut}
+    </p>
+  </div>
+
+  {/* Le compteur est une region live : il annonce le nombre de resultats sans
+      voler le focus, et le script ne l'ecrit qu'apres une pause de frappe pour
+      ne pas debiter une phrase par caractere tape. */}
+  <p
+    class="text-muted-foreground mt-8 font-sans text-sm"
+    role="status"
+    data-search-count
+    data-prompt={promptLabel}
+    data-one={t.search.countOne}
+    data-many={t.search.countLabel}
+  >
+    {promptLabel}
+  </p>
+
+  <ul
+    id="search-results"
+    class="border-border mt-4 flex flex-col border-t"
+    aria-label={t.search.resultsLabel}
+    data-search-list
+  >
+    {
+      posts.map(({ post, topic, slug }) => (
+        <li class="border-border border-b" data-search-item data-slug={slug}>
+          <a
+            href={`${routes.posts}${slug}/`}
+            lang={locale}
+            class="hover:bg-surface group flex flex-col gap-1.5 px-2 py-5 transition-colors duration-150"
+            data-search-link
+          >
+            {/* Le sujet est du texte et non un lien : une ancre dans une ancre
+                est invalide, et un resultat de recherche n'a qu'une seule
+                destination utile. */}
+            <span class="text-muted-foreground font-sans text-xs">
+              {fmt(t.search.inTopic, { topic: topic.data.name })}
+            </span>
+            <span class="font-display text-foreground group-hover:text-primary text-lg font-semibold transition-colors duration-150">
+              {post.data.title}
+            </span>
+            <span class="text-muted-foreground line-clamp-2 text-[0.95rem] leading-relaxed">
+              {post.data.description}
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  {/* L'etat vide est rendu par le serveur et simplement devoile : pas de
+      gabarit duplique dans le script, et le titre porte le jeton {query} que le
+      script remplace par ce qui a ete tape. */}
+  <div class="hidden" data-search-empty data-title={t.search.noResultsTitle}>
+    <EmptyState title={t.search.noResultsTitle} description={t.search.noResultsLede} tone="search">
+      <Button href={routes.topics} variant="outline">{t.search.noResultsCta}</Button>
+    </EmptyState>
+  </div>
+
+  <script id="search-index" type="application/json" is:inline set:html={indexJson} />
+</section>
+
+<script>
+  // --- Le moteur ------------------------------------------------------------
+  // Un score par champ, additionne, et une regle de conjonction : TOUS les mots
+  // tapes doivent apparaitre quelque part, sinon le resultat sort. Chercher
+  // "dark css" ne doit pas remonter tout ce qui parle de CSS.
+  interface Record_ {
+    slug: string;
+    locale: string;
+    title: string;
+    description: string;
+    topic: string;
+    tags: string[];
+  }
+
+  interface Scored {
+    haystacks: { title: string; description: string; topic: string; tags: string };
+    score: number;
+  }
+
+  /** Minuscules et sans accents : "Typographie" et "typographie" se valent. */
+  function fold(value: string): string {
+    return value
+      .normalize("NFKD")
+      .replace(/[̀-ͯ]/g, "")
+      .toLowerCase();
+  }
+
+  // Les poids disent ce que le theme considere comme un bon resultat : un mot
+  // dans le titre bat le meme mot noye dans un chapeau, toujours.
+  const WEIGHT = { title: 8, topic: 5, tags: 4, description: 2 } as const;
+  const STARTS_BONUS = 6;
+
+  function scoreOne(entry: Scored, terms: string[]): number {
+    let total = 0;
+    for (const term of terms) {
+      let best = 0;
+      if (entry.haystacks.title.includes(term)) {
+        best = WEIGHT.title;
+        if (entry.haystacks.title.startsWith(term)) best += STARTS_BONUS;
+      }
+      if (entry.haystacks.topic.includes(term)) best = Math.max(best, WEIGHT.topic);
+      if (entry.haystacks.tags.includes(term)) best = Math.max(best, WEIGHT.tags);
+      if (entry.haystacks.description.includes(term)) best = Math.max(best, WEIGHT.description);
+      // Un seul mot absent partout suffit a ecarter le billet.
+      if (best === 0) return 0;
+      total += best;
+    }
+    return total;
+  }
+
+  let debounce = 0;
+  let onKey: ((event: KeyboardEvent) => void) | null = null;
+
+  function init(): void {
+    if (onKey) {
+      document.removeEventListener("keydown", onKey);
+      onKey = null;
+    }
+    const root = document.querySelector<HTMLElement>("[data-search]");
+    if (!root) return;
+
+    // Searchbox etale ses attributs libres sur le <input> lui-meme : c'est donc
+    // le champ, et pas son enveloppe, qui porte l'id pose dans le gabarit.
+    const input = root.querySelector<HTMLInputElement>("#search-input");
+    const list = root.querySelector<HTMLElement>("[data-search-list]");
+    const countEl = root.querySelector<HTMLElement>("[data-search-count]");
+    const emptyEl = root.querySelector<HTMLElement>("[data-search-empty]");
+    const clearEl = root.querySelector<HTMLElement>("[data-search-clear]");
+    const raw = root.querySelector<HTMLElement>("#search-index")?.textContent;
+    if (!input || !list || !countEl || !emptyEl || !raw) return;
+
+    const records = JSON.parse(raw) as Record_[];
+    const byslug = new Map<string, Scored>();
+    for (const record of records) {
+      byslug.set(record.slug, {
+        score: 0,
+        haystacks: {
+          title: fold(record.title),
+          description: fold(record.description),
+          topic: fold(record.topic),
+          tags: fold(record.tags.join(" ")),
+        },
+      });
+    }
+
+    const items = Array.from(root.querySelectorAll<HTMLElement>("[data-search-item]"));
+    const emptyTitle = emptyEl.querySelector<HTMLElement>("[data-slot='empty-state'] p:first-of-type");
+    const titleTemplate = emptyEl.dataset.title ?? "";
+    const prompt = countEl.dataset.prompt ?? "";
+    const one = countEl.dataset.one ?? "";
+    const many = countEl.dataset.many ?? "";
+
+    function announce(text: string): void {
+      window.clearTimeout(debounce);
+      debounce = window.setTimeout(() => {
+        countEl!.textContent = text;
+      }, 400);
+    }
+
+    function apply(query: string): void {
+      const terms = fold(query).split(/\s+/).filter(Boolean);
+      clearEl?.classList.toggle("hidden", terms.length === 0);
+      clearEl?.classList.toggle("grid", terms.length > 0);
+
+      let shown = 0;
+      const ranked: { el: HTMLElement; score: number }[] = [];
+
+      for (const item of items) {
+        const entry = byslug.get(item.dataset.slug ?? "");
+        const score = !entry ? 0 : terms.length === 0 ? 1 : scoreOne(entry, terms);
+        const visible = score > 0;
+        item.hidden = !visible;
+        if (visible) {
+          shown += 1;
+          ranked.push({ el: item, score });
+        }
+      }
+
+      // Reordonner sans deplacer un seul noeud : la liste est en flex colonne,
+      // et order suffit. A egalite de score l'ordre du serveur tient, donc le
+      // plus recent reste devant.
+      if (terms.length === 0) {
+        for (const item of items) item.style.order = "";
+      } else {
+        ranked
+          .sort((a, b) => b.score - a.score)
+          .forEach((hit, rank) => {
+            hit.el.style.order = String(rank);
+          });
+      }
+
+      list!.hidden = shown === 0;
+      emptyEl!.classList.toggle("hidden", shown > 0);
+      if (shown === 0 && emptyTitle) {
+        emptyTitle.textContent = titleTemplate.replace("{query}", query.trim());
+      }
+
+      if (terms.length === 0) announce(prompt);
+      else announce(shown === 1 ? one : many.replace("{count}", String(shown)));
+    }
+
+    // --- Navigation clavier -------------------------------------------------
+    // Fleches pour parcourir les resultats visibles dans l'ordre affiche,
+    // Echap pour vider, "/" pour revenir au champ depuis n'importe ou.
+    function visibleLinks(): HTMLAnchorElement[] {
+      return Array.from(root!.querySelectorAll<HTMLElement>("[data-search-item]"))
+        .filter((item) => !item.hidden)
+        .sort((a, b) => (Number(a.style.order) || 0) - (Number(b.style.order) || 0))
+        .map((item) => item.querySelector<HTMLAnchorElement>("[data-search-link]"))
+        .filter((link): link is HTMLAnchorElement => link !== null);
+    }
+
+    function move(delta: number, from: Element | null): void {
+      const links = visibleLinks();
+      if (links.length === 0) return;
+      const at = from instanceof HTMLAnchorElement ? links.indexOf(from) : -1;
+      const next = at < 0 ? (delta > 0 ? 0 : links.length - 1) : at + delta;
+      if (next < 0) {
+        input!.focus();
+        return;
+      }
+      links[Math.min(next, links.length - 1)]?.focus();
+    }
+
+    onKey = (event: KeyboardEvent): void => {
+      const target = event.target;
+      const typing =
+        target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement;
+      if (event.key === "/" && !typing) {
+        event.preventDefault();
+        input.focus();
+        input.select();
+        return;
+      }
+      if (!root.contains(target instanceof Node ? target : null)) return;
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        event.preventDefault();
+        move(event.key === "ArrowDown" ? 1 : -1, document.activeElement);
+      } else if (event.key === "Escape" && typing) {
+        input.value = "";
+        apply("");
+      }
+    };
+    document.addEventListener("keydown", onKey);
+
+    input.addEventListener("input", () => apply(input.value));
+    clearEl?.addEventListener("click", () => {
+      input.value = "";
+      apply("");
+      input.focus();
+    });
+
+    // Une recherche doit pouvoir se partager : /search/?q=dark arrive filtree.
+    const initial = new URLSearchParams(window.location.search).get("q") ?? "";
+    if (initial) input.value = initial;
+    apply(input.value);
+  }
+
+  init();
+  document.addEventListener("astro:page-load", init);
+</script>

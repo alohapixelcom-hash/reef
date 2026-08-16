@@ -1,0 +1,101 @@
+---
+// src/components/ui/alert/Alert.astro - encart de statut : info, success, warning, danger.
+// Quatre icones a formes distinctes (la couleur n'est jamais le seul signal), titre en prop
+// ou en slot nomme, contenu par le slot par defaut. danger passe en aplat sombre : le plus
+// grave est le plus contraste, et l'icone corail y ressort pleinement.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const alert = tv({
+  slots: {
+    root: "relative flex w-full items-start gap-3.5 rounded-card border p-5",
+    icon: "mt-0.5 size-5 shrink-0 [&>svg]:size-5",
+    body: "flex min-w-0 flex-col gap-1",
+    title: "font-display leading-snug font-bold",
+    description:
+      "text-sm leading-relaxed [&_a]:font-semibold [&_a]:underline [&_a]:underline-offset-2",
+  },
+  variants: {
+    variant: {
+      info: {
+        root: "border-border bg-muted",
+        icon: "text-muted-foreground",
+        title: "text-foreground",
+        description: "text-muted-foreground",
+      },
+      success: {
+        root: "border-accent/30 bg-accent/10",
+        icon: "text-accent",
+        title: "text-foreground",
+        description: "text-muted-foreground",
+      },
+      warning: {
+        root: "border-primary/30 bg-primary/10",
+        icon: "text-primary",
+        title: "text-foreground",
+        description: "text-muted-foreground",
+      },
+      danger: {
+        root: "bg-foreground border-transparent",
+        icon: "text-primary",
+        title: "text-background",
+        description: "text-background/75",
+      },
+    },
+  },
+  defaultVariants: { variant: "info" },
+});
+
+type AlertVariants = VariantProps<typeof alert>;
+
+type Props = Omit<HTMLAttributes<"div">, "title"> &
+  AlertVariants & {
+    title?: string;
+  };
+
+const { variant = "info", title, class: className, ...rest } = Astro.props;
+const { root, icon, body, title: titleClass, description } = alert({ variant });
+
+// Un trace par variante : cercle info, cercle coche, triangle, octogone.
+const icons: Record<NonNullable<AlertVariants["variant"]>, string> = {
+  info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  success: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+  warning:
+    '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 20h16a2 2 0 0 0 1.73-2Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  danger:
+    '<polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+};
+
+// info et success annoncent poliment, warning et danger interrompent.
+const role = variant === "warning" || variant === "danger" ? "alert" : "status";
+---
+
+<div class={root({ class: className })} role={role} data-slot="alert" {...rest}>
+  <span class={icon()} aria-hidden="true" data-slot="alert-icon">
+    <slot name="icon">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <Fragment set:html={icons[variant]} />
+      </svg>
+    </slot>
+  </span>
+  <div class={body()} data-slot="alert-body">
+    {
+      (title || Astro.slots.has("title")) && (
+        <p class={titleClass()} data-slot="alert-title">
+          <slot name="title">{title}</slot>
+        </p>
+      )
+    }
+    <div class={description()} data-slot="alert-description">
+      <slot />
+    </div>
+  </div>
+</div>

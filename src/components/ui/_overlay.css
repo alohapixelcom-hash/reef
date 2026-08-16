@@ -1,0 +1,179 @@
+/* src/components/ui/_overlay.css - socle partage des superpositions : scrim, animations d'entree/sortie des dialog et sheet, apparition des panneaux details, verrou de scroll. */
+
+/* ---------------------------------------------------------------------------
+ * Verrou d'etat ferme.
+ *
+ * Les transitions ci-dessous portent sur display avec allow-discrete, ce qui
+ * autorise le navigateur a garder un dialogue affiche pendant sa sortie. Le
+ * revers est qu'un dialogue JAMAIS ouvert peut, selon l'ordre de la cascade et
+ * le moment du premier rendu, se retrouver affiche le temps d'une image. Dans
+ * une grille, cela ajoute une deuxieme copie de son contenu dans la case et
+ * empile les vignettes les unes sur les autres.
+ *
+ * Cette regle rend le cas impossible : ferme veut dire invisible, sans
+ * exception. La sortie animee continue de fonctionner, parce que le navigateur
+ * conserve l'attribut open pendant toute la duree de la transition.
+ * ------------------------------------------------------------------------- */
+dialog[data-slot="dialog"]:not([open]),
+dialog[data-slot="sheet"]:not([open]) {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------------
+ * Scrim commun aux dialog et sheet : un voile ocean profond legerement floute.
+ * Le fondu de sortie repose sur transition-behavior: allow-discrete ; les
+ * navigateurs qui l'ignorent retombent sur une ouverture/fermeture instantanee.
+ * ------------------------------------------------------------------------- */
+dialog[data-slot="dialog"]::backdrop,
+dialog[data-slot="sheet"]::backdrop {
+  background: rgb(2 28 36 / 0.55);
+  background: color-mix(in oklab, var(--color-scrim) 55%, transparent);
+  backdrop-filter: var(--glass-blur, none);
+  --glass-blur: blur(6px);
+  opacity: 0;
+  transition:
+    opacity 0.25s ease,
+    display 0.25s ease allow-discrete,
+    overlay 0.25s ease allow-discrete;
+}
+
+/* La forme prefixee vit dans SA propre regle, jamais a cote de la standard :
+ * cote a cote, l'optimiseur CSS fusionne les deux et n'en reemet qu'une, et
+ * c'est la prefixee qui gagnait ici. Chrome ne la comprend pas, le scrim
+ * n'etait donc pas floute du tout. Voir styles/motion/materials.css. */
+@supports not (backdrop-filter: blur(1px)) {
+  dialog[data-slot="dialog"]::backdrop,
+  dialog[data-slot="sheet"]::backdrop {
+    -webkit-backdrop-filter: var(--glass-blur, none);
+  }
+}
+
+/* Quelqu'un qui refuse la transparence garde le voile, mais franc et sans
+ * flou. La regle vit ici, contre celle qu'elle corrige, plutot que dans un
+ * autre fichier dont l'ordre de chargement n'est pas garanti. */
+@media (prefers-reduced-transparency: reduce) {
+  dialog[data-slot="dialog"]::backdrop,
+  dialog[data-slot="sheet"]::backdrop {
+    --glass-blur: none;
+    background: color-mix(in oklab, var(--color-scrim) 78%, transparent);
+  }
+}
+
+dialog[data-slot="dialog"][open]::backdrop,
+dialog[data-slot="sheet"][open]::backdrop {
+  opacity: 1;
+}
+
+/* Pendant un geste de fermeture, le scrim suit le doigt au lieu d'attendre la
+ * fin : les deux appartiennent au meme mouvement. --sheet-progress est pose
+ * image par image par sheet-gesture.ts, et la transition est coupee le temps
+ * du geste pour que le suivi reste au pixel. */
+dialog[data-slot="sheet"][open]::backdrop {
+  opacity: var(--sheet-progress, 1);
+}
+
+dialog[data-slot="sheet"][data-dragging]::backdrop {
+  transition: none;
+}
+
+@starting-style {
+  dialog[data-slot="dialog"][open]::backdrop,
+  dialog[data-slot="sheet"][open]::backdrop {
+    opacity: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Dialog centre : fondu + legere montee, symetrique a l'entree et a la sortie.
+ * ------------------------------------------------------------------------- */
+dialog[data-slot="dialog"] {
+  opacity: 0;
+  transform: translateY(0.75rem) scale(0.97);
+  transition:
+    opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    display 0.3s allow-discrete,
+    overlay 0.3s allow-discrete;
+}
+
+dialog[data-slot="dialog"][open] {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  dialog[data-slot="dialog"][open] {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.97);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Sheet : glissement depuis le bord porte par data-side="right|left".
+ * ------------------------------------------------------------------------- */
+dialog[data-slot="sheet"] {
+  transition:
+    transform 0.35s cubic-bezier(0.32, 0.72, 0, 1),
+    display 0.35s allow-discrete,
+    overlay 0.35s allow-discrete;
+}
+
+dialog[data-slot="sheet"][data-side="right"] {
+  transform: translateX(100%);
+}
+
+dialog[data-slot="sheet"][data-side="left"] {
+  transform: translateX(-100%);
+}
+
+dialog[data-slot="sheet"][open] {
+  transform: translateX(0);
+}
+
+@starting-style {
+  dialog[data-slot="sheet"][open][data-side="right"] {
+    transform: translateX(100%);
+  }
+
+  dialog[data-slot="sheet"][open][data-side="left"] {
+    transform: translateX(-100%);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Panneaux des menus en <details> (dropdown, mega-menu) : petit pop d'entree.
+ * L'animation est portee par l'etat [open] du parent, elle rejoue donc a
+ * chaque ouverture quel que soit le mode de masquage du navigateur.
+ * ------------------------------------------------------------------------- */
+/* L'origine de l'ouverture est le declencheur, pas le centre du panneau : un
+ * menu doit avoir l'air de sortir du bouton sur lequel on vient d'appuyer.
+ * Chaque composant peut deplacer l'ancre avec --overlay-origin. */
+.overlay-pop {
+  transform-origin: var(--overlay-origin, top center);
+}
+
+details[open] > .overlay-pop {
+  animation: overlay-pop 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes overlay-pop {
+  from {
+    opacity: 0;
+    transform: translateY(0.375rem) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Verrou de scroll, 100% CSS : tant qu'un dialog ou une sheet est ouvert, la
+ * page ne defile plus. scrollbar-gutter garde la gouttiere et evite le saut.
+ * ------------------------------------------------------------------------- */
+html:has(dialog[data-slot="dialog"][open]),
+html:has(dialog[data-slot="sheet"][open]) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}

@@ -1,0 +1,76 @@
+---
+// src/components/ui/accordion/AccordionItem.astro - un volet : <details> natif (name pour un groupe exclusif), chevron anime, contenu deplie en douceur en CSS pur.
+// Le clavier, l'etat ouvert et la restitution aux lecteurs d'ecran sont
+// entierement portes par la plateforme : zero JavaScript.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const accordionItem = tv({
+  slots: {
+    root: "group",
+    summary: [
+      "flex min-h-11 w-full cursor-pointer list-none items-center justify-between gap-4 py-4 text-left",
+      "font-display text-base font-bold text-foreground md:text-lg",
+      "[&::-webkit-details-marker]:hidden",
+    ],
+    icon: [
+      "grid size-8 shrink-0 place-items-center rounded-pill border border-border text-muted-foreground",
+      "transition-transform duration-300 group-open:rotate-180",
+    ],
+    content: "pb-5 text-[0.95rem] leading-relaxed text-muted-foreground",
+  },
+});
+
+type Props = HTMLAttributes<"details"> & {
+  // La question ou l'intitule du volet, rendu dans le <summary>.
+  title: string;
+  // Meme name sur plusieurs volets = ouverture exclusive native.
+  name?: string;
+  open?: boolean;
+};
+
+const { title, name, open, class: className, ...rest } = Astro.props;
+const { root, summary, icon, content } = accordionItem();
+---
+
+<details class={root({ class: className })} data-slot="accordion-item" name={name} open={open} {...rest}>
+  <summary class={summary()} data-slot="accordion-trigger">
+    {title}
+    <span class={icon()} aria-hidden="true">
+      <svg
+        class="size-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="m6 9 6 6 6-6"></path>
+      </svg>
+    </span>
+  </summary>
+  <div class={content()} data-slot="accordion-content">
+    <slot />
+  </div>
+</details>
+
+<style>
+  /* Depliage anime du contenu natif : pris en charge la ou ::details-content
+   * et interpolate-size existent, ouverture instantanee ailleurs. */
+  details {
+    interpolate-size: allow-keywords;
+  }
+
+  details::details-content {
+    block-size: 0;
+    overflow-y: clip;
+    transition:
+      block-size 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      content-visibility 0.35s allow-discrete;
+  }
+
+  details[open]::details-content {
+    block-size: auto;
+  }
+</style>
