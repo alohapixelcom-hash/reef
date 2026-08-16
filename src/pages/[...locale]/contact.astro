@@ -1,0 +1,175 @@
+---
+// src/pages/[...locale]/contact.astro - contact : un formulaire de demonstration complet, l'adresse directe, et ce qui se passe ensuite.
+//
+// Le formulaire est ECRIT mais NON MONTE : il n'a pas d'attribut action, il
+// n'envoie rien, et c'est un choix. Le theme est 100% statique et sans adapter ;
+// choisir un prestataire d'envoi a la place de l'acheteur l'obligerait a le
+// desinstaller avant d'installer le sien. Tout le reste est pret : le balisage,
+// les libelles traduits, le cablage d'accessibilite (label lie au champ, aide
+// annoncee par aria-describedby, champs requis marques). Pour le brancher :
+// poser action et method vers le point d'arrivee de votre choix (Formspree,
+// Netlify Forms, Web3Forms, ou une route d'API si vous ajoutez un adapter).
+// t.contact.success et t.contact.error attendent ce moment-la : ce sont les deux
+// messages a afficher au retour, deja traduits.
+import Footer from "@components/Sections/Global/Footer.astro";
+import Navbar from "@components/Sections/Global/Navbar.astro";
+import PageHero from "@components/Sections/Global/PageHero.astro";
+import { Icon } from "@components/svg/icons";
+import { Button } from "@components/ui/button";
+import { Input } from "@components/ui/input";
+import { Label } from "@components/ui/label";
+import { Textarea } from "@components/ui/textarea";
+import siteData from "@config/siteData.json";
+import { getLocale, localePaths, localizePath, useTranslations } from "@i18n";
+import { breadcrumbList } from "@js/schema";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+export const getStaticPaths = localePaths;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+
+const title = t.contact.metaTitle;
+const description = t.contact.metaDescription;
+
+const base = Astro.site ?? Astro.url;
+const crumbs = breadcrumbList([
+  { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
+  { name: t.contact.metaTitle, url: new URL(localizePath("/contact/", locale), base).href },
+]);
+---
+
+<BaseLayout {title} {description}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
+  </Fragment>
+
+  <Navbar />
+
+  <main id="content">
+    <PageHero
+      eyebrow={t.contact.eyebrow}
+      title={t.contact.title}
+      accentWord={t.contact.accent}
+      lede={t.contact.lede}
+      crumbs={[{ label: t.contact.metaTitle }]}
+    />
+
+    <div class="container-page grid gap-10 py-14 md:py-20 lg:grid-cols-12 lg:gap-14">
+      <section class="lg:col-span-7" aria-labelledby="form-title">
+        <div class="border-border bg-card rounded-panel border p-7 sm:p-9">
+          <h2 id="form-title" class="font-display text-foreground text-2xl font-semibold tracking-tight">
+            {t.contact.formTitle}
+          </h2>
+
+          <form class="mt-7 flex flex-col gap-5" name="contact" aria-describedby="contact-note">
+            <div class="grid gap-5 sm:grid-cols-2">
+              <p class="flex flex-col gap-2">
+                <Label for="contact-name" required>{t.contact.nameLabel}</Label>
+                <Input
+                  id="contact-name"
+                  name="name"
+                  type="text"
+                  autocomplete="name"
+                  placeholder={t.contact.namePlaceholder}
+                  required
+                />
+              </p>
+              <p class="flex flex-col gap-2">
+                <Label for="contact-email" required>{t.contact.emailLabel}</Label>
+                <Input
+                  id="contact-email"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  spellcheck="false"
+                  placeholder={t.contact.emailPlaceholder}
+                  required
+                />
+              </p>
+            </div>
+
+            <p class="flex flex-col gap-2">
+              <Label for="contact-subject">{t.contact.subjectLabel}</Label>
+              <Input
+                id="contact-subject"
+                name="subject"
+                type="text"
+                placeholder={t.contact.subjectPlaceholder}
+              />
+            </p>
+
+            <p class="flex flex-col gap-2">
+              <Label for="contact-message" required>{t.contact.messageLabel}</Label>
+              <Textarea
+                id="contact-message"
+                name="message"
+                rows="6"
+                placeholder={t.contact.messagePlaceholder}
+                required
+              />
+            </p>
+
+            <p id="contact-note" class="text-muted-foreground text-sm leading-relaxed">
+              {t.contact.formNote}
+            </p>
+
+            <div>
+              <Button type="submit" variant="primary" size="lg">
+                {t.contact.submit}
+                <Icon name="send" size={17} />
+              </Button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <div class="flex flex-col gap-6 lg:col-span-5">
+        <section
+          class="border-border bg-surface rounded-card flex flex-col gap-3 border p-7"
+          aria-labelledby="direct-title"
+        >
+          <span class="text-primary" aria-hidden="true"><Icon name="mail" size={22} /></span>
+          <h2 id="direct-title" class="font-display text-foreground text-xl font-semibold tracking-tight">
+            {t.contact.directTitle}
+          </h2>
+          <p class="text-muted-foreground text-[0.95rem] leading-relaxed">{t.contact.directLede}</p>
+          <Button
+            href={`mailto:${siteData.author.email}`}
+            variant="outline"
+            size="md"
+            class="mt-2 self-start"
+          >
+            {t.contact.directCta}
+          </Button>
+        </section>
+
+        <section
+          class="border-border rounded-card flex flex-col gap-4 border p-7"
+          aria-labelledby="next-title"
+        >
+          <h2 id="next-title" class="font-display text-foreground text-xl font-semibold tracking-tight">
+            {t.contact.nextTitle}
+          </h2>
+          <ol class="flex flex-col gap-4">
+            {
+              t.contact.nextSteps.map((step, index) => (
+                <li class="flex items-start gap-3">
+                  <span
+                    class="bg-primary/12 text-primary font-display rounded-pill mt-0.5 grid size-6 shrink-0 place-items-center text-xs font-semibold"
+                    aria-hidden="true"
+                  >
+                    {index + 1}
+                  </span>
+                  <span class="text-muted-foreground text-[0.95rem] leading-relaxed">{step}</span>
+                </li>
+              ))
+            }
+          </ol>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>

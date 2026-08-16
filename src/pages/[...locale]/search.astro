@@ -1,0 +1,41 @@
+---
+// src/pages/[...locale]/search.astro - la recherche : index construit au build, filtrage dans le navigateur, aucune requete et aucun service tiers.
+//
+// noindex : une page de recherche interne n'a rien a apporter a un moteur, et
+// laisser indexer des URLs a parametres est la meilleure facon de diluer un
+// site dans son propre bruit.
+import Search from "@components/Sections/Search/Search.astro";
+import Footer from "@components/Sections/Global/Footer.astro";
+import Navbar from "@components/Sections/Global/Navbar.astro";
+import PageHero from "@components/Sections/Global/PageHero.astro";
+import { getLocale, localePaths, useTranslations } from "@i18n";
+import { getResolvedPosts } from "@js/posts";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+export const getStaticPaths = localePaths;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const posts = await getResolvedPosts(locale);
+
+const title = t.search.metaTitle;
+const description = t.search.metaDescription;
+---
+
+<BaseLayout {title} {description} noindex>
+  <Navbar />
+
+  <main id="content">
+    <PageHero
+      eyebrow={t.search.eyebrow}
+      title={t.search.title}
+      accentWord={t.search.accent}
+      lede={t.search.lede}
+      crumbs={[{ label: t.search.metaTitle }]}
+    />
+
+    <Search {posts} />
+  </main>
+
+  <Footer />
+</BaseLayout>

@@ -1,0 +1,63 @@
+---
+// src/pages/[...locale]/legal.astro - les mentions legales : qui publie, qui heberge, et comment signaler un probleme.
+//
+// Ce document porte SA copie dans le dictionnaire (t.legal) et non dans
+// src/config/legalData.json.ts, qui ne couvre que la confidentialite et les
+// conditions. Les passages entre crochets sont a completer par l'acheteur, et
+// ce texte ne vaut pas un avis juridique.
+import LegalArticle from "@components/Sections/Legal/LegalArticle.astro";
+import Footer from "@components/Sections/Global/Footer.astro";
+import Navbar from "@components/Sections/Global/Navbar.astro";
+import PageHero from "@components/Sections/Global/PageHero.astro";
+import { getLocale, localePaths, localizePath, useTranslations } from "@i18n";
+import { breadcrumbList } from "@js/schema";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+export const getStaticPaths = localePaths;
+
+// La date de revision des mentions legales vit ici : contrairement a la
+// confidentialite et aux conditions, ce document n'a pas d'entree dans
+// src/config/legalData.json.ts. C'est la ligne a changer le jour ou le texte
+// change, et la seule.
+const LEGAL_UPDATED = "2026-01-15";
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+
+const title = t.legal.title;
+const description = t.legal.description;
+
+const base = Astro.site ?? Astro.url;
+const crumbs = breadcrumbList([
+  { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
+  { name: t.legal.title, url: new URL(localizePath("/legal/", locale), base).href },
+]);
+---
+
+<BaseLayout {title} {description}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
+  </Fragment>
+
+  <Navbar />
+
+  <main id="content">
+    <PageHero
+      eyebrow={t.legal.eyebrow}
+      title={t.legal.title}
+      lede={t.legal.description}
+      crumbs={[{ label: t.legal.title }]}
+    />
+
+    <LegalArticle
+      sections={t.legal.sections}
+      updated={LEGAL_UPDATED}
+      updatedTemplate={t.legal.lastUpdated}
+      tocLabel={t.legal.toc}
+      backToTopLabel={t.legal.backToTop}
+      {locale}
+    />
+  </main>
+
+  <Footer />
+</BaseLayout>

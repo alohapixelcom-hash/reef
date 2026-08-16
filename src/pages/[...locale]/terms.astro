@@ -1,0 +1,56 @@
+---
+// src/pages/[...locale]/terms.astro - les conditions d'utilisation, servies depuis src/config/legalData.json.ts.
+//
+// getSiteRoutes declare /terms/ : la route existe donc pour de bon, meme si le
+// pied de page ne l'affiche pas (il ne montre que les mentions legales et la
+// confidentialite, les deux documents qu'un lecteur de blog consulte). Meme
+// gabarit que les deux autres documents.
+import LegalArticle from "@components/Sections/Legal/LegalArticle.astro";
+import Footer from "@components/Sections/Global/Footer.astro";
+import Navbar from "@components/Sections/Global/Navbar.astro";
+import PageHero from "@components/Sections/Global/PageHero.astro";
+import { getLegalData } from "@config/legalData.json.ts";
+import { getLocale, localePaths, localizePath, useTranslations } from "@i18n";
+import { breadcrumbList } from "@js/schema";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+export const getStaticPaths = localePaths;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const doc = getLegalData(locale).terms;
+
+const base = Astro.site ?? Astro.url;
+const crumbs = breadcrumbList([
+  { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
+  { name: doc.title, url: new URL(localizePath("/terms/", locale), base).href },
+]);
+---
+
+<BaseLayout title={doc.title} description={doc.description}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
+  </Fragment>
+
+  <Navbar />
+
+  <main id="content">
+    <PageHero
+      eyebrow={t.legal.eyebrow}
+      title={doc.title}
+      lede={doc.description}
+      crumbs={[{ label: doc.title }]}
+    />
+
+    <LegalArticle
+      sections={doc.sections}
+      updated={doc.lastUpdated}
+      updatedTemplate={t.legal.lastUpdated}
+      tocLabel={t.legal.toc}
+      backToTopLabel={t.legal.backToTop}
+      {locale}
+    />
+  </main>
+
+  <Footer />
+</BaseLayout>
