@@ -21,7 +21,7 @@ bundling, self-hosting and commercial use.
 |---|---|---|---|---|
 | Space Grotesk (variable) | @fontsource-variable/space-grotesk | 5.3.0 | OFL-1.1 | Display headings (font-display) |
 | Instrument Sans (variable) | @fontsource-variable/instrument-sans | 5.3.0 | OFL-1.1 | Body text and interface labels (font-sans) |
-| Instrument Serif | @fontsource/instrument-serif | 5.3.0 | OFL-1.1 | The single italic accent word, 400-italic only (font-serif, font-script) |
+| Besley (variable) | @fontsource-variable/besley | 5.3.0 | OFL-1.1 | The single italic accent word, variable italic only (font-serif, font-script) |
 
 The three imports live at the top of src/layouts/BaseHead.astro. Each package
 carries its own LICENSE file in node_modules; the license fields above were
@@ -65,7 +65,7 @@ licenses. Versions are the ones resolved in pnpm-lock.yaml at the date above.
 | tailwind-merge | MIT | Class merging inside tv |
 | @fontsource-variable/space-grotesk | OFL-1.1 | Space Grotesk files |
 | @fontsource-variable/instrument-sans | OFL-1.1 | Instrument Sans files |
-| @fontsource/instrument-serif | OFL-1.1 | Instrument Serif files (400 italic) |
+| @fontsource-variable/besley | OFL-1.1 | Besley files (variable italic) |
 
 There is no React, no animation library and no WebGL dependency in Reef. The
 whole theme is .astro, and every effect on the page is CSS.

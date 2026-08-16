@@ -18,9 +18,9 @@
   "dependencies": {
     "@astrojs/mdx": "^7.0.0",
     "@astrojs/sitemap": "^3.7.3",
+    "@fontsource-variable/besley": "^5.3.0",
     "@fontsource-variable/instrument-sans": "^5.3.0",
     "@fontsource-variable/space-grotesk": "^5.3.0",
-    "@fontsource/instrument-serif": "^5.3.0",
     "@tailwindcss/vite": "^4.3.2",
     "astro": "^7.0.3",
     "tailwind-merge": "^3.6.0",
