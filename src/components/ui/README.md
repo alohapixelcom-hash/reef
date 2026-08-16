@@ -29,7 +29,8 @@ Règles, toutes obligatoires :
 9. **Aucun fichier au-dessus de 400 lignes.**
 
 Utilitaires generés par les tokens, disponibles partout :
-`font-display`, `font-script`, `text-display-sm|md|lg|xl`,
+`font-display`, `font-script` (alias de `font-display`),
+`text-display-sm|md|lg|xl`,
 `rounded-card|panel|pill`, `shadow-float|lift|glass`,
 `animate-rise|marquee|pulse-slow`, et les classes maison de `global.css` :
 `.prose` (la colonne de lecture, avec `.prose-wide` et `.prose-dropcap`),
