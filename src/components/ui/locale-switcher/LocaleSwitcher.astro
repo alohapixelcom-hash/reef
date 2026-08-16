@@ -1,0 +1,165 @@
+---
+// src/components/ui/locale-switcher/LocaleSwitcher.astro - le selecteur de langue.
+//
+// Deux details le separent d'un selecteur ordinaire :
+//
+//   1. Il pointe vers LA MEME page dans l'autre langue, pas vers l'accueil.
+//      C'est le defaut le plus courant des sites multilingues : on lit un
+//      article, on change de langue, on se retrouve a la racine. Ici les liens
+//      viennent de getAlternates, exactement la meme source que les balises
+//      hreflang du <head> : les deux ne peuvent pas diverger.
+//
+//   2. Sa forme suit le nombre de langues. Deux langues : un segmente, un seul
+//      geste, aucun menu a ouvrir. Trois ou plus : un menu deroulant, parce
+//      qu'un segmente a cinq cases deborde de la barre sur iPhone.
+//
+// Aucun drapeau : un drapeau designe un pays, pas une langue.
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@components/ui/dropdown";
+import { getAlternates, getLocale, locales, useTranslations } from "@i18n";
+
+interface Props {
+  /** Rendu compact pour la barre de navigation (par defaut), ou etendu pour le pied de page. */
+  variant?: "bar" | "inline";
+  class?: string;
+}
+
+const { variant = "bar", class: className } = Astro.props;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const alternates = getAlternates(Astro.url, Astro.site, locale);
+const compact = locales.length <= 2;
+
+// Changer de langue recharge la page au lieu de passer par une view transition :
+// le document cible a un autre lang, un autre dir et d'autres balises hreflang,
+// et le routeur client ne remplace que le corps. Le passer par un objet etale
+// evite l'avertissement d'Astro sur DropdownItem, qui ne devine pas qu'il rend
+// bien une ancre des qu'on lui donne un href.
+const reload = { "data-astro-reload": true };
+
+const segment = [
+  "font-display rounded-pill px-2.5 py-1 text-xs font-bold tracking-wide uppercase",
+  "transition-colors duration-200",
+].join(" ");
+---
+
+{
+  compact ? (
+    // --- Deux langues : un segmente ---------------------------------------
+    // Le libelle complet reste dans aria-label ; l'oeil lit "EN FR", le lecteur
+    // d'ecran entend "English" et "Francais". Les deux publics sont servis.
+    <div
+      class:list={[
+        "flex items-center gap-0.5 rounded-pill p-0.5",
+        variant === "bar" ? "bg-current/10" : "bg-muted",
+        className,
+      ]}
+      role="group"
+      aria-label={t.nav.switchLanguage}
+      data-slot="locale-switcher"
+    >
+      {alternates.map((alt) =>
+        alt.current ? (
+          <span
+            class:list={[
+              segment,
+              variant === "bar"
+                ? "bg-current/15 text-current"
+                : "bg-background text-foreground shadow-float",
+            ]}
+            aria-current="true"
+            lang={alt.hreflang}
+          >
+            <span class="sr-only">{alt.label}, </span>
+            <span aria-hidden="true">{alt.short}</span>
+          </span>
+        ) : (
+          <a
+            href={alt.href}
+            hreflang={alt.hreflang}
+            lang={alt.hreflang}
+            aria-label={alt.label}
+            data-astro-reload
+            class:list={[
+              segment,
+              variant === "bar"
+                ? "text-current/60 hover:bg-current/10 hover:text-current"
+                : "text-muted-foreground hover:text-foreground",
+            ]}
+          >
+            <span aria-hidden="true">{alt.short}</span>
+          </a>
+        ),
+      )}
+    </div>
+  ) : (
+    // --- Trois langues ou plus : un menu ------------------------------------
+    <Dropdown class={className} data-slot="locale-switcher">
+      <DropdownTrigger
+        variant="ghost"
+        size="sm"
+        aria-label={t.nav.switchLanguage}
+        class="text-current hover:bg-current/10"
+      >
+        <svg
+          class="size-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18" />
+        </svg>
+        <span class="font-display text-xs font-bold uppercase">
+          {alternates.find((alt) => alt.current)?.short}
+        </span>
+      </DropdownTrigger>
+      <DropdownMenu align="end" class="min-w-44">
+        {alternates.map((alt) => (
+          <DropdownItem
+            href={alt.href}
+            hreflang={alt.hreflang}
+            lang={alt.hreflang}
+            {...reload}
+            aria-current={alt.current ? "true" : undefined}
+            class={alt.current ? "bg-muted" : undefined}
+          >
+            <span class="font-display w-6 text-xs font-bold opacity-60">{alt.short}</span>
+            {alt.label}
+          </DropdownItem>
+        ))}
+      </DropdownMenu>
+    </Dropdown>
+  )
+}
+
+<script>
+  // Un choix explicite dans ce selecteur pose un cookie, et ce cookie prime
+  // ensuite sur l'en-tete Accept-Language du navigateur. Sans lui, un
+  // francophone qui veut lire la version anglaise serait renvoye en francais
+  // a chaque navigation : la detection automatique deviendrait une prison.
+  //
+  // Un an de duree : c'est une preference, pas une session. SameSite=Lax pour
+  // qu'elle survive a une arrivee depuis un lien externe, et pas de Secure en
+  // local pour que le developpement fonctionne aussi.
+  function bind(): void {
+    const root = document.querySelector<HTMLElement>("[data-slot='locale-switcher']");
+    if (!root || root.dataset.bound === "true") return;
+    root.dataset.bound = "true";
+
+    root.addEventListener("click", (event) => {
+      const link = (event.target as HTMLElement | null)?.closest?.("a[hreflang]");
+      if (!(link instanceof HTMLAnchorElement)) return;
+      const locale = link.getAttribute("hreflang");
+      if (!locale) return;
+      const secure = location.protocol === "https:" ? "; Secure" : "";
+      document.cookie = `aloha_locale=${encodeURIComponent(locale)}; Path=/; Max-Age=31536000; SameSite=Lax${secure}`;
+    });
+  }
+
+  bind();
+  document.addEventListener("astro:page-load", bind);
+</script>

@@ -1,0 +1,33 @@
+---
+// src/components/ui/label/Label.astro - etiquette de champ dans la grotesque d'affichage, marque requise en corail.
+// La marque "*" est decorative (aria-hidden) : l'etat requis est porte par l'input lui-meme.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const label = tv({
+  base: "inline-flex items-baseline gap-1 font-display font-bold text-foreground",
+  variants: {
+    size: {
+      sm: "text-xs",
+      md: "text-sm",
+      lg: "text-base",
+    },
+  },
+  defaultVariants: { size: "md" },
+});
+
+type LabelVariants = VariantProps<typeof label>;
+
+type Props = HTMLAttributes<"label"> &
+  LabelVariants & {
+    // Affiche la marque requise corail apres le texte.
+    required?: boolean;
+  };
+
+const { size, required = false, class: className, ...rest } = Astro.props;
+---
+
+<label class={label({ size, class: className })} data-slot="label" {...rest}>
+  <slot />
+  {required && <span class="text-primary" aria-hidden="true">*</span>}
+</label>

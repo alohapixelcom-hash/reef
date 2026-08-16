@@ -1,0 +1,106 @@
+---
+// src/components/ui/field/Field.astro - un champ de formulaire complet.
+//
+// Le detail qui separe un formulaire de vitrine d'un formulaire qui marche :
+// le cablage d'accessibilite. Le label pointe sur le champ, l'aide et l'erreur
+// sont annoncees par aria-describedby, l'erreur pose aria-invalid, et elle est
+// dans une region live pour qu'un lecteur d'ecran l'entende au moment ou elle
+// apparait, sans que l'utilisateur ait a revenir dessus.
+//
+// Personne n'ecrit ce cablage a la main dans un theme achete. Il est donc ici.
+//
+//   <Field label="Votre email" name="email" hint="On ne s'en sert que pour repondre.">
+//     <Input type="email" name="email" />
+//   </Field>
+import { field, type FieldVariants } from "./field";
+
+type Props = FieldVariants & {
+  /** Le libelle visible. Jamais un placeholder a la place : il disparait a la saisie. */
+  label: string;
+  /** L'identifiant du champ. Sert a relier label, aide et erreur. */
+  name: string;
+  /** Aide permanente, sous le champ. */
+  hint?: string;
+  /** Le message d'erreur. Sa presence suffit a basculer le champ en etat invalide. */
+  error?: string;
+  /** Marque le champ requis, visuellement et pour les technologies d'assistance. */
+  required?: boolean;
+  class?: string;
+};
+
+const { label, name, hint, error, required, tone, class: className } = Astro.props;
+const {
+  root,
+  labelClass,
+  control,
+  hintClass,
+  errorClass,
+  star,
+} = field({ tone: error ? "invalid" : tone });
+
+const hintId = hint ? `${name}-hint` : undefined;
+const errorId = error ? `${name}-error` : undefined;
+// L'ordre compte : l'erreur est lue avant l'aide, parce qu'elle est ce qui
+// bloque l'envoi.
+const describedBy = [errorId, hintId].filter(Boolean).join(" ") || undefined;
+---
+
+<div class={root({ class: className })} data-slot="field" data-invalid={error ? "" : undefined}>
+  <label for={name} class={labelClass()}>
+    {label}
+    {required && <span class={star()} aria-hidden="true">*</span>}
+  </label>
+
+  {/* Le slot recoit Input, Textarea ou Select. Les attributs de liaison sont
+      poses ici par le script du composant, pour que l'appelant n'ait rien a
+      recopier et ne puisse pas les oublier. */}
+  <div
+    class={control()}
+    data-field-control
+    data-field-name={name}
+    data-field-describedby={describedBy}
+    data-field-invalid={error ? "true" : undefined}
+    data-field-required={required ? "true" : undefined}
+  >
+    <slot />
+  </div>
+
+  {error && (
+    <p id={errorId} class={errorClass()} role="alert">
+      {error}
+    </p>
+  )}
+  {hint && !error && (
+    <p id={hintId} class={hintClass()}>
+      {hint}
+    </p>
+  )}
+</div>
+
+<script>
+  // Le cablage se fait au chargement plutot qu'a la compilation : le slot peut
+  // contenir n'importe quel controle, et on ne veut pas obliger l'appelant a
+  // repeter id, aria-describedby et aria-invalid sur chaque champ.
+  function wire(): void {
+    document
+      .querySelectorAll<HTMLElement>("[data-field-control]:not([data-field-wired])")
+      .forEach((holder) => {
+        holder.setAttribute("data-field-wired", "");
+        const control = holder.querySelector<HTMLElement>("input, textarea, select");
+        if (!control) return;
+
+        const name = holder.dataset.fieldName;
+        if (name) {
+          if (!control.id) control.id = name;
+          if (!control.getAttribute("name")) control.setAttribute("name", name);
+        }
+        const described = holder.dataset.fieldDescribedby;
+        if (described) control.setAttribute("aria-describedby", described);
+        if (holder.dataset.fieldInvalid === "true") control.setAttribute("aria-invalid", "true");
+        if (holder.dataset.fieldRequired === "true") control.setAttribute("required", "");
+      });
+  }
+
+  wire();
+  document.addEventListener("astro:page-load", wire);
+</script>

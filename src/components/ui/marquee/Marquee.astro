@@ -1,0 +1,66 @@
+---
+// src/components/ui/marquee/Marquee.astro - bande defilante CSS pur : contenu duplique pour une boucle sans couture, pause au survol et au focus clavier.
+// Le clone est aria-hidden pour n'etre lu qu'une fois ; le pr de chaque copie
+// egale son gap, donc la couture de boucle est invisible. Le garde-fou global
+// reduced-motion fige la bande sur sa premiere copie.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const marquee = tv({
+  slots: {
+    root: "group/marquee relative w-full overflow-hidden",
+    track: [
+      "flex w-max animate-marquee",
+      "group-hover/marquee:[animation-play-state:paused]",
+      "group-focus-within/marquee:[animation-play-state:paused]",
+    ],
+    part: "flex w-max shrink-0 items-center",
+  },
+  variants: {
+    speed: {
+      slow: { track: "[animation-duration:60s]" },
+      normal: {},
+      fast: { track: "[animation-duration:20s]" },
+    },
+    gap: {
+      sm: { part: "gap-6 pr-6" },
+      md: { part: "gap-10 pr-10" },
+      lg: { part: "gap-16 pr-16" },
+    },
+    reverse: {
+      true: { track: "[animation-direction:reverse]" },
+    },
+    fade: {
+      true: { root: "marquee-fade" },
+    },
+  },
+  defaultVariants: { speed: "normal", gap: "md", fade: true },
+});
+
+type MarqueeVariants = VariantProps<typeof marquee>;
+
+type Props = HTMLAttributes<"div"> & MarqueeVariants;
+
+const { speed, gap, reverse, fade, class: className, ...rest } = Astro.props;
+const { root, track, part } = marquee({ speed, gap, reverse, fade });
+---
+
+<div class={root({ class: className })} data-slot="marquee" {...rest}>
+  <div class={track()}>
+    <div class={part()}>
+      <slot />
+    </div>
+    <div class={part()} aria-hidden="true">
+      <slot />
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Fondu des bords : un masque alpha, pas un degrade colore, pour rester
+   * juste sur n'importe quel fond, clair ou hero sombre. */
+  .marquee-fade {
+    mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  }
+</style>

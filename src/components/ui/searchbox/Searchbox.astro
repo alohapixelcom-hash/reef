@@ -1,0 +1,77 @@
+---
+// src/components/ui/searchbox/Searchbox.astro - champ de recherche en pilule, loupe inline.
+// Le slot par defaut vient a droite (raccourci clavier, bouton). Si aucun label
+// accessible n'est fourni, le placeholder sert d'aria-label. class va a la racine.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const searchbox = tv({
+  slots: {
+    root: "relative flex w-full items-center",
+    field: [
+      "block w-full min-w-0 rounded-pill border border-border bg-card text-card-foreground",
+      "caret-primary placeholder:text-muted-foreground/80",
+      "transition-[border-color] duration-200 hover:border-foreground/25",
+      "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-border",
+      "[&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden",
+    ],
+    icon: "pointer-events-none absolute text-muted-foreground",
+    trailing: "absolute inset-y-0 flex items-center",
+  },
+  variants: {
+    size: {
+      sm: { field: "h-9 pl-9 pr-4 text-sm", icon: "left-3 size-4", trailing: "right-1.5 gap-1" },
+      md: { field: "h-11 pl-11 pr-5 text-[0.95rem]", icon: "left-4 size-4", trailing: "right-2 gap-1.5" },
+      lg: { field: "h-13 pl-12 pr-6 text-base", icon: "left-5 size-5", trailing: "right-2.5 gap-2" },
+    },
+  },
+  defaultVariants: { size: "md" },
+});
+
+type SearchboxVariants = VariantProps<typeof searchbox>;
+
+type Props = Omit<HTMLAttributes<"input">, "size" | "type"> & SearchboxVariants;
+
+const {
+  size,
+  class: className,
+  placeholder = "Search",
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledby,
+  ...rest
+} = Astro.props;
+
+const { root, field, icon, trailing } = searchbox({ size });
+const hasTrailing = Astro.slots.has("default");
+---
+
+<div class={root({ class: className })} data-slot="searchbox">
+  <svg
+    class={icon()}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="11" cy="11" r="7"></circle>
+    <path d="m20 20-3.5-3.5"></path>
+  </svg>
+  <input
+    type="search"
+    enterkeyhint="search"
+    class={field({ class: hasTrailing ? "pr-14" : undefined })}
+    placeholder={placeholder}
+    aria-label={ariaLabel ?? (ariaLabelledby ? undefined : placeholder)}
+    aria-labelledby={ariaLabelledby}
+    data-slot="searchbox-field"
+    {...rest}
+  />
+  {hasTrailing && (
+    <span class={trailing()} data-slot="searchbox-trailing">
+      <slot />
+    </span>
+  )}
+</div>

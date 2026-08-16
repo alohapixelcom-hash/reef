@@ -1,0 +1,58 @@
+---
+// src/components/ui/separator/Separator.astro - filet de separation, horizontal ou vertical.
+// Decoratif par defaut, donc retire de l'arbre d'accessibilite ; decorative={false} expose
+// un vrai role separator. fade estompe les extremites, joli entre deux sections aerees.
+// Le mode vertical s'etire dans un parent flex (self-stretch).
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const separator = tv({
+  base: "bg-border shrink-0",
+  variants: {
+    orientation: {
+      horizontal: "h-px w-full",
+      vertical: "w-px self-stretch",
+    },
+    fade: {
+      true: "bg-transparent",
+    },
+  },
+  compoundVariants: [
+    {
+      orientation: "horizontal",
+      fade: true,
+      class: "bg-linear-to-r from-transparent via-border to-transparent",
+    },
+    {
+      orientation: "vertical",
+      fade: true,
+      class: "bg-linear-to-b from-transparent via-border to-transparent",
+    },
+  ],
+  defaultVariants: { orientation: "horizontal", fade: false },
+});
+
+type SeparatorVariants = VariantProps<typeof separator>;
+
+type Props = HTMLAttributes<"div"> &
+  SeparatorVariants & {
+    decorative?: boolean;
+  };
+
+const {
+  orientation = "horizontal",
+  fade,
+  decorative = true,
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<div
+  class={separator({ orientation, fade, class: className })}
+  role={decorative ? "none" : "separator"}
+  aria-orientation={!decorative && orientation === "vertical" ? "vertical" : undefined}
+  data-slot="separator"
+  {...rest}
+>
+</div>

@@ -1,0 +1,63 @@
+---
+// src/components/ui/select/Select.astro - <select> natif habille en pilule, chevron SVG inline.
+// Pense pour la selection simple : les <option> arrivent par le slot, et une prop
+// placeholder ajoute une premiere option desactivee. class va a la racine.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const select = tv({
+  slots: {
+    root: "relative block w-full",
+    field: [
+      "block w-full min-w-0 cursor-pointer appearance-none truncate rounded-pill",
+      "border border-border bg-card text-card-foreground",
+      "transition-[border-color] duration-200 hover:border-foreground/25",
+      "aria-invalid:border-primary",
+      "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-border",
+    ],
+    icon: "pointer-events-none absolute top-1/2 -translate-y-1/2 text-muted-foreground",
+  },
+  variants: {
+    size: {
+      sm: { field: "h-9 pl-4 pr-9 text-sm", icon: "right-3 size-4" },
+      md: { field: "h-11 pl-5 pr-11 text-[0.95rem]", icon: "right-4 size-4" },
+      lg: { field: "h-13 pl-6 pr-12 text-base", icon: "right-5 size-5" },
+    },
+  },
+  defaultVariants: { size: "md" },
+});
+
+type SelectVariants = VariantProps<typeof select>;
+
+type Props = Omit<HTMLAttributes<"select">, "size"> &
+  SelectVariants & {
+    // Premiere option desactivee et masquee, affichee tant que rien n'est choisi.
+    placeholder?: string;
+  };
+
+const { size, placeholder, class: className, ...rest } = Astro.props;
+const { root, field, icon } = select({ size });
+---
+
+<span class={root({ class: className })} data-slot="select">
+  <select class={field()} {...rest}>
+    {placeholder && (
+      <option value="" disabled selected hidden>
+        {placeholder}
+      </option>
+    )}
+    <slot />
+  </select>
+  <svg
+    class={icon()}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="m6 9 6 6 6-6"></path>
+  </svg>
+</span>

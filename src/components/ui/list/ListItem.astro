@@ -1,0 +1,49 @@
+---
+// src/components/ui/list/ListItem.astro - item coche : pastille lagon par defaut (la couleur
+// des etats reussis), primary en corail, contrast pour les fonds sombres du hero.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const listItem = tv({
+  slots: {
+    root: "flex items-start gap-3",
+    marker: "mt-0.5 grid size-5 shrink-0 place-items-center rounded-pill",
+    content: "min-w-0 flex-1 leading-6",
+  },
+  variants: {
+    tone: {
+      accent: { marker: "bg-accent/15 text-accent" },
+      primary: { marker: "bg-primary/15 text-primary" },
+      contrast: { marker: "bg-white/15 text-white" },
+    },
+  },
+  defaultVariants: { tone: "accent" },
+});
+
+type ListItemVariants = VariantProps<typeof listItem>;
+
+type Props = HTMLAttributes<"li"> & ListItemVariants;
+
+const { tone, class: className, ...rest } = Astro.props;
+const { root, marker, content } = listItem({ tone });
+---
+
+<li class={root({ class: className })} data-slot="list-item" {...rest}>
+  <span class={marker()} aria-hidden="true" data-slot="list-item-marker">
+    <svg
+      class="size-3"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="3"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M20 6 9 17l-5-5"></path>
+    </svg>
+  </span>
+  <span class={content()} data-slot="list-item-content">
+    <slot />
+  </span>
+</li>
