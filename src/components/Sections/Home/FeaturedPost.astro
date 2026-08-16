@@ -1,0 +1,37 @@
+---
+// src/components/Sections/Home/FeaturedPost.astro - la bande du billet a la une, pleine largeur du conteneur.
+//
+// La section ne decide rien : elle recoit le billet deja choisi par la page,
+// parce que le garde-fou "un seul billet a la une par langue" appartient a la
+// page, seul endroit qui voit tous les billets a la fois.
+import FeaturedPostCard from "@components/Cards/FeaturedPostCard.astro";
+import { getLocale, useTranslations } from "@i18n";
+import type { ResolvedPost } from "@js/posts";
+
+type Props = {
+  entry: ResolvedPost;
+};
+
+const { entry } = Astro.props;
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+---
+
+{/* Le titre visible de cette section est celui de la carte : le surtitre sert
+    de nom accessible plutot que d'ajouter un second titre qui dirait la meme
+    chose une ligne plus haut. */}
+<section
+  class="container-page py-14 md:py-20"
+  aria-labelledby="featured-eyebrow"
+  data-slot="featured-post"
+>
+  <p
+    id="featured-eyebrow"
+    class="font-sans text-muted-foreground mb-6 flex items-center gap-3 text-xs font-medium tracking-[0.18em] uppercase"
+  >
+    <span class="bg-primary inline-block h-px w-8 shrink-0" aria-hidden="true"></span>
+    {t.home.featuredEyebrow}
+  </p>
+
+  <FeaturedPostCard {entry} {locale} label={t.home.featuredLabel} as="h2" />
+</section>

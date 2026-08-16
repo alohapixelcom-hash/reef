@@ -1,0 +1,49 @@
+---
+// src/components/Sections/Home/LatestPosts.astro - la grille des notes recentes de l'accueil, avec sa sortie vers l'archive complete.
+import PostCard from "@components/Cards/PostCard.astro";
+import SectionHeader from "@components/Sections/Global/SectionHeader.astro";
+import { Icon } from "@components/svg/icons";
+import { Button } from "@components/ui/button";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { getLocale, useTranslations } from "@i18n";
+import type { ResolvedPost } from "@js/posts";
+
+type Props = {
+  /** Les billets deja tries et coupes par la page : la section ne trie pas. */
+  posts: ResolvedPost[];
+};
+
+const { posts } = Astro.props;
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+---
+
+<section class="bg-surface border-border border-y" aria-labelledby="latest-title" data-slot="latest-posts">
+  <div class="container-page py-16 md:py-24">
+    <SectionHeader
+      as="h2"
+      headingId="latest-title"
+      title={t.home.latestTitle}
+      accentWord={t.home.latestAccent}
+      lede={t.home.latestLede}
+    />
+
+    <ul class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        posts.map((entry) => (
+          <li class="flex">
+            <PostCard {entry} {locale} as="h3" class="w-full" />
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="mt-10 flex justify-center">
+      <Button href={routes.posts} variant="outline" size="lg">
+        {t.home.latestCta}
+        <Icon name="arrow-right" size={18} />
+      </Button>
+    </div>
+  </div>
+</section>

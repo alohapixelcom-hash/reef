@@ -1,0 +1,132 @@
+---
+// src/components/Sections/Global/PageHero.astro - en-tete compact des pages interieures : fil d'ariane, surtitre, titre a mot d'accent, chapeau.
+//
+// Compact, et c'est le point : sur un blog, l'en-tete d'une page d'archive est
+// un panneau indicateur, pas une affiche. Il dit ou l'on est puis rend la place
+// au premier titre d'article, qui est la vraie raison de la visite.
+//
+// Le pt-32 absorbe la barre flottante : PageHero est toujours le premier bloc
+// d'une page interieure.
+import { Breadcrumb } from "@components/ui/breadcrumb";
+import { getLocale, localizePath, useTranslations } from "@i18n";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const pageHero = tv({
+  slots: {
+    root: "bg-surface border-border relative isolate overflow-hidden border-b",
+    inner: "container-page relative z-10 flex flex-col gap-5 pt-28 pb-12 md:pt-36 md:pb-16",
+    eyebrow:
+      "font-sans text-muted-foreground flex items-center gap-3 text-xs font-medium tracking-[0.18em] uppercase",
+    rule: "bg-primary inline-block h-px w-8 shrink-0",
+    // Pas de text-foreground ici, et ce n'est pas un oubli.
+    //
+    // tv() fait passer les classes d'un slot dans tailwind-merge, qui ne
+    // connait pas l'echelle maison text-display-*. Il la range donc avec les
+    // couleurs de texte, voit un conflit avec text-foreground, et garde la
+    // derniere : la taille disparaissait purement et simplement du markup en
+    // dessous de la borne ou la variante md:/sm: prend le relais. Le titre
+    // d'une page interieure sortait a 16 px sur telephone, plus petit que son
+    // propre chapeau, et rien dans le CSS compile ne le signalait.
+    //
+    // La couleur est de toute facon heritee du body, et les scenes sombres
+    // reaffectent le role pour leur sous-arbre : la retirer ne change aucun
+    // rendu et supprime le conflit a la source.
+    heading: "font-display text-display-sm sm:text-display-md max-w-4xl",
+    lede: "text-muted-foreground measure-wide text-lg leading-relaxed",
+  },
+  variants: {
+    align: {
+      left: { inner: "items-start text-left" },
+      center: { inner: "items-center text-center", eyebrow: "justify-center" },
+    },
+  },
+  defaultVariants: { align: "left" },
+});
+
+type Crumb = { label: string; href?: string };
+
+type Props = VariantProps<typeof pageHero> & {
+  /** Surtitre court au-dessus du titre : nomme la section, jamais une phrase. */
+  eyebrow?: string;
+  title: string;
+  /** Le mot du titre passe en italique corail. Un seul, toujours. */
+  accentWord?: string;
+  lede?: string;
+  /** Maillons apres l'accueil ; le dernier, sans href, devient la page courante. */
+  crumbs?: Crumb[];
+  class?: string;
+};
+
+const { eyebrow, title, accentWord, lede, crumbs = [], align, class: className } = Astro.props;
+const {
+  root,
+  inner,
+  eyebrow: eyebrowClass,
+  rule,
+  heading,
+  lede: ledeClass,
+} = pageHero({ align });
+
+// Le premier maillon est toujours l'accueil : il est ajoute ici, dans la bonne
+// langue et vers la bonne racine, pour qu'aucune page n'ait a y penser.
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const trail =
+  crumbs.length > 0 ? [{ label: t.common.home, href: localizePath("/", locale) }, ...crumbs] : [];
+
+// Decoupe du titre autour du mot accentue, insensible a la casse.
+const accent = accentWord?.trim() ?? "";
+const at = accent ? title.toLowerCase().indexOf(accent.toLowerCase()) : -1;
+const before = at >= 0 ? title.slice(0, at) : title;
+const word = at >= 0 ? title.slice(at, at + accent.length) : "";
+const after = at >= 0 ? title.slice(at + accent.length) : "";
+---
+
+<section class={root({ class: className })} data-slot="page-hero">
+  {/* Un halo, un seul, et dans l'aigue-marine plutot que dans le corail. Une
+      page d'archive est une page de CLASSEMENT : elle prend donc le second
+      accent, celui des sujets et des etats, et laisse le corail aux actions.
+      Il derive tres lentement, comme ceux du premier ecran : c'est ce qui
+      rattache une page interieure a l'accueil sans lui voler sa scene. */}
+  <div
+    class="animate-drift-slow pointer-events-none absolute -top-1/2 -right-[12%] size-[34rem] rounded-full opacity-25 blur-3xl dark:opacity-50"
+    style="background: radial-gradient(circle, var(--color-reef-400) 0%, transparent 70%)"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class={inner()}>
+    {
+      trail.length > 0 && (
+        <Breadcrumb
+          items={trail}
+          label={t.common.breadcrumbLabel}
+          class={align === "center" ? "[&>ol]:justify-center" : undefined}
+        />
+      )
+    }
+    {
+      eyebrow && (
+        <p class={eyebrowClass()}>
+          <span class={rule()} aria-hidden="true" />
+          {eyebrow}
+        </p>
+      )
+    }
+    <h1 class={heading()}>
+      {
+        word ? (
+          <Fragment>
+            {before}
+            <span class="accent-script">{word}</span>
+            {after}
+          </Fragment>
+        ) : (
+          title
+        )
+      }
+    </h1>
+    {lede && <p class={ledeClass()}>{lede}</p>}
+    <slot />
+  </div>
+</section>
