@@ -38,9 +38,9 @@ Inside `@theme`: three colour ramps and the non-colour tokens.
   and quiet states, never a flat background under long text.
 - **Typography**: `--font-display` Space Grotesk (headings), `--font-sans`
   Instrument Sans (body and interface), `--font-serif` and `--font-script`
-  Instrument Serif (italic only, the one accent word of each big title). The
-  display scale runs to 5.5rem; both variable families load the weight axis
-  only.
+  Besley (variable italic only, the one accent word of each big title). The
+  display scale runs to 5.5rem; all three variable families load the weight
+  axis only.
 - **Radii**: card 0.875rem, panel 1.25rem, pill 999px. Buttons are pills; cards
   and panels are gently rounded, which reads as calm on a page of prose.
 - **Brand animations**: rise, marquee, pulse-slow (`--animate-*` at

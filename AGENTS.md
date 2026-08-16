@@ -31,7 +31,7 @@ is named **Reef**. A buyer replaces Reef Notes and keeps Reef.
 Astro 7 (static output, no adapter), Tailwind CSS 4 (CSS-first config, no
 tailwind.config.js), tailwind-variants, @astrojs/mdx (Markdown and MDX posts)
 and @astrojs/sitemap, Fontsource for Space Grotesk, Instrument Sans and
-Instrument Serif. Node >= 22.12, pnpm. Demo copy is bilingual, for a fictional
+Besley. Node >= 22.12, pnpm. Demo copy is bilingual, for a fictional
 publication named Reef Notes.
 
 **No React, no WebGL, no animation library.** Reef has zero islands and ten

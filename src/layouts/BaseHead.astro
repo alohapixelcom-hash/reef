@@ -8,13 +8,14 @@
 // remarque dans le premier paragraphe. Le fichier ne part que si une italique
 // est reellement peinte, et il ne bloque rien (font-display: swap).
 //
-// Instrument Serif n'entre que par sa coupe 400 italique : c'est son seul usage
-// dans le theme (le mot d'accent d'un grand titre, la citation, la lettrine).
-// Importer le paquet entier chargerait un romain que personne n'affiche.
+// Besley n'entre que par sa coupe italique variable (une Clarendon) : c'est
+// son seul usage dans le theme (le mot d'accent d'un grand titre, la citation,
+// la lettrine). Importer le paquet entier chargerait un romain que personne
+// n'affiche.
 import "@fontsource-variable/space-grotesk";
 import "@fontsource-variable/instrument-sans";
 import "@fontsource-variable/instrument-sans/wght-italic.css";
-import "@fontsource/instrument-serif/400-italic.css";
+import "@fontsource-variable/besley/wght-italic.css";
 import siteData from "@config/siteData.json";
 import siteSettings from "@config/siteSettings.json";
 import { defaultLocale, getAlternates, getLocale, localeMeta, localizePath } from "@i18n";

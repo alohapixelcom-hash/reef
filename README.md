@@ -65,7 +65,7 @@ Numbers below were counted from the source, not estimated (snapshot
 Astro 7 (static output, no adapter), Tailwind CSS 4 (CSS-first, no config
 file), tailwind-variants, @astrojs/mdx (Markdown and MDX posts) and
 @astrojs/sitemap, self-hosted fonts via Fontsource (Space Grotesk, Instrument
-Sans, Instrument Serif, all OFL). Node >= 22.12 and pnpm. No React, no
+Sans, Besley, all OFL). Node >= 22.12 and pnpm. No React, no
 animation library, no WebGL.
 
 ## Quick start
