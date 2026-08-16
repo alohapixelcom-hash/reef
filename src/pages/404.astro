@@ -1,0 +1,90 @@
+---
+// src/pages/404.astro - page introuvable : un ecran autonome, sans barre ni pied de page, exclu des moteurs.
+//
+// Une seule 404 pour tout le domaine : la plupart des hebergeurs statiques n'en
+// servent qu'une, quelle que soit l'URL demandee. Elle est donc rendue dans la
+// langue par defaut.
+//
+// Et elle ne porte NI barre NI pied de page, ce qui est un choix et pas un
+// oubli : le selecteur de langue de la barre calcule ses liens depuis l'URL
+// courante, et sur une 404 cette URL n'existe dans aucune langue. Il pointerait
+// donc vers une seconde page introuvable. A la place, l'ecran offre la racine
+// de chaque langue, nommee dans sa propre langue.
+import { Icon } from "@components/svg/icons";
+import { Button } from "@components/ui/button";
+import { defaultLocale, localeMeta, localePrefix, locales, useTranslations } from "@i18n";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+const t = useTranslations(defaultLocale);
+const title = t.notFound.metaTitle;
+const description = t.notFound.metaDescription;
+
+// Decoupe du titre autour du mot accentue.
+const heading = t.notFound.title;
+const accent = t.notFound.accent;
+const at = heading.toLowerCase().indexOf(accent.toLowerCase());
+const before = at >= 0 ? heading.slice(0, at) : heading;
+const word = at >= 0 ? heading.slice(at, at + accent.length) : "";
+const after = at >= 0 ? heading.slice(at + accent.length) : "";
+
+const others = locales.filter((locale) => locale !== defaultLocale);
+---
+
+<BaseLayout {title} {description} noindex>
+  <main id="content" class="grid min-h-dvh place-items-center py-20">
+    <div class="container-page flex flex-col items-center gap-6 text-center">
+      <p class="font-display text-primary text-display-lg leading-none font-semibold" aria-hidden="true">
+        {t.notFound.code}
+      </p>
+
+      <h1 class="font-display text-display-sm md:text-display-md text-foreground">
+        {
+          word ? (
+            <Fragment>
+              {before}
+              <span class="accent-script">{word}</span>
+              {after}
+            </Fragment>
+          ) : (
+            heading
+          )
+        }
+      </h1>
+
+      <p class="text-muted-foreground measure-prose text-lg leading-relaxed">{t.notFound.lede}</p>
+
+      <div class="mt-2 flex flex-wrap items-center justify-center gap-3">
+        <Button href={`${localePrefix(defaultLocale)}/`} variant="primary" size="lg">
+          {t.notFound.homeCta}
+        </Button>
+        <Button href={`${localePrefix(defaultLocale)}/blog/`} variant="outline" size="lg">
+          {t.notFound.postsCta}
+        </Button>
+        <Button href={`${localePrefix(defaultLocale)}/search/`} variant="ghost" size="lg">
+          <Icon name="search" size={17} />
+          {t.notFound.searchCta}
+        </Button>
+      </div>
+
+      {
+        others.length > 0 && (
+          <ul class="mt-6 flex flex-wrap items-center justify-center gap-4">
+            {others.map((locale) => (
+              <li>
+                <a
+                  href={`${localePrefix(locale)}/`}
+                  hreflang={localeMeta[locale].htmlLang}
+                  lang={localeMeta[locale].htmlLang}
+                  class="text-muted-foreground hover:text-foreground inline-flex min-h-11 items-center gap-1.5 font-sans text-sm underline underline-offset-4 transition-colors duration-150"
+                >
+                  {localeMeta[locale].label}
+                  <Icon name="arrow-right" size={15} />
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </main>
+</BaseLayout>

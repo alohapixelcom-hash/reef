@@ -1,0 +1,79 @@
+---
+// src/pages/[...locale]/authors/index.astro - l'index des signatures : qui ecrit ici, et combien chacun a publie.
+import AuthorCard from "@components/Cards/AuthorCard.astro";
+import Footer from "@components/Sections/Global/Footer.astro";
+import Navbar from "@components/Sections/Global/Navbar.astro";
+import PageHero from "@components/Sections/Global/PageHero.astro";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { getLocale, localePaths, localizePath, useTranslations } from "@i18n";
+import { entrySlug, getLocalizedCollection } from "@i18n/content";
+import { getResolvedPosts } from "@js/posts";
+import { breadcrumbList } from "@js/schema";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+export const getStaticPaths = localePaths;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+
+const authors = (await getLocalizedCollection("authors", locale)).sort((a, b) =>
+  a.data.name.localeCompare(b.data.name),
+);
+const posts = await getResolvedPosts(locale);
+
+const counts: Record<string, number> = {};
+for (const entry of posts) counts[entry.authorSlug] = (counts[entry.authorSlug] ?? 0) + 1;
+
+const title = t.authors.metaTitle;
+const description = t.authors.metaDescription;
+
+const base = Astro.site ?? Astro.url;
+const crumbs = breadcrumbList([
+  { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
+  { name: t.authors.metaTitle, url: new URL(localizePath("/authors/", locale), base).href },
+]);
+---
+
+<BaseLayout {title} {description}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
+  </Fragment>
+
+  <Navbar />
+
+  <main id="content">
+    <PageHero
+      eyebrow={t.authors.eyebrow}
+      title={t.authors.title}
+      accentWord={t.authors.accent}
+      lede={t.authors.lede}
+      crumbs={[{ label: t.authors.metaTitle }]}
+    />
+
+    <section class="container-page py-14 md:py-20" aria-label={t.authors.metaTitle}>
+      <ul class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {
+          authors.map((author) => {
+            const slug = entrySlug(author.id);
+            return (
+              <li class="flex">
+                <AuthorCard
+                  {author}
+                  {locale}
+                  href={`${routes.authors}${slug}/`}
+                  count={counts[slug] ?? 0}
+                  as="h2"
+                  showLinks
+                  class="w-full"
+                />
+              </li>
+            );
+          })
+        }
+      </ul>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>

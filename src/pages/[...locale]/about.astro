@@ -1,0 +1,163 @@
+---
+// src/pages/[...locale]/about.astro - a propos : l'histoire du carnet, les trois regles de travail, les signatures et l'invitation a travailler ensemble.
+import AuthorCard from "@components/Cards/AuthorCard.astro";
+import Footer from "@components/Sections/Global/Footer.astro";
+import Navbar from "@components/Sections/Global/Navbar.astro";
+import PageHero from "@components/Sections/Global/PageHero.astro";
+import SectionHeader from "@components/Sections/Global/SectionHeader.astro";
+import { Icon } from "@components/svg/icons";
+import { Button } from "@components/ui/button";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import siteData from "@config/siteData.json";
+import { getLocale, localePaths, localizePath, useTranslations } from "@i18n";
+import { entrySlug, getLocalizedCollection } from "@i18n/content";
+import { getResolvedPosts } from "@js/posts";
+import { breadcrumbList, organization } from "@js/schema";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+export const getStaticPaths = localePaths;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+
+const authors = (await getLocalizedCollection("authors", locale)).sort((a, b) =>
+  a.data.name.localeCompare(b.data.name),
+);
+const posts = await getResolvedPosts(locale);
+const counts: Record<string, number> = {};
+for (const entry of posts) counts[entry.authorSlug] = (counts[entry.authorSlug] ?? 0) + 1;
+
+const title = t.about.metaTitle;
+const description = t.about.metaDescription;
+
+const base = Astro.site ?? Astro.url;
+const siteUrl = new URL(localizePath("/", locale), base).href;
+const schemas = [
+  organization({
+    name: siteData.name,
+    url: siteUrl,
+    sameAs: siteData.author.twitter ? [`https://x.com/${siteData.author.twitter}`] : undefined,
+  }),
+  breadcrumbList([
+    { name: t.common.home, url: siteUrl },
+    { name: t.about.metaTitle, url: new URL(localizePath("/about/", locale), base).href },
+  ]),
+];
+---
+
+<BaseLayout {title} {description}>
+  <Fragment slot="head">
+    {
+      schemas.map((node) => (
+        <script is:inline type="application/ld+json" set:html={JSON.stringify(node)} />
+      ))
+    }
+  </Fragment>
+
+  <Navbar />
+
+  <main id="content">
+    <PageHero
+      eyebrow={t.about.eyebrow}
+      title={t.about.title}
+      accentWord={t.about.accent}
+      lede={t.about.lede}
+      crumbs={[{ label: t.about.metaTitle }]}
+    />
+
+    {/* L'histoire est du texte long : elle passe donc par .prose, la colonne de
+        lecture du theme, et pas par une grille de cartes. */}
+    <section class="container-page py-14 md:py-20" aria-labelledby="story-title">
+      <SectionHeader
+        as="h2"
+        headingId="story-title"
+        title={t.about.storyTitle}
+        accentWord={t.about.storyAccent}
+      />
+      <div class="prose prose-dropcap mt-8">
+        {t.about.storyParagraphs.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+    </section>
+
+    <section class="bg-surface border-border border-y" aria-labelledby="values-title">
+      <div class="container-page py-16 md:py-24">
+        <SectionHeader
+          as="h2"
+          headingId="values-title"
+          title={t.about.valuesTitle}
+          accentWord={t.about.valuesAccent}
+          lede={t.about.valuesLede}
+        />
+        <ol class="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
+          {
+            t.about.values.map((value, index) => (
+              <li class="border-border bg-card rounded-card flex flex-col gap-3 border p-6">
+                <span class="font-display text-primary text-2xl font-semibold italic" aria-hidden="true">
+                  {index + 1}
+                </span>
+                <h3 class="font-display text-foreground text-xl font-semibold tracking-tight">
+                  {value.title}
+                </h3>
+                <p class="text-muted-foreground text-[0.95rem] leading-relaxed">{value.text}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </section>
+
+    <section class="container-page py-16 md:py-24" aria-labelledby="writers-title">
+      <SectionHeader
+        as="h2"
+        headingId="writers-title"
+        title={t.about.writersTitle}
+        accentWord={t.about.writersAccent}
+        lede={t.about.writersLede}
+      />
+      <ul class="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {
+          authors.map((author) => {
+            const slug = entrySlug(author.id);
+            return (
+              <li class="flex">
+                <AuthorCard
+                  {author}
+                  {locale}
+                  href={`${routes.authors}${slug}/`}
+                  count={counts[slug] ?? 0}
+                  as="h3"
+                  showLinks
+                  class="w-full"
+                />
+              </li>
+            );
+          })
+        }
+      </ul>
+      <div class="mt-10 flex justify-center">
+        <Button href={routes.authors} variant="ghost" size="md">
+          {t.about.writersCta}
+          <Icon name="arrow-right" size={17} />
+        </Button>
+      </div>
+    </section>
+
+    <section class="bg-surface border-border border-t" aria-labelledby="work-title">
+      <div class="container-page flex flex-col items-start gap-5 py-16 md:py-24">
+        <h2 id="work-title" class="font-display text-display-sm md:text-display-md text-foreground">
+          {t.about.contactTitle}
+        </h2>
+        <p class="text-muted-foreground measure-wide text-lg leading-relaxed">
+          {t.about.contactLede}
+        </p>
+        <Button href={routes.contact} variant="primary" size="lg" class="mt-2">
+          {t.about.contactCta}
+          <Icon name="arrow-right" size={18} />
+        </Button>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>

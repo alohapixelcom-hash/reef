@@ -1,0 +1,130 @@
+---
+// src/layouts/BaseHead.astro - la couche SEO possedee : meta, canonical, OG, twitter, favicon, fonts, view transitions.
+// Chaque balise est ecrite a la main, lisible et modifiable ici : zero paquet SEO.
+// L'italique d'Instrument Sans est charge separement, et ce n'est pas un oubli
+// de l'avoir mis la : sans lui, le navigateur FABRIQUE l'italique en penchant
+// le romain, ce qui casse les liaisons et raidit les courbes. Sur un theme dont
+// tout l'argument est la qualite de lecture, un <em> en oblique synthetique se
+// remarque dans le premier paragraphe. Le fichier ne part que si une italique
+// est reellement peinte, et il ne bloque rien (font-display: swap).
+//
+// Instrument Serif n'entre que par sa coupe 400 italique : c'est son seul usage
+// dans le theme (le mot d'accent d'un grand titre, la citation, la lettrine).
+// Importer le paquet entier chargerait un romain que personne n'affiche.
+import "@fontsource-variable/space-grotesk";
+import "@fontsource-variable/instrument-sans";
+import "@fontsource-variable/instrument-sans/wght-italic.css";
+import "@fontsource/instrument-serif/400-italic.css";
+import siteData from "@config/siteData.json";
+import siteSettings from "@config/siteSettings.json";
+import { defaultLocale, getAlternates, getLocale, localeMeta, localizePath } from "@i18n";
+import tokensRaw from "@styles/tokens.css?raw";
+import { ClientRouter } from "astro:transitions";
+
+export interface Props {
+  title: string;
+  description?: string;
+  image?: { src: string; alt: string };
+  type?: "website" | "article";
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = siteData.description,
+  image = siteData.defaultImage,
+  type = "website",
+  noindex = false,
+} = Astro.props;
+
+// "Titre | Marque", sauf si le titre porte deja la marque (page d'accueil).
+const fullTitle = title.includes(siteData.name) ? title : `${title} | ${siteData.name}`;
+
+// Canonical : une seule forme d'URL, celle de trailingSlash "always" dans astro.config.
+// Les routes fichiers (rss.xml, robots.txt) gardent leur extension telle quelle.
+const base = Astro.site ?? Astro.url;
+const pathname = Astro.url.pathname;
+const canonicalPath = pathname.endsWith("/") || /\.[a-z0-9]+$/i.test(pathname) ? pathname : `${pathname}/`;
+const canonical = new URL(canonicalPath, base);
+const imageUrl = new URL(image.src, base);
+
+// Les versions linguistiques de CETTE page, pas de l'accueil. La meme fonction
+// alimente le selecteur de langue de la barre : les deux ne peuvent pas mentir
+// l'un sur l'autre. x-default pointe vers la langue par defaut, ce que Google
+// attend pour choisir quoi servir a un visiteur dont la langue n'est pas servie.
+const locale = getLocale(Astro);
+const alternates = getAlternates(Astro.url, Astro.site, locale);
+const xDefault = alternates.find((alt) => alt.locale === defaultLocale);
+// og:locale veut du snake_case (en_US), pas du BCP-47 (en-US).
+const ogLocale = localeMeta[locale].intl.replace("-", "_");
+const ogAlternates = alternates.filter((alt) => !alt.current);
+
+// Les couleurs de marque sont lues dans tokens.css au moment du build : un
+// pnpm rebrand repeint aussi le favicon et la barre du navigateur, sans autre edition.
+const tokenColor = (name: string, fallback: string): string =>
+  new RegExp(`--color-${name}:\\s*(#[0-9a-fA-F]{3,8})`).exec(tokensRaw)?.[1] ?? fallback;
+const ink = tokenColor("ink-950", "#0a0f17");
+const coral = tokenColor("coral-500", "#f95c36");
+const reef = tokenColor("reef-500", "#1a9fc4");
+
+// Favicon : deux vagues, corail et lagon, sur fond ocean. SVG inline en data-uri, aucun fichier a servir.
+const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="${ink}"/><path d="M32 52V26" stroke="${coral}" stroke-width="7" stroke-linecap="round"/><path d="M32 34 22 24M32 38l10-10" stroke="${coral}" stroke-width="6" stroke-linecap="round"/><path d="M14 52h36" stroke="${reef}" stroke-width="5" stroke-linecap="round" opacity="0.9"/></svg>`;
+const faviconHref = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
+---
+
+<meta charset="utf-8" />
+{/* viewport-fit=cover : necessaire pour que env(safe-area-inset-*) fonctionne
+    sur iPhone a encoche, en Safari comme dans une coquille Capacitor. */}
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="generator" content={Astro.generator} />
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical.href} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+<link rel="icon" href={faviconHref} type="image/svg+xml" />
+<link rel="sitemap" href="/sitemap-index.xml" />
+<link
+  rel="alternate"
+  type="application/rss+xml"
+  title={siteData.name}
+  href={localizePath("/rss.xml", locale)}
+/>
+
+{/* hreflang : chaque page declare ses soeurs, y compris elle-meme. Un ensemble
+    hreflang incomplet est pire que pas de hreflang du tout, donc la liste est
+    generee, jamais ecrite a la main. */}
+{alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
+{xDefault && <link rel="alternate" hreflang="x-default" href={xDefault.href} />}
+
+{/* La barre du navigateur suit le theme : blanche en clair, ocean profond en sombre. */}
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content={ink} />
+
+{/* Open Graph, complet : l'apercu de partage est la premiere impression du site. */}
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonical.href} />
+<meta property="og:site_name" content={siteData.name} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={imageUrl.href} />
+<meta property="og:image:alt" content={image.alt} />
+<meta property="og:locale" content={ogLocale} />
+{
+  ogAlternates.map((alt) => (
+    <meta property="og:locale:alternate" content={localeMeta[alt.locale].intl.replace("-", "_")} />
+  ))
+}
+
+<meta name="twitter:card" content="summary_large_image" />
+{siteData.author.twitter && <meta name="twitter:site" content={`@${siteData.author.twitter}`} />}
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl.href} />
+<meta name="twitter:image:alt" content={image.alt} />
+
+{/* Le slot recoit les <script type="application/ld+json"> construits avec @js/schema. */}
+<slot />
+
+{siteSettings.useViewTransitions && <ClientRouter />}

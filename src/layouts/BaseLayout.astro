@@ -1,0 +1,39 @@
+---
+// src/layouts/BaseLayout.astro - squelette de toutes les pages : <html> unique, head SEO, theme anti-flash, body nu.
+// La classe .dark de <html> est posee par ThemeInit avant le premier rendu et
+// reposee apres chaque view transition : jamais de flash de theme.
+// Les pages injectent leur JSON-LD via <Fragment slot="head">.
+import { ThemeInit } from "@components/ui/theme-toggle";
+import { getLocale, localeMeta } from "@i18n";
+import BaseHead from "@layouts/BaseHead.astro";
+import "@styles/global.css";
+
+export interface Props {
+  title: string;
+  description?: string;
+  image?: { src: string; alt: string };
+  type?: "website" | "article";
+  noindex?: boolean;
+}
+
+const { title, description, image, type, noindex } = Astro.props;
+
+// lang et dir viennent de la langue de l'URL, jamais d'une constante. C'est ce
+// qui fait qu'un lecteur d'ecran change de voix entre /pricing/ et /fr/pricing/,
+// et qu'une future langue RTL n'obligera a rouvrir aucun layout.
+const locale = getLocale(Astro);
+const meta = localeMeta[locale];
+---
+
+<!doctype html>
+<html lang={meta.htmlLang} dir={meta.dir}>
+  <head>
+    <BaseHead {title} {description} {image} {type} {noindex}>
+      <slot name="head" />
+    </BaseHead>
+    <ThemeInit />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
