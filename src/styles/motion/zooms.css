@@ -1,0 +1,82 @@
+/* src/styles/motion/zooms.css - famille echelle : zooms, pops a ressort et derive lente d'image. */
+
+/* L'echelle de depart (ou d'arrivee pour les sorties) se regle via
+ * --motion-scale. Les valeurs restent proches de 1 : un zoom discret
+ * grandit le contenu, un zoom theatral le rapetisse. */
+
+@utility animate-zoom-in {
+  animation: zoom-in 0.55s var(--motion-ease-out) both;
+}
+
+@utility animate-zoom-in-sm {
+  --motion-scale: 0.98;
+  animation: zoom-in 0.45s var(--motion-ease-out) both;
+}
+
+@utility animate-zoom-in-lg {
+  --motion-scale: 0.86;
+  animation: zoom-in 0.75s var(--motion-ease-out) both;
+}
+
+@utility animate-zoom-out {
+  animation: zoom-out 0.45s var(--motion-ease-in) both;
+}
+
+@utility animate-zoom-out-sm {
+  --motion-scale: 0.98;
+  animation: zoom-out 0.35s var(--motion-ease-in) both;
+}
+
+@utility animate-zoom-out-lg {
+  --motion-scale: 0.86;
+  animation: zoom-out 0.6s var(--motion-ease-in) both;
+}
+
+/* Pop : les memes keyframes que zoom-in, mais la courbe spring depasse la
+ * cible avant de s'y poser. Pour les badges et les confirmations. */
+@utility animate-pop {
+  --motion-scale: 0.92;
+  animation: zoom-in 0.55s var(--motion-ease-spring) both;
+}
+
+@utility animate-pop-sm {
+  --motion-scale: 0.97;
+  animation: zoom-in 0.45s var(--motion-ease-spring) both;
+}
+
+/* Derive lente facon Ken Burns pour les images de couverture. A poser sur
+ * l'enfant d'un conteneur overflow-hidden, jamais sur le conteneur. */
+@utility animate-kenburns {
+  animation: kenburns 26s ease-in-out infinite alternate;
+}
+
+@keyframes zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(var(--motion-scale, 0.94));
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes zoom-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(var(--motion-scale, 0.94));
+  }
+}
+
+@keyframes kenburns {
+  from {
+    transform: scale(1) translate(0, 0);
+  }
+  to {
+    transform: scale(1.08) translate(-1.5%, -1%);
+  }
+}

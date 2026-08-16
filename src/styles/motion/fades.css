@@ -1,0 +1,149 @@
+/* src/styles/motion/fades.css - famille fondu : entrees et sorties en opacite, avec ou sans derive. */
+
+/* Le suffixe directionnel est le sens du deplacement, pas le cote d'origine :
+ * animate-fade-up derive vers le haut, l'element part donc d'en dessous.
+ * La distance de derive se regle via --motion-travel (1.25rem par defaut). */
+
+@utility animate-fade-in {
+  animation: fade-in 0.6s var(--motion-ease-out) both;
+}
+
+/* La sortie laisse l'element en place (opacity 0) : le retirer du DOM sur
+ * animationend, ou lui poser pointer-events-none. */
+@utility animate-fade-out {
+  animation: fade-out 0.45s var(--motion-ease-in) both;
+}
+
+/* Le quatuor directionnel standard, meme derive courte que animate-rise. */
+@utility animate-fade-up {
+  animation: fade-up 0.7s var(--motion-ease-out) both;
+}
+
+@utility animate-fade-down {
+  animation: fade-down 0.7s var(--motion-ease-out) both;
+}
+
+@utility animate-fade-left {
+  animation: fade-left 0.7s var(--motion-ease-out) both;
+}
+
+@utility animate-fade-right {
+  animation: fade-right 0.7s var(--motion-ease-out) both;
+}
+
+/* Variantes -lg : derive doublee et tempo plus ample, pour les heros. */
+@utility animate-fade-up-lg {
+  --motion-travel: 2.75rem;
+  animation: fade-up 0.85s var(--motion-ease-out) both;
+}
+
+@utility animate-fade-down-lg {
+  --motion-travel: 2.75rem;
+  animation: fade-down 0.85s var(--motion-ease-out) both;
+}
+
+@utility animate-fade-left-lg {
+  --motion-travel: 2.75rem;
+  animation: fade-left 0.85s var(--motion-ease-out) both;
+}
+
+@utility animate-fade-right-lg {
+  --motion-travel: 2.75rem;
+  animation: fade-right 0.85s var(--motion-ease-out) both;
+}
+
+/* Mise au point depuis un flou : reserve aux visuels et aux grands chiffres,
+ * le filtre coute plus cher qu'un simple translate. */
+@utility animate-blur-in {
+  animation: blur-in 0.8s var(--motion-ease-out) both;
+}
+
+@utility animate-blur-up {
+  animation: blur-up 0.9s var(--motion-ease-out) both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-travel, 1.25rem));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--motion-travel, 1.25rem)));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-left {
+  from {
+    opacity: 0;
+    transform: translateX(var(--motion-travel, 1.25rem));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-right {
+  from {
+    opacity: 0;
+    transform: translateX(calc(-1 * var(--motion-travel, 1.25rem)));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes blur-in {
+  from {
+    opacity: 0;
+    filter: blur(12px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes blur-up {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(var(--motion-travel, 1.25rem));
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}

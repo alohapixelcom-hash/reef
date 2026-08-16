@@ -1,0 +1,199 @@
+/* ---------------------------------------------------------------------------
+ * src/styles/motion/materials.css - les materiaux translucides et leurs replis.
+ *
+ * Le verre n'est pas un effet decoratif, c'est une couche fonctionnelle : elle
+ * flotte au-dessus du contenu, laisse deviner ce qui passe dessous, et dit donc
+ * "je suis au-dessus, le contenu continue en dessous" sans consommer de bande
+ * opaque. Trois choses la rendent credible, et ce fichier les tient :
+ *
+ *   1. Le poids du materiau porte la hierarchie. Une grande surface doit lire
+ *      plus epaisse qu'une petite pastille : plus de flou, ombre plus profonde.
+ *   2. Le texte pose dessus a besoin d'aide. Sur un fond qui change en
+ *      permanence, un gris plat devient illisible : on remonte le contraste et
+ *      on ajoute une nuance de graisse plutot que de baisser l'opacite.
+ *   3. Tout le monde n'en veut pas. Trois preferences systeme existent, et un
+ *      theme vendu qui les ignore est un theme qui casse chez une partie de ses
+ *      utilisateurs finaux.
+ * ------------------------------------------------------------------------- */
+
+/* --- Le flou de fond, ecrit UNE seule fois --------------------------------
+ * Piege de compilation, constate sur le rendu et pas sur le code source :
+ * ecrire `backdrop-filter` puis `-webkit-backdrop-filter` dans la MEME regle
+ * fait fusionner les deux par l'optimiseur CSS, qui n'en reemet qu'une. Ici
+ * c'est la forme prefixee qui survivait, et Chrome ne la comprend pas. Tout le
+ * verre du site etait donc mort sur le navigateur le plus repandu, sans
+ * qu'aucune erreur ne le signale : le CSS compilait, la classe existait, et
+ * rien ne floutait.
+ *
+ * Les deux formes vivent maintenant dans deux regles distinctes, ce qui
+ * interdit la fusion, et la prefixee ne sert que la ou la standard manque
+ * (Safari avant 18). La valeur passe par --glass-blur : une seule variable a
+ * eteindre pour retirer tout le verre d'un coup, ce dont se servent plus bas
+ * les preferences systeme.
+ *
+ * Regle de tenue : ne jamais ecrire `backdrop-filter` ailleurs que dans ce
+ * bloc. Poser --glass-blur sur la surface, c'est tout.
+ *
+ * Les `-webkit-backdrop-filter` restes dans global.css ne genent pas : c'est
+ * une AUTRE propriete, elle ne se dispute pas avec celle d'ici. Ils continuent
+ * de servir Safari avant 18, et Chrome lit la regle ci-dessous. */
+.glass,
+.glass-light {
+  --glass-blur: blur(20px) saturate(180%);
+}
+
+:where(.glass, .glass-light, .glass-thick) {
+  backdrop-filter: var(--glass-blur, none);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  :where(.glass, .glass-light, .glass-thick) {
+    -webkit-backdrop-filter: var(--glass-blur, none);
+  }
+}
+
+/* --- Le poids des materiaux -----------------------------------------------
+ * .glass est calibree pour les petites surfaces (pastilles, boutons de verre).
+ * Une grande surface posee sur du contenu dense a besoin de plus de flou et
+ * d'une ombre plus profonde, sinon elle a l'air d'un rectangle sale plutot que
+ * d'une plaque de verre. */
+.glass-thick {
+  --glass-blur: blur(32px) saturate(180%);
+  background: color-mix(in oklab, #ffffff 14%, transparent);
+  border: 1px solid color-mix(in oklab, #ffffff 22%, transparent);
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, #ffffff 24%, transparent) inset,
+    0 24px 70px -24px rgb(0 0 0 / 0.55);
+}
+
+/* --- Vibrance -------------------------------------------------------------
+ * Le texte secondaire pose sur du verre ne doit PAS etre le meme gris que sur
+ * une surface opaque : le fond bouge sous lui, et un gris a 60% disparait des
+ * qu'une zone claire passe dessous. On garde donc une opacite haute et on
+ * compense la perte de presence par un demi-cran de graisse et un souffle de
+ * chasse, ce qui se lit comme du texte pose sur du verre et non comme du texte
+ * delave. */
+.vibrant {
+  color: color-mix(in oklab, currentColor 88%, transparent);
+  font-weight: 500;
+  letter-spacing: 0.006em;
+}
+
+/* --- Bord de defilement, supprime -----------------------------------------
+ * Il y avait ici un degrade pose sous la barre, cense adoucir le passage du
+ * contenu dessous. Sur un hero sombre, ce degrade partait de la couleur de
+ * fond du site, qui est claire : il dessinait donc une bavure blanche en
+ * travers de la scene, juste sous la pilule. Un effet qui depend de la couleur
+ * du fond ne peut pas etre pose une fois pour toutes sur une barre qui survole
+ * des fonds de toutes les couleurs. Le materiau de la barre suffit a dire
+ * qu'elle est au-dessus : elle s'epaissit deja quand du contenu passe dessous.
+
+ * ------------------------------------------------------------------------- */
+
+/* --- Materialiser, plutot que fondre --------------------------------------
+ * Une surface de verre qui apparait en simple fondu d'opacite ne se lit pas
+ * comme un materiau : elle se lit comme une image qui s'allume. Faire monter
+ * le flou EN MEME TEMPS que l'echelle donne l'impression d'une plaque qui
+ * arrive et se fige, ce qui est exactement ce qu'on raconte.
+ *
+ * Meme precaution qu'en haut de fichier : la variante prefixee est ecrite dans
+ * un second jeu d'images cles, jamais a cote de la standard. */
+@keyframes materialize {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.97);
+    backdrop-filter: blur(0px) saturate(100%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    backdrop-filter: blur(20px) saturate(180%);
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  @keyframes materialize {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem) scale(0.97);
+      -webkit-backdrop-filter: blur(0px) saturate(100%);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+    }
+  }
+}
+
+.animate-materialize {
+  animation: materialize 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* --- Transparence refusee -------------------------------------------------
+ * prefers-reduced-transparency n'est pas un caprice : le flou coute cher a
+ * lire pour certaines personnes, et il coute cher a calculer sur des machines
+ * modestes. On rend les surfaces franches plutot que de les supprimer : la
+ * hierarchie doit survivre a la disparition du materiau.
+ *
+ * Une seule variable eteint le flou partout, y compris sur la barre de nav :
+ * plus besoin d'un !important qui ne s'appliquerait qu'aux selecteurs listes. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass-thick,
+  .glass-light,
+  [data-navbar] {
+    --glass-blur: none;
+  }
+
+  .glass,
+  .glass-thick {
+    background: color-mix(in oklab, var(--color-scrim) 92%, transparent);
+    border-color: color-mix(in oklab, #ffffff 20%, transparent);
+  }
+
+  .glass-light,
+  [data-navbar].glass-light {
+    background: var(--color-background);
+    border-color: var(--color-border);
+  }
+
+  /* Le scrim des superpositions se corrige dans components/ui/_overlay.css,
+   * contre la regle qu'il remplace : deux fichiers differents ne garantissent
+   * pas leur ordre de chargement, et une correction qui perd la cascade ne
+   * corrige rien. */
+
+  .animate-materialize {
+    animation-name: none;
+  }
+}
+
+/* --- Contraste renforce ---------------------------------------------------
+ * En contraste eleve, on ne se contente pas d'assombrir : on redonne a chaque
+ * surface une bordure franche, parce que c'est la bordure et non l'ombre qui
+ * separe deux plans quand les nuances se rapprochent. */
+@media (prefers-contrast: more) {
+  .glass,
+  .glass-thick,
+  .glass-light {
+    --glass-blur: none;
+    border-width: 2px;
+  }
+
+  .glass,
+  .glass-thick {
+    background: var(--color-scrim);
+    border-color: #ffffff;
+  }
+
+  .glass-light {
+    background: var(--color-background);
+    border-color: var(--color-foreground);
+  }
+
+  .vibrant {
+    color: currentColor;
+    font-weight: 600;
+  }
+
+}
