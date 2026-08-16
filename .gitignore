@@ -1,0 +1,16 @@
+# .gitignore - keeps installs, build output, generated caches and secrets out of the repository.
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Astro generated types and content cache
+.astro/
+
+# Cloudflare Wrangler local state
+.wrangler/
+
+# Local environment and secrets. Copy .env.example to .env, never commit .env.
+.env
