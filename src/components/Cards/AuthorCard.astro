@@ -1,0 +1,96 @@
+---
+// src/components/Cards/AuthorCard.astro - la carte d'un auteur : portrait, nom, fonction, biographie, nombre de billets et liens externes.
+//
+// Une signature sur un blog n'est pas une vignette d'equipe : elle sert a
+// decider si l'on fait confiance a ce qu'on va lire. La carte affiche donc la
+// fonction reelle et la biographie entiere, et le compteur de billets sert de
+// preuve plutot que de decoration.
+import { Icon } from "@components/svg/icons";
+import { Avatar } from "@components/ui/avatar";
+import { fmt, useTranslations, type Locale } from "@i18n";
+import type { CollectionEntry } from "astro:content";
+
+type Props = {
+  author: CollectionEntry<"authors">;
+  href: string;
+  /** Nombre de billets publies sous cette signature, deja compte par la page. */
+  count: number;
+  locale: Locale;
+  /** Affiche la rangee de liens externes. Reservee aux pages qui ont la place. */
+  showLinks?: boolean;
+  as?: "h2" | "h3";
+  class?: string;
+};
+
+const {
+  author,
+  href,
+  count,
+  locale,
+  showLinks = false,
+  as: Tag = "h3",
+  class: className,
+}: Props = Astro.props;
+
+const t = useTranslations(locale);
+const countLabel = count === 1 ? t.authors.countOne : fmt(t.authors.countLabel, { count });
+const links = author.data.links;
+---
+
+<article
+  class:list={[
+    "group border-border bg-card rounded-card relative flex flex-col gap-4 border p-6",
+    "transition-[border-color,transform,box-shadow] duration-300",
+    "hover:shadow-float hover:border-foreground/20 hover:-translate-y-0.5",
+    className,
+  ]}
+  data-slot="author-card"
+>
+  <div class="flex items-center gap-4">
+    <Avatar name={author.data.name} src={author.data.avatar?.src} size="xl" alt="" />
+    <div class="flex min-w-0 flex-col gap-0.5">
+      <Tag class="font-display text-foreground text-xl font-semibold tracking-tight">
+        <a href={href} class="after:absolute after:inset-0 after:content-['']">
+          {author.data.name}
+        </a>
+      </Tag>
+      <p class="text-muted-foreground font-sans text-sm">{author.data.role}</p>
+    </div>
+  </div>
+
+  <p class="text-muted-foreground text-[0.95rem] leading-relaxed">{author.data.bio}</p>
+
+  <div class="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
+    <span class="bg-muted text-muted-foreground font-sans rounded-pill px-2.5 py-1 text-xs font-medium">
+      {countLabel}
+    </span>
+
+    {
+      showLinks && links.length > 0 && (
+        <ul class="flex flex-wrap items-center gap-3" aria-label={t.authors.linksLabel}>
+          {links.map((link) => (
+            <li>
+              {/* z-10 : ces liens sortent vers l'exterieur et doivent passer
+                  AU-DESSUS du lien de carte, qui couvre toute la surface. */}
+              <a
+                href={link.href}
+                rel="noopener"
+                class="text-muted-foreground hover:text-foreground relative z-10 inline-flex min-h-11 items-center gap-1 font-sans text-sm transition-colors duration-150"
+              >
+                {link.label}
+                <Icon name="arrow-up-right" size={14} />
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    <span
+      class="text-muted-foreground group-hover:text-foreground ml-auto transition-colors duration-200"
+      aria-hidden="true"
+    >
+      <Icon name="arrow-right" size={18} />
+    </span>
+  </div>
+</article>

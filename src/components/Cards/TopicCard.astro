@@ -1,0 +1,91 @@
+---
+// src/components/Cards/TopicCard.astro - la carte d'un sujet : initiale en filigrane, nom, description, nombre de billets, et l'accent declare par le contenu.
+//
+// L'accent d'un sujet est un NOM (coral, reef, ink), jamais une couleur : le
+// contenu declare une intention, la table topicTone la traduit en tokens. C'est
+// ce qui permet de repeindre le theme sans rouvrir un seul fichier de contenu.
+//
+// Pourquoi une initiale en filigrane
+// ----------------------------------
+// La carte precedente etait un bloc de texte avec un filet au-dessus : cinq
+// cartes cote a cote donnaient cinq rectangles gris qu'on ne distinguait qu'en
+// les lisant. Un sujet doit se reconnaitre AVANT d'etre lu, et la seule matiere
+// disponible reste la typographie : Reef n'a ni icone par sujet ni photo, et
+// n'en aura pas. L'initiale, posee tres grande dans la serif italique de la
+// maison et dans la couleur du sujet, donne a chaque carte une silhouette a
+// elle, nette a toutes les densites d'ecran et repeinte au rebranding.
+import { Icon } from "@components/svg/icons";
+import { fmt, useTranslations, type Locale } from "@i18n";
+import type { CollectionEntry } from "astro:content";
+import { topicTone } from "./topicTone";
+
+// Re-export de commodite : la table canonique vit dans ./topicTone, et les
+// composants qui montrent un sujet peuvent la prendre ici ou la, au choix.
+export { topicTone };
+
+type Props = {
+  topic: CollectionEntry<"topics">;
+  href: string;
+  /** Nombre de billets publies dans ce sujet, deja compte par la page. */
+  count: number;
+  locale: Locale;
+  /** Niveau de titre reel, selon ce qui precede la grille dans la page. */
+  as?: "h2" | "h3";
+  class?: string;
+};
+
+const { topic, href, count, locale, as: Tag = "h3", class: className }: Props = Astro.props;
+const t = useTranslations(locale);
+const tone = topicTone[topic.data.accent];
+const countLabel = count === 1 ? t.topics.countOne : fmt(t.topics.countLabel, { count });
+const initial = topic.data.name.trim().charAt(0).toUpperCase();
+---
+
+<article
+  class:list={[
+    "group border-border bg-card rounded-card relative flex flex-col gap-3 overflow-hidden border p-7",
+    "transition-[border-color,transform,box-shadow] duration-300",
+    "hover:shadow-float hover:-translate-y-0.5",
+    tone.hover,
+    className,
+  ]}
+  data-slot="topic-card"
+>
+  {/* L'initiale deborde en bas a droite : entierement contenue elle aurait
+      l'air d'un logo pose dans un coin, coupee par le bord elle a l'air d'un
+      fond sur lequel le texte est imprime. */}
+  <span
+    class:list={[
+      "font-serif pointer-events-none absolute -right-3 -bottom-12 text-[11rem] leading-none italic select-none",
+      "opacity-[0.13] transition-opacity duration-300 group-hover:opacity-25",
+      tone.ghost,
+    ]}
+    aria-hidden="true">{initial}</span
+  >
+
+  <span class:list={["relative h-0.5 w-10 rounded-pill", tone.rule]} aria-hidden="true"></span>
+
+  <Tag class="font-display text-foreground relative text-xl font-bold tracking-tight">
+    {/* Le lien couvre toute la carte via ::after : un seul arret de tabulation,
+        et pourtant la surface cliquable est celle que le doigt vise. */}
+    <a href={href} class="after:absolute after:inset-0 after:content-['']">
+      {topic.data.name}
+    </a>
+  </Tag>
+
+  <p class="text-muted-foreground relative line-clamp-4 text-[0.95rem] leading-relaxed">
+    {topic.data.description}
+  </p>
+
+  <p class="relative mt-auto flex items-center gap-2 pt-2">
+    <span class:list={["rounded-pill px-2.5 py-1 text-xs font-medium", tone.chip]}>
+      {countLabel}
+    </span>
+    <span
+      class="text-muted-foreground group-hover:text-foreground ml-auto transition-colors duration-200"
+      aria-hidden="true"
+    >
+      <Icon name="arrow-right" size={18} />
+    </span>
+  </p>
+</article>

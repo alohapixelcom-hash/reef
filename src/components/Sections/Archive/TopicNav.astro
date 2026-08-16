@@ -1,0 +1,71 @@
+---
+// src/components/Sections/Archive/TopicNav.astro - les pastilles de sujets posees sous un en-tete d'archive.
+//
+// Une rangee de pastilles plutot qu'un <select> : le lecteur voit d'un coup
+// tout ce qui existe et combien il en reste, ce qu'un menu ferme lui cache.
+// Cinq sujets tiennent sur une ligne, et la rangee defile horizontalement en
+// dessous de 640 px au lieu de se casser en trois etages.
+//
+// Le sujet actif porte aria-current="page" : la couleur seule ne suffit pas a
+// dire "vous etes ici", et un lecteur d'ecran n'en voit rien.
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { useTranslations, type Locale } from "@i18n";
+import { entrySlug } from "@i18n/content";
+import { topicTone } from "@components/Cards/topicTone";
+import type { CollectionEntry } from "astro:content";
+
+type Props = {
+  topics: CollectionEntry<"topics">[];
+  locale: Locale;
+  /** Le slug du sujet en cours, sans prefixe de langue. Absent sur l'archive complete. */
+  activeSlug?: string;
+  class?: string;
+};
+
+const { topics, locale, activeSlug, class: className } = Astro.props;
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+
+const pill = [
+  "inline-flex min-h-11 items-center gap-2 rounded-pill border px-4",
+  "font-sans text-sm whitespace-nowrap",
+  "transition-[background-color,border-color,color] duration-200",
+].join(" ");
+const idle = "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30";
+const active = "border-transparent bg-foreground text-background font-medium";
+---
+
+<nav class:list={["w-full", className]} aria-label={t.topics.allTopics} data-slot="topic-nav">
+  <ul class="-mx-1 flex flex-nowrap items-center gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible">
+    <li>
+      <a
+        href={routes.posts}
+        class:list={[pill, activeSlug === undefined ? active : idle]}
+        aria-current={activeSlug === undefined ? "page" : undefined}
+      >
+        {t.common.all}
+      </a>
+    </li>
+    {
+      topics.map((topic) => {
+        const slug = entrySlug(topic.id);
+        const isActive = slug === activeSlug;
+        return (
+          <li>
+            <a
+              href={`${routes.topics}${slug}/`}
+              class:list={[pill, isActive ? active : idle]}
+              aria-current={isActive ? "page" : undefined}
+            >
+              <span
+                class:list={["size-1.5 rounded-pill", isActive ? "bg-background" : topicTone[topic.data.accent].dot]}
+                aria-hidden="true"
+              />
+              {topic.data.name}
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</nav>

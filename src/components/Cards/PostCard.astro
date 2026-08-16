@@ -1,0 +1,99 @@
+---
+// src/components/Cards/PostCard.astro - la carte d'un billet dans une liste : sujet, date, titre, chapeau, signature et temps de lecture.
+//
+// Deux partis pris tiennent toute la carte.
+//
+// La couverture est OPTIONNELLE et la carte ne l'attend pas. Un blog qui exige
+// une image par billet finit avec neuf photos de banque d'images qui ne disent
+// rien : ici, sans couverture, la carte devient purement typographique et c'est
+// une composition a part entiere, pas un trou.
+//
+// Le lien couvre toute la carte via ::after plutot que d'envelopper le tout
+// dans une ancre : un seul arret de tabulation, le titre reste le nom
+// accessible du lien, et la date comme le sujet restent selectionnables.
+import { Avatar } from "@components/ui/avatar";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { fmt, formatDate, useTranslations, type Locale } from "@i18n";
+import type { ResolvedPost } from "@js/posts";
+import { Image } from "astro:assets";
+import { topicTone } from "./topicTone";
+
+type Props = {
+  entry: ResolvedPost;
+  locale: Locale;
+  /** Niveau de titre reel : h2 dans une grille sans sous-titre, h3 sous un titre de section. */
+  as?: "h2" | "h3";
+  class?: string;
+};
+
+const { entry, locale, as: Tag = "h3", class: className }: Props = Astro.props;
+const { post, author, topic, slug, topicSlug, minutes } = entry;
+
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+const href = `${routes.posts}${slug}/`;
+const topicHref = `${routes.topics}${topicSlug}/`;
+const tone = topicTone[topic.data.accent];
+const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: minutes });
+---
+
+<article
+  class:list={[
+    "group border-border bg-card rounded-card relative flex flex-col overflow-hidden border",
+    "transition-[border-color,transform,box-shadow] duration-300",
+    "hover:shadow-float hover:border-foreground/20 hover:-translate-y-0.5",
+    className,
+  ]}
+  data-slot="post-card"
+>
+  {
+    post.data.cover && (
+      <Image
+        src={post.data.cover}
+        alt={post.data.coverAlt ?? ""}
+        widths={[420, 760]}
+        sizes="(min-width: 1024px) 24rem, (min-width: 640px) 45vw, 92vw"
+        class="aspect-[16/9] w-full object-cover"
+        loading="lazy"
+        decoding="async"
+      />
+    )
+  }
+
+  <div class="flex flex-1 flex-col gap-3 p-6">
+    <p class="flex flex-wrap items-center gap-x-3 gap-y-1">
+      {/* Le sujet est un vrai lien, pose AU-DESSUS du lien de carte (z-10) :
+          sans cela le ::after du titre l'avalerait. */}
+      <a
+        href={topicHref}
+        class:list={[
+          "font-sans rounded-pill relative z-10 px-2.5 py-1 text-xs font-medium",
+          tone.chip,
+        ]}
+      >
+        {topic.data.name}
+      </a>
+      <span class="text-muted-foreground font-sans text-xs">
+        <time datetime={post.data.pubDate.toISOString()}>
+          {formatDate(post.data.pubDate, locale)}
+        </time>
+      </span>
+    </p>
+
+    <Tag class="font-display text-foreground text-xl leading-snug font-semibold text-balance">
+      <a href={href} class="after:absolute after:inset-0 after:content-['']">
+        {post.data.title}
+      </a>
+    </Tag>
+
+    <p class="text-muted-foreground line-clamp-3 text-[0.95rem] leading-relaxed">
+      {post.data.description}
+    </p>
+
+    <div class="border-border mt-auto flex items-center gap-2.5 border-t pt-4">
+      <Avatar name={author.data.name} src={author.data.avatar?.src} size="sm" alt="" />
+      <span class="text-foreground font-sans text-sm font-medium">{author.data.name}</span>
+      <span class="text-muted-foreground ml-auto font-sans text-xs">{readLabel}</span>
+    </div>
+  </div>
+</article>
