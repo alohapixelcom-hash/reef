@@ -1,0 +1,171 @@
+---
+// src/components/Sections/Post/PostHero.astro - en-tete d'article : sujet, titre, chapeau, signature, dates et temps de lecture calcule sur le corps reel.
+//
+// L'en-tete d'un billet n'est pas l'en-tete d'une page d'archive. PageHero est
+// un panneau indicateur ; celui-ci est l'affiche du texte, et il n'a qu'un seul
+// travail : conduire l'oeil du titre au premier paragraphe sans le lacher. La
+// descente est donc continue, du display au chapeau puis au corps, et le
+// chapeau reste dans la MEME mesure que la colonne de lecture pour que les deux
+// blocs partagent leur bord gauche au caractere pres.
+//
+// Le fond reste celui de la page, sans bandeau de couleur : un billet commence
+// sur du papier. Le seul filet de la composition passe au-dessus de la ligne de
+// signature, la ou il separe vraiment deux choses.
+import { Avatar } from "@components/ui/avatar";
+import { Badge } from "@components/ui/badge";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { readingTime } from "@js/textUtils";
+import { fmt, formatDate, getLocale, useTranslations } from "@i18n";
+import { entrySlug } from "@i18n/content";
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+
+type Props = {
+  post: CollectionEntry<"posts">;
+  author: CollectionEntry<"authors">;
+  topic: CollectionEntry<"topics">;
+  class?: string;
+};
+
+const { post, author, topic, class: className } = Astro.props;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+
+// --- Temps de lecture ------------------------------------------------------
+// Calcule sur le corps REEL du billet, jamais lu dans le frontmatter : une
+// valeur qu'un auteur doit tenir a jour est fausse des le paragraphe suivant.
+// Les balises HTML d'un bloc MDX ne sont pas des mots, le reste compte, code
+// compris : un bloc de code se lit, il ne se saute pas.
+//
+// 200 mots par minute, plancher a une minute. Le chiffre est celui d'une
+// colonne technique qui porte du code, pas celui d'un article de presse.
+//
+// Une seule formule dans tout le depot : readingTime() (src/js/textUtils.ts),
+// que lisent aussi les cartes de liste via getResolvedPosts. Deux formules
+// concurrentes finissent toujours par afficher deux chiffres differents pour
+// le meme article, sur la carte et sur la page.
+const { minutes } = readingTime(post.body ?? "");
+const readingLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: minutes });
+
+const { title, description, pubDate, updatedDate, cover, coverAlt, draft } = post.data;
+const topicHref = `${routes.topics}${entrySlug(topic.id)}/`;
+const authorHref = `${routes.authors}${entrySlug(author.id)}/`;
+
+// datetime porte la date complete pour les machines ; le texte visible passe
+// par Intl et suit les usages de la langue affichee.
+const iso = (date: Date): string => date.toISOString();
+---
+
+<header class:list={["pt-28 pb-10 md:pt-36 md:pb-12", className]} data-slot="post-hero">
+  <div class="container-page">
+    <div class="measure-prose mx-auto flex flex-col">
+      {/* Surtitre de rubrique : le filet corail de la maison, puis le nom du
+          sujet en vrai lien. C'est la seule sortie laterale de l'en-tete, et
+          elle mene la ou le lecteur ira vraiment. Meme filet que PageHero et
+          SectionHeader : un surtitre est un surtitre partout dans le theme. */}
+      <p class="mb-4 flex flex-wrap items-center gap-3">
+        <span class="bg-primary inline-block h-px w-8 shrink-0" aria-hidden="true"></span>
+        <a
+          href={topicHref}
+          class="font-sans text-muted-foreground hover:text-foreground text-xs font-medium tracking-[0.18em] uppercase transition-colors duration-150"
+        >
+          <span class="sr-only">{t.post.topicLabel}: </span>
+          {topic.data.name}
+        </a>
+        {draft && <Badge variant="outline">{t.post.draft}</Badge>}
+      </p>
+
+      {/* transition:name suit la meme convention que les cartes de liste : le
+          titre de la carte grandit jusqu'a sa place de h1 au lieu d'un fondu
+          croise generique. Le slug ne porte ni prefixe de langue ni slash, ce
+          qui en fait un identifiant CSS valide. */}
+      <h1
+        class="font-display text-display-sm md:text-display-md text-foreground"
+        transition:name={`post-title-${entrySlug(post.id)}`}
+      >
+        {title}
+      </h1>
+
+      {/* Le chapeau est le palier entre le titre et le corps : plus grand que
+          le texte courant, assourdi, et deja dans la police de lecture. La
+          graisse descend a 400 alors que le titre est a 700 : c'est la marche
+          qui separe les deux blocs, pas un changement de famille. */}
+      <p
+        class="text-muted-foreground mt-5 text-xl leading-[1.55] font-normal md:text-2xl md:leading-[1.5]"
+      >
+        {description}
+      </p>
+
+      {/* Signature et dates. Le filet est haut : il ferme le bloc de titre et
+          ouvre les metadonnees, au lieu de border la page pour rien. */}
+      <div class="border-border mt-8 flex flex-wrap items-center gap-x-5 gap-y-4 border-t pt-5">
+        <div class="flex items-center gap-3">
+          <Avatar name={author.data.name} src={author.data.avatar?.src} size="md" alt="" />
+          <span class="flex flex-col">
+            <span class="font-sans text-sm">
+              <span class="text-muted-foreground">{t.post.writtenBy} </span>
+              <a
+                href={authorHref}
+                class="text-foreground decoration-primary/50 font-medium underline-offset-4 hover:underline"
+              >
+                {author.data.name}
+              </a>
+            </span>
+            <span class="text-muted-foreground font-sans text-xs">{author.data.role}</span>
+          </span>
+        </div>
+
+        {/* Les libelles restent visibles : "Published on 16 September 2025" se
+            lit d'un trait, la ou une date nue oblige a deviner ce qu'elle
+            date. Les deux dates cohabitent quand le billet a ete revu. */}
+        <p class="text-muted-foreground flex flex-wrap items-center gap-x-5 gap-y-1 font-sans text-sm">
+          <span>
+            {t.post.published}{" "}
+            <time datetime={iso(pubDate)} class="text-foreground">
+              {formatDate(pubDate, locale)}
+            </time>
+          </span>
+
+          {
+            updatedDate && (
+              <span title={t.post.updatedNote}>
+                {t.post.updated}{" "}
+                <time datetime={iso(updatedDate)} class="text-foreground">
+                  {formatDate(updatedDate, locale)}
+                </time>
+              </span>
+            )
+          }
+
+          <span>{readingLabel}</span>
+        </p>
+      </div>
+
+      {
+        draft && (
+          <p class="border-border bg-muted text-muted-foreground rounded-card mt-6 border p-4 font-sans text-sm leading-relaxed">
+            {t.post.draftNote}
+          </p>
+        )
+      }
+    </div>
+  </div>
+
+  {
+    cover && (
+      <figure class="container-page mt-10 md:mt-12">
+        <Image
+          src={cover}
+          alt={coverAlt ?? ""}
+          widths={[720, 1080, 1440]}
+          sizes="(min-width: 80rem) 72rem, 100vw"
+          class="rounded-card shadow-float measure-wide mx-auto w-full object-cover"
+          loading="eager"
+          decoding="async"
+        />
+      </figure>
+    )
+  }
+</header>

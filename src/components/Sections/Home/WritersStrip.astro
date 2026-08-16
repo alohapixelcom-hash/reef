@@ -1,0 +1,69 @@
+---
+// src/components/Sections/Home/WritersStrip.astro - la rangee des signatures de l'accueil : qui ecrit ici, et combien chacun a publie.
+import AuthorCard from "@components/Cards/AuthorCard.astro";
+import SectionHeader from "@components/Sections/Global/SectionHeader.astro";
+import { Icon } from "@components/svg/icons";
+import { Button } from "@components/ui/button";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { getLocale, useTranslations } from "@i18n";
+import { entrySlug } from "@i18n/content";
+import type { CollectionEntry } from "astro:content";
+
+type Props = {
+  authors: CollectionEntry<"authors">[];
+  /** Nombre de billets publies par slug d'auteur, compte une fois par la page. */
+  counts: Record<string, number>;
+};
+
+const { authors, counts } = Astro.props;
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+
+// Une signature sans billet publie n'a rien a faire sur l'accueil : la page
+// auteur existe, elle attend simplement son premier texte.
+const active = authors.filter((author) => (counts[entrySlug(author.id)] ?? 0) > 0);
+---
+
+<section
+  class="bg-surface border-border border-y"
+  aria-labelledby="writers-title"
+  data-slot="writers-strip"
+>
+  <div class="container-page py-16 md:py-24">
+    <SectionHeader
+      as="h2"
+      headingId="writers-title"
+      title={t.home.authorsTitle}
+      accentWord={t.home.authorsAccent}
+      lede={t.home.authorsLede}
+    />
+
+    <ul class="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {
+        active.map((author) => {
+          const slug = entrySlug(author.id);
+          return (
+            <li class="flex">
+              <AuthorCard
+                {author}
+                {locale}
+                href={`${routes.authors}${slug}/`}
+                count={counts[slug] ?? 0}
+                as="h3"
+                class="w-full"
+              />
+            </li>
+          );
+        })
+      }
+    </ul>
+
+    <div class="mt-10 flex justify-center">
+      <Button href={routes.authors} variant="ghost" size="md">
+        {t.home.authorsCta}
+        <Icon name="arrow-right" size={17} />
+      </Button>
+    </div>
+  </div>
+</section>

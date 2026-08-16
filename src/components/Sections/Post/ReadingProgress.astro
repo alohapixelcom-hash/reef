@@ -1,0 +1,67 @@
+---
+// src/components/Sections/Post/ReadingProgress.astro - la barre de progression de lecture, sans une ligne de JavaScript.
+//
+// La version classique de ce composant ecoute le scroll, lit scrollHeight et
+// ecrit un style a chaque image. Elle coute un ecouteur, une lecture de mise en
+// page par image et un requestAnimationFrame, tout cela sur le fil principal
+// pendant que le lecteur fait defiler.
+//
+// Ici, rien de tout cela : `animation-timeline: scroll(root)` remplace
+// l'horloge par le defilement de la page, et l'animation tourne sur le fil de
+// composition. Le catalogue motion porte deja l'utilitaire (motion/scroll.css,
+// `animate-scroll-progress`), avec ses deux gardes.
+//
+// Deux refus, ecrits ici plutot qu'herites :
+//   - la ou le navigateur ne sait pas piloter une animation par le scroll, la
+//     barre resterait figee a zero, c'est-a-dire un trait mort en haut de page.
+//     Elle n'est donc pas rendue du tout ;
+//   - en mouvement reduit, elle disparait aussi. Une barre qui avance toute
+//     seule reste du mouvement, meme quand elle ne fait que trois pixels.
+---
+
+<div class="reading-progress" data-slot="reading-progress" aria-hidden="true">
+  <span class="reading-progress-bar animate-scroll-progress"></span>
+</div>
+
+<style>
+  .reading-progress {
+    position: fixed;
+    /* Sous la barre de statut dans la coquille d'application, contre le bord
+       haut dans un navigateur, ou env() vaut zero. Meme calcul que la nav. */
+    inset-block-start: env(safe-area-inset-top, 0px);
+    inset-inline: 0;
+    /* Au-dessus de la barre de navigation flottante (z-50), sous le curseur
+       contextuel (z-100). */
+    z-index: 60;
+    block-size: 3px;
+    pointer-events: none;
+  }
+
+  .reading-progress-bar {
+    display: block;
+    block-size: 100%;
+    /* Corail vers lagon : les deux accents de la maison, dans l'ordre ou le
+       theme les hierarchise. */
+    background: linear-gradient(to right, var(--color-primary), var(--color-accent));
+  }
+
+  /* L'utilitaire du catalogue ancre l'echelle a gauche ; en ecriture de droite
+     a gauche, la progression part du bord oppose. Le :global() est
+     obligatoire : sans lui, Astro colle l'attribut de portee sur [dir="rtl"],
+     c'est-a-dire sur le <html>, qui ne le portera jamais. */
+  :global([dir="rtl"]) .reading-progress-bar {
+    transform-origin: right center;
+  }
+
+  @supports not (animation-timeline: scroll()) {
+    .reading-progress {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reading-progress {
+      display: none;
+    }
+  }
+</style>

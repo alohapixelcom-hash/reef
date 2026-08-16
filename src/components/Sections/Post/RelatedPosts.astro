@@ -1,0 +1,74 @@
+---
+// src/components/Sections/Post/RelatedPosts.astro - fin de lecture : trois billets du meme sujet, dans la meme langue, completes par les plus recents.
+//
+// La selection est ecrite en trois lignes et assumee comme telle : meme sujet
+// d'abord, du plus recent au plus ancien, puis le reste de l'archive pour
+// completer la rangee. Pas de score de similarite, pas de nuage de mots. Sur un
+// blog de cent billets, un classement par sujet et par date bat une heuristique
+// que personne ne pourra deboguer, et le chapeau du bloc le dit au lecteur.
+//
+// La rangee reutilise PostCard : les cartes de "lecture suivante" doivent etre
+// exactement celles de l'archive, sinon le lecteur croit changer de site.
+import PostCard from "@components/Cards/PostCard.astro";
+import SectionHeader from "@components/Sections/Global/SectionHeader.astro";
+import { Button } from "@components/ui/button";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { getLocale, useTranslations } from "@i18n";
+import { getResolvedPosts } from "@js/posts";
+import type { CollectionEntry } from "astro:content";
+
+type Props = {
+  /** Le billet en cours de lecture : exclu de la selection, et source du sujet. */
+  post: CollectionEntry<"posts">;
+  class?: string;
+};
+
+const { post, class: className } = Astro.props;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+
+// getResolvedPosts rend deja les billets PUBLIES de la langue courante, du plus
+// recent au plus ancien : le filtre de langue, celui des brouillons et le tri
+// sont tenus a un seul endroit pour tout le theme. Il ne reste qu'a retirer le
+// billet courant et a faire passer son sujet devant.
+const pool = (await getResolvedPosts(locale)).filter((entry) => entry.post.id !== post.id);
+const sameTopic = pool.filter((entry) => entry.post.data.topic.id === post.data.topic.id);
+const others = pool.filter((entry) => entry.post.data.topic.id !== post.data.topic.id);
+const related = [...sameTopic, ...others].slice(0, 3);
+---
+
+{
+  related.length > 0 && (
+    <section
+      class:list={["bg-surface border-border border-t py-20 md:py-24", className]}
+      aria-labelledby="related-posts-title"
+      data-slot="related-posts"
+    >
+      <div class="container-page flex flex-col gap-10 md:gap-12">
+        <div class="flex flex-wrap items-end justify-between gap-6">
+          <SectionHeader
+            as="h2"
+            headingId="related-posts-title"
+            title={t.post.keepReading}
+            accentWord={t.post.keepReadingAccent}
+            lede={t.post.keepReadingLede}
+            class="max-w-2xl"
+          />
+          <Button href={routes.posts} variant="outline" size="md">
+            {t.post.keepReadingCta}
+          </Button>
+        </div>
+
+        <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {related.map((entry) => (
+            <li class="h-full">
+              <PostCard entry={entry} locale={locale} as="h3" class="h-full" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}

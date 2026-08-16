@@ -1,0 +1,40 @@
+---
+// src/components/Sections/Home/StudioNote.astro - le mot du studio : qui tient ce carnet, et ou lire la suite.
+//
+// Un blog d'artisan doit dire qui parle avant que le lecteur ait a le chercher.
+// Deux phrases et un lien suffisent : la page a propos fait le reste, et
+// l'accueil ne devient pas une page de presentation deguisee.
+import SectionHeader from "@components/Sections/Global/SectionHeader.astro";
+import { Icon } from "@components/svg/icons";
+import { Button } from "@components/ui/button";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { getLocale, useTranslations } from "@i18n";
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+---
+
+<section class="container-page py-16 md:py-24" aria-labelledby="studio-title" data-slot="studio-note">
+  <div class="border-border rounded-panel bg-card border p-8 md:p-12">
+    <SectionHeader
+      as="h2"
+      headingId="studio-title"
+      eyebrow={t.about.eyebrow}
+      title={t.home.aboutTitle}
+      accentWord={t.home.aboutAccent}
+      lede={t.home.aboutLede}
+    />
+
+    <div class="mt-8 flex flex-wrap gap-3">
+      {/* Le corail est la seule couleur d'action du theme : un bouton blanc
+          ici ferait un second point d'action, d'une autre couleur, sur un ecran
+          qui n'en demande qu'un. */}
+      <Button href={routes.about} variant="primary" size="md">
+        {t.home.aboutCta}
+        <Icon name="arrow-right" size={17} />
+      </Button>
+      <Button href={routes.contact} variant="outline" size="md">{t.nav.contact}</Button>
+    </div>
+  </div>
+</section>
