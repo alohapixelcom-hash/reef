@@ -1,0 +1,183 @@
+---
+// src/components/Cards/FeaturedPostCard.astro - le billet a la une : une bande pleine largeur, pas une carte agrandie.
+//
+// Un article a la une qui n'est qu'une carte en plus gros ne met rien en avant.
+// Celui-ci prend toute la largeur, monte le titre a l'echelle d'affichage et
+// s'offre une colonne de respiration a droite (la couverture si elle existe, un
+// specimen typographique sinon). C'est la piece qui doit donner envie de lire
+// avant que le lecteur ait fini de descendre l'ecran.
+//
+// La couverture typographique n'est pas un bouche-trou. Reef n'embarque aucune
+// image et n'en embarquera pas : la couverture est donc composee, avec un halo
+// qui derive dans la couleur du sujet, l'initiale du sujet posee tres grande
+// dans la serif italique de la maison, le nom du sujet en capitales espacees et
+// les deux vagues de la marque. Rien a servir, net a toutes les densites, et
+// repeint tout seul au rebranding.
+//
+// La version precedente n'avait ni halo ni contraste : sur fond sombre, un gris
+// a 8% sur un gris a 10% ne dessine rien, et le panneau lisait comme un trou
+// dans la carte. C'etait la faute la plus visible de la page d'accueil.
+import { Icon } from "@components/svg/icons";
+import { Avatar } from "@components/ui/avatar";
+import { Button } from "@components/ui/button";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { fmt, formatDate, useTranslations, type Locale } from "@i18n";
+import type { ResolvedPost } from "@js/posts";
+import { Image } from "astro:assets";
+import { topicTone } from "./topicTone";
+
+type Props = {
+  entry: ResolvedPost;
+  locale: Locale;
+  /** Etiquette posee en haut a gauche, du dictionnaire (jamais ecrite en dur). */
+  label?: string;
+  as?: "h2" | "h3";
+  class?: string;
+};
+
+const { entry, locale, label, as: Tag = "h2", class: className }: Props = Astro.props;
+const { post, author, topic, slug, topicSlug, minutes } = entry;
+
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+const href = `${routes.posts}${slug}/`;
+const topicHref = `${routes.topics}${topicSlug}/`;
+const tone = topicTone[topic.data.accent];
+const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: minutes });
+const initial = topic.data.name.trim().charAt(0).toUpperCase();
+---
+
+<article
+  class:list={[
+    "group border-border bg-card rounded-panel relative overflow-hidden border",
+    "shadow-float transition-[box-shadow,border-color] duration-300",
+    "hover:shadow-lift hover:border-foreground/20",
+    className,
+  ]}
+  data-slot="featured-post-card"
+>
+  <div class="grid items-stretch lg:grid-cols-12">
+    <div class="flex flex-col gap-5 p-7 sm:p-10 lg:col-span-7 lg:p-12">
+      <p class="flex flex-wrap items-center gap-x-3 gap-y-2">
+        {
+          label && (
+            <span class="bg-primary text-primary-foreground font-sans rounded-pill px-3 py-1 text-xs font-medium tracking-[0.12em] uppercase">
+              {label}
+            </span>
+          )
+        }
+        <a
+          href={topicHref}
+          class:list={["font-sans rounded-pill relative z-10 px-2.5 py-1 text-xs font-medium", tone.chip]}
+        >
+          {topic.data.name}
+        </a>
+        <span class="text-muted-foreground font-sans text-xs">
+          <time datetime={post.data.pubDate.toISOString()}>
+            {formatDate(post.data.pubDate, locale)}
+          </time>
+        </span>
+      </p>
+
+      <Tag class="font-display text-display-sm md:text-display-md text-foreground max-w-2xl">
+        <a href={href} class="after:absolute after:inset-0 after:content-['']">
+          {post.data.title}
+        </a>
+      </Tag>
+
+      <p class="text-muted-foreground measure-prose text-lg leading-relaxed">
+        {post.data.description}
+      </p>
+
+      <div class="mt-2 flex flex-wrap items-center gap-4">
+        <span class="flex items-center gap-2.5">
+          <Avatar name={author.data.name} src={author.data.avatar?.src} size="md" alt="" />
+          <span class="flex flex-col">
+            <span class="text-foreground font-sans text-sm font-medium">{author.data.name}</span>
+            <span class="text-muted-foreground font-sans text-xs">{readLabel}</span>
+          </span>
+        </span>
+        {/* Le bouton double le lien de carte : il ne sert qu'a annoncer l'action
+            a l'oeil. tabindex -1 et aria-hidden evitent de le faire annoncer
+            deux fois au clavier et au lecteur d'ecran. */}
+        <Button
+          href={href}
+          variant="outline"
+          size="md"
+          class="relative z-10 ml-auto hidden sm:inline-flex"
+          tabindex="-1"
+          aria-hidden="true"
+        >
+          {t.common.readPost}
+          <Icon name="arrow-right" size={17} />
+        </Button>
+      </div>
+    </div>
+
+    <div class="lg:col-span-5">
+      {
+        post.data.cover ? (
+          <Image
+            src={post.data.cover}
+            alt={post.data.coverAlt ?? ""}
+            widths={[640, 1024]}
+            sizes="(min-width: 1024px) 40vw, 100vw"
+            class="h-full min-h-56 w-full object-cover"
+            loading="eager"
+            decoding="async"
+          />
+        ) : (
+          <div
+            class:list={[
+              "deep-scene border-border relative flex h-full min-h-64 items-center justify-center overflow-hidden",
+              "border-t lg:border-t-0 lg:border-l",
+            ]}
+            aria-hidden="true"
+          >
+            {/* Le halo prend la couleur du sujet, pas celle de la marque : c'est
+                lui qui fait qu'un billet de typographie et un billet de
+                performance n'ont pas la meme couverture. */}
+            <span
+              class="animate-drift-slow absolute -top-1/4 -right-1/4 size-[26rem] rounded-full opacity-45 blur-3xl"
+              style={`background: radial-gradient(circle, ${tone.halo} 0%, transparent 68%)`}
+            ></span>
+            <span class:list={["absolute inset-x-0 top-0 h-0.5", tone.rule]}></span>
+
+            <svg
+              class:list={["absolute inset-x-0 bottom-0 w-full opacity-25", tone.ghost]}
+              viewBox="0 0 200 60"
+              fill="none"
+              preserveAspectRatio="none"
+            >
+              <path
+                d="M0 34c20-16 40-16 60 0s40 16 60 0 40-16 60 0 40 16 60 0"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+              <path
+                d="M0 48c20-12 40-12 60 0s40 12 60 0 40-12 60 0 40 12 60 0"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+
+            <span class="font-serif text-foreground/85 relative text-[11rem] leading-none italic">
+              {initial}
+            </span>
+
+            {/* Le nom du sujet, a la verticale contre le bord gauche du panneau.
+                Il transforme le panneau en couverture de rubrique au lieu d'un
+                aplat decoratif, et il ne vole pas une ligne au titre. */}
+            <span
+              class="text-muted-foreground absolute top-6 left-5 text-[0.7rem] font-medium tracking-[0.32em] uppercase [writing-mode:vertical-rl]"
+            >
+              {topic.data.name}
+            </span>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</article>

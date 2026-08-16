@@ -1,0 +1,110 @@
+---
+// src/components/Sections/Archive/PostGrid.astro - la grille paginee de billets, reutilisee par l'archive, les sujets, les auteurs et l'accueil.
+//
+// Une seule grille pour cinq pages : c'est ce qui garantit qu'un billet a la
+// meme allure partout, et qu'ameliorer la carte ameliore le site entier.
+//
+// Les URLs de pagination passent par buildPageHref et jamais par une
+// concatenation : trailingSlash vaut "always" dans astro.config, et une URL
+// sans slash final provoque une redirection a chaque clic de pagination.
+import PostCard from "@components/Cards/PostCard.astro";
+import { Pagination } from "@components/ui/pagination";
+import { fmt, useTranslations, type Locale } from "@i18n";
+import { buildPageHref } from "@js/pagination";
+import type { ResolvedPost } from "@js/posts";
+import EmptyState from "./EmptyState.astro";
+
+type Props = {
+  posts: ResolvedPost[];
+  locale: Locale;
+  /** Racine des URLs de liste, deja localisee ("/fr/blog"). */
+  basePath: string;
+  currentPage?: number;
+  totalPages?: number;
+  /** Total toutes pages confondues. Affiche le compteur quand il est fourni. */
+  total?: number;
+  /** Niveau de titre des cartes, selon ce qui precede la grille dans la page. */
+  headingLevel?: "h2" | "h3";
+  /** Etat vide : le texte de l'archive par defaut, surchargeable par la page.
+   *  Une page auteur sans billet ne dit pas la meme chose qu'une archive vide. */
+  emptyTitle?: string;
+  emptyDescription?: string;
+  /** Libelle et cible du bouton de l'etat vide. */
+  emptyCtaLabel?: string;
+  emptyCtaHref?: string;
+  class?: string;
+};
+
+const {
+  posts,
+  locale,
+  basePath,
+  currentPage = 1,
+  totalPages = 1,
+  total,
+  headingLevel = "h3",
+  emptyTitle,
+  emptyDescription,
+  emptyCtaLabel,
+  emptyCtaHref,
+  class: className,
+} = Astro.props;
+
+const t = useTranslations(locale);
+const countLabel =
+  total === undefined
+    ? undefined
+    : total === 1
+      ? t.archive.countOne
+      : fmt(t.archive.countLabel, { count: total });
+---
+
+<section class:list={["container-page py-14 md:py-20", className]} data-slot="post-grid">
+  {
+    posts.length === 0 ? (
+      <EmptyState
+        title={emptyTitle ?? t.archive.emptyTitle}
+        description={emptyDescription ?? t.archive.emptyLede}
+        icon="file-text"
+        ctaLabel={emptyCtaLabel}
+        ctaHref={emptyCtaHref}
+      />
+    ) : (
+      <Fragment>
+        {countLabel && (
+          <p class="text-muted-foreground mb-8 font-sans text-sm">
+            {countLabel}
+            {totalPages > 1 && (
+              <Fragment>
+                {" "}
+                <span aria-hidden="true">/</span>{" "}
+                {fmt(t.common.pageOf, { current: currentPage, total: totalPages })}
+              </Fragment>
+            )}
+          </p>
+        )}
+
+        <ul
+          class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          aria-label={t.archive.listLabel}
+        >
+          {posts.map((entry) => (
+            <li class="flex">
+              <PostCard {entry} {locale} as={headingLevel} class="w-full" />
+            </li>
+          ))}
+        </ul>
+
+        {totalPages > 1 && (
+          <Pagination
+            class="mt-14"
+            {currentPage}
+            {totalPages}
+            getUrl={(page) => buildPageHref(basePath, page)}
+            label={t.archive.paginationLabel}
+          />
+        )}
+      </Fragment>
+    )
+  }
+</section>

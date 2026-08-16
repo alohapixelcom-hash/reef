@@ -1,0 +1,27 @@
+---
+// src/components/Sections/Archive/EmptyState.astro - l'etat vide des listes : habille la primitive ui/empty-state et lui ajoute son issue.
+//
+// La primitive dessine le motif et pose la hierarchie ; cette section lui donne
+// le seul detail qui manque, un bouton. Un ecran vide sans issue est une
+// impasse : s'il n'y a vraiment rien a faire, autant ne pas montrer d'ecran.
+import { Button } from "@components/ui/button";
+import { EmptyState as EmptyStatePrimitive } from "@components/ui/empty-state";
+import type { IconName } from "@components/svg/icons";
+import type { EmptyStateVariants } from "@components/ui/empty-state";
+
+type Props = EmptyStateVariants & {
+  title: string;
+  description?: string;
+  icon?: IconName;
+  /** Le libelle du bouton. Sans lui, aucun bouton n'est rendu. */
+  ctaLabel?: string;
+  ctaHref?: string;
+  class?: string;
+};
+
+const { title, description, icon, tone, ctaLabel, ctaHref, class: className } = Astro.props;
+---
+
+<EmptyStatePrimitive {title} {description} {icon} {tone} class={className}>
+  {ctaLabel && ctaHref && <Button href={ctaHref} variant="outline">{ctaLabel}</Button>}
+</EmptyStatePrimitive>
