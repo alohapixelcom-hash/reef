@@ -1,0 +1,9 @@
+{
+  "name": "Mara Lindqvist",
+  "role": "Founder and web developer",
+  "bio": "Mara opened the studio in 2016 after eight years in agencies, and still writes most of the HTML that ships. She is happiest on the boring parts of a project: naming, data modelling, and the contract clause nobody wants to read.",
+  "links": [
+    { "label": "Website", "href": "https://maralindqvist.se" },
+    { "label": "Mastodon", "href": "https://mastodon.social/@mara" }
+  ]
+}
