@@ -1,0 +1,33 @@
+---
+// src/components/ui/textarea/Textarea.astro - zone de texte en carte arrondie, auto-extensible.
+// field-sizing-content laisse le champ grandir avec la frappe (progressif, max-h en garde-fou).
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const textarea = tv({
+  base: [
+    "block w-full min-w-0 resize-y rounded-card border border-border bg-card text-card-foreground",
+    "caret-primary placeholder:text-muted-foreground/80",
+    "transition-[border-color] duration-200 hover:border-foreground/25",
+    "field-sizing-content max-h-80",
+    "aria-invalid:border-primary",
+    "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-border",
+  ],
+  variants: {
+    size: {
+      sm: "min-h-24 px-4 py-2.5 text-sm",
+      md: "min-h-32 px-5 py-3.5 text-[0.95rem]",
+      lg: "min-h-40 px-6 py-4 text-base",
+    },
+  },
+  defaultVariants: { size: "md" },
+});
+
+type TextareaVariants = VariantProps<typeof textarea>;
+
+type Props = HTMLAttributes<"textarea"> & TextareaVariants;
+
+const { size, class: className, ...rest } = Astro.props;
+---
+
+<textarea class={textarea({ size, class: className })} data-slot="textarea" {...rest}><slot /></textarea>

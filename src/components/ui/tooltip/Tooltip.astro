@@ -1,0 +1,77 @@
+---
+// src/components/ui/tooltip/Tooltip.astro - infobulle 100% CSS : le texte vit dans data-tip, revele au survol et au focus clavier, zero JavaScript.
+// L'infobulle est un renfort visuel : le contenu du slot garde son propre nom
+// accessible (par exemple aria-label sur un bouton icone).
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"span"> & {
+  tip: string;
+  side?: "top" | "bottom";
+};
+
+const { tip, side = "top", class: className, ...rest } = Astro.props;
+---
+
+<span
+  class:list={["tooltip", className]}
+  data-slot="tooltip"
+  data-tip={tip}
+  data-side={side}
+  {...rest}
+>
+  <slot />
+</span>
+
+<style>
+  .tooltip {
+    position: relative;
+    display: inline-flex;
+  }
+
+  /* La bulle : pilule sombre inversee (elle suit les tokens, donc claire en
+   * mode sombre), posee au-dessus ou en dessous selon data-side. */
+  .tooltip::after {
+    content: attr(data-tip);
+    position: absolute;
+    left: 50%;
+    z-index: 60;
+    width: max-content;
+    max-width: 16rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.75rem;
+    background: var(--color-foreground);
+    color: var(--color-background);
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: center;
+    box-shadow: var(--shadow-lift);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) scale(0.96);
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease;
+  }
+
+  .tooltip[data-side="top"]::after {
+    bottom: calc(100% + 0.5rem);
+    transform-origin: bottom center;
+  }
+
+  .tooltip[data-side="bottom"]::after {
+    top: calc(100% + 0.5rem);
+    transform-origin: top center;
+  }
+
+  /* Apparition au survol, ou des que l'element du slot recoit le focus
+   * clavier. Le petit delai evite les bulles au simple passage de souris. */
+  .tooltip:hover::after,
+  .tooltip:focus-visible::after,
+  .tooltip:has(:focus-visible)::after {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+    transition-delay: 0.15s;
+  }
+</style>

@@ -1,0 +1,42 @@
+---
+// src/components/ui/theme-toggle/ThemeInit.astro - script inline anti-flash : applique le theme memorise sur <html> avant le premier rendu.
+// A inclure dans le <head> du layout de base, le plus tot possible. Reapplique
+// aussi la classe apres chaque view transition (astro:after-swap remplace les
+// attributs de <html> par ceux rendus cote serveur).
+//
+// Le defaut est le theme SOMBRE, et non la preference du systeme.
+//
+// C'est un choix de vitrine, pas un choix technique. Le sombre est la version
+// dans laquelle ces themes ont ete composes : les degrades, les halos, les
+// lueurs de bordure et la scene WebGL sont dessines pour lui, et c'est celle
+// qu'on veut montrer en premier a tout le monde. Suivre la preference du
+// systeme ferait de la premiere impression une loterie, et une moitie des
+// visiteurs ne verrait jamais la version verifiee.
+//
+// Le clair reste a un geste, et le choix du visiteur, lui, est memorise et
+// respecte : `stored` gagne toujours contre le defaut.
+//
+// Un acheteur qui veut ouvrir en clair remplace la ligne `dark` par
+// `stored === "dark"`. Un acheteur qui veut suivre le systeme ecrit :
+// stored === "dark" || (stored !== "light" &&
+//   window.matchMedia("(prefers-color-scheme: dark)").matches)
+---
+
+<script is:inline>
+  (function () {
+    var KEY = "reef-theme";
+    function applyTheme() {
+      var stored = null;
+      try {
+        stored = localStorage.getItem(KEY);
+      } catch (error) {
+        /* stockage indisponible : on reste en sombre, comme un premier passage */
+      }
+      var dark = stored !== "light";
+      document.documentElement.classList.toggle("dark", dark);
+      document.documentElement.style.colorScheme = dark ? "dark" : "light";
+    }
+    applyTheme();
+    document.addEventListener("astro:after-swap", applyTheme);
+  })();
+</script>

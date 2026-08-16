@@ -1,0 +1,29 @@
+---
+// src/components/ui/skeleton/Skeleton.astro - placeholder de chargement qui pulse doucement.
+// Trois formes ; la taille vient de l'appelant (h-4 w-3/4, size-10...). Purement decoratif,
+// donc retire de l'arbre d'accessibilite : le vrai statut de chargement se dit ailleurs
+// (par exemple avec le Spinner et son role status).
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const skeleton = tv({
+  base: "animate-pulse-slow bg-muted pointer-events-none",
+  variants: {
+    shape: {
+      line: "h-4 w-full rounded-pill",
+      circle: "rounded-pill",
+      block: "rounded-card",
+    },
+  },
+  defaultVariants: { shape: "line" },
+});
+
+type SkeletonVariants = VariantProps<typeof skeleton>;
+
+type Props = HTMLAttributes<"div"> & SkeletonVariants;
+
+const { shape, class: className, ...rest } = Astro.props;
+---
+
+<div class={skeleton({ shape, class: className })} aria-hidden="true" data-slot="skeleton" {...rest}>
+</div>

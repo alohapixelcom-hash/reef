@@ -1,0 +1,18 @@
+---
+// src/components/ui/table/TableCell.astro - <td> : cellule aeree. Ajouter tabular-nums
+// et text-right cote appelant pour les colonnes de chiffres.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const tableCell = tv({
+  base: "px-4 py-4 align-middle",
+});
+
+type Props = HTMLAttributes<"td">;
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<td class={tableCell({ class: className })} data-slot="table-cell" {...rest}>
+  <slot />
+</td>

@@ -1,0 +1,31 @@
+---
+// src/components/ui/tabs/TabPanel.astro - un panneau d'onglet : role tabpanel, masque via hidden tant que son onglet n'est pas selectionne.
+// tabindex=0 rend le panneau atteignable au clavier juste apres son onglet,
+// meme quand son contenu ne contient rien de focusable.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const tabPanel = tv({
+  base: "mt-6",
+});
+
+type Props = HTMLAttributes<"div"> & {
+  // Doit correspondre au value du Tab associe.
+  value: string;
+  selected?: boolean;
+};
+
+const { value, selected = false, class: className, ...rest } = Astro.props;
+---
+
+<div
+  class={tabPanel({ class: className })}
+  data-slot="tab-panel"
+  data-value={value}
+  role="tabpanel"
+  tabindex="0"
+  hidden={!selected}
+  {...rest}
+>
+  <slot />
+</div>

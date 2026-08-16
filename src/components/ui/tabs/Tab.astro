@@ -1,0 +1,38 @@
+---
+// src/components/ui/tabs/Tab.astro - un onglet : bouton pilule role tab, etat porte par aria-selected, active par le script de Tabs.
+// L'onglet actif devient une pilule bg-background posee sur le rail muted,
+// avec une ombre flottante : le look "segmented control" de la marque.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const tab = tv({
+  base: [
+    "inline-flex h-11 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-pill px-5",
+    "font-display text-sm font-bold whitespace-nowrap select-none",
+    "text-muted-foreground transition-[background-color,color,box-shadow] duration-200",
+    "hover:text-foreground",
+    "aria-selected:bg-background aria-selected:text-foreground aria-selected:shadow-float",
+  ],
+});
+
+type Props = HTMLAttributes<"button"> & {
+  // Cle de liaison avec le TabPanel qui porte le meme value.
+  value: string;
+  selected?: boolean;
+};
+
+const { value, selected = false, class: className, ...rest } = Astro.props;
+---
+
+<button
+  type="button"
+  class={tab({ class: className })}
+  data-slot="tab"
+  data-value={value}
+  role="tab"
+  aria-selected={selected ? "true" : "false"}
+  tabindex={selected ? 0 : -1}
+  {...rest}
+>
+  <slot />
+</button>

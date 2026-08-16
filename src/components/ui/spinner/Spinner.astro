@@ -1,0 +1,53 @@
+---
+// src/components/ui/spinner/Spinner.astro - anneau de chargement SVG, anime en pur CSS.
+// role status + texte pour lecteurs d'ecran ; quand prefers-reduced-motion coupe la
+// rotation (garde-fou global), l'arc reste visible en statique.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+export const spinner = tv({
+  slots: {
+    root: "inline-flex items-center justify-center",
+    svg: "animate-spin",
+  },
+  variants: {
+    size: {
+      sm: { svg: "size-4" },
+      md: { svg: "size-5" },
+      lg: { svg: "size-7" },
+      xl: { svg: "size-10" },
+    },
+    tone: {
+      primary: { svg: "text-primary" },
+      muted: { svg: "text-muted-foreground" },
+      // Herite la couleur du parent : pratique dans un bouton ou sur le hero.
+      current: { svg: "text-current" },
+    },
+  },
+  defaultVariants: { size: "md", tone: "primary" },
+});
+
+type SpinnerVariants = VariantProps<typeof spinner>;
+
+type Props = HTMLAttributes<"span"> &
+  SpinnerVariants & {
+    // Annonce accessible, invisible a l'ecran.
+    label?: string;
+  };
+
+const { size, tone, label = "Loading", class: className, ...rest } = Astro.props;
+const { root, svg } = spinner({ size, tone });
+---
+
+<span class={root({ class: className })} role="status" data-slot="spinner" {...rest}>
+  <svg class={svg()} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="3" class="opacity-20">
+    </circle>
+    <path
+      d="M21.5 12a9.5 9.5 0 0 0-9.5-9.5"
+      stroke="currentColor"
+      stroke-width="3"
+      stroke-linecap="round"></path>
+  </svg>
+  <span class="sr-only">{label}</span>
+</span>

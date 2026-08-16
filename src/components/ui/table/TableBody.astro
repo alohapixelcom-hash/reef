@@ -1,0 +1,18 @@
+---
+// src/components/ui/table/TableBody.astro - <tbody> : survol des lignes de donnees ici,
+// jamais sur l'en-tete, et pas de filet sous la derniere ligne.
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+export const tableBody = tv({
+  base: "[&_tr:hover]:bg-muted/50 [&_tr:last-child]:border-0",
+});
+
+type Props = HTMLAttributes<"tbody">;
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<tbody class={tableBody({ class: className })} data-slot="table-body" {...rest}>
+  <slot />
+</tbody>
