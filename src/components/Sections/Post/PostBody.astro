@@ -1,0 +1,136 @@
+---
+// src/components/Sections/Post/PostBody.astro - la colonne de lecture : pose la mesure, le rythme et la marge collante du sommaire autour du Markdown rendu.
+//
+// Ce composant ne redefinit PAS la typographie de la prose : .prose (src/styles/
+// prose.css) porte deja la mesure, le rythme vertical, les notes de bas de page
+// et le bloc de code. On construit autour, et on ne garde ici que ce qui depend
+// de la PAGE et pas du texte : la grille, la marge collante, l'attaque, le
+// reperage d'ancre et le comportement des blocs larges sur telephone.
+//
+// La grille de grand ecran a trois colonnes, et la piece maitresse est que les
+// deux colonnes exterieures soient des 1fr EGAUX : la colonne du milieu vaut
+// alors exactement la mesure, elle reste centree sur la page, et le titre de
+// PostHero (meme mesure, meme centrage) partage son bord gauche au pixel pres a
+// toute largeur. Avec deux marges fixes, la colonne se serait retrecie sous
+// 1360 px et le corps aurait glisse a droite du titre.
+//
+// La bascule est a 80rem : en dessous, la marge restante ne fait plus 200 px et
+// un rail n'y tient pas sans pousser le texte hors de l'axe. Le sommaire
+// redevient alors le <details> replie en tete d'article, ce qui coute moins
+// cher au lecteur qu'une colonne de lecture deplacee.
+
+type Props = {
+  class?: string;
+};
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={["pt-2 pb-10 md:pt-4 md:pb-12", className]} data-slot="post-body">
+  <div class="container-page post-layout">
+    {/* Le sommaire est le PREMIER noeud du bloc : sur telephone il ouvre
+        l'article, sur grand ecran la grille l'envoie dans la marge droite sans
+        toucher a l'ordre du document. */}
+    <div class="post-aside"><slot name="toc" /></div>
+
+    {/* Un <div> et pas un <article> : l'element article est pose par la page,
+        autour de l'en-tete, du corps et du pied, ce qui est la seule facon de
+        le rendre vrai. Un <article> qui ne contiendrait que le corps
+        exclurait le titre du billet qu'il pretend delimiter. */}
+    <div class="post-column">
+      <div class="prose mx-auto"><slot /></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .post-layout {
+    display: grid;
+    /* Aucun row-gap : le sommaire absent (article court) ne doit pas laisser
+       une rangee vide de 2 rem au-dessus du premier paragraphe. L'ecart vit
+       donc sur le sommaire lui-meme, la ou il disparait avec lui. */
+    row-gap: 0;
+    /* La gouttiere de .container-page en dessous de sm, lue par le debord des
+       blocs de code plus bas. Une seule valeur a corriger si elle change. */
+    --post-gutter: 1.25rem;
+  }
+
+  .post-column {
+    /* Un enfant de grille vaut min-width: auto : sans ce zero, une ligne de
+       code trop longue refuse de retrecir et c'est la PAGE qui defile
+       lateralement sur iPhone, ce qu'aucun reglage de .prose ne rattrape. */
+    min-inline-size: 0;
+  }
+
+  @media (min-width: 80rem) {
+    .post-layout {
+      /* Les deux 1fr sont la clef : la colonne du milieu est servie EN PREMIER
+         jusqu'a sa mesure, et les deux marges se partagent le reste a parts
+         egales. La colonne de lecture vaut donc toujours 68ch exactement, au
+         meme endroit qu'en une seule colonne, et le sommaire vit dans ce qui
+         reste sans jamais deplacer le texte. */
+      grid-template-columns: minmax(0, 1fr) minmax(0, var(--measure-prose)) minmax(0, 1fr);
+      column-gap: 3rem;
+      align-items: start;
+    }
+
+    .post-column {
+      grid-row: 1;
+      grid-column: 2;
+    }
+
+    .post-aside {
+      grid-row: 1;
+      grid-column: 3;
+      position: sticky;
+      inset-block-start: var(--anchor-offset);
+      /* Un sommaire de vingt entrees defile dans son rail plutot que de sortir
+         par le bas de l'ecran. */
+      max-block-size: calc(100dvh - var(--anchor-offset) - 2rem);
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+  }
+
+  /* --- Le contenu arrive par slot : tout ce qui suit passe par :global() --- */
+
+  /* L'attaque. Un demi-cran au-dessus du texte courant, et c'est le dernier
+     barreau de l'echelle qui descend du titre au chapeau puis au corps. Pose
+     ici et pas dans prose.css : une page legale ou un encart n'ont pas
+     d'attaque, ils ont un premier paragraphe. */
+  .post-column :global(.prose > p:first-of-type) {
+    font-size: 1.075em;
+    line-height: 1.62;
+  }
+
+  /* Apres un saut depuis le sommaire, le lecteur doit VOIR ou il a atterri.
+     prose.css fait deja ce reperage pour les notes de bas de page ; c'est le
+     meme voile, avec le meme box-shadow qui elargit sans deplacer une ligne. */
+  .post-column :global(.prose :is(h2, h3, h4):target) {
+    border-radius: 0.375rem;
+    background: color-mix(in oklab, var(--color-primary) 10%, transparent);
+    box-shadow: 0 0 0 0.4em color-mix(in oklab, var(--color-primary) 10%, transparent);
+  }
+
+  /* Le geste de defilement d'un bloc large reste DANS le bloc : sans cela,
+     arriver au bout d'un tableau ou d'une ligne de code enchaine sur le retour
+     arriere du navigateur, et le lecteur quitte l'article en croyant faire
+     defiler du code. */
+  .post-column :global(.prose :is(pre, table)) {
+    overscroll-behavior-inline: contain;
+  }
+
+  /* Sur telephone, le bloc de code va d'un bord a l'autre. Sur 375 px, les
+     1,25 rem de gouttiere valent quatre caracteres par ligne, et ce sont
+     exactement ceux qui manquent pour lire une ligne de code sans la faire
+     defiler. Le rayon et les bordures tombent avec la gouttiere : un cadre
+     arrondi colle aux bords de l'ecran ne ressemble plus a rien. */
+  @media (max-width: 39.99rem) {
+    .post-column :global(.prose > pre) {
+      margin-inline: calc(-1 * var(--post-gutter));
+      border-inline: 0;
+      border-radius: 0;
+      padding-inline: var(--post-gutter);
+    }
+  }
+</style>

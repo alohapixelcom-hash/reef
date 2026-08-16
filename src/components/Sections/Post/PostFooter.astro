@@ -1,0 +1,230 @@
+---
+// src/components/Sections/Post/PostFooter.astro - pied d'article : etiquettes, partage sans mouchard, signature de l'auteur et navigation entre billets.
+//
+// Le partage tient en deux liens et zero script. Les boutons officiels des
+// reseaux sont des iframes qui chargent 40 ko et posent un cookie a chaque
+// affichage, y compris quand personne ne clique : un theme de blog qui les
+// embarque fait payer a tous ses lecteurs le partage de quelques-uns. Une
+// ancre mailto: et une ancre d'intention font le meme travail, hors ligne
+// comprise, et ne suivent personne.
+import { Icon } from "@components/svg/icons";
+import { Avatar } from "@components/ui/avatar";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { fmt, getLocale, useTranslations } from "@i18n";
+import { entrySlug } from "@i18n/content";
+import { getResolvedPosts } from "@js/posts";
+import type { CollectionEntry } from "astro:content";
+
+type Props = {
+  post: CollectionEntry<"posts">;
+  author: CollectionEntry<"authors">;
+  /** URL absolue et canonique du billet, deja construite par la page. */
+  url: string;
+  class?: string;
+};
+
+const { post, author, url, class: className } = Astro.props;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+
+const authorHref = `${routes.authors}${entrySlug(author.id)}/`;
+
+// --- Billet precedent et suivant -------------------------------------------
+// La liste est celle de la langue courante, publiee, du plus recent au plus
+// ancien. La convention est celle des blogs depuis toujours : "precedent" est
+// le billet publie AVANT celui-ci, "suivant" celui publie apres. Un brouillon
+// n'appartient a aucune des deux chaines, donc il n'en a ni l'un ni l'autre.
+const published = await getResolvedPosts(locale);
+const index = published.findIndex((entry) => entry.post.id === post.id);
+const newer = index > 0 ? published[index - 1] : undefined;
+const older = index >= 0 ? published[index + 1] : undefined;
+
+// --- Partage ---------------------------------------------------------------
+const title = post.data.title;
+const mailHref = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${title}\n\n${url}`)}`;
+const xHref = `https://x.com/intent/post?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+
+const eyebrow =
+  "font-sans text-muted-foreground text-xs font-medium tracking-[0.18em] uppercase";
+const chip =
+  "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground rounded-pill inline-flex min-h-9 items-center gap-1.5 border px-3 font-sans text-xs transition-colors duration-150";
+---
+
+<footer class:list={["pb-16 md:pb-20", className]} data-slot="post-footer">
+  <div class="container-page">
+    <div class="measure-prose mx-auto flex flex-col gap-10">
+      {/* Etiquettes et partage sur la meme ligne : ce sont les deux gestes de
+          fin de lecture, et ils meritent le meme rang. */}
+      <div
+        class="border-border flex flex-col gap-6 border-t pt-8 sm:flex-row sm:items-start sm:justify-between"
+      >
+        {
+          post.data.tags.length > 0 && (
+            <div class="flex flex-col gap-3">
+              <h2 class={eyebrow}>{t.post.tagsLabel}</h2>
+              {/* Les etiquettes menent a la recherche et non a une archive par
+                  etiquette : la recherche du theme couvre deja titres, chapeaux,
+                  sujets et etiquettes, et elle existe dans la table des routes.
+                  Une page par etiquette ferait cent routes pour trois clics. */}
+              <ul class="flex flex-wrap gap-2">
+                {post.data.tags.map((tag) => (
+                  <li>
+                    <a class={chip} href={`${routes.search}?q=${encodeURIComponent(tag)}`}>
+                      {tag}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+
+        <div class="flex shrink-0 flex-col gap-3 sm:items-end">
+          <h2 class={eyebrow}>{t.post.share}</h2>
+          <ul class="flex flex-wrap gap-2">
+            <li>
+              <a
+                class={chip}
+                href={mailHref}
+                aria-label={fmt(t.post.shareOn, { network: t.post.networkEmail })}
+              >
+                <Icon name="mail" size={14} />
+                {t.post.networkEmail}
+              </a>
+            </li>
+            <li>
+              <a
+                class={chip}
+                href={xHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${fmt(t.post.shareOn, { network: t.post.networkX })} (${t.common.newTab})`}
+              >
+                <Icon name="external-link" size={14} />
+                {t.post.networkX}
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* La signature. Une biographie en fin d'article ne decore pas : elle
+          repond a la question que le lecteur se pose une fois convaincu, qui
+          est "qui me dit ca". */}
+      <section class="border-border bg-card rounded-card flex flex-col gap-4 border p-6 md:p-7">
+        <h2 class={eyebrow}>{t.post.aboutAuthor}</h2>
+
+        <div class="flex flex-col gap-4 sm:flex-row sm:gap-5">
+          <Avatar name={author.data.name} src={author.data.avatar?.src} size="xl" alt="" />
+
+          <div class="flex min-w-0 flex-col gap-2">
+            <p class="flex flex-wrap items-baseline gap-x-3">
+              <a
+                href={authorHref}
+                class="font-display text-foreground text-lg font-semibold tracking-tight"
+              >
+                {author.data.name}
+              </a>
+              <span class="text-muted-foreground font-sans text-sm">{author.data.role}</span>
+            </p>
+
+            <p class="text-muted-foreground text-[0.95rem] leading-relaxed">{author.data.bio}</p>
+
+            {
+              author.data.links.length > 0 && (
+                <ul class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+                  {author.data.links.map((link) => (
+                    <li>
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-muted-foreground hover:text-foreground inline-flex min-h-11 items-center gap-1 font-sans text-sm transition-colors duration-150"
+                      >
+                        {link.label}
+                        <Icon name="arrow-up-right" size={14} />
+                        <span class="sr-only">({t.common.newTab})</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )
+            }
+
+            <p>
+              <a
+                href={authorHref}
+                class="text-primary hover:decoration-primary inline-flex items-center gap-1.5 font-sans text-sm font-medium underline decoration-transparent underline-offset-4 transition-colors duration-150"
+              >
+                {fmt(t.post.moreFromAuthor, { name: author.data.name })}
+                <Icon name="arrow-right" size={16} />
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {
+        (older || newer) && (
+          <nav class="grid gap-4 sm:grid-cols-2" aria-label={t.post.navLabel}>
+            {older && (
+              <a
+                href={`${routes.posts}${older.slug}/`}
+                rel="prev"
+                class="group border-border bg-card rounded-card hover:border-foreground/20 hover:shadow-float flex flex-col gap-1.5 border p-5 transition-[border-color,box-shadow] duration-200"
+              >
+                <span class={`${eyebrow} flex items-center gap-1.5`}>
+                  <Icon
+                    name="arrow-left"
+                    size={14}
+                    class="transition-transform duration-200 group-hover:-translate-x-0.5"
+                  />
+                  {t.post.previousPost}
+                </span>
+                <span class="font-display text-foreground leading-snug font-semibold text-balance">
+                  {older.post.data.title}
+                </span>
+              </a>
+            )}
+
+            {newer && (
+              <a
+                href={`${routes.posts}${newer.slug}/`}
+                rel="next"
+                class:list={[
+                  "group border-border bg-card rounded-card hover:border-foreground/20 hover:shadow-float flex flex-col gap-1.5 border p-5 transition-[border-color,box-shadow] duration-200",
+                  "sm:items-end sm:text-right",
+                  !older && "sm:col-start-2",
+                ]}
+              >
+                <span class={`${eyebrow} flex items-center gap-1.5`}>
+                  {t.post.nextPost}
+                  <Icon
+                    name="arrow-right"
+                    size={14}
+                    class="transition-transform duration-200 group-hover:translate-x-0.5"
+                  />
+                </span>
+                <span class="font-display text-foreground leading-snug font-semibold text-balance">
+                  {newer.post.data.title}
+                </span>
+              </a>
+            )}
+          </nav>
+        )
+      }
+
+      <p>
+        <a
+          href={routes.posts}
+          class="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 font-sans text-sm transition-colors duration-150"
+        >
+          <Icon name="arrow-left" size={16} />
+          {t.post.backToPosts}
+        </a>
+      </p>
+    </div>
+  </div>
+</footer>

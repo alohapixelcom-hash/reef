@@ -1,0 +1,114 @@
+---
+// src/components/Sections/Home/NewsletterInvite.astro - l'invitation a s'abonner : une scene sombre, la lettre a gauche, le flux a droite.
+//
+// C'est la deuxieme et derniere image de la page, et c'est voulu. La bande
+// precedente etait un formulaire pose sur un aplat gris, a un ton du fond de la
+// page : la seule section qui demande quelque chose au lecteur etait aussi la
+// plus discrete de l'accueil. Elle reprend donc le materiau du premier ecran,
+// halos compris, et referme la page sur la scene qui l'a ouverte.
+//
+// Les deux moyens sont montres ensemble a dessein. Une invitation qui ne propose
+// qu'une adresse email traite le flux comme un detail technique, alors que c'est
+// le seul abonnement qui ne demande rien au lecteur et ne coute rien a l'auteur.
+//
+// C'est aussi cette section qui porte id="newsletter", la cible du bouton
+// "S'abonner" de la barre. Le pied de page cede l'ancre et son formulaire des
+// que la page porte cette bande : deux formulaires identiques a deux ecrans
+// d'ecart, c'est une page qui bafouille.
+//
+// Le formulaire est une DEMONSTRATION : il n'envoie rien et n'a volontairement
+// pas d'action. Voir le commentaire du meme bloc dans Sections/Global/Footer.astro
+// pour le brancher sur un prestataire.
+import { Icon } from "@components/svg/icons";
+import { Button } from "@components/ui/button";
+import { Input } from "@components/ui/input";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { getLocale, useTranslations } from "@i18n";
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+
+const title = t.newsletter.title;
+const accent = t.newsletter.accent;
+const at = title.toLowerCase().indexOf(accent.toLowerCase());
+const before = at >= 0 ? title.slice(0, at) : title;
+const word = at >= 0 ? title.slice(at, at + accent.length) : "";
+const after = at >= 0 ? title.slice(at + accent.length) : "";
+---
+
+<div class="bg-background p-2 sm:p-3 md:p-4" data-slot="newsletter-invite">
+  <section
+    class="deep-scene rounded-panel relative isolate overflow-hidden"
+    id="newsletter"
+    aria-labelledby="invite-title"
+  >
+    <div
+      class="animate-drift pointer-events-none absolute -top-1/3 -left-1/5 size-[34rem] rounded-full opacity-30 blur-3xl"
+      style="background: radial-gradient(circle, var(--color-coral-500) 0%, transparent 68%)"
+      aria-hidden="true"
+    >
+    </div>
+    <div
+      class="animate-drift-slow pointer-events-none absolute -right-1/6 -bottom-1/3 size-[30rem] rounded-full opacity-50 blur-3xl"
+      style="background: radial-gradient(circle, var(--color-reef-500) 0%, transparent 70%)"
+      aria-hidden="true"
+    >
+    </div>
+
+    <div class="container-page relative z-10 grid gap-12 py-16 md:py-24 lg:grid-cols-12 lg:gap-16">
+      <div class="flex flex-col gap-5 lg:col-span-7">
+        <span class="bg-primary h-0.5 w-12 rounded-pill" aria-hidden="true"></span>
+        <h2 id="invite-title" class="font-display text-display-sm md:text-display-md">
+          {
+            word ? (
+              <Fragment>
+                {before}
+                <span class="accent-script">{word}</span>
+                {after}
+              </Fragment>
+            ) : (
+              title
+            )
+          }
+        </h2>
+        <p class="text-muted-foreground measure-wide text-lg leading-relaxed">{t.newsletter.lede}</p>
+
+        <form class="mt-2 flex flex-col gap-3 sm:max-w-xl sm:flex-row" name="newsletter-home">
+          <label class="sr-only" for="home-newsletter-email">{t.newsletter.emailLabel}</label>
+          <Input
+            id="home-newsletter-email"
+            class="sm:flex-1"
+            type="email"
+            name="email"
+            size="lg"
+            placeholder={t.newsletter.placeholder}
+            autocomplete="email"
+            spellcheck="false"
+            aria-describedby="home-newsletter-note"
+            required
+          />
+          <Button type="submit" variant="primary" size="lg" class="sm:shrink-0">
+            {t.newsletter.submit}
+          </Button>
+        </form>
+        <p id="home-newsletter-note" class="text-muted-foreground text-sm">{t.newsletter.note}</p>
+      </div>
+
+      {/* Le flux vit dans un panneau de verre et non dans une carte opaque : sur
+          une scene, une carte pleine fait un trou, le verre laisse passer le
+          halo et reste une couche au-dessus. Son bouton est en contour et non
+          en corail, parce qu'un ecran n'a qu'un seul point d'action et que
+          c'est le champ d'inscription. */}
+      <aside class="glass rounded-card flex flex-col gap-3 p-7 lg:col-span-5">
+        <span class="text-accent" aria-hidden="true"><Icon name="rss" size={22} /></span>
+        <h3 class="font-display text-xl font-bold tracking-tight">{t.newsletter.rssTitle}</h3>
+        <p class="text-muted-foreground text-[0.95rem] leading-relaxed">{t.newsletter.rssLede}</p>
+        <Button href={routes.rss} variant="outline" size="md" class="mt-2 self-start">
+          {t.newsletter.rssCta}
+          <Icon name="arrow-up-right" size={17} />
+        </Button>
+      </aside>
+    </div>
+  </section>
+</div>

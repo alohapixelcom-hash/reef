@@ -1,0 +1,92 @@
+---
+// src/components/Sections/Legal/LegalArticle.astro - le gabarit des trois documents legaux : date de revision, sommaire, sections ancrees et retour en haut.
+//
+// Un document legal se consulte, il ne se lit pas : on y cherche une clause
+// precise. D'ou le sommaire ancre en tete et le retour en haut sous chaque
+// section, qui coutent quelques lignes et evitent la molette infinie sur
+// telephone.
+//
+// Le corps passe par .prose : c'est la meme colonne de lecture que les articles,
+// donc la meme mesure et le meme rythme. Un document legal compose autrement
+// n'aurait pas l'air d'appartenir au meme site.
+import { Icon } from "@components/svg/icons";
+import { formatDate, fmt, type Locale } from "@i18n";
+import { slugify } from "@js/textUtils";
+
+type Section = { title: string; body: string };
+
+type Props = {
+  sections: readonly Section[];
+  /** Date ISO (YYYY-MM-DD) de la derniere revision du document. */
+  updated: string;
+  /** Le gabarit de la ligne de date, avec son jeton {date}. */
+  updatedTemplate: string;
+  tocLabel: string;
+  backToTopLabel: string;
+  locale: Locale;
+  class?: string;
+};
+
+const {
+  sections,
+  updated,
+  updatedTemplate,
+  tocLabel,
+  backToTopLabel,
+  locale,
+  class: className,
+} = Astro.props;
+
+// Les ancres viennent du titre de la section, donc de la langue : les URLs
+// francaises et anglaises ne partagent pas leurs ancres, et c'est correct,
+// puisqu'elles ne partagent pas leurs titres.
+const anchored = sections.map((section) => ({ ...section, id: slugify(section.title) }));
+---
+
+<div class:list={["container-page py-14 md:py-20", className]} data-slot="legal-article">
+  <p class="text-muted-foreground font-sans text-sm">
+    <time datetime={updated}>{fmt(updatedTemplate, { date: formatDate(new Date(updated), locale) })}</time>
+  </p>
+
+  <nav class="border-border bg-surface rounded-card mt-8 border p-6" aria-label={tocLabel}>
+    <p class="font-sans text-muted-foreground text-xs font-medium tracking-[0.18em] uppercase">
+      {tocLabel}
+    </p>
+    <ol class="mt-3 flex flex-col gap-1">
+      {
+        anchored.map((section) => (
+          <li>
+            <a
+              href={`#${section.id}`}
+              class="text-muted-foreground hover:text-foreground inline-flex min-h-11 items-center text-[0.95rem] transition-colors duration-150"
+            >
+              {section.title}
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+
+  <div class="prose mt-12">
+    {
+      anchored.map((section) => (
+        <section aria-labelledby={section.id}>
+          <h2 id={section.id}>{section.title}</h2>
+          <p>{section.body}</p>
+          {/* no-underline gagne sur le souligne de .prose : les utilitaires
+              vivent dans une couche posterieure a celle des composants. */}
+          <p>
+            <a
+              href="#content"
+              class="text-muted-foreground hover:text-foreground inline-flex min-h-11 items-center gap-1.5 font-sans text-xs no-underline"
+            >
+              <Icon name="chevron-up" size={14} />
+              {backToTopLabel}
+            </a>
+          </p>
+        </section>
+      ))
+    }
+  </div>
+</div>

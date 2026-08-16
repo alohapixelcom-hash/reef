@@ -1,0 +1,70 @@
+---
+// src/components/Sections/Home/TopicStrip.astro - la bande des sujets : une carte par fil, avec le nombre de billets derriere chacun.
+//
+// Un sujet vide n'apparait pas. Une bande qui annonce cinq fils dont deux ne
+// menent nulle part promet plus que le contenu ne tient, et c'est exactement la
+// premiere chose qu'un acheteur remarque quand il installe le theme avec ses
+// propres billets.
+import TopicCard from "@components/Cards/TopicCard.astro";
+import SectionHeader from "@components/Sections/Global/SectionHeader.astro";
+import { Icon } from "@components/svg/icons";
+import { Button } from "@components/ui/button";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { getLocale, useTranslations } from "@i18n";
+import { entrySlug } from "@i18n/content";
+import type { CollectionEntry } from "astro:content";
+
+type Props = {
+  topics: CollectionEntry<"topics">[];
+  /** Nombre de billets publies par slug de sujet, compte une fois par la page. */
+  counts: Record<string, number>;
+};
+
+const { topics, counts } = Astro.props;
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+
+const filled = topics.filter((topic) => (counts[entrySlug(topic.id)] ?? 0) > 0);
+---
+
+<section class="container-page py-16 md:py-24" aria-labelledby="topics-title" data-slot="topic-strip">
+  <SectionHeader
+    as="h2"
+    headingId="topics-title"
+    title={t.home.topicsTitle}
+    accentWord={t.home.topicsAccent}
+    lede={t.home.topicsLede}
+  />
+
+  {/* Un flux centre, et non une grille. Une grille a quatre colonnes laisse un
+      trou de trois cases des que le nombre de sujets n'est pas un multiple de
+      quatre, et l'acheteur qui installe le theme avec ses propres fils voit ce
+      trou avant de voir les cartes. Un flux centre range la derniere rangee au
+      milieu, quel que soit le nombre de sujets. */}
+  <ul class="mt-10 flex flex-wrap justify-center gap-5">
+    {
+      filled.map((topic) => {
+        const slug = entrySlug(topic.id);
+        return (
+          <li class="flex w-full sm:w-[calc(50%-0.625rem)] lg:w-[calc(33.333%-0.834rem)]">
+            <TopicCard
+              {topic}
+              {locale}
+              href={`${routes.topics}${slug}/`}
+              count={counts[slug] ?? 0}
+              class="w-full"
+            />
+          </li>
+        );
+      })
+    }
+  </ul>
+
+  <div class="mt-10 flex justify-center">
+    <Button href={routes.topics} variant="ghost" size="md">
+      {t.home.topicsCta}
+      <Icon name="arrow-right" size={17} />
+    </Button>
+  </div>
+</section>
