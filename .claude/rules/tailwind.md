@@ -36,7 +36,8 @@ color. Anything else that styles something fails.
 
 ## Token-generated utilities and house classes
 
-- From tokens: `font-display`, `font-sans`, `font-serif`, `font-script`,
+- From tokens: `font-display`, `font-sans`, `font-serif`/`font-script`
+  (compatibility aliases of the display font),
   `text-display-sm|md|lg|xl`, `rounded-card|panel|pill`,
   `shadow-float|lift|glass`, `animate-rise|marquee|pulse-slow`.
 - From global.css: `.accent-script`, `.glass`, `.glass-light`,
@@ -70,5 +71,6 @@ for `dark:` only for effects a role cannot express; if you are writing
 - Cards float: `bg-card rounded-card shadow-float`.
 - Sections breathe: `py-24 md:py-32`.
 - Display headings: `font-display` (Space Grotesk), and exactly one word per
-  big title wrapped in `<span class="accent-script">`, in Instrument Serif
-  italic.
+  big title wrapped in `<span class="accent-script">`: it keeps the heading
+  font, turns coral and carries the coral wave underline (`--accent-wave`).
+  Never an italic serif.
