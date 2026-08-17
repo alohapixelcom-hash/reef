@@ -1,0 +1,34 @@
+# Autorise les scripts d'installation dont le theme a besoin.
+#
+# POURQUOI CE FICHIER EXISTE, ET POURQUOI IL EST INDISPENSABLE
+#
+# Depuis pnpm 10, les scripts d'installation des dependances ne s'executent
+# plus sans autorisation explicite : c'est une protection contre les paquets
+# malveillants, et c'est une bonne chose. Mais depuis pnpm 11, `pnpm install`
+# ne se contente plus d'avertir, il SORT EN ERREUR (code 1). Comme pnpm
+# verifie l'etat des dependances avant de lancer un script, `pnpm dev` et
+# `pnpm build` echouent alors a leur tour, et le theme ne construit rien.
+#
+# Concretement, sans ce fichier, voici ce que vit une personne qui vient de
+# telecharger le theme avec une version recente de pnpm :
+#
+#   pnpm install   -> ERR_PNPM_IGNORED_BUILDS, code de sortie 1
+#   pnpm build     -> echoue, dist/ reste vide
+#
+# Mesure le 17 aout 2026 sur pnpm 11.22 et Node 22 : quatre etapes sur quatre
+# en echec. Avec ce fichier : install, build et check sortent en 0, et les 55
+# pages sont construites.
+#
+# Le nom du reglage a change : `pnpm.onlyBuiltDependencies` dans package.json
+# n'est PLUS LU par pnpm 11 (il l'annonce dans un avertissement facile a
+# manquer). Le nouvel emplacement est ce fichier, avec la cle `allowBuilds`.
+#
+# Ce qui est autorise ici, et rien d'autre :
+#   - esbuild : installe son binaire natif, utilise par Astro pour compiler.
+#   - sharp   : optimise les images au build.
+# Deux dependances directes et connues du theme. Aucune autorisation globale
+# n'est donnee : un paquet tiers qui arriverait plus tard resterait bloque,
+# ce qui est exactement le comportement voulu.
+allowBuilds:
+  esbuild: true
+  sharp: true
