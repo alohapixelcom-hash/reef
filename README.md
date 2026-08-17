@@ -1,6 +1,36 @@
 <!-- README.md - the sales page of the repo: what Reef is, what it contains, how to run it, what to do before deploying. -->
 
-# Reef
+<p align="center">
+  <img src="https://alohapixel.app/astro-preview/reef.jpg" alt="Reef, a free bilingual blog theme for Astro, shown on desktop and on an iPhone" width="900">
+</p>
+
+<h1 align="center">Reef</h1>
+
+<p align="center">
+  <b>A free, bilingual, dark-by-default blog theme for Astro 7.</b><br>
+  Reading-first typography, MDX collections, art-directed light and dark modes,<br>
+  owned SEO, and an iOS / Android build from the same source.
+</p>
+
+<p align="center">
+  <a href="https://reef.alohapixel.app"><b>Live demo</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://reef.alohapixel.app/fr/">Version française</a>
+  &nbsp;·&nbsp;
+  <a href="#quick-start">Quick start</a>
+  &nbsp;·&nbsp;
+  <a href="https://alohapixel.app/themes/">The rest of the family</a>
+</p>
+
+<p align="center">
+  <img alt="Astro 7" src="https://img.shields.io/badge/Astro-7-BC52EE?style=flat-square&logo=astro&logoColor=white">
+  <img alt="Tailwind CSS v4" src="https://img.shields.io/badge/Tailwind-v4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white">
+  <img alt="TypeScript strict" src="https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white">
+  <img alt="English and French" src="https://img.shields.io/badge/i18n-EN%20%2B%20FR-1D7F8D?style=flat-square">
+  <img alt="Free" src="https://img.shields.io/badge/price-free-FF7A59?style=flat-square">
+</p>
+
+---
 
 A blog theme for Astro 7, by Aloha Pixel. One repository gives you the whole
 front of a writing publication: a home that leads with the latest piece, a
