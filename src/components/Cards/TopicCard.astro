@@ -1,19 +1,28 @@
 ---
-// src/components/Cards/TopicCard.astro - la carte d'un sujet : initiale en filigrane, nom, description, nombre de billets, et l'accent declare par le contenu.
+// src/components/Cards/TopicCard.astro - la carte d'un sujet : vague en filigrane, nom, description, nombre de billets, et l'accent declare par le contenu.
 //
 // L'accent d'un sujet est un NOM (coral, reef, ink), jamais une couleur : le
 // contenu declare une intention, la table topicTone la traduit en tokens. C'est
 // ce qui permet de repeindre le theme sans rouvrir un seul fichier de contenu.
 //
-// Pourquoi une initiale en filigrane
-// ----------------------------------
-// La carte precedente etait un bloc de texte avec un filet au-dessus : cinq
-// cartes cote a cote donnaient cinq rectangles gris qu'on ne distinguait qu'en
-// les lisant. Un sujet doit se reconnaitre AVANT d'etre lu, et la seule matiere
-// disponible reste la typographie : Reef n'a ni icone par sujet ni photo, et
-// n'en aura pas. L'initiale, posee tres grande dans la serif italique de la
-// maison et dans la couleur du sujet, donne a chaque carte une silhouette a
-// elle, nette a toutes les densites d'ecran et repeinte au rebranding.
+// Pourquoi une vague en filigrane, et plus une initiale geante
+// ------------------------------------------------------------
+// Un sujet doit se reconnaitre AVANT d'etre lu : cinq cartes de texte cote a
+// cote ne donnent que cinq rectangles gris. Il faut donc une silhouette par
+// carte.
+//
+// La premiere reponse etait l'initiale du sujet, posee tres grande en fond.
+// Elle a ete retiree, et la raison merite d'etre ecrite pour qu'on ne la
+// repose pas : la lettre geante en filigrane est un tic visuel que le public
+// associe aux pages generees. Le reproche est arrive de l'exterieur, sur la
+// vignette d'un billet, et il valait pour toutes les cartes du theme.
+//
+// La vague le remplace, et ce n'est pas un motif de substitution choisi au
+// hasard : le logo de la maison EST une vague, et c'est deja elle qui souligne
+// le mot d'accent des grands titres. La carte porte donc la signature de la
+// marque plutot qu'une lettre que n'importe quel theme pourrait poser. Elle
+// prend la couleur du sujet, elle deborde du coin, et elle se lit a toutes les
+// densites parce que c'est un trace, pas une image.
 import { Icon } from "@components/svg/icons";
 import { fmt, useTranslations, type Locale } from "@i18n";
 import type { CollectionEntry } from "astro:content";
@@ -38,7 +47,6 @@ const { topic, href, count, locale, as: Tag = "h3", class: className }: Props = 
 const t = useTranslations(locale);
 const tone = topicTone[topic.data.accent];
 const countLabel = count === 1 ? t.topics.countOne : fmt(t.topics.countLabel, { count });
-const initial = topic.data.name.trim().charAt(0).toUpperCase();
 ---
 
 <article
@@ -51,17 +59,31 @@ const initial = topic.data.name.trim().charAt(0).toUpperCase();
   ]}
   data-slot="topic-card"
 >
-  {/* L'initiale deborde en bas a droite : entierement contenue elle aurait
-      l'air d'un logo pose dans un coin, coupee par le bord elle a l'air d'un
-      fond sur lequel le texte est imprime. */}
-  <span
+  {/* La vague deborde des deux bords en bas : entierement contenue elle aurait
+      l'air d'un logo pose dans un coin, coupee elle a l'air d'un fond sur
+      lequel le texte est imprime. */}
+  <svg
     class:list={[
-      "font-display pointer-events-none absolute -right-3 -bottom-12 text-[11rem] leading-none select-none",
-      "opacity-[0.13] transition-opacity duration-300 group-hover:opacity-25",
+      "pointer-events-none absolute -right-6 -bottom-4 -left-6 w-[calc(100%+3rem)] select-none",
+      "opacity-[0.16] transition-opacity duration-300 group-hover:opacity-30",
       tone.ghost,
     ]}
-    aria-hidden="true">{initial}</span
+    viewBox="0 0 200 60"
+    fill="none"
+    preserveAspectRatio="none"
+    aria-hidden="true"
   >
+    <path
+      d="M0 34c20-16 40-16 60 0s40 16 60 0 40-16 60 0 40 16 60 0"
+      stroke="currentColor"
+      stroke-width="3"
+      stroke-linecap="round"></path>
+    <path
+      d="M0 48c20-12 40-12 60 0s40 12 60 0 40-12 60 0 40 12 60 0"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"></path>
+  </svg>
 
   <span class:list={["relative h-0.5 w-10 rounded-pill", tone.rule]} aria-hidden="true"></span>
 
