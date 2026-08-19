@@ -113,13 +113,23 @@ const depth = [
       aria-hidden="true"
     />
 
-    {/* Voile de lecture. Sans lui, le titre passe sous le rapport de contraste
-        des que la photo s'eclaircit derriere lui. Le degrade est dense a
-        gauche, la ou vit la colonne de texte, et s'ouvre a droite pour laisser
-        respirer l'eau derriere la pile de fiches. Le noir est ici un canal
-        alpha, pas une couleur : il n'a donc pas de token, et il n'en veut pas. */}
+    {/* Voile de lecture, en deux couches et pas une.
+        Une seule nappe horizontale assez dense pour tenir le contraste du
+        titre eteignait la photo partout ailleurs : le premier essai, a 90 pour
+        cent de noir a gauche, rendait l'image invisible. La lecture n'a pas
+        besoin de noircir toute la scene, seulement la zone ou vit le texte.
+        Donc : une nappe horizontale forte a gauche et transparente des le
+        milieu, plus une nappe verticale legere qui rattrape le bas, la ou les
+        compteurs se posent sur de l'eau claire.
+        Le noir est ici un canal alpha, pas une couleur : il n'a donc pas de
+        token, et il n'en veut pas. */}
     <div
-      class="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/40"
+      class="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/80 via-black/35 to-transparent"
+      aria-hidden="true"
+    >
+    </div>
+    <div
+      class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/20"
       aria-hidden="true"
     >
     </div>
@@ -128,16 +138,18 @@ const depth = [
         uniforme, donc plat, alors qu'un halo a un centre, donc une direction.
         C'est la direction qui fait la profondeur. Ils derivent en 26 et 34
         secondes, assez lentement pour qu'on ne les voie pas bouger et assez
-        pour que la scene ne soit pas une image fixe. Poses sur la photo, ils
-        se lisent comme une lumiere, plus comme un fond. */}
+        pour que la scene ne soit pas une image fixe.
+        Poses sur une photographie, ils sont nettement plus discrets qu'avant :
+        leur role a change, ils coloraient un fond vide, ils ne font plus que
+        rechauffer une lumiere qui existe deja. */}
     <div
-      class="animate-drift pointer-events-none absolute -top-2/5 -right-1/4 size-[42rem] rounded-full opacity-25 blur-3xl"
+      class="animate-drift pointer-events-none absolute -top-2/5 -right-1/4 size-[42rem] rounded-full opacity-20 blur-3xl"
       style="background: radial-gradient(circle, var(--color-coral-500) 0%, transparent 68%)"
       aria-hidden="true"
     >
     </div>
     <div
-      class="animate-drift-slow pointer-events-none absolute -bottom-1/4 -left-1/5 size-[38rem] rounded-full opacity-45 blur-3xl"
+      class="animate-drift-slow pointer-events-none absolute -bottom-1/4 -left-1/5 size-[38rem] rounded-full opacity-30 blur-3xl"
       style="background: radial-gradient(circle, var(--color-reef-500) 0%, transparent 70%)"
       aria-hidden="true"
     >
