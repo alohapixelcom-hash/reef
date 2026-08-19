@@ -55,17 +55,46 @@ Both wrappers re-init on `astro:page-load` and mark processed nodes with a
 
 ## Accessibility of moving things
 
-- Marquees duplicate content for the seamless loop, hide the clone with
-  `aria-hidden`, and pause on hover and keyboard focus
-  (src/components/ui/marquee/Marquee.astro:2-5).
+- Marquees duplicate content for the seamless loop and pause on hover and
+  keyboard focus (src/components/ui/marquee/Marquee.astro). The duplicate is
+  `aria-hidden` AND `inert`: `aria-hidden` alone hides the clone from screen
+  readers but leaves its links in the tab order, so a keyboard user tabs twice
+  through the same list, the second time into links nothing announces. Any
+  filler repetition the caller adds to widen the track needs the same treatment
+  (src/components/Sections/Home/TopicMarquee.astro): five stops for five
+  destinations, not fifteen.
 - Scroll rails have no autoplay and no library: a `scroll-snap` rail with a
   `tabindex` and a name gets keyboard scrolling from the platform for free.
 
-## No heavy effect, and that is the point
+## No heavy effect without paying the toll
 
-Reef ships no canvas, no WebGL and no video. The most expensive thing on the
-page is a set of blurred radial-gradient halos in the hero that drift slowly.
-If a future effect needs a canvas, it must first prove that CSS cannot do it,
-then clear a strict sobriety ladder: never initialize under reduced motion,
-load only when visible, pause off-viewport and in hidden tabs, clean up on
-`astro:before-swap`.
+Reef ships no canvas and no WebGL. It ships exactly one video, and the
+exception is instructive.
+
+The home page carries a scroll-scrubbed sequence
+(src/components/Sections/Home/FilmScene.astro, engine in `_film.ts`): the
+video's playhead is tied to scroll position, so the reader's hand advances the
+image. It is not a background video. It was added on the owner's explicit and
+repeated request, as a port of the effect running in production on
+alohapixel.com, and it supersedes the earlier "no video" line here.
+
+It earned its place by clearing the sobriety ladder in full, and any future
+heavy effect must clear the same one before it lands:
+
+- never initialize under reduced motion, and also not under Save-Data or a
+  2g-class connection;
+- load nothing until three conditions hold at once: a real scroll gesture, the
+  section near the viewport, and the browser idle;
+- pause off-viewport, via IntersectionObserver, and in hidden tabs, via
+  `visibilitychange`;
+- re-init on `astro:page-load` behind a `data-*-ready` guard, and tear down on
+  `astro:before-swap`. This one is not optional and it is not theoretical: the
+  first version of FilmScene skipped it, and the sequence was measurably dead
+  after home -> post -> home, with the rAF loop and both observers from the
+  previous page still running. Route every listener through a single
+  AbortController so teardown is one line and none can be forgotten;
+- degrade to a still frame that carries the whole message. If the fallback is
+  not readable on its own, the effect has not earned the right to run.
+
+Everything else on the page stays cheap: the most expensive remaining thing is
+a set of blurred radial-gradient halos in the hero that drift slowly.
