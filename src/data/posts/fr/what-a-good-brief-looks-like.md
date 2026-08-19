@@ -5,6 +5,8 @@ pubDate: 2026-03-24
 author: fr/mara-lindqvist
 topic: fr/studio
 tags: ["freelance", "process", "clients"]
+cover: ../../../assets/covers/reef-bon-brief.webp
+coverAlt: "Vue de dessus d'une table en bois foncé : une main sur le clavier d'un ordinateur portable, l'autre écrivant dans un carnet ouvert"
 featured: false
 draft: false
 ---
