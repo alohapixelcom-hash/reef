@@ -5,6 +5,8 @@ pubDate: 2026-08-04
 author: en/mara-lindqvist
 topic: en/studio
 tags: ["freelance", "pricing", "contracts"]
+cover: ../../../assets/covers/reef-prix-refonte.webp
+coverAlt: "The inside of an antique safe door: brass gears and locking bolts in warm golden light"
 featured: false
 draft: true
 ---
