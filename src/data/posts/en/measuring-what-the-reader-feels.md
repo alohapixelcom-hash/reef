@@ -6,6 +6,8 @@ updatedDate: 2026-06-30
 author: en/noor-benali
 topic: en/performance
 tags: ["web vitals", "rum", "measurement"]
+cover: ../../../assets/covers/reef-mesurer-lecteur.webp
+coverAlt: "Two hands holding a phone on a street at night, orange headlight halos blurred behind"
 featured: false
 draft: false
 ---
