@@ -5,6 +5,8 @@ pubDate: 2025-11-25
 author: fr/tomas-abaroa
 topic: fr/typography
 tags: ["typographie", "polices", "performance"]
+cover: ../../../assets/covers/reef-cout-police.webp
+coverAlt: "Une main guide des ciseaux de couturière dans un tissu sarcelle tendu"
 featured: false
 draft: false
 ---
