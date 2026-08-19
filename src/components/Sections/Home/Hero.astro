@@ -1,5 +1,5 @@
 ---
-// src/components/Sections/Home/Hero.astro - le premier ecran : une scene encadree, une colonne de texte a gauche, la pile des dernieres notes a droite.
+// src/components/Sections/Home/Hero.astro - le premier ecran : une photographie du recif, une colonne de texte a gauche, la pile des dernieres notes a droite.
 //
 // Ce que ce hero corrige
 // ----------------------
@@ -9,19 +9,22 @@
 // seconde, et une seconde ne suffit pas a lire trois titres : elle suffit a
 // reconnaitre une forme.
 //
-// La forme, ici, c'est une pile de fiches en perspective. C'est la seule
-// matiere que possede un blog : ses articles. Reef n'a pas de capture d'ecran
-// et n'en aura jamais, donc l'objet a regarder est fabrique avec ce qui existe
-// deja, du texte compose, et il reste net a toutes les densites d'ecran.
+// La forme, ici, c'est une photographie, et par dessus une pile de fiches en
+// perspective. La pile seule ne suffisait pas : un ecran entierement fabrique
+// avec du texte compose et des degrades se reconnait, et se fait reprocher.
+// La photographie apporte ce qu'aucun degrade ne sait produire, une lumiere
+// qui n'est pas calculee.
 //
 // La scene reste sombre dans les deux themes (.deep-scene, voir global.css).
 // Un cadre qui blanchit en mode clair perd ses halos et ses lueurs de bordure :
 // il perd donc l'image, et le premier ecran redevient une page de texte.
+import heroRecif from "../../../assets/reef-hero-corail.webp";
 import { topicTone, type TopicAccent } from "@components/Cards/topicTone";
 import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { fmt, getLocale, useTranslations } from "@i18n";
+import { Image } from "astro:assets";
 
 interface RecentEntry {
   href: string;
@@ -92,19 +95,49 @@ const depth = [
     aria-labelledby="hero-title"
     data-deep-scene
   >
+    {/* La photographie, tout au fond. Elle est decorative au sens strict : le
+        titre dit deja de quoi parle le site, donc un alt vide evite de faire
+        lire deux fois la meme chose a un lecteur d'ecran.
+        loading="eager" et fetchpriority="high" parce que c'est le premier
+        ecran : la charger paresseusement, c'est afficher un trou noir pendant
+        que le reste s'installe. Les dimensions viennent de l'import, donc
+        aucun decalage de mise en page au chargement. */}
+    <Image
+      src={heroRecif}
+      alt=""
+      widths={[720, 1200, 1600]}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+      class="pointer-events-none absolute inset-0 size-full object-cover"
+      aria-hidden="true"
+    />
+
+    {/* Voile de lecture. Sans lui, le titre passe sous le rapport de contraste
+        des que la photo s'eclaircit derriere lui. Le degrade est dense a
+        gauche, la ou vit la colonne de texte, et s'ouvre a droite pour laisser
+        respirer l'eau derriere la pile de fiches. Le noir est ici un canal
+        alpha, pas une couleur : il n'a donc pas de token, et il n'en veut pas. */}
+    <div
+      class="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/40"
+      aria-hidden="true"
+    >
+    </div>
+
     {/* Deux halos poses en dur, pas dans le degrade de fond : un degrade est
         uniforme, donc plat, alors qu'un halo a un centre, donc une direction.
         C'est la direction qui fait la profondeur. Ils derivent en 26 et 34
         secondes, assez lentement pour qu'on ne les voie pas bouger et assez
-        pour que la scene ne soit pas une image fixe. */}
+        pour que la scene ne soit pas une image fixe. Poses sur la photo, ils
+        se lisent comme une lumiere, plus comme un fond. */}
     <div
-      class="animate-drift pointer-events-none absolute -top-2/5 -right-1/4 size-[42rem] rounded-full opacity-30 blur-3xl"
+      class="animate-drift pointer-events-none absolute -top-2/5 -right-1/4 size-[42rem] rounded-full opacity-25 blur-3xl"
       style="background: radial-gradient(circle, var(--color-coral-500) 0%, transparent 68%)"
       aria-hidden="true"
     >
     </div>
     <div
-      class="animate-drift-slow pointer-events-none absolute -bottom-1/4 -left-1/5 size-[38rem] rounded-full opacity-60 blur-3xl"
+      class="animate-drift-slow pointer-events-none absolute -bottom-1/4 -left-1/5 size-[38rem] rounded-full opacity-45 blur-3xl"
       style="background: radial-gradient(circle, var(--color-reef-500) 0%, transparent 70%)"
       aria-hidden="true"
     >
