@@ -6,6 +6,8 @@ updatedDate: 2026-02-10
 author: fr/noor-benali
 topic: fr/performance
 tags: ["performance", "budgets", "process"]
+cover: ../../../assets/covers/reef-budget-performance.webp
+coverAlt: "Balance à fléau ancienne suspendue, ses deux plateaux de laiton en équilibre devant un fond ocre lumineux"
 featured: false
 draft: false
 ---
