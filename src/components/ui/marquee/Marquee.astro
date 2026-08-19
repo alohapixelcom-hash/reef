@@ -50,7 +50,13 @@ const { root, track, part } = marquee({ speed, gap, reverse, fade });
     <div class={part()}>
       <slot />
     </div>
-    <div class={part()} aria-hidden="true">
+    {/* La copie de bouclage est decorative. aria-hidden la retire du lecteur
+        d'ecran, mais aria-hidden seul laisse ses liens accessibles au clavier :
+        on tabulait alors deux fois dans la meme liste, la seconde fois vers
+        des liens qu'aucune synthese vocale n'annonce. inert les retire aussi
+        de l'ordre de tabulation et du pointeur, ce qui rend la copie vraiment
+        decorative. */}
+    <div class={part()} aria-hidden="true" inert>
       <slot />
     </div>
   </div>
