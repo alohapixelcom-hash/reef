@@ -5,6 +5,8 @@ pubDate: 2025-11-25
 author: en/tomas-abaroa
 topic: en/typography
 tags: ["typography", "fonts", "performance"]
+cover: ../../../assets/covers/reef-cout-police.webp
+coverAlt: "A hand guiding tailor's shears through taut teal fabric"
 featured: false
 draft: false
 ---
