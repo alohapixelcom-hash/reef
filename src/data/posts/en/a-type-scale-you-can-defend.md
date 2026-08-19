@@ -5,6 +5,8 @@ pubDate: 2026-06-16
 author: en/tomas-abaroa
 topic: en/typography
 tags: ["typography", "css", "scale"]
+cover: ../../../assets/covers/reef-echelle-typo.webp
+coverAlt: "A watchmaker's hands opening a watch case with tweezers, several dismantled watches laid out on a pale wooden bench"
 featured: true
 draft: false
 ---
@@ -109,6 +111,6 @@ The tests are boring on purpose:
 3. Does the page still make sense at 200% browser zoom, which is the same test as asking whether any size is locked in px?
 4. Do two adjacent steps look different enough that a reader can tell a section from a subsection without counting pixels?
 
-#### The question that kills scales
+### The question that kills scales
 
 Question four is the one that does it. If you cannot tell the difference, you do not have two steps, you have one step and a rounding error, and the fix is to delete one rather than to add contrast somewhere else. The [cost of a second typeface](/blog/the-real-cost-of-a-web-font/) is a separate discussion, but a scale that needs one to be legible was never a scale in the first place.
