@@ -6,6 +6,8 @@ updatedDate: 2026-02-10
 author: en/noor-benali
 topic: en/performance
 tags: ["performance", "budgets", "process"]
+cover: ../../../assets/covers/reef-budget-performance.webp
+coverAlt: "An antique balance scale hanging with its two brass pans level against a bright ochre background"
 featured: false
 draft: false
 ---
