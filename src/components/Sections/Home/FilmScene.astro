@@ -35,6 +35,14 @@
 //    devient une image fixe avec son texte. Rien ne bouge, rien ne se
 //    telecharge, et le message reste entier.
 //
+// La scene porte .deep-scene : elle reste sombre dans les deux themes, et les
+// couleurs qu'elle utilise sont les ROLES (background, foreground, primary,
+// accent), jamais des noms de palette. C'est ce qui permet a `pnpm rebrand` de
+// la repeindre sans rouvrir ce fichier.
+//
+// Le moteur vit dans ./_film.ts : limite de 400 lignes par fichier, et surtout
+// cycle de vie du routeur client (voir l'en-tete de ce module).
+//
 // Les fichiers pointent vers alohapixel.com parce que c'est la demonstration.
 // Qui installe le theme remplace les trois adresses ci-dessous par les
 // siennes : c'est le seul endroit a changer.
@@ -80,7 +88,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
 ---
 
 <section
-  class="film"
+  class="film deep-scene"
   data-film
   data-from={from}
   data-to={to}
@@ -163,7 +171,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
   .film {
     position: relative;
     height: 300vh;
-    background: var(--color-ink-950);
+    background: var(--color-background);
   }
 
   .film__pin {
@@ -172,7 +180,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     height: 100vh;
     height: 100svh;
     overflow: hidden;
-    background: var(--color-ink-950);
+    background: var(--color-background);
   }
 
   /* inset negatif : la mise a l'echelle ne doit jamais laisser voir un bord. */
@@ -198,16 +206,16 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     background:
       linear-gradient(
         90deg,
-        color-mix(in oklab, var(--color-ink-950) 78%, transparent) 0%,
-        color-mix(in oklab, var(--color-ink-950) 46%, transparent) 48%,
+        color-mix(in oklab, var(--color-background) 78%, transparent) 0%,
+        color-mix(in oklab, var(--color-background) 46%, transparent) 48%,
         transparent 100%
       ),
       linear-gradient(
         180deg,
-        color-mix(in oklab, var(--color-ink-950) 46%, transparent) 0%,
+        color-mix(in oklab, var(--color-background) 46%, transparent) 0%,
         transparent 26%,
         transparent 68%,
-        color-mix(in oklab, var(--color-ink-950) 58%, transparent) 100%
+        color-mix(in oklab, var(--color-background) 58%, transparent) 100%
       );
   }
 
@@ -218,8 +226,8 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     mix-blend-mode: screen;
     background: radial-gradient(
       58% 62% at 62% 46%,
-      color-mix(in oklab, var(--color-paper-50) 38%, transparent) 0%,
-      color-mix(in oklab, var(--color-paper-50) 12%, transparent) 38%,
+      color-mix(in oklab, var(--color-foreground) 38%, transparent) 0%,
+      color-mix(in oklab, var(--color-foreground) 12%, transparent) 38%,
       transparent 72%
     );
   }
@@ -238,7 +246,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     inset-inline: 0;
     bottom: 0;
     height: 2px;
-    background: color-mix(in oklab, var(--color-paper-50) 12%, transparent);
+    background: color-mix(in oklab, var(--color-foreground) 12%, transparent);
     z-index: 3;
   }
 
@@ -248,11 +256,11 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     width: 0;
     background: linear-gradient(
       90deg,
-      var(--color-coral-500) 0%,
-      var(--color-reef-400) 62%,
-      var(--color-paper-50) 100%
+      var(--color-primary) 0%,
+      var(--color-accent) 62%,
+      var(--color-foreground) 100%
     );
-    box-shadow: 0 0 0.85em color-mix(in oklab, var(--color-reef-400) 70%, transparent);
+    box-shadow: 0 0 0.85em color-mix(in oklab, var(--color-accent) 70%, transparent);
   }
 
   /* Repli. Sous 1025 pixels, en mouvement reduit ou en economie de donnees, la
@@ -292,9 +300,9 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
   .film--flat .film__veil {
     background: linear-gradient(
       180deg,
-      color-mix(in oklab, var(--color-ink-950) 66%, transparent) 0%,
-      color-mix(in oklab, var(--color-ink-950) 34%, transparent) 42%,
-      color-mix(in oklab, var(--color-ink-950) 62%, transparent) 100%
+      color-mix(in oklab, var(--color-background) 66%, transparent) 0%,
+      color-mix(in oklab, var(--color-background) 34%, transparent) 42%,
+      color-mix(in oklab, var(--color-background) 62%, transparent) 100%
     );
   }
 
@@ -309,194 +317,5 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
 </style>
 
 <script>
-  // Voir le commentaire en tete de fichier pour le pourquoi de chaque garde-fou.
-  const clamp = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x);
-
-  function setup(section: HTMLElement) {
-    const video = section.querySelector<HTMLVideoElement>(".film__video");
-    const media = section.querySelector<HTMLElement>(".film__media");
-    const bloom = section.querySelector<HTMLElement>(".film__bloom");
-    const bar = section.querySelector<HTMLElement>(".film__rail i");
-    const items = [...section.querySelectorAll<HTMLElement>(".film__item")];
-    if (!video || !media) return;
-
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const wide = window.matchMedia("(min-width: 1025px)");
-    const dense = window.matchMedia("(min-resolution: 1.5dppx)");
-
-    const portrait = () => window.innerWidth <= 1024 && window.innerHeight >= window.innerWidth;
-
-    // Economie de donnees demandee, ou reseau tres lent.
-    const thrifty = () => {
-      const c = (navigator as any).connection;
-      if (!c) return false;
-      return Boolean(c.saveData) || /^(slow-)?2g$/.test(c.effectiveType ?? "");
-    };
-
-    const animated = () => wide.matches && !reduce.matches && !thrifty();
-
-    const from = Number(section.dataset.from ?? 0);
-    const to = Number(section.dataset.to ?? 0);
-
-    let loaded = false;
-    let gesture = false;
-    let near = false;
-    let running = false;
-    let raf = 0;
-    let cursor = 0;
-    let travel = 0;
-    let last = "";
-    let seekOk = false;
-    let tries = 0;
-    let firstTry = 0;
-    let usePortrait = false;
-
-    function poster() {
-      const p = portrait()
-        ? (video!.dataset.posterPortrait ?? video!.dataset.poster)
-        : video!.dataset.poster;
-      if (p && video!.getAttribute("poster") !== p) video!.setAttribute("poster", p);
-    }
-
-    function load() {
-      if (loaded || !animated()) return;
-      loaded = true;
-      usePortrait = portrait() && Boolean(video!.dataset.srcPortrait);
-      const chosen = usePortrait
-        ? video!.dataset.srcPortrait!
-        : dense.matches && video!.dataset.srcHd
-          ? video!.dataset.srcHd
-          : video!.dataset.src!;
-      video!.preload = "auto";
-      video!.src = chosen;
-      video!.load();
-      // Une premiere lecture immediatement mise en pause : c'est le seul moyen
-      // fiable d'amorcer le decodeur sur les navigateurs mobiles, qui refusent
-      // de se deplacer dans une video jamais lue.
-      video!.addEventListener(
-        "loadedmetadata",
-        () => {
-          const p = video!.play();
-          if (p) p.then(() => { video!.pause(); try { video!.currentTime = 0.001; } catch {} }).catch(() => {});
-        },
-        { once: true },
-      );
-      video!.addEventListener("seeked", () => { seekOk = true; }, { once: true });
-      video!.addEventListener(
-        "error",
-        () => {
-          video!.style.display = "none";
-          media!.style.backgroundImage = `url(${video!.getAttribute("poster") ?? ""})`;
-          media!.style.backgroundSize = "cover";
-          media!.style.backgroundPosition = "center";
-        },
-        { once: true },
-      );
-    }
-
-    function tryLoad() {
-      if (!gesture || !near || loaded || !animated()) return;
-      const push = () =>
-        "requestIdleCallback" in window
-          ? (window as any).requestIdleCallback(load, { timeout: 2500 })
-          : setTimeout(load, 200);
-      if (document.readyState === "complete") push();
-      else window.addEventListener("load", push, { once: true });
-    }
-
-    function progress() {
-      const r = section.getBoundingClientRect();
-      const span = r.height - window.innerHeight;
-      if (span > 40) return clamp(-r.top / span);
-      return clamp((window.innerHeight - r.top) / (window.innerHeight + r.height));
-    }
-
-    function place(p: number) {
-      items.forEach((el, n) => {
-        const a = clamp((p - (0.06 + n * 0.055)) * 8);
-        el.style.opacity = String(a);
-        el.style.transform = `translate3d(0,${((1 - a) * 2.1).toFixed(3)}em,0)`;
-      });
-    }
-
-    function release() {
-      items.forEach((el) => { el.style.opacity = ""; el.style.transform = ""; });
-      section.classList.remove("film--live");
-    }
-
-    function tick() {
-      const p = progress();
-      const key = p.toFixed(5);
-      if (key !== last) {
-        last = key;
-        if (bar) bar.style.width = `${(p * 100).toFixed(2)}%`;
-        media!.style.transform = `scale(${(1.06 - p * 0.055).toFixed(4)}) translateZ(0)`;
-        if (bloom) bloom.style.opacity = (p * p * 0.85).toFixed(3);
-        place(p);
-      }
-
-      const d = video!.duration;
-      if (d && isFinite(d) && video!.readyState > 0 && !section.classList.contains("film--looping")) {
-        const start = usePortrait ? 0 : from < d ? from : 0;
-        let end = !usePortrait && to > start && to <= d ? to : d;
-        // Garde-fou de cadence : au moins ~1,2 px de defilement par image.
-        const most = travel / 36;
-        if (end - start > most) end = start + most;
-
-        const target = start + p * (end - start - 0.05);
-        cursor += (target - cursor) * 0.2;
-
-        if (!video!.seeking && Math.abs(video!.currentTime - cursor) > 0.015) {
-          if (!firstTry) firstTry = performance.now();
-          tries++;
-          try { video!.currentTime = cursor; } catch {}
-          // Le deplacement n'aboutit pas : on renonce et on lit en boucle.
-          if (!seekOk && tries > 40 && performance.now() - firstTry > 8000 && p > 0.15) {
-            section.classList.add("film--looping");
-            video!.loop = true;
-            video!.muted = true;
-            video!.play()?.catch(() => {});
-          }
-        }
-      }
-      raf = requestAnimationFrame(tick);
-    }
-
-    const start = () => { if (!running && animated()) { running = true; raf = requestAnimationFrame(tick); } };
-    const stop = () => { if (running) { running = false; cancelAnimationFrame(raf); } };
-
-    function configure() {
-      const live = animated();
-      section.classList.toggle("film--flat", !live);
-      section.classList.toggle("film--live", live);
-      if (!loaded) poster();
-      travel = section.offsetHeight - window.innerHeight > 40
-        ? section.offsetHeight - window.innerHeight
-        : window.innerHeight + section.offsetHeight;
-      last = "";
-      if (!live) { stop(); release(); return; }
-      place(progress());
-      tryLoad();
-      start();
-    }
-
-    configure();
-
-    (["wheel", "touchstart", "touchmove", "pointerdown", "keydown"] as const).forEach((e) =>
-      window.addEventListener(e, () => { gesture = true; tryLoad(); }, { once: true, passive: true }),
-    );
-
-    if ("IntersectionObserver" in window) {
-      new IntersectionObserver((es) => { if (es[0].isIntersecting) { near = true; tryLoad(); } },
-        { rootMargin: "400px 0px" }).observe(section);
-      new IntersectionObserver((es) => (es[0].isIntersecting ? start() : stop()),
-        { rootMargin: "150px 0px" }).observe(section);
-    } else { near = true; gesture = true; tryLoad(); start(); }
-
-    let t = 0;
-    window.addEventListener("resize", () => { clearTimeout(t); t = window.setTimeout(configure, 120); },
-      { passive: true });
-  }
-
-  document.querySelectorAll<HTMLElement>("[data-film]").forEach(setup);
+  import "./_film";
 </script>
