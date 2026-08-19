@@ -67,10 +67,6 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
 // haute et la plus enfoncee, la plus recente est devant et entiere. On inverse
 // donc l'ordre a l'affichage, pas dans les donnees.
 //
-// Le chevauchement ne mange QUE le rembourrage bas des fiches du fond, jamais
-// une ligne de texte : une fiche coupee au milieu d'un mot ne se lit pas comme
-// une pile, elle se lit comme un defaut d'affichage.
-//
 // L'opacite des fiches du fond ne descend pas plus bas que 0.84, et c'est une
 // contrainte de lisibilite et non de gout : en dessous, la date et le sujet
 // passaient sous le rapport de contraste de 4.5 alors qu'ils restent sur de
@@ -99,8 +95,8 @@ const depth = [
         ecran : la charger paresseusement, c'est afficher un trou noir pendant
         que le reste s'installe. Les dimensions viennent de l'import, donc
         aucun decalage de mise en page au chargement.
-        Le cadrage tire vers le bas (object-position) : la ou la vague se
-        creuse. Centre, on ne voyait que du ciel. */}
+        Le cadrage tire vers le bas : la ou la vague se creuse. Centre, on ne
+        voyait que du ciel. */}
     <Image
       src={heroVague}
       alt=""
@@ -113,22 +109,22 @@ const depth = [
     />
 
     {/* Voile de lecture, en deux couches et pas une.
-        Une seule nappe assez dense pour tenir le contraste du titre eteignait
-        la photo partout ailleurs : le premier essai, a 90 pour cent de noir a
-        gauche, rendait l'image invisible, le second a 80 la laissait encore
-        noire. La lecture n'a pas besoin d'assombrir toute la scene, seulement
-        la zone ou vit le texte, et cette zone s'arrete au tiers de l'ecran.
-        Donc : une nappe horizontale qui meurt avant le milieu, plus une nappe
-        verticale legere qui pose les compteurs en bas.
+        Reglage trouve en trois essais, et les deux ratages valent d'etre notes
+        parce qu'ils bornent le probleme : a 90 pour cent de noir sur toute la
+        largeur, la photo devenait invisible ; a 70 pour cent qui mouraient
+        avant le milieu, le chapeau et les compteurs passaient sous le rapport
+        de contraste des que l'ecume passait dessous. Le voile doit donc couvrir
+        TOUTE la colonne de texte, qui va jusqu'a 55 pour cent de la largeur sur
+        grand ecran, puis s'ouvrir franchement pour laisser la vague entiere.
         Le noir est ici un canal alpha, pas une couleur : il n'a donc pas de
         token, et il n'en veut pas. */}
     <div
-      class="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/70 from-0% via-black/20 via-45% to-transparent to-70%"
+      class="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/88 from-0% via-black/60 via-42% to-transparent to-80%"
       aria-hidden="true"
     >
     </div>
     <div
-      class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/25"
+      class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/30"
       aria-hidden="true"
     >
     </div>
@@ -181,7 +177,10 @@ const depth = [
           }
         </h1>
 
-        <p class="text-muted-foreground measure-wide mt-6 leading-relaxed md:text-lg lg:text-xl">
+        {/* Le chapeau et les compteurs passent en blanc franc plutot qu'en
+            muted : le gris de texte secondaire a ete calcule pour un aplat
+            sombre, pas pour une photographie qui bouge sous lui. */}
+        <p class="measure-wide mt-6 leading-relaxed text-white/85 md:text-lg lg:text-xl">
           {t.home.heroLede}
         </p>
 
@@ -210,7 +209,10 @@ const depth = [
                 return (
                   <article
                     class:list={[
-                      "glass rounded-card relative overflow-hidden px-5 pt-5 sm:px-6 sm:pt-6",
+                      // bg-black/25 en plus du verre : sur un aplat sombre le
+                      // verre seul suffisait, sur de l'ecume il devenait blanc
+                      // sur blanc et la date disparaissait.
+                      "glass rounded-card relative overflow-hidden bg-black/25 px-5 pt-5 sm:px-6 sm:pt-6",
                       front ? "pb-5 sm:pb-6" : "pb-6 lg:pb-11",
                       i > 0 && "-mt-6",
                       "lg:[transform:translateZ(var(--deck-z))_translateX(var(--deck-x))]",
@@ -225,7 +227,7 @@ const depth = [
                       <span class:list={["rounded-pill px-2.5 py-1 text-xs font-medium", tone.chip]}>
                         {entry.topic}
                       </span>
-                      <time class="text-muted-foreground text-xs" datetime={entry.iso}>
+                      <time class="text-xs text-white/70" datetime={entry.iso}>
                         {entry.date}
                       </time>
                     </p>
@@ -243,7 +245,7 @@ const depth = [
                       </a>
                     </h2>
                     {front && (
-                      <p class="text-muted-foreground mt-4 flex items-center gap-2 text-xs">
+                      <p class="mt-4 flex items-center gap-2 text-xs text-white/70">
                         <Icon name="clock" size={14} />
                         {readLabel}
                       </p>
@@ -260,13 +262,13 @@ const depth = [
           qu'un lecteur se pose avant de cliquer, "y a-t-il de quoi lire". */}
       {
         ledger.length > 0 && (
-          <dl class="border-border flex flex-wrap gap-x-10 gap-y-4 border-t pt-6 lg:col-start-1 lg:row-start-2 lg:self-start">
+          <dl class="flex flex-wrap gap-x-10 gap-y-4 border-t border-white/25 pt-6 lg:col-start-1 lg:row-start-2 lg:self-start">
             {t.home.heroLedger.map((label, i) => (
               <div class="flex flex-col gap-0.5">
                 <dd class="font-display text-3xl leading-none font-bold md:text-4xl">
                   {ledger[i] ?? 0}
                 </dd>
-                <dt class="text-muted-foreground text-xs tracking-[0.14em] uppercase">{label}</dt>
+                <dt class="text-xs tracking-[0.14em] text-white/75 uppercase">{label}</dt>
               </div>
             ))}
           </dl>
