@@ -5,6 +5,8 @@ pubDate: 2026-02-17
 author: fr/tomas-abaroa
 topic: fr/design
 tags: ["design", "mode sombre", "css"]
+cover: ../../../assets/covers/reef-mode-sombre.webp
+coverAlt: "Une devanture vitrée éclairée de l'intérieur à la nuit tombée, guirlandes lumineuses sur la terrasse voisine"
 featured: false
 draft: false
 ---
