@@ -40,7 +40,7 @@ Les retouches illimitées ne sont pas de la générosité, c'est une option non 
 1. **Deux tours de retours consolidés par livrable.** Consolidés veut dire un document du décideur nommé, pas cinq courriels de quatre personnes.
 2. **Un tour, c'est un ensemble de modifications à l'intérieur de la direction validée.** Changer de direction n'est pas un tour, c'est un nouveau livrable, et nous le disons pendant la réunion plutôt que sur la facture.
 3. **Les tours supplémentaires sont chiffrés avant d'avoir lieu**, à un tarif journalier annoncé, et n'arrivent jamais par surprise.
-4. **Un silence de plus de dix jours ouvrés clot le tour.** Pas comme une punition : parce qu'un projet en pause pendant un mois nous coûte le créneau que nous lui avions réservé.
+4. **Un silence de plus de dix jours ouvrés clôt le tour.** Pas comme une punition : parce qu'un projet en pause pendant un mois nous coûte le créneau que nous lui avions réservé.
 
 C'est la quatrième ligne qui a fait le plus de travail. Les projets meurent rarement d'un désaccord, ils meurent de dérive, et la dérive coûte cher d'une façon que personne ne met sur une facture.[^taux]
 
