@@ -5,6 +5,8 @@ pubDate: 2026-02-17
 author: en/tomas-abaroa
 topic: en/design
 tags: ["design", "dark mode", "css"]
+cover: ../../../assets/covers/reef-mode-sombre.webp
+coverAlt: "A glass shopfront lit from within after dark, string lights strung over the terrace beside it"
 featured: false
 draft: false
 ---
