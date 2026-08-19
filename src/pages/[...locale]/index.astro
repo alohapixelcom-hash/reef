@@ -11,10 +11,11 @@
 import Footer from "@components/Sections/Global/Footer.astro";
 import Navbar from "@components/Sections/Global/Navbar.astro";
 import FeaturedPost from "@components/Sections/Home/FeaturedPost.astro";
+import FilmScene from "@components/Sections/Home/FilmScene.astro";
 import Hero from "@components/Sections/Home/Hero.astro";
 import LatestPosts from "@components/Sections/Home/LatestPosts.astro";
 import NewsletterInvite from "@components/Sections/Home/NewsletterInvite.astro";
-import StudioNote from "@components/Sections/Home/StudioNote.astro";
+import TopicMarquee from "@components/Sections/Home/TopicMarquee.astro";
 import TopicStrip from "@components/Sections/Home/TopicStrip.astro";
 import WritersStrip from "@components/Sections/Home/WritersStrip.astro";
 import { getSiteRoutes } from "@config/navData.json.ts";
@@ -102,11 +103,18 @@ const schemas = [
 
   <main id="content">
     <Hero {recent} {ledger} />
+    {/* La bande defilante mord les deux bords juste sous le hero : c'est elle
+        qui casse la largeur de panneau du premier ecran et lance le rythme de
+        la page. Elle porte les vrais sujets, pas des mots decoratifs. */}
+    <TopicMarquee {topics} counts={topicCounts} />
     {featured && <FeaturedPost entry={featured} />}
     {latest.length > 0 && <LatestPosts posts={latest} />}
     <TopicStrip {topics} counts={topicCounts} />
     <WritersStrip {authors} counts={authorCounts} />
-    <StudioNote />
+    {/* La sequence filmee remplace le bloc "mot du studio" : c'est le meme
+        message, mais le lecteur le deroule lui-meme. Le composant StudioNote
+        reste dans le theme pour qui prefere un bloc sans video. */}
+    <FilmScene />
     <NewsletterInvite />
   </main>
 
