@@ -1,0 +1,18 @@
+# wrangler.toml - deploiement de la demo en ligne (reef-demo). Ne concerne pas le theme vendu.
+
+name = "reef-demo"
+main = "src/worker.ts"
+compatibility_date = "2026-08-14"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+# Le worker doit voir TOUTES les requetes, sinon "/" servirait index.html
+# directement et la redirection de langue ne s'executerait jamais. C'est pour
+# cette raison que le worker teste lui-meme l'extension du chemin avant de
+# rediriger : il laisse passer les feuilles de style et les scripts.
+run_worker_first = true
+
+# Astro produit un 404.html : on le sert au lieu d'une reponse vide.
+not_found_handling = "404-page"
