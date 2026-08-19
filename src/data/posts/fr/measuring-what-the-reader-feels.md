@@ -6,6 +6,8 @@ updatedDate: 2026-06-30
 author: fr/noor-benali
 topic: fr/performance
 tags: ["web vitals", "rum", "mesure"]
+cover: ../../../assets/covers/reef-mesurer-lecteur.webp
+coverAlt: "Deux mains tiennent un téléphone dans une rue le soir, halos orange des phares de voitures en arrière-plan"
 featured: false
 draft: false
 ---
