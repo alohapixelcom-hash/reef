@@ -111,6 +111,6 @@ Les tests sont volontairement ennuyeux :
 3. La page tient-elle encore debout à 200 % de zoom navigateur, question qui revient à demander si une taille est verrouillée en px ?
 4. Deux paliers voisins se distinguent-ils assez pour qu'un lecteur reconnaisse une section d'une sous-section sans compter les pixels ?
 
-#### La question qui tue les échelles
+### La question qui tue les échelles
 
 C'est la quatrième qui s'en charge. Si vous ne voyez pas la différence, vous n'avez pas deux paliers, vous avez un palier et une erreur d'arrondi, et le remède est d'en supprimer un plutôt que d'ajouter du contraste ailleurs. Le [coût d'une seconde police](/fr/blog/the-real-cost-of-a-web-font/) est une autre discussion, mais une échelle qui en réclame une pour être lisible n'a jamais été une échelle.

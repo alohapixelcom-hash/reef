@@ -83,7 +83,7 @@ Les noms de classe qui décrivaient une *apparence* étaient tous morts : `card-
 
 Les noms de classe qui décrivaient une *nature* ont presque tous survécu : `article-meta`, `topic-badge`, `field-error`. Le design a bougé deux fois sous eux et les noms sont restés vrais, parce qu'ils n'avaient jamais rien promis sur des pixels.
 
-#### Un test qui prend dix secondes
+### Un test qui prend dix secondes
 
 Lisez le nom de classe à voix haute, puis demandez-vous : si la designer change d'avis demain sur l'apparence, la phrase reste-t-elle vraie ? `field-error` passe. `text-red` échoue. Toute la règle est là, et c'est ce qui sépare une feuille de style qu'on peut refactorer d'une feuille de style à laquelle on ne peut qu'ajouter. Le corollaire, c'est que les classes utilitaires vont très bien justement parce que ce ne sont pas des noms : `p-4` n'a jamais prétendu être un concept, donc il ne peut pas devenir un concept périmé. Ce qui ruine un projet, c'est la couche intermédiaire, ce nom à moitié sémantique qui encode la mise en page de l'année dernière et se retrouve copié dans onze gabarits avant que quiconque s'en aperçoive.
 
