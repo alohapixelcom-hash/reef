@@ -5,6 +5,8 @@ pubDate: 2026-06-16
 author: fr/tomas-abaroa
 topic: fr/typography
 tags: ["typographie", "css", "echelle"]
+cover: ../../../assets/covers/reef-echelle-typo.webp
+coverAlt: "Les mains d'un horloger ouvrent le boîtier d'une montre à la pincette, plusieurs montres démontées posées sur un établi en bois clair"
 featured: true
 draft: false
 ---
