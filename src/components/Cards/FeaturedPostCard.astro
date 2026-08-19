@@ -7,12 +7,16 @@
 // specimen typographique sinon). C'est la piece qui doit donner envie de lire
 // avant que le lecteur ait fini de descendre l'ecran.
 //
-// La couverture typographique n'est pas un bouche-trou. Reef n'embarque aucune
-// image et n'en embarquera pas : la couverture est donc composee, avec un halo
-// qui derive dans la couleur du sujet, l'initiale du sujet posee tres grande
-// dans la serif italique de la maison, le nom du sujet en capitales espacees et
-// les deux vagues de la marque. Rien a servir, net a toutes les densites, et
-// repeint tout seul au rebranding.
+// La couverture de secours n'est pas un bouche-trou : c'est ce qui s'affiche
+// quand un billet n'a pas de photo. Elle est composee, avec un halo qui derive
+// dans la couleur du sujet, les deux vagues de la marque et le nom du sujet en
+// capitales espacees le long du bord.
+//
+// L'initiale geante qui tronait au centre a ete retiree. La lettre en
+// filigrane est un tic visuel que le public associe aux pages generees, et le
+// reproche est arrive de l'exterieur. La vague la remplace : le logo de la
+// maison EST une vague, donc la couverture porte la signature de la marque au
+// lieu d'un motif que n'importe quel theme pourrait poser.
 //
 // La version precedente n'avait ni halo ni contraste : sur fond sombre, un gris
 // a 8% sur un gris a 10% ne dessine rien, et le panneau lisait comme un trou
@@ -44,7 +48,6 @@ const href = `${routes.posts}${slug}/`;
 const topicHref = `${routes.topics}${topicSlug}/`;
 const tone = topicTone[topic.data.accent];
 const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: minutes });
-const initial = topic.data.name.trim().charAt(0).toUpperCase();
 ---
 
 <article
@@ -144,7 +147,7 @@ const initial = topic.data.name.trim().charAt(0).toUpperCase();
             <span class:list={["absolute inset-x-0 top-0 h-0.5", tone.rule]}></span>
 
             <svg
-              class:list={["absolute inset-x-0 bottom-0 w-full opacity-25", tone.ghost]}
+              class:list={["absolute inset-x-0 bottom-0 w-full opacity-40", tone.ghost]}
               viewBox="0 0 200 60"
               fill="none"
               preserveAspectRatio="none"
@@ -162,10 +165,6 @@ const initial = topic.data.name.trim().charAt(0).toUpperCase();
                 stroke-linecap="round"
               />
             </svg>
-
-            <span class="font-display text-foreground/85 relative text-[11rem] leading-none">
-              {initial}
-            </span>
 
             {/* Le nom du sujet, a la verticale contre le bord gauche du panneau.
                 Il transforme le panneau en couverture de rubrique au lieu d'un
