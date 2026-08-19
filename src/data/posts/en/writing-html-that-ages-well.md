@@ -5,6 +5,8 @@ pubDate: 2025-09-16
 author: en/mara-lindqvist
 topic: en/craft
 tags: ["html", "semantics", "maintenance"]
+cover: ../../../assets/covers/reef-html-qui-vieillit.webp
+coverAlt: "A carpenter's hands pushing a hand plane along a board, a wood shaving curling out of the tool"
 featured: false
 draft: false
 ---
@@ -81,7 +83,7 @@ Class names that described what something *looked like* were all dead: `card--wi
 
 Class names that described what something *was* mostly survived: `article-meta`, `topic-badge`, `field-error`. The design moved under them twice and the names stayed true, because they were never making a claim about pixels.
 
-#### A test that takes ten seconds
+### A test that takes ten seconds
 
 Read the class name out loud, then ask: if the designer changed their mind tomorrow about how this looks, would the sentence still be true? `field-error` passes. `text-red` fails. This is the whole rule, and it is the difference between a stylesheet you can refactor and one you can only add to. The corollary is that utility classes are fine precisely because they are not names: `p-4` never claimed to be a concept, so it never becomes a stale one. What ruins a codebase is the middle layer, the half-semantic name that encodes last year's layout and gets copied into eleven templates before anyone notices.
 
