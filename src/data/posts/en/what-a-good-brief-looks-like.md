@@ -5,6 +5,8 @@ pubDate: 2026-03-24
 author: en/mara-lindqvist
 topic: en/studio
 tags: ["freelance", "process", "clients"]
+cover: ../../../assets/covers/reef-bon-brief.webp
+coverAlt: "Overhead view of a dark wooden table: one hand on a laptop keyboard, the other writing in an open notebook"
 featured: false
 draft: false
 ---
