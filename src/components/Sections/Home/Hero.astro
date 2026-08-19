@@ -1,5 +1,5 @@
 ---
-// src/components/Sections/Home/Hero.astro - le premier ecran : une photographie du recif, une colonne de texte a gauche, la pile des dernieres notes a droite.
+// src/components/Sections/Home/Hero.astro - le premier ecran : une vague en pleine page, une colonne de texte a gauche, la pile des dernieres notes a droite.
 //
 // Ce que ce hero corrige
 // ----------------------
@@ -13,12 +13,14 @@
 // perspective. La pile seule ne suffisait pas : un ecran entierement fabrique
 // avec du texte compose et des degrades se reconnait, et se fait reprocher.
 // La photographie apporte ce qu'aucun degrade ne sait produire, une lumiere
-// qui n'est pas calculee.
+// qui n'est pas calculee. Et le sujet n'est pas decoratif : le logo de la
+// maison EST une vague, le mot d'accent des titres est souligne d'une vague.
+// Le premier ecran dit donc la meme chose que la marque.
 //
 // La scene reste sombre dans les deux themes (.deep-scene, voir global.css).
 // Un cadre qui blanchit en mode clair perd ses halos et ses lueurs de bordure :
 // il perd donc l'image, et le premier ecran redevient une page de texte.
-import heroRecif from "../../../assets/reef-hero-corail.webp";
+import heroVague from "../../../assets/reef-hero-vague.webp";
 import { topicTone, type TopicAccent } from "@components/Cards/topicTone";
 import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
@@ -67,18 +69,13 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
 //
 // Le chevauchement ne mange QUE le rembourrage bas des fiches du fond, jamais
 // une ligne de texte : une fiche coupee au milieu d'un mot ne se lit pas comme
-// une pile, elle se lit comme un defaut d'affichage. La profondeur vient donc
-// du recul en Z, du decalage lateral et de l'opacite, pas d'un empilement
-// serre.
+// une pile, elle se lit comme un defaut d'affichage.
 //
 // L'opacite des fiches du fond ne descend pas plus bas que 0.84, et c'est une
 // contrainte de lisibilite et non de gout : en dessous, la date et le sujet
 // passaient sous le rapport de contraste de 4.5 alors qu'ils restent sur de
-// vrais liens. Le recul se lit deja dans le Z et le decalage lateral.
+// vrais liens.
 const deck = [...recent].slice(0, 3).reverse();
-// Recul en Z et decalage lateral de chaque fiche, passes en variables plutot
-// qu'en transform tout fait : le composant a besoin de les appliquer sur grand
-// ecran seulement, et une media query ne peut pas atteindre un attribut style.
 const depth = [
   { z: "-110px", x: "2.2rem", o: "0.84" },
   { z: "-55px", x: "1.1rem", o: "0.93" },
@@ -101,55 +98,53 @@ const depth = [
         loading="eager" et fetchpriority="high" parce que c'est le premier
         ecran : la charger paresseusement, c'est afficher un trou noir pendant
         que le reste s'installe. Les dimensions viennent de l'import, donc
-        aucun decalage de mise en page au chargement. */}
+        aucun decalage de mise en page au chargement.
+        Le cadrage tire vers le bas (object-position) : la ou la vague se
+        creuse. Centre, on ne voyait que du ciel. */}
     <Image
-      src={heroRecif}
+      src={heroVague}
       alt=""
-      widths={[720, 1200, 1600]}
+      widths={[720, 1200, 1920]}
       sizes="100vw"
       loading="eager"
       fetchpriority="high"
-      class="pointer-events-none absolute inset-0 size-full object-cover"
+      class="pointer-events-none absolute inset-0 size-full object-cover object-[center_62%]"
       aria-hidden="true"
     />
 
     {/* Voile de lecture, en deux couches et pas une.
-        Une seule nappe horizontale assez dense pour tenir le contraste du
-        titre eteignait la photo partout ailleurs : le premier essai, a 90 pour
-        cent de noir a gauche, rendait l'image invisible. La lecture n'a pas
-        besoin de noircir toute la scene, seulement la zone ou vit le texte.
-        Donc : une nappe horizontale forte a gauche et transparente des le
-        milieu, plus une nappe verticale legere qui rattrape le bas, la ou les
-        compteurs se posent sur de l'eau claire.
+        Une seule nappe assez dense pour tenir le contraste du titre eteignait
+        la photo partout ailleurs : le premier essai, a 90 pour cent de noir a
+        gauche, rendait l'image invisible, le second a 80 la laissait encore
+        noire. La lecture n'a pas besoin d'assombrir toute la scene, seulement
+        la zone ou vit le texte, et cette zone s'arrete au tiers de l'ecran.
+        Donc : une nappe horizontale qui meurt avant le milieu, plus une nappe
+        verticale legere qui pose les compteurs en bas.
         Le noir est ici un canal alpha, pas une couleur : il n'a donc pas de
         token, et il n'en veut pas. */}
     <div
-      class="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/80 via-black/35 to-transparent"
+      class="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/70 from-0% via-black/20 via-45% to-transparent to-70%"
       aria-hidden="true"
     >
     </div>
     <div
-      class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/20"
+      class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/25"
       aria-hidden="true"
     >
     </div>
 
-    {/* Deux halos poses en dur, pas dans le degrade de fond : un degrade est
-        uniforme, donc plat, alors qu'un halo a un centre, donc une direction.
-        C'est la direction qui fait la profondeur. Ils derivent en 26 et 34
-        secondes, assez lentement pour qu'on ne les voie pas bouger et assez
-        pour que la scene ne soit pas une image fixe.
-        Poses sur une photographie, ils sont nettement plus discrets qu'avant :
-        leur role a change, ils coloraient un fond vide, ils ne font plus que
-        rechauffer une lumiere qui existe deja. */}
+    {/* Les deux halos existaient pour donner un centre a un fond vide. Le fond
+        n'est plus vide : la photo a sa propre lumiere, et deux nappes floues
+        par dessus la salissent au lieu de la servir. Ils restent, tres bas, et
+        seulement pour rechauffer les bords ou la photo s'assombrit. */}
     <div
-      class="animate-drift pointer-events-none absolute -top-2/5 -right-1/4 size-[42rem] rounded-full opacity-20 blur-3xl"
+      class="animate-drift pointer-events-none absolute -top-2/5 -right-1/4 size-[42rem] rounded-full opacity-12 blur-3xl"
       style="background: radial-gradient(circle, var(--color-coral-500) 0%, transparent 68%)"
       aria-hidden="true"
     >
     </div>
     <div
-      class="animate-drift-slow pointer-events-none absolute -bottom-1/4 -left-1/5 size-[38rem] rounded-full opacity-30 blur-3xl"
+      class="animate-drift-slow pointer-events-none absolute -bottom-1/4 -left-1/5 size-[38rem] rounded-full opacity-20 blur-3xl"
       style="background: radial-gradient(circle, var(--color-reef-500) 0%, transparent 70%)"
       aria-hidden="true"
     >
@@ -157,10 +152,9 @@ const depth = [
 
     {/* La grille compte trois enfants et non deux : le texte, la pile, puis le
         compteur. Sur telephone ils se suivent dans cet ordre, ce qui fait
-        remonter la pile juste sous les boutons et met une IMAGE dans le
-        premier ecran au lieu de sept lignes de texte. Sur grand ecran le
-        compteur retrouve sa place sous le texte, et la pile occupe les deux
-        rangees de la colonne de droite. */}
+        remonter la pile juste sous les boutons. Sur grand ecran le compteur
+        retrouve sa place sous le texte, et la pile occupe les deux rangees de
+        la colonne de droite. */}
     <div
       class="container-page relative z-10 grid gap-10 pt-28 pb-14 sm:gap-14 sm:pt-32 md:pt-40 md:pb-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:grid-rows-[auto_auto] lg:gap-x-16 lg:gap-y-10 lg:pt-44 lg:pb-24"
     >
@@ -200,11 +194,7 @@ const depth = [
         </div>
       </div>
 
-      {/* --- Colonne de droite : ce qu'on donne a lire --------------------
-          La pile penche en perspective sur grand ecran seulement. Sur un
-          telephone, une fiche inclinee de quinze degres devient illisible bien
-          avant d'etre jolie : les cartes s'y empilent a plat, avec le meme
-          chevauchement. */}
+      {/* --- Colonne de droite : ce qu'on donne a lire -------------------- */}
       {
         deck.length > 0 && (
           <div
@@ -223,10 +213,6 @@ const depth = [
                       "glass rounded-card relative overflow-hidden px-5 pt-5 sm:px-6 sm:pt-6",
                       front ? "pb-5 sm:pb-6" : "pb-6 lg:pb-11",
                       i > 0 && "-mt-6",
-                      // Le recul ne s'applique qu'a partir de lg. Sur un
-                      // telephone, la perspective rapetisse les fiches du fond
-                      // et les pousse hors de la gouttiere : on garde le
-                      // meme empilement, a plat.
                       "lg:[transform:translateZ(var(--deck-z))_translateX(var(--deck-x))]",
                     ]}
                     style={`--deck-z: ${depth[i]?.z}; --deck-x: ${depth[i]?.x}; opacity: ${depth[i]?.o}; z-index: ${i + 1}`}
@@ -243,17 +229,6 @@ const depth = [
                         {entry.date}
                       </time>
                     </p>
-                    {/* Deux lignes au plus pour les fiches du fond, et le
-                        rembourrage bas des fiches du fond est calcule pour que
-                        le chevauchement n'en mange aucune. Il est plus genereux
-                        que l'ecart de marge parce que la fiche de devant est
-                        plus PROCHE : la perspective l'agrandit, et elle
-                        recouvre donc plus que ce que la mise en page a plat
-                        laisse prevoir. D'ou la marge supplementaire a partir de
-                        lg seulement, la ou la perspective existe. Une seule ligne
-                        paraissait plus propre et coupait les titres anglais au
-                        milieu d'un mot : un titre a rallonge dans une vitrine
-                        se lit comme un bug, pas comme une contrainte. */}
                     <h2
                       class:list={[
                         "font-display mt-3 leading-snug font-bold text-balance",
@@ -282,8 +257,7 @@ const depth = [
       }
 
       {/* Trois nombres, et rien d'autre : ils repondent a la seule question
-          qu'un lecteur se pose avant de cliquer, "y a-t-il de quoi lire". Un
-          chiffre le dit plus vite qu'une phrase de promesse. */}
+          qu'un lecteur se pose avant de cliquer, "y a-t-il de quoi lire". */}
       {
         ledger.length > 0 && (
           <dl class="border-border flex flex-wrap gap-x-10 gap-y-4 border-t pt-6 lg:col-start-1 lg:row-start-2 lg:self-start">
