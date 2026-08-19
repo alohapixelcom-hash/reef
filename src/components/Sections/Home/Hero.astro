@@ -72,10 +72,29 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
 // passaient sous le rapport de contraste de 4.5 alors qu'ils restent sur de
 // vrais liens.
 const deck = [...recent].slice(0, 3).reverse();
+
+// Pourquoi une echelle 2D et non un translateZ en perspective
+// -----------------------------------------------------------
+// La pile etait construite en 3D : un conteneur en preserve-3d, chaque fiche
+// poussee en arriere par translateZ. C'etait joli et c'etait casse. Sous
+// preserve-3d, Chrome projette les fiches du fond a un endroit et les teste au
+// clic a un autre : DEUX FICHES SUR TROIS N'ETAIENT PAS CLIQUABLES sur
+// ordinateur, le clic traversait la fiche et atterrissait sur le conteneur.
+// Sur telephone, ou la pile est a plat, les trois marchaient. Mesure au
+// navigateur, pas devine.
+//
+// Les valeurs ci-dessous sont exactement ce que la perspective produisait :
+// une fiche a translateZ(-110px) sous perspective:1500px est rendue a
+// 1500 / (1500 + 110) = 0.932. On garde donc le rendu au pixel pres, et on
+// recupere une detection de clic exacte, parce qu'une transformation 2D est
+// testee la ou elle est peinte.
+//
+// Ne pas remettre de translateZ ici. Le gain visuel est nul, le cout est une
+// page d'accueil dont les liens ne repondent pas.
 const depth = [
-  { z: "-110px", x: "2.2rem", o: "0.84" },
-  { z: "-55px", x: "1.1rem", o: "0.93" },
-  { z: "0px", x: "0rem", o: "1" },
+  { s: "0.932", x: "2.2rem", o: "0.84" },
+  { s: "0.965", x: "1.1rem", o: "0.93" },
+  { s: "1", x: "0rem", o: "1" },
 ];
 ---
 
@@ -197,60 +216,71 @@ const depth = [
       {
         deck.length > 0 && (
           <div
-            class="relative [perspective:1500px] lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:self-center"
+            class="relative lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:self-center"
             aria-label={t.home.heroRecent}
           >
-            <div class="flex flex-col [transform-style:preserve-3d] lg:[transform:rotateY(-15deg)_rotateX(7deg)_rotate(-1.5deg)]">
+            <div class="deck-plane flex flex-col">
               {deck.map((entry, i) => {
                 const tone = topicTone[entry.accent];
                 const front = i === deck.length - 1;
                 const readLabel =
                   entry.minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: entry.minutes });
                 return (
-                  <article
+                  // LA FICHE EST LE LIEN, et ce n'est pas un detail de style.
+                  //
+                  // Avant, la fiche etait un <article> et seul le titre portait
+                  // un <a>, etendu a toute la carte par un ::after en position
+                  // absolue. C'est le motif habituel, et il est fragile : des
+                  // que la carte est transformee, la zone peinte et la zone
+                  // testee au clic se decalent, et des pans entiers de la carte
+                  // cessent de repondre. Mesure : le rembourrage haut et les
+                  // marges laterales ne declenchaient rien sur ordinateur.
+                  //
+                  // Une ancre de niveau bloc n'a pas ce probleme : sa zone
+                  // cliquable EST sa boite. Aucune pastille de sujet n'est un
+                  // lien dans cette pile, donc rien n'est imbrique a tort.
+                  <a
+                    href={entry.href}
                     class:list={[
                       // bg-black/25 en plus du verre : sur un aplat sombre le
                       // verre seul suffisait, sur de l'ecume il devenait blanc
                       // sur blanc et la date disparaissait.
-                      "glass rounded-card relative overflow-hidden bg-black/25 px-5 pt-5 sm:px-6 sm:pt-6",
+                      "deck-card glass rounded-card relative block overflow-hidden bg-black/25 px-5 pt-5 sm:px-6 sm:pt-6",
                       front ? "pb-5 sm:pb-6" : "pb-6 lg:pb-11",
                       i > 0 && "-mt-6",
-                      "lg:[transform:translateZ(var(--deck-z))_translateX(var(--deck-x))]",
                     ]}
-                    style={`--deck-z: ${depth[i]?.z}; --deck-x: ${depth[i]?.x}; opacity: ${depth[i]?.o}; z-index: ${i + 1}`}
+                    style={`--deck-s: ${depth[i]?.s}; --deck-x: ${depth[i]?.x}; --deck-o: ${depth[i]?.o}; --deck-z: ${i + 1}`}
                   >
                     <span
                       class:list={["absolute inset-x-0 top-0 h-0.5", tone.rule]}
                       aria-hidden="true"
                     />
-                    <p class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span class="flex flex-wrap items-center gap-x-3 gap-y-1">
                       <span class:list={["rounded-pill px-2.5 py-1 text-xs font-medium", tone.chip]}>
                         {entry.topic}
                       </span>
                       <time class="text-xs text-white/70" datetime={entry.iso}>
                         {entry.date}
                       </time>
-                    </p>
+                    </span>
                     <h2
                       class:list={[
-                        "font-display mt-3 leading-snug font-bold text-balance",
+                        "deck-title font-display mt-3 leading-snug font-bold text-balance transition-colors duration-200",
                         front ? "text-xl sm:text-2xl" : "line-clamp-2 text-lg",
                       ]}
                     >
-                      <a
-                        href={entry.href}
-                        class="hover:text-primary transition-colors duration-200 after:absolute after:inset-0 after:content-['']"
-                      >
-                        {entry.title}
-                      </a>
+                      {entry.title}
                     </h2>
-                    {front && (
-                      <p class="mt-4 flex items-center gap-2 text-xs text-white/70">
-                        <Icon name="clock" size={14} />
-                        {readLabel}
-                      </p>
-                    )}
-                  </article>
+                    <span
+                      class:list={[
+                        "flex items-center gap-2 text-xs text-white/70",
+                        front ? "mt-4" : "deck-read mt-3",
+                      ]}
+                    >
+                      <Icon name="clock" size={14} />
+                      {readLabel}
+                    </span>
+                  </a>
                 );
               })}
             </div>
@@ -277,3 +307,80 @@ const depth = [
     </div>
   </section>
 </div>
+
+<style>
+  /* La pile des dernieres notes.
+     Tout est ici et pas en classes utilitaires parce que l'etat de survol doit
+     pouvoir ecraser l'etat de base : les valeurs de base arrivent en variables
+     posees dans l'attribut style de chaque fiche, et une regle utilitaire ne
+     gagne jamais contre un style en ligne. */
+
+  .deck-card {
+    z-index: var(--deck-z);
+    opacity: var(--deck-o);
+  }
+
+  .deck-card:hover .deck-title,
+  .deck-card:focus-visible .deck-title {
+    color: var(--color-primary);
+  }
+
+  /* Le temps de lecture des fiches du fond n'apparait qu'au survol : sur la
+     pile au repos il ajouterait trois lignes de gris a une fiche dont on ne
+     lit que le titre. */
+  .deck-read {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .deck-plane {
+      /* L'inclinaison reste, mais elle est portee par le plan entier et non
+         par chaque fiche : une seule couche transformee, donc une detection
+         de clic exacte. */
+      transform: rotate(-1.5deg) skewY(-1.6deg);
+    }
+
+    .deck-card {
+      transform: scale(var(--deck-s)) translateX(var(--deck-x));
+      transform-origin: right center;
+      transition:
+        transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 420ms ease,
+        box-shadow 420ms ease;
+    }
+
+    .deck-read {
+      transition:
+        max-height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 300ms ease;
+    }
+
+    /* Le survol et le focus font la MEME chose : la fiche revient au premier
+       plan, en entier, et passe au-dessus des autres. C'est ce qui rend la
+       pile honnete. Avant, les deux fiches du fond etaient du decor : elles
+       montraient un titre qu'on ne pouvait pas atteindre. */
+    .deck-card:hover,
+    .deck-card:focus-visible {
+      transform: scale(1.015) translateX(-0.4rem);
+      opacity: 1;
+      z-index: 40;
+    }
+
+    .deck-card:hover .deck-read,
+    .deck-card:focus-visible .deck-read {
+      max-height: 2rem;
+      opacity: 1;
+    }
+  }
+
+  /* Une pile qui bondit sous le curseur est une pile qui gene, pour qui a
+     demande moins de mouvement. L'etat d'arrivee reste atteint, sans trajet. */
+  @media (prefers-reduced-motion: reduce) {
+    .deck-card,
+    .deck-read {
+      transition: none;
+    }
+  }
+</style>
