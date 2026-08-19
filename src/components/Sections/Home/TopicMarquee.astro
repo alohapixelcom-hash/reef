@@ -1,0 +1,79 @@
+---
+// src/components/Sections/Home/TopicMarquee.astro - la bande defilante sous le hero.
+//
+// Elle mord les deux bords, c'est la regle de la maison : le hero est un
+// panneau arrondi pose dans une marge, et la bande qui le suit doit repartir
+// de bord a bord. Sans cela on empile deux blocs de meme largeur et la page
+// perd son rythme des le deuxieme ecran.
+//
+// Ce qu'elle porte n'est pas du decor. Une bande qui defile avec des mots
+// choisis pour faire joli, c'est le genre de detail qu'on repere tout de
+// suite : ici chaque element est un SUJET REEL, il porte le nombre de notes
+// publiees dessous, et il mene a la page du fil. Si on retire l'animation, il
+// reste une liste de liens utile, ce qui est l'epreuve du regard de la maison.
+import { Marquee } from "@components/ui/marquee";
+import { topicTone, type TopicAccent } from "@components/Cards/topicTone";
+import { getSiteRoutes } from "@config/navData.json.ts";
+import { getLocale, useTranslations } from "@i18n";
+import { entrySlug } from "@i18n/content";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  topics: CollectionEntry<"topics">[];
+  counts: Record<string, number>;
+}
+
+const { topics, counts } = Astro.props;
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+const routes = getSiteRoutes(locale);
+
+// La bande boucle sur elle-meme : avec cinq sujets et un ecran large, une
+// seule copie laisserait un trou. On repete donc la liste jusqu'a depasser
+// largement la largeur d'un ecran, et le composant Marquee la double encore
+// pour la couture. Trois passes suffisent des 320 pixels comme a 2560.
+//
+// Une seule des trois passes est atteignable au clavier. Sans cela on
+// tabulait quinze fois pour cinq destinations : le lecteur au clavier
+// traversait trois fois la meme liste avant d'atteindre la suite de la page.
+// Les passes de remplissage sont donc inertes, exactement comme la copie de
+// bouclage du composant Marquee.
+const items = [...topics, ...topics, ...topics].map((topic, i) => {
+  const slug = entrySlug(topic.id);
+  return {
+    slug,
+    name: topic.data.name,
+    href: `${routes.topics}${slug}/`,
+    count: counts[slug] ?? 0,
+    tone: topicTone[topic.data.accent as TopicAccent],
+    filler: i >= topics.length,
+  };
+});
+---
+
+<section class="border-border bg-card/50 border-y" aria-label={t.topics.allTopics}>
+  <Marquee speed="slow" gap="lg" fade class="py-5">
+    {
+      items.map((item) => (
+        <a
+          href={item.href}
+          class="group/topic flex shrink-0 items-baseline gap-3 whitespace-nowrap"
+          inert={item.filler}
+          aria-hidden={item.filler ? "true" : undefined}
+        >
+          {/* Le point prend la couleur du sujet : c'est le seul endroit de la
+              bande ou la couleur classe, et elle ne classe rien d'autre. */}
+          <span
+            class:list={["size-1.5 shrink-0 self-center rounded-full", item.tone.dot]}
+            aria-hidden="true"
+          />
+          <span class="font-display group-hover/topic:text-primary text-foreground text-lg font-semibold tracking-tight transition-colors duration-200 md:text-xl">
+            {item.name}
+          </span>
+          <span class="text-muted-foreground font-sans text-xs tabular-nums">{item.count}</span>
+        </a>
+      ))
+    }
+  </Marquee>
+</section>
