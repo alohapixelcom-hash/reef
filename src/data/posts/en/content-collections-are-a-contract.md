@@ -6,6 +6,8 @@ updatedDate: 2026-03-02
 author: en/mara-lindqvist
 topic: en/craft
 tags: ["astro", "zod", "content"]
+cover: ../../../assets/covers/reef-collections-contrat.webp
+coverAlt: "An open brass compass resting on an old nautical chart engraved with a sailing ship"
 featured: false
 draft: false
 ---
