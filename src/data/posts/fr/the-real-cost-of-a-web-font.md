@@ -6,7 +6,7 @@ author: fr/tomas-abaroa
 topic: fr/typography
 tags: ["typographie", "polices", "performance"]
 cover: ../../../assets/covers/reef-cout-police.webp
-coverAlt: "Une main guide des ciseaux de couturière dans un tissu sarcelle tendu"
+coverAlt: "Banc de petits poissons orange nageant dans une eau bleue au-dessus d'un jardin de coraux colorés"
 featured: false
 draft: false
 ---
