@@ -7,7 +7,7 @@ author: fr/noor-benali
 topic: fr/performance
 tags: ["web vitals", "rum", "mesure"]
 cover: ../../../assets/covers/reef-mesurer-lecteur.webp
-coverAlt: "Deux mains tiennent un téléphone dans une rue le soir, halos orange des phares de voitures en arrière-plan"
+coverAlt: "Longue plage vue du ciel, trains de houle parallèles arrivant sur le sable dans la brume du matin"
 featured: false
 draft: false
 ---

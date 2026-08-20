@@ -6,7 +6,7 @@ author: fr/mara-lindqvist
 topic: fr/craft
 tags: ["html", "semantique", "maintenance"]
 cover: ../../../assets/covers/reef-html-qui-vieillit.webp
-coverAlt: "Les mains d'un menuisier poussent un rabot sur une planche, un copeau de bois s'enroulant à la sortie de l'outil"
+coverAlt: "Falaises couvertes de végétation dense plongeant dans une mer turquoise, lumière voilée du matin"
 featured: false
 draft: false
 ---

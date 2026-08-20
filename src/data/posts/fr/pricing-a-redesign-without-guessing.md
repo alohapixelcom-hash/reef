@@ -6,7 +6,7 @@ author: fr/mara-lindqvist
 topic: fr/studio
 tags: ["freelance", "tarification", "contrats"]
 cover: ../../../assets/covers/reef-prix-refonte.webp
-coverAlt: "L'intérieur d'une porte de coffre-fort ancienne : engrenages et pênes de laiton dans une lumière dorée"
+coverAlt: "Côte de Na Pali vue du ciel, falaises verdoyantes plongeant dans un lagon turquoise"
 featured: false
 draft: true
 ---
