@@ -93,7 +93,16 @@ const schemas = [
           {
             t.about.values.map((value, index) => (
               <li class="border-border bg-card rounded-card flex flex-col gap-3 border p-6">
-                <span class="font-display text-primary text-2xl font-semibold italic" aria-hidden="true">
+                {/* Pas d'italique sur ce numero. Space Grotesk n'a pas de coupe
+                    italique : le navigateur en fabriquait une oblique, qui
+                    penche les chiffres sans les redessiner et se voit tout de
+                    suite. La regle vaut pour toute la famille, elle est ecrite
+                    en toutes lettres dans prose.css, et ce numero etait le
+                    dernier endroit du theme qui l'enfreignait. */}
+                <span
+                  class="font-display text-primary text-2xl font-semibold tabular-nums"
+                  aria-hidden="true"
+                >
                   {index + 1}
                 </span>
                 <h3 class="font-display text-foreground text-xl font-semibold tracking-tight">
@@ -135,7 +144,7 @@ const schemas = [
           })
         }
       </ul>
-      <div class="mt-10 flex justify-center">
+      <div class="mt-10 flex justify-start">
         <Button href={routes.authors} variant="ghost" size="md">
           {t.about.writersCta}
           <Icon name="arrow-right" size={17} />
