@@ -4,6 +4,7 @@
 // bouton secondaire pour le DialogFooter. Ferme via data-dialog-close.
 import type { HTMLAttributes } from "astro/types";
 import type { VariantProps } from "tailwind-variants";
+import { getLocale, useTranslations } from "@i18n";
 import { button } from "../button";
 
 type ButtonVariants = VariantProps<typeof button>;
@@ -16,8 +17,21 @@ type Props = HTMLAttributes<"button"> & {
 
 const iconOnly = !Astro.slots.has("default");
 
+// Le libelle par defaut vient du dictionnaire, et c'est un correctif, pas un
+// raffinement : il etait ecrit "Close dialog" en dur dans ce fichier. La croix
+// de fermeture du menu mobile portait donc ce libelle anglais sur TOUTES les
+// pages francaises du theme, y compris celles qui n'ont pas un mot d'anglais
+// ailleurs. Un utilisateur de lecteur d'ecran en francais entendait une phrase
+// anglaise sur le seul bouton qui lui permet de ressortir du menu.
+//
+// Une primitive d'interface qui porte du texte visible ou annonce porte de la
+// COPIE, et la copie vit dans le dictionnaire. La prop label reste disponible
+// pour un libelle plus precis que "Fermer" au point d'appel.
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+
 const {
-  label = "Close dialog",
+  label = t.common.close,
   variant = iconOnly ? "ghost" : "outline",
   size = iconOnly ? "icon" : "md",
   class: className,
