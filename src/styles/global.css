@@ -250,24 +250,36 @@
 @layer utilities {
   /* La largeur de page.
    *
-   * max-w-7xl (1280 px) centre au milieu d'un ecran de 27 pouces laisse deux
-   * marges vides plus larges que le contenu : c'est la silhouette d'un site de
-   * 2015. La borne monte donc a 1600 px et la gouttiere grandit avec l'ecran,
-   * ce qui garde une marge lisible sans enfermer le contenu dans une colonne.
+   * Deux relevements successifs, et le second vient d'une mesure, pas d'un
+   * gout. Le premier avait fait passer la borne de 1280 a 1600 px, parce
+   * qu'un contenu de 1280 centre au milieu d'un 27 pouces est la silhouette
+   * d'un site de 2015. Ca ne suffisait pas : mesure au navigateur sur un
+   * ecran de 2560, la page tenait dans 1800 px et laissait DEUX FOIS 380 px
+   * de vide sur les cotes. La barre de qualite de la maison, elle, occupe
+   * 2432 px sur le meme ecran et ne garde que 64 px de gouttiere.
+   *
+   * La borne monte donc a 132rem. Elle ne change rien sous 1500 px environ,
+   * ou c'est la gouttiere qui commande : le portable garde exactement la mise
+   * en page d'avant, et seul le grand ecran cesse de gaspiller ses bords.
+   *
+   * Ce qui empeche les lignes de devenir illisibles n'est PAS la largeur de
+   * page, c'est la mesure du texte : .measure-prose et .measure-wide. Un bloc
+   * de prose qui s'etire sur 2000 px est une faute de composition dans le
+   * composant, pas dans le conteneur.
    *
    * Deux echappatoires pour les compositions qui doivent respirer davantage :
    *   .container-wide  pour les grilles et les galeries,
    *   .bleed           pour sortir completement du conteneur (pleine largeur). */
   .container-page {
     @apply mx-auto w-full;
-    max-width: 100rem;
-    padding-inline: clamp(1.25rem, 4vw, 4.5rem);
+    max-width: 132rem;
+    padding-inline: clamp(1.25rem, 3.2vw, 4rem);
   }
 
   .container-wide {
     @apply mx-auto w-full;
-    max-width: 120rem;
-    padding-inline: clamp(1.25rem, 3vw, 3rem);
+    max-width: 148rem;
+    padding-inline: clamp(1.25rem, 2.4vw, 3rem);
   }
 
   /* Sort le bloc de la gouttiere de son conteneur, quelle qu'elle soit. */
