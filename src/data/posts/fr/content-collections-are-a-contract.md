@@ -7,7 +7,7 @@ author: fr/mara-lindqvist
 topic: fr/craft
 tags: ["astro", "zod", "contenu"]
 cover: ../../../assets/covers/reef-collections-contrat.webp
-coverAlt: "Une boussole de laiton ouverte posée sur une vieille carte marine gravée d'un voilier"
+coverAlt: "Pépinière de coraux fixés sur leur support sous la surface, dans une eau bleue traversée par la lumière"
 featured: false
 draft: false
 ---
