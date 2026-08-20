@@ -108,13 +108,23 @@ const schemas = [
         la page. Elle porte les vrais sujets, pas des mots decoratifs. */}
     <TopicMarquee {topics} counts={topicCounts} />
     {featured && <FeaturedPost entry={featured} />}
+    {/* La sequence filmee remplace le bloc "mot du studio" : c'est le meme
+        message, mais le lecteur le deroule lui-meme. Le composant StudioNote
+        reste dans le theme pour qui prefere un bloc sans video.
+
+        Elle est placee ICI, juste apres le billet a la une, et pas en fin de
+        page ou elle avait ete posee d'abord. La raison est une mesure : en
+        fin de page elle donnait trois blocs sombres a la suite, la scene
+        filmee, le panneau d'abonnement et le pied de page, separes par une
+        bande de 18 px de fond de page. Deux blocs de la meme encre separes
+        par un filet d'une encre voisine ne se lisent pas comme une
+        composition, ils se lisent comme un raccord rate. Au milieu de la
+        page, la sequence coupe au contraire deux grilles de cartes, ce qui
+        est exactement ce qu'une pleine largeur doit faire. */}
+    <FilmScene />
     {latest.length > 0 && <LatestPosts posts={latest} />}
     <TopicStrip {topics} counts={topicCounts} />
     <WritersStrip {authors} counts={authorCounts} />
-    {/* La sequence filmee remplace le bloc "mot du studio" : c'est le meme
-        message, mais le lecteur le deroule lui-meme. Le composant StudioNote
-        reste dans le theme pour qui prefere un bloc sans video. */}
-    <FilmScene />
     <NewsletterInvite />
   </main>
 
