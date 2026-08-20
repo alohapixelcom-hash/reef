@@ -17,3 +17,7 @@ dist/
 
 # Cartes Open Graph : generees par `pnpm og`, refabriquees au build.
 public/og/
+
+# Photographies de la demo : rapatriees par `pnpm covers`, refabriquees au build.
+src/assets/covers/
+src/assets/*.webp

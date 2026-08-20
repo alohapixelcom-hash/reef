@@ -6,7 +6,7 @@ author: en/tomas-abaroa
 topic: en/typography
 tags: ["typography", "css", "scale"]
 cover: ../../../assets/covers/reef-echelle-typo.webp
-coverAlt: "A watchmaker's hands opening a watch case with tweezers, several dismantled watches laid out on a pale wooden bench"
+coverAlt: "Looking down the spiral stair of a lighthouse, the steps winding away between turquoise tiled walls"
 featured: true
 draft: false
 ---
