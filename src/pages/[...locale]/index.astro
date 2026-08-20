@@ -18,9 +18,8 @@ import NewsletterInvite from "@components/Sections/Home/NewsletterInvite.astro";
 import TopicMarquee from "@components/Sections/Home/TopicMarquee.astro";
 import TopicStrip from "@components/Sections/Home/TopicStrip.astro";
 import WritersStrip from "@components/Sections/Home/WritersStrip.astro";
-import { getSiteRoutes } from "@config/navData.json.ts";
 import siteData from "@config/siteData.json";
-import { formatDate, getLocale, localePaths, locales, localizePath, useTranslations } from "@i18n";
+import { getLocale, localePaths, locales, localizePath, useTranslations } from "@i18n";
 import { getLocalizedCollection } from "@i18n/content";
 import { getResolvedPosts, getSortedTopics } from "@js/posts";
 import { organization, website } from "@js/schema";
@@ -39,22 +38,6 @@ const posts = await getResolvedPosts(locale);
 // leve le drapeau, le plus recent prend la place.
 const featured = posts.find((entry) => entry.post.data.featured) ?? posts.at(0);
 const latest = posts.filter((entry) => entry !== featured).slice(0, 6);
-
-// Les trois dernieres notes pour la pile du hero. On les prend dans la liste
-// complete et non dans `latest` : le billet a la une est le plus recent, et un
-// lecteur qui arrive doit le voir ici aussi, pas seulement plus bas dans la
-// page. Chaque fiche porte son sujet et son temps de lecture, ce qui en fait un
-// objet compose plutot qu'une ligne de titre alignee sur un filet.
-const heroRoutes = getSiteRoutes(locale);
-const recent = posts.slice(0, 3).map((entry) => ({
-  href: `${heroRoutes.posts}${entry.slug}/`,
-  title: entry.post.data.title,
-  date: formatDate(entry.post.data.pubDate, locale),
-  iso: entry.post.data.pubDate.toISOString().slice(0, 10),
-  topic: entry.topic.data.name,
-  accent: entry.topic.data.accent,
-  minutes: entry.minutes,
-}));
 
 const topics = await getSortedTopics(locale);
 const authors = (await getLocalizedCollection("authors", locale)).sort((a, b) =>
@@ -102,7 +85,7 @@ const schemas = [
   <Navbar />
 
   <main id="content">
-    <Hero {recent} {ledger} />
+    <Hero {ledger} />
     {/* La bande defilante mord les deux bords juste sous le hero : c'est elle
         qui casse la largeur de panneau du premier ecran et lance le rythme de
         la page. Elle porte les vrais sujets, pas des mots decoratifs. */}

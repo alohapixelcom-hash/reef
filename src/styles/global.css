@@ -49,7 +49,7 @@
      * une grotesque bien dessinee tient les huit minutes de lecture aussi
      * bien qu'une serif d'ecran, ce que dix ans de lecture sur telephone ont
      * tranche. Le mot d'accent des titres garde la police du titre et porte
-     * une vague corail (voir .accent-script). */
+     * une vague turquoise (voir .accent-script). */
     @apply bg-background text-foreground font-sans antialiased;
     font-synthesis-weight: none;
   }
@@ -109,16 +109,17 @@
     ring-offset-color: var(--reef-background);
   }
 
-  /* La selection est teintee corail dans les deux modes, mais pas avec la meme
-   * valeur : un corail clair sur fond encre rend le texte selectionne moins
-   * lisible que le texte normal, ce qui est exactement l'inverse du but. */
+  /* La selection suit le primaire, qui est le turquoise de la maison. Deux
+   * valeurs et non une : un turquoise clair sur fond encre rend le texte
+   * selectionne moins lisible que le texte normal, ce qui est exactement
+   * l'inverse du but. */
   ::selection {
-    background: var(--color-coral-200);
+    background: var(--color-reef-300);
     color: var(--color-ink-950);
   }
 
   .dark ::selection {
-    background: var(--color-coral-800);
+    background: var(--color-reef-600);
     color: var(--color-paper-50);
   }
 }
@@ -129,12 +130,12 @@
    * ======================================================================= */
 
   /* Le mot d'accent d'un titre. Un seul par titre, jamais deux.
-   * Plus AUCUNE police a part : meme police que le titre, corail, souligne
+   * Plus AUCUNE police a part : meme police que le titre, turquoise, souligne
    * d'une VAGUE - la signature Aloha Pixel (le logo est une vague), pas un
    * tic d'outil. L'italique serif d'accent est bannie de toute la famille
    * (decision d'Aloha du 16 aout : c'est le marqueur des "sites claude").
    * La vague vit dans --accent-wave (tokens.css), une par mode puisque le
-   * corail de Reef change entre clair et sombre. */
+   * primaire de Reef change entre clair et sombre. */
   .accent-script {
     @apply text-primary font-normal not-italic;
     /* La vague loge dans la zone des descendantes, jamais dans l'interligne :
@@ -168,15 +169,15 @@
     --reef-muted-foreground: var(--color-ink-300);
     --reef-card: color-mix(in oklab, var(--color-ink-900) 78%, transparent);
     --reef-card-foreground: var(--color-paper-50);
-    --reef-primary: var(--color-coral-400);
+    --reef-primary: var(--color-reef-400);
     --reef-primary-foreground: var(--color-ink-950);
-    /* Le primaire de la scene est le corail 400 du sombre, dans les deux
+    /* Le primaire de la scene est le turquoise 400 du sombre, dans les deux
      * modes : la vague du mot d'accent suit, comme les autres roles. */
-    --accent-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 10' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q 6 2.5 12 7 T 24 7 T 36 7 T 48 7' fill='none' stroke='%23ff7a59' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
-    --reef-accent: var(--color-reef-400);
+    --accent-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 10' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q 6 2.5 12 7 T 24 7 T 36 7 T 48 7' fill='none' stroke='%233fc0e0' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
+    --reef-accent: var(--color-coral-400);
     --reef-accent-foreground: var(--color-ink-950);
     --reef-border: color-mix(in oklab, var(--color-paper-50) 15%, transparent);
-    --reef-ring: var(--color-coral-400);
+    --reef-ring: var(--color-reef-400);
     --reef-surface: var(--color-ink-900);
 
     /* Les memes outils que le mode sombre : bordure lumineuse et lueur interne
@@ -186,9 +187,9 @@
       0 1px 0 0 color-mix(in oklab, var(--color-paper-50) 8%, transparent) inset,
       0 14px 36px -18px rgb(0 0 0 / 0.7);
     --reef-shadow-lift:
-      0 0 0 1px color-mix(in oklab, var(--color-coral-400) 26%, transparent),
+      0 0 0 1px color-mix(in oklab, var(--color-reef-400) 26%, transparent),
       0 1px 0 0 color-mix(in oklab, var(--color-paper-50) 10%, transparent) inset,
-      0 22px 58px -24px color-mix(in oklab, var(--color-coral-400) 32%, transparent),
+      0 22px 58px -24px color-mix(in oklab, var(--color-reef-400) 32%, transparent),
       0 18px 46px -22px rgb(0 0 0 / 0.75);
     --reef-shadow-glass:
       0 1px 0 0 rgb(255 255 255 / 0.09) inset,

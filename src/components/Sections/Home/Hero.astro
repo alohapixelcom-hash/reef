@@ -1,5 +1,5 @@
 ---
-// src/components/Sections/Home/Hero.astro - le premier ecran : une vague en pleine page, une colonne de texte a gauche, la pile des dernieres notes a droite.
+// src/components/Sections/Home/Hero.astro - le premier ecran : une vague en pleine page, le message a gauche, l'action a droite.
 //
 // Ce que ce hero corrige
 // ----------------------
@@ -9,47 +9,32 @@
 // seconde, et une seconde ne suffit pas a lire trois titres : elle suffit a
 // reconnaitre une forme.
 //
-// La forme, ici, c'est une photographie, et par dessus une pile de fiches en
-// perspective. La pile seule ne suffisait pas : un ecran entierement fabrique
-// avec du texte compose et des degrades se reconnait, et se fait reprocher.
-// La photographie apporte ce qu'aucun degrade ne sait produire, une lumiere
-// qui n'est pas calculee. Et le sujet n'est pas decoratif : le logo de la
-// maison EST une vague, le mot d'accent des titres est souligne d'une vague.
-// Le premier ecran dit donc la meme chose que la marque.
+// La forme, ici, c'est une photographie, et rien d'autre. Elle apporte ce
+// qu'aucun degrade ne sait produire, une lumiere qui n'est pas calculee. Et le
+// sujet n'est pas decoratif : le logo de la maison EST une vague, le mot
+// d'accent des titres est souligne d'une vague. Le premier ecran dit donc la
+// meme chose que la marque.
+//
+// Une pile de fiches en perspective a occupe la moitie droite pendant un
+// temps. Elle est partie sur un retour de terrain : voir le commentaire de la
+// grille plus bas. Ne pas la reposer.
 //
 // La scene reste sombre dans les deux themes (.deep-scene, voir global.css).
 // Un cadre qui blanchit en mode clair perd ses halos et ses lueurs de bordure :
 // il perd donc l'image, et le premier ecran redevient une page de texte.
 import heroVague from "../../../assets/reef-hero-vague.webp";
-import { topicTone, type TopicAccent } from "@components/Cards/topicTone";
 import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
-import { fmt, getLocale, useTranslations } from "@i18n";
+import { getLocale, useTranslations } from "@i18n";
 import { Image } from "astro:assets";
 
-interface RecentEntry {
-  href: string;
-  title: string;
-  /** Date deja mise en forme dans la langue de la page. */
-  date: string;
-  /** La meme date en ISO, pour l'attribut datetime. */
-  iso: string;
-  /** Nom du sujet, deja traduit par la page. */
-  topic: string;
-  /** L'accent declare par le sujet, traduit en tokens par topicTone. */
-  accent: TopicAccent;
-  minutes: number;
-}
-
 interface Props {
-  /** Les trois dernieres notes. La page les fournit, le hero ne les cherche pas. */
-  recent?: RecentEntry[];
   /** Trois nombres qui disent combien il y a a lire : notes, sujets, langues. */
   ledger?: readonly number[];
 }
 
-const { recent = [], ledger = [] } = Astro.props;
+const { ledger = [] } = Astro.props;
 
 const locale = getLocale(Astro);
 const t = useTranslations(locale);
@@ -62,40 +47,6 @@ const at = title.toLowerCase().indexOf(accent.toLowerCase());
 const before = at >= 0 ? title.slice(0, at) : title;
 const word = at >= 0 ? title.slice(at, at + accent.length) : "";
 const after = at >= 0 ? title.slice(at + accent.length) : "";
-
-// La pile se lit du fond vers l'avant : la note la plus ancienne est la plus
-// haute et la plus enfoncee, la plus recente est devant et entiere. On inverse
-// donc l'ordre a l'affichage, pas dans les donnees.
-//
-// L'opacite des fiches du fond ne descend pas plus bas que 0.84, et c'est une
-// contrainte de lisibilite et non de gout : en dessous, la date et le sujet
-// passaient sous le rapport de contraste de 4.5 alors qu'ils restent sur de
-// vrais liens.
-const deck = [...recent].slice(0, 3).reverse();
-
-// Pourquoi une echelle 2D et non un translateZ en perspective
-// -----------------------------------------------------------
-// La pile etait construite en 3D : un conteneur en preserve-3d, chaque fiche
-// poussee en arriere par translateZ. C'etait joli et c'etait casse. Sous
-// preserve-3d, Chrome projette les fiches du fond a un endroit et les teste au
-// clic a un autre : DEUX FICHES SUR TROIS N'ETAIENT PAS CLIQUABLES sur
-// ordinateur, le clic traversait la fiche et atterrissait sur le conteneur.
-// Sur telephone, ou la pile est a plat, les trois marchaient. Mesure au
-// navigateur, pas devine.
-//
-// Les valeurs ci-dessous sont exactement ce que la perspective produisait :
-// une fiche a translateZ(-110px) sous perspective:1500px est rendue a
-// 1500 / (1500 + 110) = 0.932. On garde donc le rendu au pixel pres, et on
-// recupere une detection de clic exacte, parce qu'une transformation 2D est
-// testee la ou elle est peinte.
-//
-// Ne pas remettre de translateZ ici. Le gain visuel est nul, le cout est une
-// page d'accueil dont les liens ne repondent pas.
-const depth = [
-  { s: "0.932", x: "2.2rem", o: "0.84" },
-  { s: "0.965", x: "1.1rem", o: "0.93" },
-  { s: "1", x: "0rem", o: "1" },
-];
 ---
 
 {/* Le fond de page sur lequel la scene est posee. C'est lui qui fait exister le
@@ -165,16 +116,31 @@ const depth = [
     >
     </div>
 
-    {/* La grille compte trois enfants et non deux : le texte, la pile, puis le
-        compteur. Sur telephone ils se suivent dans cet ordre, ce qui fait
-        remonter la pile juste sous les boutons. Sur grand ecran le compteur
-        retrouve sa place sous le texte, et la pile occupe les deux rangees de
-        la colonne de droite. */}
+    {/* Deux colonnes : ce qu'on dit a gauche, ce qu'on fait a droite.
+
+        La colonne de droite portait une pile de trois fiches en perspective.
+        Elle a ete retiree sur un retour de terrain : elle "fait tres Claude
+        design". Le reproche est le meme que celui qui a fait tomber
+        l'initiale geante en filigrane des cartes, et il vaut ici pour la meme
+        raison : une pile de rectangles inclines est un tic visuel que le
+        public associe aux pages generees.
+
+        Ne pas la remplacer par un autre objet decoratif. Ce qui occupe
+        maintenant la moitie droite du premier ecran est ce qu'on demande au
+        lecteur de faire, les deux boutons, et de quoi decider, les trois
+        nombres. La photographie porte l'image a elle seule. */}
+    {/* min-h-[80svh] et content-center : le premier ecran doit peser quatre
+        cinquiemes de la hauteur reelle, pas ce que sa marge interieure lui
+        donne par hasard. svh et non vh parce que la barre d'adresse mobile
+        fait varier vh en cours de defilement, et un hero qui saute pendant
+        qu'on le lit est pire qu'un hero trop court. content-center range les
+        rangees au milieu de la hauteur restante quand le contenu est plus
+        court qu'elle ; sans lui, la grille tasserait tout en haut. */}
     <div
-      class="container-page relative z-10 grid gap-10 pt-28 pb-14 sm:gap-14 sm:pt-32 md:pt-40 md:pb-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:grid-rows-[auto_auto] lg:gap-x-16 lg:gap-y-10 lg:pt-44 lg:pb-24"
+      class="container-page relative z-10 grid min-h-[80svh] content-center gap-10 pt-28 pb-14 sm:gap-14 sm:pt-32 md:pt-40 md:pb-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.72fr)] lg:items-center lg:gap-x-16 lg:pt-44 lg:pb-24"
     >
       {/* --- Colonne de gauche : ce qu'on dit ----------------------------- */}
-      <div class="flex flex-col items-start lg:col-start-1 lg:row-start-1 lg:self-end">
+      <div class="flex flex-col items-start">
         <p
           class="text-muted-foreground flex items-center gap-3 text-xs font-medium tracking-[0.18em] uppercase"
         >
@@ -202,185 +168,38 @@ const depth = [
         <p class="measure-wide mt-6 leading-relaxed text-white/85 md:text-lg lg:text-xl">
           {t.home.heroLede}
         </p>
+      </div>
 
-        <div class="mt-8 flex flex-wrap items-center gap-3">
+      {/* --- Colonne de droite : ce qu'on demande de faire ----------------
+          Les deux boutons, puis les trois nombres qui repondent a la seule
+          question qu'un lecteur se pose avant de cliquer, "y a-t-il de quoi
+          lire". Ils etaient l'un sous le chapeau et l'autre sous le titre,
+          dans la colonne de gauche : la moitie droite de l'ecran ne portait
+          alors qu'une illustration. */}
+      <div class="flex flex-col items-start gap-8">
+        <div class="flex flex-wrap items-center gap-3">
           <Button href={routes.posts} variant="primary" size="lg">
             {t.home.heroPrimary}
             <Icon name="arrow-right" size={18} />
           </Button>
           <Button href={routes.about} variant="outline" size="lg">{t.home.heroSecondary}</Button>
         </div>
+
+        {
+          ledger.length > 0 && (
+            <dl class="flex w-full flex-wrap gap-x-10 gap-y-4 border-t border-white/25 pt-6">
+              {t.home.heroLedger.map((label, i) => (
+                <div class="flex flex-col gap-0.5">
+                  <dd class="font-display text-3xl leading-none font-bold md:text-4xl">
+                    {ledger[i] ?? 0}
+                  </dd>
+                  <dt class="text-xs tracking-[0.14em] text-white/75 uppercase">{label}</dt>
+                </div>
+              ))}
+            </dl>
+          )
+        }
       </div>
-
-      {/* --- Colonne de droite : ce qu'on donne a lire -------------------- */}
-      {
-        deck.length > 0 && (
-          <div
-            class="relative lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:self-center"
-            aria-label={t.home.heroRecent}
-          >
-            <div class="deck-plane flex flex-col">
-              {deck.map((entry, i) => {
-                const tone = topicTone[entry.accent];
-                const front = i === deck.length - 1;
-                const readLabel =
-                  entry.minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: entry.minutes });
-                return (
-                  // LA FICHE EST LE LIEN, et ce n'est pas un detail de style.
-                  //
-                  // Avant, la fiche etait un <article> et seul le titre portait
-                  // un <a>, etendu a toute la carte par un ::after en position
-                  // absolue. C'est le motif habituel, et il est fragile : des
-                  // que la carte est transformee, la zone peinte et la zone
-                  // testee au clic se decalent, et des pans entiers de la carte
-                  // cessent de repondre. Mesure : le rembourrage haut et les
-                  // marges laterales ne declenchaient rien sur ordinateur.
-                  //
-                  // Une ancre de niveau bloc n'a pas ce probleme : sa zone
-                  // cliquable EST sa boite. Aucune pastille de sujet n'est un
-                  // lien dans cette pile, donc rien n'est imbrique a tort.
-                  <a
-                    href={entry.href}
-                    class:list={[
-                      // bg-black/25 en plus du verre : sur un aplat sombre le
-                      // verre seul suffisait, sur de l'ecume il devenait blanc
-                      // sur blanc et la date disparaissait.
-                      "deck-card glass rounded-card relative block overflow-hidden bg-black/25 px-5 pt-5 sm:px-6 sm:pt-6",
-                      front ? "pb-5 sm:pb-6" : "pb-6 lg:pb-11",
-                      i > 0 && "-mt-6",
-                    ]}
-                    style={`--deck-s: ${depth[i]?.s}; --deck-x: ${depth[i]?.x}; --deck-o: ${depth[i]?.o}; --deck-z: ${i + 1}`}
-                  >
-                    <span
-                      class:list={["absolute inset-x-0 top-0 h-0.5", tone.rule]}
-                      aria-hidden="true"
-                    />
-                    <span class="flex flex-wrap items-center gap-x-3 gap-y-1">
-                      <span class:list={["rounded-pill px-2.5 py-1 text-xs font-medium", tone.chip]}>
-                        {entry.topic}
-                      </span>
-                      <time class="text-xs text-white/70" datetime={entry.iso}>
-                        {entry.date}
-                      </time>
-                    </span>
-                    <h2
-                      class:list={[
-                        "deck-title font-display mt-3 leading-snug font-bold text-balance transition-colors duration-200",
-                        front ? "text-xl sm:text-2xl" : "line-clamp-2 text-lg",
-                      ]}
-                    >
-                      {entry.title}
-                    </h2>
-                    <span
-                      class:list={[
-                        "flex items-center gap-2 text-xs text-white/70",
-                        front ? "mt-4" : "deck-read mt-3",
-                      ]}
-                    >
-                      <Icon name="clock" size={14} />
-                      {readLabel}
-                    </span>
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-        )
-      }
-
-      {/* Trois nombres, et rien d'autre : ils repondent a la seule question
-          qu'un lecteur se pose avant de cliquer, "y a-t-il de quoi lire". */}
-      {
-        ledger.length > 0 && (
-          <dl class="flex flex-wrap gap-x-10 gap-y-4 border-t border-white/25 pt-6 lg:col-start-1 lg:row-start-2 lg:self-start">
-            {t.home.heroLedger.map((label, i) => (
-              <div class="flex flex-col gap-0.5">
-                <dd class="font-display text-3xl leading-none font-bold md:text-4xl">
-                  {ledger[i] ?? 0}
-                </dd>
-                <dt class="text-xs tracking-[0.14em] text-white/75 uppercase">{label}</dt>
-              </div>
-            ))}
-          </dl>
-        )
-      }
     </div>
   </section>
 </div>
-
-<style>
-  /* La pile des dernieres notes.
-     Tout est ici et pas en classes utilitaires parce que l'etat de survol doit
-     pouvoir ecraser l'etat de base : les valeurs de base arrivent en variables
-     posees dans l'attribut style de chaque fiche, et une regle utilitaire ne
-     gagne jamais contre un style en ligne. */
-
-  .deck-card {
-    z-index: var(--deck-z);
-    opacity: var(--deck-o);
-  }
-
-  .deck-card:hover .deck-title,
-  .deck-card:focus-visible .deck-title {
-    color: var(--color-primary);
-  }
-
-  /* Le temps de lecture des fiches du fond n'apparait qu'au survol : sur la
-     pile au repos il ajouterait trois lignes de gris a une fiche dont on ne
-     lit que le titre. */
-  .deck-read {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-  }
-
-  @media (min-width: 1024px) {
-    .deck-plane {
-      /* L'inclinaison reste, mais elle est portee par le plan entier et non
-         par chaque fiche : une seule couche transformee, donc une detection
-         de clic exacte. */
-      transform: rotate(-1.5deg) skewY(-1.6deg);
-    }
-
-    .deck-card {
-      transform: scale(var(--deck-s)) translateX(var(--deck-x));
-      transform-origin: right center;
-      transition:
-        transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
-        opacity 420ms ease,
-        box-shadow 420ms ease;
-    }
-
-    .deck-read {
-      transition:
-        max-height 420ms cubic-bezier(0.22, 1, 0.36, 1),
-        opacity 300ms ease;
-    }
-
-    /* Le survol et le focus font la MEME chose : la fiche revient au premier
-       plan, en entier, et passe au-dessus des autres. C'est ce qui rend la
-       pile honnete. Avant, les deux fiches du fond etaient du decor : elles
-       montraient un titre qu'on ne pouvait pas atteindre. */
-    .deck-card:hover,
-    .deck-card:focus-visible {
-      transform: scale(1.015) translateX(-0.4rem);
-      opacity: 1;
-      z-index: 40;
-    }
-
-    .deck-card:hover .deck-read,
-    .deck-card:focus-visible .deck-read {
-      max-height: 2rem;
-      opacity: 1;
-    }
-  }
-
-  /* Une pile qui bondit sous le curseur est une pile qui gene, pour qui a
-     demande moins de mouvement. L'etat d'arrivee reste atteint, sans trajet. */
-  @media (prefers-reduced-motion: reduce) {
-    .deck-card,
-    .deck-read {
-      transition: none;
-    }
-  }
-</style>
