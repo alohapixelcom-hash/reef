@@ -4,20 +4,19 @@
 // aussi la classe apres chaque view transition (astro:after-swap remplace les
 // attributs de <html> par ceux rendus cote serveur).
 //
-// Le defaut est le theme SOMBRE, et non la preference du systeme.
+// LE CLAIR EST LE DEFAUT, ET C'EST UNE DECISION, PAS UN REGLAGE.
 //
-// C'est un choix de vitrine, pas un choix technique. Le sombre est la version
-// dans laquelle ces themes ont ete composes : les degrades, les halos, les
-// lueurs de bordure et la scene WebGL sont dessines pour lui, et c'est celle
-// qu'on veut montrer en premier a tout le monde. Suivre la preference du
-// systeme ferait de la premiere impression une loterie, et une moitie des
-// visiteurs ne verrait jamais la version verifiee.
+// Le defaut etait le sombre, au motif que la scene, les halos et les lueurs de
+// bordure ont ete dessines pour lui. L'argument est vrai et il ne suffit pas :
+// la majorite des visiteurs prefere le clair, et un site qui ouvre dans la
+// version que son visiteur n'a pas choisie perd la premiere seconde a le
+// surprendre. Toute la famille ouvre donc en clair.
 //
-// Le clair reste a un geste, et le choix du visiteur, lui, est memorise et
+// Le sombre reste a un geste, et le choix du visiteur, lui, est memorise et
 // respecte : `stored` gagne toujours contre le defaut.
 //
-// Un acheteur qui veut ouvrir en clair remplace la ligne `dark` par
-// `stored === "dark"`. Un acheteur qui veut suivre le systeme ecrit :
+// Un acheteur qui veut ouvrir en sombre remplace la ligne `dark` par
+// `stored !== "light"`. Un acheteur qui veut suivre le systeme ecrit :
 // stored === "dark" || (stored !== "light" &&
 //   window.matchMedia("(prefers-color-scheme: dark)").matches)
 ---
@@ -30,9 +29,9 @@
       try {
         stored = localStorage.getItem(KEY);
       } catch (error) {
-        /* stockage indisponible : on reste en sombre, comme un premier passage */
+        /* stockage indisponible : on reste en clair, comme un premier passage */
       }
-      var dark = stored !== "light";
+      var dark = stored === "dark";
       document.documentElement.classList.toggle("dark", dark);
       document.documentElement.style.colorScheme = dark ? "dark" : "light";
     }
