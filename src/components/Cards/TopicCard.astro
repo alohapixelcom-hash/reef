@@ -95,7 +95,11 @@ const countLabel = count === 1 ? t.topics.countOne : fmt(t.topics.countLabel, { 
     </a>
   </Tag>
 
-  <p class="text-muted-foreground relative line-clamp-4 text-[0.95rem] leading-relaxed">
+  {/* La description garde sa mesure meme quand la carte s'elargit. Sur une
+      carte de deux tiers de page, une description qui va d'un bord a l'autre
+      donne des lignes de cent trente signes : plus personne ne les lit, et la
+      carte cesse d'etre une carte pour devenir un paragraphe encadre. */}
+  <p class="text-muted-foreground relative line-clamp-4 max-w-[62ch] text-[0.95rem] leading-relaxed">
     {topic.data.description}
   </p>
 
