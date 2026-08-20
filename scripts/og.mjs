@@ -5,10 +5,15 @@
  * Usage :
  *   pnpm og            genere public/og/*.png (1200x630) depuis le manifest ci-dessous
  *
- * Pourquoi un script et pas un service : zero dependance externe, zero runtime,
- * les images sont des fichiers statiques versionnes. Le rendu part d'un template
- * SVG (degrade ocean + grille + titre Inter Tight + vague corail) rasterise par
- * sharp, deja present dans les devDependencies.
+ * Pourquoi un script et pas un service : zero dependance externe, zero runtime.
+ * Le rendu part d'un gabarit SVG (degrade d'encre, grille, titre Space Grotesk,
+ * vague aigue-marine) rasterise par sharp, deja present dans les
+ * devDependencies.
+ *
+ * Les PNG ne sont PAS versionnes : `pnpm build` appelle ce script avant
+ * `astro build`, donc un depot propre, une CI ou un `pnpm rebrand` refabriquent
+ * les cartes aux couleurs du moment. C'est ce qui manquait : /og/default.png
+ * repondait 404 en production.
  *
  * Personnalisation : edite PAGES ou appelle `makeOg(titre, sortie, accent)`.
  */
@@ -25,17 +30,23 @@ const OUT = join(ROOT, "public/og");
 const tokens = readFileSync(join(ROOT, "src/styles/tokens.css"), "utf8");
 const token = (name, fallback) => tokens.match(new RegExp(`--color-${name}:\\s*(#[0-9a-fA-F]{6})`))?.[1] ?? fallback;
 
-const OCEAN = token("ocean-950", "#021c24");
-const OCEAN_MID = token("ocean-900", "#0a3341");
-const CORAL = token("coral-400", "#ff7a59");
-const LAGOON = token("lagoon-400", "#34c9b6");
+// Les quatre couleurs de la carte viennent de la palette DE CE THEME, pas de
+// celle d'un autre : un rebrand repeint donc aussi les cartes de partage.
+const DEEP = token("ink-950", "#080d10");
+const DEEP_MID = token("ink-900", "#101a20");
+const DEEP_SOFT = token("ink-300", "#8fa6b2");
+// L'accent dominant est l'aigue-marine de la maison. Le corail passe en second
+// : c'est la couleur des actions, pas celle de l'identite.
+const ACCENT = token("reef-400", "#3fc0e0");
+const ACCENT_2 = token("coral-400", "#ff7a59");
 
 // title : ce qui s'affiche en enorme. eyebrow : la petite ligne au-dessus.
 const PAGES = [
-  { slug: "default", eyebrow: "Aloha · Astro SaaS theme", title: "Ship a SaaS site that feels expensive." },
-  { slug: "pricing", eyebrow: "Aloha · Pricing", title: "One licence. Unlimited end products." },
-  { slug: "features", eyebrow: "Aloha · Features", title: "52 primitives. Zero JavaScript by default." },
-  { slug: "blog", eyebrow: "Aloha · Blog", title: "Notes on building fast, calm websites." },
+  { slug: "default", eyebrow: "Reef Notes", title: "The notebook, not the portfolio." },
+  { slug: "blog", eyebrow: "Reef Notes · Posts", title: "What we learn while building sites." },
+  { slug: "topics", eyebrow: "Reef Notes · Topics", title: "Every note, sorted by subject." },
+  { slug: "about", eyebrow: "Reef Notes · About", title: "A two-person studio that writes it down." },
+  { slug: "contact", eyebrow: "Reef Notes · Contact", title: "Tell us what you are building." },
 ];
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -59,23 +70,23 @@ function svgTemplate({ eyebrow, title }) {
   const titleSize = lines.length === 2 ? 76 : 84;
   const firstY = lines.length === 2 ? 330 : 370;
   const text = lines
-    .map((l, i) => `<text x="90" y="${firstY + i * (titleSize + 12)}" font-family="Inter Tight, Inter, Arial, sans-serif" font-weight="800" font-size="${titleSize}" letter-spacing="-2.5" fill="#ffffff">${esc(l)}</text>`)
+    .map((l, i) => `<text x="90" y="${firstY + i * (titleSize + 12)}" font-family="Space Grotesk, Inter Tight, Arial, sans-serif" font-weight="800" font-size="${titleSize}" letter-spacing="-2.5" fill="#ffffff">${esc(l)}</text>`)
     .join("\n  ");
 
   return `<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="${OCEAN_MID}"/>
-      <stop offset="0.55" stop-color="${OCEAN}"/>
-      <stop offset="1" stop-color="#01141a"/>
+      <stop offset="0" stop-color="${DEEP_MID}"/>
+      <stop offset="0.55" stop-color="${DEEP}"/>
+      <stop offset="1" stop-color="${DEEP}"/>
     </linearGradient>
-    <radialGradient id="glowCoral" cx="0.85" cy="0.1" r="0.7">
-      <stop offset="0" stop-color="${CORAL}" stop-opacity="0.5"/>
-      <stop offset="1" stop-color="${CORAL}" stop-opacity="0"/>
+    <radialGradient id="glowA" cx="0.85" cy="0.1" r="0.7">
+      <stop offset="0" stop-color="${ACCENT}" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="${ACCENT}" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="glowLagoon" cx="0.1" cy="0.95" r="0.6">
-      <stop offset="0" stop-color="${LAGOON}" stop-opacity="0.35"/>
-      <stop offset="1" stop-color="${LAGOON}" stop-opacity="0"/>
+    <radialGradient id="glowB" cx="0.1" cy="0.95" r="0.6">
+      <stop offset="0" stop-color="${ACCENT_2}" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="${ACCENT_2}" stop-opacity="0"/>
     </radialGradient>
     <pattern id="grid" width="72" height="72" patternUnits="userSpaceOnUse">
       <path d="M 72 0 L 0 0 0 72" fill="none" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
@@ -83,15 +94,15 @@ function svgTemplate({ eyebrow, title }) {
   </defs>
 
   <rect width="1200" height="630" fill="url(#bg)"/>
-  <rect width="1200" height="630" fill="url(#glowCoral)"/>
-  <rect width="1200" height="630" fill="url(#glowLagoon)"/>
+  <rect width="1200" height="630" fill="url(#glowA)"/>
+  <rect width="1200" height="630" fill="url(#glowB)"/>
   <rect width="1200" height="630" fill="url(#grid)"/>
 
-  <text x="90" y="180" font-family="Inter Tight, Inter, Arial, sans-serif" font-weight="700" font-size="30" letter-spacing="6" fill="${CORAL}">${esc(eyebrow.toUpperCase())}</text>
+  <text x="90" y="180" font-family="Space Grotesk, Inter Tight, Arial, sans-serif" font-weight="700" font-size="30" letter-spacing="6" fill="${ACCENT}">${esc(eyebrow.toUpperCase())}</text>
   ${text}
 
-  <path d="M 90 520 q 30 -26 60 0 t 60 0 t 60 0 t 60 0" fill="none" stroke="${CORAL}" stroke-width="7" stroke-linecap="round"/>
-  <text x="1110" y="560" text-anchor="end" font-family="Inter Tight, Inter, Arial, sans-serif" font-weight="700" font-size="26" fill="#8dc0d0">alohapixel.app</text>
+  <path d="M 90 520 q 30 -26 60 0 t 60 0 t 60 0 t 60 0" fill="none" stroke="${ACCENT}" stroke-width="7" stroke-linecap="round"/>
+  <text x="1110" y="560" text-anchor="end" font-family="Space Grotesk, Inter Tight, Arial, sans-serif" font-weight="700" font-size="26" fill="${DEEP_SOFT}">reef.alohapixel.app</text>
 </svg>`;
 }
 
