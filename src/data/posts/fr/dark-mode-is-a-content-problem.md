@@ -6,7 +6,7 @@ author: fr/tomas-abaroa
 topic: fr/design
 tags: ["design", "mode sombre", "css"]
 cover: ../../../assets/covers/reef-mode-sombre.webp
-coverAlt: "Une devanture vitrée éclairée de l'intérieur à la nuit tombée, guirlandes lumineuses sur la terrasse voisine"
+coverAlt: "Ouverture d'une grotte marine sur un lagon turquoise, la lumière du jour entrant par le fond"
 featured: false
 draft: false
 ---

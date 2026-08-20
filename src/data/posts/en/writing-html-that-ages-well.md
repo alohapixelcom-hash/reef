@@ -6,7 +6,7 @@ author: en/mara-lindqvist
 topic: en/craft
 tags: ["html", "semantics", "maintenance"]
 cover: ../../../assets/covers/reef-html-qui-vieillit.webp
-coverAlt: "A carpenter's hands pushing a hand plane along a board, a wood shaving curling out of the tool"
+coverAlt: "Cliffs under dense green cover dropping into a turquoise sea, in veiled morning light"
 featured: false
 draft: false
 ---

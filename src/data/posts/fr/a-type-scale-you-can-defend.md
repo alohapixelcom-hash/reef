@@ -6,7 +6,7 @@ author: fr/tomas-abaroa
 topic: fr/typography
 tags: ["typographie", "css", "echelle"]
 cover: ../../../assets/covers/reef-echelle-typo.webp
-coverAlt: "Les mains d'un horloger ouvrent le boîtier d'une montre à la pincette, plusieurs montres démontées posées sur un établi en bois clair"
+coverAlt: "Vue plongeante sur l'escalier en colimaçon d'un phare, les marches s'enroulant entre des murs de faïence turquoise"
 featured: true
 draft: false
 ---

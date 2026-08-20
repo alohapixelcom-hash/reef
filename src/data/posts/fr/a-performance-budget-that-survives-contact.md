@@ -7,7 +7,7 @@ author: fr/noor-benali
 topic: fr/performance
 tags: ["performance", "budgets", "process"]
 cover: ../../../assets/covers/reef-budget-performance.webp
-coverAlt: "Balance à fléau ancienne suspendue, ses deux plateaux de laiton en équilibre devant un fond ocre lumineux"
+coverAlt: "Vague turquoise qui se creuse, crête translucide éclairée à contre-jour et voile d'écume blanche"
 featured: false
 draft: false
 ---
