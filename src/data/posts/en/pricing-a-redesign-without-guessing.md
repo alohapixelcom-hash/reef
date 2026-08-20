@@ -6,7 +6,7 @@ author: en/mara-lindqvist
 topic: en/studio
 tags: ["freelance", "pricing", "contracts"]
 cover: ../../../assets/covers/reef-prix-refonte.webp
-coverAlt: "The inside of an antique safe door: brass gears and locking bolts in warm golden light"
+coverAlt: "The Na Pali coast from the air, green cliffs falling into a turquoise lagoon"
 featured: false
 draft: true
 ---

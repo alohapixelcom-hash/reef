@@ -6,7 +6,7 @@ author: en/tomas-abaroa
 topic: en/typography
 tags: ["typography", "fonts", "performance"]
 cover: ../../../assets/covers/reef-cout-police.webp
-coverAlt: "A hand guiding tailor's shears through taut teal fabric"
+coverAlt: "A school of small orange fish swimming in blue water above a garden of coloured coral"
 featured: false
 draft: false
 ---
