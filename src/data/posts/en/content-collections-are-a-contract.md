@@ -7,7 +7,7 @@ author: en/mara-lindqvist
 topic: en/craft
 tags: ["astro", "zod", "content"]
 cover: ../../../assets/covers/reef-collections-contrat.webp
-coverAlt: "An open brass compass resting on an old nautical chart engraved with a sailing ship"
+coverAlt: "A coral nursery fixed to its frame below the surface, in blue water crossed by light"
 featured: false
 draft: false
 ---
