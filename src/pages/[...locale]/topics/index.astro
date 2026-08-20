@@ -31,6 +31,12 @@ const crumbs = breadcrumbList([
   { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
   { name: t.topics.metaTitle, url: new URL(localizePath("/topics/", locale), base).href },
 ]);
+
+// Voir le commentaire de la grille plus bas : les dernieres cartes s'elargissent
+// pour remplir la rangee. Zero, deux ou quatre selon ce que laisse la division.
+const rest = topics.length % 3;
+const tail = rest === 0 ? 0 : rest === 2 ? 2 : Math.min(topics.length, 4);
+const firstWide = topics.length - tail;
 ---
 
 <BaseLayout {title} {description}>
@@ -50,15 +56,16 @@ const crumbs = breadcrumbList([
     />
 
     <section class="container-page py-14 md:py-20" aria-label={t.topics.allTopics}>
-      {/* Un flux centre et non une grille : le nombre de sujets d'un blog n'est
-          jamais un multiple du nombre de colonnes, et une grille laisse alors
-          un trou a droite de la derniere rangee. */}
-      <ul class="flex flex-wrap justify-center gap-5">
+      {/* Meme regle que la bande de l'accueil : trois cartes par rangee sur une
+          grille de six colonnes, et le reste de la division elargit les
+          dernieres cartes au lieu de partir au centre. Ni trou a droite, ni
+          rangee orpheline au milieu. */}
+      <ul class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-6">
         {
-          topics.map((topic) => {
+          topics.map((topic, i) => {
             const slug = entrySlug(topic.id);
             return (
-              <li class="flex w-full sm:w-[calc(50%-0.625rem)] lg:w-[calc(33.333%-0.834rem)]">
+              <li class:list={["flex", i >= firstWide ? "lg:col-span-3" : "lg:col-span-2"]}>
                 <TopicCard
                   {topic}
                   {locale}
