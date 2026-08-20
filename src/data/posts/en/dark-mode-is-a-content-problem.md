@@ -6,7 +6,7 @@ author: en/tomas-abaroa
 topic: en/design
 tags: ["design", "dark mode", "css"]
 cover: ../../../assets/covers/reef-mode-sombre.webp
-coverAlt: "A glass shopfront lit from within after dark, string lights strung over the terrace beside it"
+coverAlt: "The mouth of a sea cave opening onto a turquoise lagoon, daylight coming in from the far end"
 featured: false
 draft: false
 ---

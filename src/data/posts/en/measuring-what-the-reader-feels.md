@@ -7,7 +7,7 @@ author: en/noor-benali
 topic: en/performance
 tags: ["web vitals", "rum", "measurement"]
 cover: ../../../assets/covers/reef-mesurer-lecteur.webp
-coverAlt: "Two hands holding a phone on a street at night, orange headlight halos blurred behind"
+coverAlt: "A long beach seen from the air, parallel lines of swell arriving on the sand in the morning haze"
 featured: false
 draft: false
 ---
