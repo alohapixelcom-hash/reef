@@ -20,11 +20,18 @@ export const button = tv({
   ],
   variants: {
     variant: {
-      // Blanc + texte ocean : le bouton signature pose sur le hero sombre.
-      // Fond blanc constant, donc encre constante : text-foreground passe au
-      // blanc en mode sombre et le bouton devient illisible. primary-foreground
-      // vaut l'ocean profond dans les deux modes, c'est le seul choix sur.
-      hero: "bg-white text-primary-foreground shadow-lift hover:-translate-y-0.5",
+      // Blanc + encre sombre : le bouton signature pose sur une scene sombre.
+      //
+      // L'encre est text-scrim et non text-primary-foreground, et la nuance a
+      // coute une regression sur les deux sites de la maison. Le fond est
+      // blanc CONSTANT, donc l'encre doit etre sombre CONSTANTE.
+      // primary-foreground remplissait ce role tant que le primaire etait un
+      // corail clair, sur lequel on ecrit en encre ; le jour ou le primaire
+      // est passe au turquoise fonce, primary-foreground est devenu du blanc
+      // et ces boutons sont sortis blancs sur blancs, texte compris.
+      // --color-scrim vaut ink-950 dans les deux modes : c'est le seul jeton
+      // d'encre du theme qui ne bouge jamais.
+      hero: "bg-white text-scrim shadow-lift hover:-translate-y-0.5",
       // Corail : l'action principale sur fond clair.
       primary: "bg-primary text-primary-foreground shadow-float hover:-translate-y-0.5 hover:shadow-lift",
       // Ocean profond : l'action secondaire forte.
