@@ -26,7 +26,7 @@ const active = authors.filter((author) => (counts[entrySlug(author.id)] ?? 0) > 
 ---
 
 <section
-  class="bg-surface border-border border-y"
+  class="bg-surface border-border border-t"
   aria-labelledby="writers-title"
   data-slot="writers-strip"
 >
@@ -59,7 +59,9 @@ const active = authors.filter((author) => (counts[entrySlug(author.id)] ?? 0) > 
       }
     </ul>
 
-    <div class="mt-10 flex justify-center">
+    {/* Fer a gauche : apres trois fiches, l'oeil revient a la marge, et c'est
+        la qu'on lui tend la suite. Rien sur cette page ne se range au centre. */}
+    <div class="mt-10 flex justify-start">
       <Button href={routes.authors} variant="ghost" size="md">
         {t.home.authorsCta}
         <Icon name="arrow-right" size={17} />

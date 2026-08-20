@@ -26,28 +26,47 @@ const t = useTranslations(locale);
 const routes = getSiteRoutes(locale);
 
 const filled = topics.filter((topic) => (counts[entrySlug(topic.id)] ?? 0) > 0);
+
+// Trois cartes par rangee sur grand ecran, sur une grille de six colonnes. Ce
+// qui depasse ne part PAS au centre : les dernieres cartes s'elargissent pour
+// que chaque rangee soit pleine et calee a gauche.
+//
+// Une derniere rangee centree sous une rangee pleine est la signature d'une
+// grille qu'on a laissee decider a notre place. Ici cinq sujets donnent une
+// rangee de trois puis une rangee de deux qui occupent toute la largeur, et
+// sept en donnent trois, deux, deux. Le cas d'une seule carte orpheline
+// n'existe pas : quand il ne reste qu'une carte, les quatre dernieres se
+// rangent en deux rangees de deux.
+const rest = filled.length % 3;
+const tail = rest === 0 ? 0 : rest === 2 ? 2 : Math.min(filled.length, 4);
+const firstWide = filled.length - tail;
 ---
 
 <section class="container-page py-16 md:py-24" aria-labelledby="topics-title" data-slot="topic-strip">
-  <SectionHeader
-    as="h2"
-    headingId="topics-title"
-    title={t.home.topicsTitle}
-    accentWord={t.home.topicsAccent}
-    lede={t.home.topicsLede}
-  />
+  {/* Titre a gauche, sortie vers l'index a droite, sur la meme ligne de base.
+      Le bouton n'est pas sous la grille : la derniere rangee de sujets est
+      pleine, et un bouton pose sous une rangee pleine flotte sans appui. */}
+  <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between sm:gap-10">
+    <SectionHeader
+      as="h2"
+      headingId="topics-title"
+      title={t.home.topicsTitle}
+      accentWord={t.home.topicsAccent}
+      lede={t.home.topicsLede}
+      class="sm:flex-1"
+    />
+    <Button href={routes.topics} variant="ghost" size="md" class="shrink-0 self-start sm:self-auto">
+      {t.home.topicsCta}
+      <Icon name="arrow-right" size={17} />
+    </Button>
+  </div>
 
-  {/* Un flux centre, et non une grille. Une grille a quatre colonnes laisse un
-      trou de trois cases des que le nombre de sujets n'est pas un multiple de
-      quatre, et l'acheteur qui installe le theme avec ses propres fils voit ce
-      trou avant de voir les cartes. Un flux centre range la derniere rangee au
-      milieu, quel que soit le nombre de sujets. */}
-  <ul class="mt-10 flex flex-wrap justify-center gap-5">
+  <ul class="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-6">
     {
-      filled.map((topic) => {
+      filled.map((topic, i) => {
         const slug = entrySlug(topic.id);
         return (
-          <li class="flex w-full sm:w-[calc(50%-0.625rem)] lg:w-[calc(33.333%-0.834rem)]">
+          <li class:list={["flex", i >= firstWide ? "lg:col-span-3" : "lg:col-span-2"]}>
             <TopicCard
               {topic}
               {locale}
@@ -60,11 +79,4 @@ const filled = topics.filter((topic) => (counts[entrySlug(topic.id)] ?? 0) > 0);
       })
     }
   </ul>
-
-  <div class="mt-10 flex justify-center">
-    <Button href={routes.topics} variant="ghost" size="md">
-      {t.home.topicsCta}
-      <Icon name="arrow-right" size={17} />
-    </Button>
-  </div>
 </section>

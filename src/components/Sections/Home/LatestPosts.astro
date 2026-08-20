@@ -39,7 +39,9 @@ const routes = getSiteRoutes(locale);
       }
     </ul>
 
-    <div class="mt-10 flex justify-center">
+    {/* La grille est pleine et se termine en bas a droite : la sortie se pose
+        la ou l'oeil quitte la derniere carte, pas au milieu d'une ligne vide. */}
+    <div class="mt-10 flex justify-end">
       <Button href={routes.posts} variant="outline" size="lg">
         {t.home.latestCta}
         <Icon name="arrow-right" size={18} />
