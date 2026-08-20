@@ -46,10 +46,9 @@
   --color-ink-950: #0a0f17;
 
   /* --- Palette : Papier --------------------------------------------------
-   * Le fond clair, qui n'est plus le mode par defaut mais qui doit rester
-   * juste. Il porte une pointe de bleu, pas de jaune : quelques points de
-   * teinte suffisent a poser le repos qu'on cherche, et ils vont dans le meme
-   * sens que le reste du theme au lieu de le contredire. */
+   * Le fond du mode par defaut. Il porte une pointe de bleu, pas de jaune :
+   * quelques points de teinte suffisent a poser le repos qu'on cherche, et ils
+   * vont dans le meme sens que le reste du theme au lieu de le contredire. */
   --color-paper-50: #fbfcfe;
   --color-paper-100: #f2f5fa;
   --color-paper-200: #e4eaf3;
@@ -73,7 +72,8 @@
    * d'Aloha, qui est vert. Les deux themes sont voisins et doivent se
    * distinguer d'un coup d'oeil, pas apres comparaison.
    *
-   * Il sert aux sujets, aux etats "publie" et aux liens deja lus. Jamais en
+   * C'est LE primaire du theme depuis que le corail est repasse au rang
+   * d'accent : boutons, filets de section, mot d'accent et sa vague. Jamais en
    * concurrence avec le corail sur un meme appel a l'action : une page qui a
    * deux couleurs d'action n'en a aucune. */
   --color-reef-300: #7fd8f0;
@@ -93,8 +93,8 @@
    * dessinee pour l'ecran. C'est elle qu'on lit pendant huit minutes.
    *
    * Le mot d'accent des titres n'a PLUS de police a lui : il garde la police
-   * du titre et porte une vague corail soulignee (--accent-wave, definie par
-   * mode plus bas, pres du primaire). Plus aucune italique serif nulle part :
+   * du titre et porte une vague soulignee (--accent-wave, definie par mode
+   * plus bas, pres du primaire). Plus aucune italique serif nulle part :
    * --font-serif et --font-script ne subsistent que comme alias du display,
    * pour le contenu qui les cite encore. */
   --font-display: "Space Grotesk Variable", "Space Grotesk", system-ui, sans-serif;
@@ -186,17 +186,32 @@
   --reef-muted-foreground: var(--color-ink-600);
   --reef-card: #ffffff;
   --reef-card-foreground: var(--color-ink-950);
-  --reef-primary: var(--color-coral-500);
+  /* LE PRIMAIRE EST LE TURQUOISE DE LA MAISON, PLUS LE CORAIL.
+   *
+   * Les deux etaient inverses : le corail portait tous les boutons, tous les
+   * filets de section, le mot d'accent et sa vague, et le turquoise ne servait
+   * qu'aux pastilles de sujet. Une page entiere en orange chaud, c'est la
+   * teinte que le public associe aux pages generees, et le reproche est arrive
+   * de l'exterieur. Le turquoise, lui, est la couleur de la maison : c'est
+   * celle du second trait du logo, sur alohapixel.com comme ici.
+   *
+   * Le corail ne disparait pas, il redevient ce qu'un accent doit etre : rare.
+   * Un seul appel a l'action par ecran garde donc une couleur, et ce n'est
+   * plus la meme que le reste de la page.
+   *
+   * Turquoise 600 et non 500 en mode clair : le texte des boutons est blanc,
+   * et 500 le fait passer sous le rapport de contraste de 4,5. */
+  --reef-primary: var(--color-reef-600);
   --reef-primary-foreground: #ffffff;
   /* La vague du mot d'accent (.accent-script) : le trait de la marque (le logo
-   * est une vague), dessine dans le corail du primaire. Le primaire de Reef
-   * change entre les modes, donc une vague par mode : corail 500 ici,
-   * corail 400 en sombre. */
-  --accent-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 10' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q 6 2.5 12 7 T 24 7 T 36 7 T 48 7' fill='none' stroke='%23f95c36' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
-  --reef-accent: var(--color-reef-500);
+   * est une vague), dessine dans le turquoise du primaire. Le primaire change
+   * entre les modes, donc une vague par mode : turquoise 600 ici,
+   * turquoise 400 en sombre. */
+  --accent-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 10' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q 6 2.5 12 7 T 24 7 T 36 7 T 48 7' fill='none' stroke='%23147ea0' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  --reef-accent: var(--color-coral-600);
   --reef-accent-foreground: #ffffff;
   --reef-border: color-mix(in oklab, var(--color-ink-950) 12%, transparent);
-  --reef-ring: var(--color-coral-500);
+  --reef-ring: var(--color-reef-600);
   --reef-surface: var(--color-paper-100);
   --reef-scrim: var(--color-ink-950);
 
@@ -207,7 +222,7 @@
   --reef-shadow-float: 0 1px 2px rgb(10 15 23 / 0.05), 0 6px 20px -6px rgb(10 15 23 / 0.12);
   --reef-shadow-lift:
     0 2px 4px rgb(10 15 23 / 0.06), 0 18px 40px -14px rgb(10 15 23 / 0.22),
-    0 20px 50px -22px rgb(249 92 54 / 0.18);
+    0 20px 50px -22px rgb(20 126 160 / 0.18);
   --reef-shadow-glass:
     0 1px 0 0 rgb(255 255 255 / 0.5) inset, 0 10px 34px -10px rgb(10 15 23 / 0.24);
 }
@@ -219,14 +234,14 @@
   --reef-muted-foreground: var(--color-ink-300);
   --reef-card: color-mix(in oklab, var(--color-ink-900) 80%, transparent);
   --reef-card-foreground: var(--color-paper-50);
-  --reef-primary: var(--color-coral-400);
+  --reef-primary: var(--color-reef-400);
   --reef-primary-foreground: var(--color-ink-950);
-  /* Le primaire passe en corail 400 : la vague du mot d'accent suit. */
-  --accent-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 10' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q 6 2.5 12 7 T 24 7 T 36 7 T 48 7' fill='none' stroke='%23ff7a59' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
-  --reef-accent: var(--color-reef-400);
+  /* Le primaire passe en turquoise 400 : la vague du mot d'accent suit. */
+  --accent-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 10' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q 6 2.5 12 7 T 24 7 T 36 7 T 48 7' fill='none' stroke='%233fc0e0' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  --reef-accent: var(--color-coral-400);
   --reef-accent-foreground: var(--color-ink-950);
   --reef-border: color-mix(in oklab, var(--color-paper-50) 15%, transparent);
-  --reef-ring: var(--color-coral-400);
+  --reef-ring: var(--color-reef-400);
   --reef-surface: var(--color-ink-900);
   --reef-scrim: var(--color-ink-950);
 
@@ -241,9 +256,9 @@
     0 1px 0 0 color-mix(in oklab, var(--color-paper-50) 7%, transparent) inset,
     0 14px 36px -18px rgb(0 0 0 / 0.7);
   --reef-shadow-lift:
-    0 0 0 1px color-mix(in oklab, var(--color-coral-400) 24%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--color-reef-400) 24%, transparent),
     0 1px 0 0 color-mix(in oklab, var(--color-paper-50) 10%, transparent) inset,
-    0 22px 58px -24px color-mix(in oklab, var(--color-coral-400) 30%, transparent),
+    0 22px 58px -24px color-mix(in oklab, var(--color-reef-400) 30%, transparent),
     0 18px 46px -22px rgb(0 0 0 / 0.75);
   --reef-shadow-glass:
     0 1px 0 0 rgb(255 255 255 / 0.09) inset,
