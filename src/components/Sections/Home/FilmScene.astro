@@ -35,16 +35,20 @@
 //    devient une image fixe avec son texte. Rien ne bouge, rien ne se
 //    telecharge, et le message reste entier.
 //
-// La scene porte .deep-scene : elle reste sombre dans les deux themes, et les
-// couleurs qu'elle utilise sont les ROLES (background, foreground, primary,
-// accent), jamais des noms de palette. C'est ce qui permet a `pnpm rebrand` de
-// la repeindre sans rouvrir ce fichier.
+// La scene porte .deep-scene : elle reste sombre dans les deux themes. Son CSS
+// vise les alias --reef-* et NON les utilitaires --color-*, et la nuance vaut
+// d'etre retenue : --color-background est declaree sur :root, donc sa
+// substitution se calcule la-haut, en clair, et cette valeur claire descend
+// telle quelle dans le sous-arbre. Une scene sombre qui ecrit
+// var(--color-background) peint donc du blanc. Les alias, eux, sont bien
+// reaffectes sur l'element : ils suivent la scene, et `pnpm rebrand` les
+// repeint sans rouvrir ce fichier.
 //
 // Le moteur vit dans ./_film.ts : limite de 400 lignes par fichier, et surtout
 // cycle de vie du routeur client (voir l'en-tete de ce module).
 //
 // Les fichiers pointent vers alohapixel.com parce que c'est la demonstration.
-// Qui installe le theme remplace les trois adresses ci-dessous par les
+// Qui installe le theme remplace les cinq adresses ci-dessous par les
 // siennes : c'est le seul endroit a changer.
 import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
@@ -116,10 +120,6 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     {/* Voile de lecture. Deux couches : une horizontale qui protege la colonne
         de texte, une verticale qui rattache la scene au reste de la page. */}
     <div class="film__veil" aria-hidden="true"></div>
-    {/* La lueur monte avec le carre de la progression : elle n'existe pas au
-        debut, elle s'impose a la fin. C'est ce qui donne l'impression que la
-        scene s'ouvre plutot qu'elle ne defile. */}
-    <div class="film__bloom" aria-hidden="true"></div>
 
     <div class="film__content container-page">
       <div class="max-w-2xl">
@@ -171,7 +171,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
   .film {
     position: relative;
     height: 300vh;
-    background: var(--color-background);
+    background: var(--reef-background);
   }
 
   .film__pin {
@@ -180,7 +180,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     height: 100vh;
     height: 100svh;
     overflow: hidden;
-    background: var(--color-background);
+    background: var(--reef-background);
   }
 
   /* inset negatif : la mise a l'echelle ne doit jamais laisser voir un bord. */
@@ -206,30 +206,17 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     background:
       linear-gradient(
         90deg,
-        color-mix(in oklab, var(--color-background) 78%, transparent) 0%,
-        color-mix(in oklab, var(--color-background) 46%, transparent) 48%,
+        color-mix(in oklab, var(--reef-background) 78%, transparent) 0%,
+        color-mix(in oklab, var(--reef-background) 46%, transparent) 48%,
         transparent 100%
       ),
       linear-gradient(
         180deg,
-        color-mix(in oklab, var(--color-background) 46%, transparent) 0%,
+        color-mix(in oklab, var(--reef-background) 46%, transparent) 0%,
         transparent 26%,
         transparent 68%,
-        color-mix(in oklab, var(--color-background) 58%, transparent) 100%
+        color-mix(in oklab, var(--reef-background) 58%, transparent) 100%
       );
-  }
-
-  .film__bloom {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    mix-blend-mode: screen;
-    background: radial-gradient(
-      58% 62% at 62% 46%,
-      color-mix(in oklab, var(--color-foreground) 38%, transparent) 0%,
-      color-mix(in oklab, var(--color-foreground) 12%, transparent) 38%,
-      transparent 72%
-    );
   }
 
   .film__content {
@@ -246,7 +233,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     inset-inline: 0;
     bottom: 0;
     height: 2px;
-    background: color-mix(in oklab, var(--color-foreground) 12%, transparent);
+    background: color-mix(in oklab, var(--reef-foreground) 12%, transparent);
     z-index: 3;
   }
 
@@ -256,11 +243,11 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     width: 0;
     background: linear-gradient(
       90deg,
-      var(--color-primary) 0%,
-      var(--color-accent) 62%,
-      var(--color-foreground) 100%
+      var(--reef-primary) 0%,
+      var(--reef-accent) 62%,
+      var(--reef-foreground) 100%
     );
-    box-shadow: 0 0 0.85em color-mix(in oklab, var(--color-accent) 70%, transparent);
+    box-shadow: 0 0 0.85em color-mix(in oklab, var(--reef-accent) 70%, transparent);
   }
 
   /* Repli. Sous 1025 pixels, en mouvement reduit ou en economie de donnees, la
@@ -284,10 +271,6 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     inset: 0;
   }
 
-  .film--flat .film__bloom {
-    display: none;
-  }
-
   .film--flat .film__rail {
     display: none;
   }
@@ -300,9 +283,9 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
   .film--flat .film__veil {
     background: linear-gradient(
       180deg,
-      color-mix(in oklab, var(--color-background) 66%, transparent) 0%,
-      color-mix(in oklab, var(--color-background) 34%, transparent) 42%,
-      color-mix(in oklab, var(--color-background) 62%, transparent) 100%
+      color-mix(in oklab, var(--reef-background) 66%, transparent) 0%,
+      color-mix(in oklab, var(--reef-background) 34%, transparent) 42%,
+      color-mix(in oklab, var(--reef-background) 62%, transparent) 100%
     );
   }
 
