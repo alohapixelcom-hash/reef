@@ -74,12 +74,23 @@ const columnLink =
 <footer class="bg-surface border-border border-t" data-slot="footer">
   <div class="container-page py-16 md:py-20">
     <div class="grid gap-12 lg:grid-cols-12 lg:gap-10">
-      <div class="flex max-w-md flex-col gap-6 lg:col-span-5">
+      {/* La colonne de marque prend quatre colonnes sur douze, pas cinq, et
+          n'est plus bridee a max-w-md.
+          Mesure a l'origine de ce reglage : sur un ecran de 2560, le bloc de
+          marque s'arretait a 504 px pendant que la grille, elle, grandissait.
+          Les liens ne commencant qu'a la colonne 7, il restait 635 px de vide
+          au milieu du pied de page. Un vide de cette taille ne se lit pas
+          comme une respiration, il se lit comme une colonne qu'on a oublie de
+          remplir. La description garde sa longueur de ligne confortable par
+          measure-prose, ce qui protege la lecture sans figer la colonne. */}
+      <div class="flex flex-col gap-6 lg:col-span-4">
         <a href={routes.home} class="flex items-center gap-2" aria-label={t.nav.brandHome}>
           <Icon name="wave" size={22} class="text-primary" />
           <span class="font-display text-xl font-semibold tracking-tight">{siteData.name}</span>
         </a>
-        <p class="text-muted-foreground text-[0.95rem] leading-relaxed">{t.footer.tagline}</p>
+        <p class="text-muted-foreground measure-prose text-[0.95rem] leading-relaxed">
+          {t.footer.tagline}
+        </p>
 
         {/* --- Inscription a la lettre ------------------------------------
             Formulaire de DEMONSTRATION : il n'envoie rien. Il n'a ni action ni
@@ -131,7 +142,7 @@ const columnLink =
         }
       </div>
 
-      <div class="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-6 lg:col-start-7">
+      <div class="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-8 lg:col-start-5">
         {
           columns.map((column) => (
             <div class="flex flex-col gap-2">
