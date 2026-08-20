@@ -14,3 +14,6 @@ dist/
 
 # Local environment and secrets. Copy .env.example to .env, never commit .env.
 .env
+
+# Cartes Open Graph : generees par `pnpm og`, refabriquees au build.
+public/og/

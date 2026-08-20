@@ -9,7 +9,7 @@
   },
   "scripts": {
     "app": "astro build && node scripts/app.mjs",
-    "build": "astro build",
+    "build": "node scripts/og.mjs && astro build",
     "check": "astro check",
     "dev": "astro dev",
     "og": "node scripts/og.mjs",
