@@ -26,7 +26,6 @@ const clamp = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x);
 function setup(section: HTMLElement): Teardown | null {
   const video = section.querySelector<HTMLVideoElement>(".film__video");
   const media = section.querySelector<HTMLElement>(".film__media");
-  const bloom = section.querySelector<HTMLElement>(".film__bloom");
   const bar = section.querySelector<HTMLElement>(".film__rail i");
   const items = [...section.querySelectorAll<HTMLElement>(".film__item")];
   if (!video || !media) return null;
@@ -158,7 +157,6 @@ function setup(section: HTMLElement): Teardown | null {
       last = key;
       if (bar) bar.style.width = `${(p * 100).toFixed(2)}%`;
       media!.style.transform = `scale(${(1.06 - p * 0.055).toFixed(4)}) translateZ(0)`;
-      if (bloom) bloom.style.opacity = (p * p * 0.85).toFixed(3);
       place(p);
     }
 
