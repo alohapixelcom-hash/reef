@@ -6,11 +6,11 @@ Reef is a commercial Astro theme. Buyers read the source; every file you
 touch is part of the product. This page is the operating manual. The five
 rule files it imports are binding, not advisory:
 
-- .claude/rules/astro.md - pure .astro, platform first, static only
-- .claude/rules/tailwind.md - the token contract, what markup may write
-- .claude/rules/typescript.md - strict types, selfchecks, derived types
-- .claude/rules/motion.md - the animation ladder and reduced motion
-- .claude/rules/seo.md - BaseHead, JSON-LD constructors, endpoints
+- docs/conventions/astro.md - pure .astro, platform first, static only
+- docs/conventions/tailwind.md - the token contract, what markup may write
+- docs/conventions/typescript.md - strict types, selfchecks, derived types
+- docs/conventions/motion.md - the animation ladder and reduced motion
+- docs/conventions/seo.md - BaseHead, JSON-LD constructors, endpoints
 
 Two skills exist for you: `aloha-review` (run it on your own work before
 calling it done) and `wiki` (sync it after structural changes, ask it
@@ -110,7 +110,7 @@ node src/js/pagination.selfcheck.ts
 - View transitions re-run nothing: a naive inline script executes once and
   dies on the next navigation. Use the established patterns (re-init on
   astro:page-load with a data-*-ready guard, document-level delegation, or
-  astro:after-swap for `<html>` state). See .claude/rules/astro.md.
+  astro:after-swap for `<html>` state). See docs/conventions/astro.md.
 - astro:after-swap replaces `<html>` attributes with server-rendered ones;
   ThemeInit re-applies .dark for that reason. Do not "simplify" it away.
 - assetsInlineLimit: 0 in astro.config.mjs is load-bearing (scripts must
@@ -145,7 +145,7 @@ the task is finished.
 
 ## Skills de gout (anti design generique)
 
-Quatre skills vivent dans .claude/skills/ pour tout travail de DESIGN sur ce
+Les conventions de DESIGN de la maison sont dans docs/conventions/ pour tout travail sur ce
 theme (audit, retouche, extension, refonte partielle) :
 
 - hallmark : les tells du design genere par IA, nommes un par un, et les
@@ -157,7 +157,7 @@ theme (audit, retouche, extension, refonte partielle) :
 - design-md : dix design.md de produits de reference (Apple, Linear, Stripe,
   Vercel...), la boussole de gout.
 
-Ordre de priorite en cas de conflit : .claude/rules/ et le present fichier
+Ordre de priorite en cas de conflit : docs/conventions/ et le present fichier
 GAGNENT toujours sur ces skills. Elles affinent le gout, elles ne changent ni
 les tokens, ni la limite de 400 lignes, ni le francais sans accents des
 commentaires, ni l'interdiction des noms de palette dans le markup.

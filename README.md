@@ -141,7 +141,7 @@ src/
   styles/       tokens.css, global.css, prose.css, the motion catalog
 scripts/        rebrand.mjs, og.mjs, app.mjs
 wiki/           how the theme works, anchored to the code
-.claude/        rules and skills for coding agents
+docs/           the five convention files, one per subsystem
 ```
 
 ## Make it yours, in order
@@ -196,10 +196,9 @@ checklist Apple reviewers care about, is in
 
 - AGENTS.md: the operating manual (conventions, commands, gotchas), binding
   for humans and agents alike.
-- .claude/rules/: the five house rule files (astro, tailwind, typescript,
-  motion, seo), each anchored to real files in this repo.
-- .claude/skills/: `aloha-review` (the quality bar) and `wiki` (the knowledge
-  base maintainer).
+- docs/conventions/: the five convention files (astro, tailwind, typescript,
+  motion, seo), each anchored to real files in this repo. They are written to
+  be read by a human on day one and by any coding assistant afterwards.
 - wiki/: start at wiki/overview.md; each subsystem has its own anchored page.
 - THIRD-PARTY.md: the complete honest inventory (two OFL fonts, permissive
   npm packages, and the photographs that ship with the demo).

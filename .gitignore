@@ -21,3 +21,8 @@ public/og/
 # Photographies de la demo : rapatriees par `pnpm covers`, refabriquees au build.
 src/assets/covers/
 src/assets/*.webp
+
+# Outillage local des assistants de code : utile en local, jamais publie.
+# Les conventions de la maison, elles, sont versionnees dans docs/conventions/.
+.claude/
+CLAUDE.md

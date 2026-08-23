@@ -92,7 +92,7 @@ src/styles/global.css: `.accent-script`, `.glass`, `.glass-light`,
 
 Palette names in markup are forbidden. When a component needs a colour no role
 expresses, the fix is a house class in global.css, not a palette name in the
-markup. The enforcement grep lives in .claude/rules/tailwind.md.
+markup. The enforcement grep lives in docs/conventions/tailwind.md.
 
 ## Who else reads tokens.css
 

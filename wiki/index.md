@@ -11,7 +11,7 @@ updated: 2026-08-15
 
 The map of how this theme actually works, anchored to real files with
 path:line citations. Maintained by the `wiki` skill
-(.claude/skills/wiki/SKILL.md): `sync` after changes, `ask` for questions,
+(docs/conventions/wiki.md): `sync` after changes, `ask` for questions,
 `lint` for health checks. When a page and the code disagree, the code wins
 and the page gets fixed.
 
@@ -48,4 +48,4 @@ and the page gets fixed.
 
 overview.md, then tokens.md, then ui-primitives.md. Those three explain 80%
 of any file you will open. The repo-level rules live outside the wiki, in
-.claude/rules/ (astro, tailwind, typescript, motion, seo) and AGENTS.md.
+docs/conventions/ (astro, tailwind, typescript, motion, seo) and AGENTS.md.

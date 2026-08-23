@@ -100,7 +100,7 @@ the current URL, and on a 404 that URL exists in no language.
   script, the rest are HTML and CSS. The site scripts are the mobile drawer,
   the theme switch, the shrinking navbar and the reader's table of contents.
 - Markup speaks semantic tokens only; palette names never leave src/styles
-  (.claude/rules/tailwind.md). The `.on-dark` container works only because
+  (docs/conventions/tailwind.md). The `.on-dark` container works only because
   the aliases live in `@theme inline`.
 - `trailingSlash: "always"` makes one canonical URL shape for links,
   canonical tags, pagination and the sitemap.

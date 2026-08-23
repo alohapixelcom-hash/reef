@@ -63,7 +63,7 @@ src/js/textUtils.ts: slugify, humanize, formatDate pinned to UTC so builds do
 not drift a day across timezones, readingTime at 220 wpm. src/js/pagination.ts:
 paginate (an empty list still produces one page so /blog/ always exists) and
 buildPageHref (page 1 at the root, /blog/2/ beyond, trailing slash always).
-Both files have selfchecks; see .claude/rules/typescript.md.
+Both files have selfchecks; see docs/conventions/typescript.md.
 
 ## Editing rules
 

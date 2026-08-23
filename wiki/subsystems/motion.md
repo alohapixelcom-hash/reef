@@ -15,7 +15,7 @@ updated: 2026-08-15
 # Motion system
 
 Motion is CSS first, JavaScript last. The full doctrine is
-.claude/rules/motion.md; this page maps the moving parts.
+docs/conventions/motion.md; this page maps the moving parts.
 
 ## The catalog (src/styles/motion/)
 
