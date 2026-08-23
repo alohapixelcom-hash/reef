@@ -11,7 +11,7 @@
 // morte des qu'on y revient par un lien. Mesure au navigateur : apres accueil
 // -> articles -> accueil, le rail ne bougeait plus et le texte ne se revelait
 // plus. D'ou les trois branchements ci-dessous, qui sont la forme imposee par
-// .claude/rules/astro.md :
+// docs/conventions/astro.md :
 //   - astro:page-load  : (re)installe, garde par data-film-ready
 //   - astro:before-swap: demonte tout, sinon la boucle d'animation et les deux
 //                        observateurs de la page precedente continuent de tourner
@@ -139,7 +139,7 @@ function setup(section: HTMLElement): Teardown | null {
 
   function place(p: number) {
     items.forEach((el, n) => {
-      const a = clamp((p - (0.06 + n * 0.055)) * 8);
+      const a = clamp((p - (0.05 + n * 0.038)) * 16);
       el.style.opacity = String(a);
       el.style.transform = `translate3d(0,${((1 - a) * 2.1).toFixed(3)}em,0)`;
     });

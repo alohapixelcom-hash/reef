@@ -132,8 +132,9 @@
   /* Le mot d'accent d'un titre. Un seul par titre, jamais deux.
    * Plus AUCUNE police a part : meme police que le titre, turquoise, souligne
    * d'une VAGUE - la signature Aloha Pixel (le logo est une vague), pas un
-   * tic d'outil. L'italique serif d'accent est bannie de toute la famille
-   * (decision d'Aloha du 16 aout : c'est le marqueur des "sites claude").
+   * tic d'outil. L'italique serif d'accent est bannie de toute la famille :
+   * un mot en serif italique au milieu d'un titre sans serif est l'ornement
+   * le plus repandu du web, et il ne veut rien dire de la marque.
    * La vague vit dans --accent-wave (tokens.css), une par mode puisque le
    * primaire de Reef change entre clair et sombre. */
   .accent-script {
