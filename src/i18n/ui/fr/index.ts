@@ -7,11 +7,13 @@
 
 import type { Dictionary } from "../types";
 import { frChrome } from "./chrome";
+import { frDemo } from "./demo";
 import { frPages } from "./pages";
 import { frReading } from "./reading";
 
 export const fr: Dictionary = {
   ...frChrome,
+  ...frDemo,
   ...frPages,
   ...frReading,
 };

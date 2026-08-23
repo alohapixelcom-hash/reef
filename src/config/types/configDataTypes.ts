@@ -5,6 +5,9 @@ export interface SiteDataProps {
   title: string;
   description: string;
   useViewTransitions?: boolean;
+  /** Cle i18n de la ligne "ce site est une demonstration" affichee en pied
+   *  de page. Vide ou absente, la ligne n'est pas rendue du tout. */
+  demoNotice?: string;
   author: {
     name: string;
     email: string;

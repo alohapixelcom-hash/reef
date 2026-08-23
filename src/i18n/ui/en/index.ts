@@ -5,11 +5,13 @@
 // exactement. Une traduction a trous ne compile pas, ce qui est voulu.
 
 import { enChrome } from "./chrome";
+import { enDemo } from "./demo";
 import { enPages } from "./pages";
 import { enReading } from "./reading";
 
 export const en = {
   ...enChrome,
+  ...enDemo,
   ...enPages,
   ...enReading,
 } as const;

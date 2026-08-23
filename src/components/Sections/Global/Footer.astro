@@ -14,7 +14,7 @@ import { Input } from "@components/ui/input";
 import { LocaleSwitcher } from "@components/ui/locale-switcher";
 import { getFooterData, getSiteRoutes } from "@config/navData.json.ts";
 import siteData from "@config/siteData.json";
-import { fmt, getLocale, useTranslations } from "@i18n";
+import { fmt, getLocale, localePrefix, useTranslations } from "@i18n";
 
 type Props = {
   /**
@@ -66,6 +66,18 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
 const creditHref = siteData.author.twitter
   ? `https://x.com/${siteData.author.twitter}`
   : `mailto:${siteData.author.email}`;
+
+// --- Ligne de demonstration ------------------------------------------------
+// Elle n'existe que si siteData.demoNotice est renseigne : l'acheteur vide ce
+// champ et la ligne disparait. Le champ porte la cle i18n a afficher, et
+// toute autre valeur est prise telle quelle, pour qui prefere sa propre
+// phrase. Le texte lui-meme vit dans les dictionnaires, jamais ici.
+const noticeKey = siteData.demoNotice?.trim() ?? "";
+const demoNotice = noticeKey === "demo.notice" ? t.demo.notice : noticeKey;
+const [noticeBefore = "", noticeAfter = ""] = demoNotice.split("{studio}");
+// La boutique du theme, avec le prefixe de la langue courante : /fr/ en
+// francais, la racine en anglais. Jamais de domaine ecrit deux fois.
+const studioHref = `https://alohapixel.app${localePrefix(locale)}/`;
 
 const columnLink =
   "text-muted-foreground hover:text-foreground inline-flex min-h-11 items-center text-[0.95rem] transition-colors duration-150";
@@ -176,6 +188,17 @@ const columnLink =
             {siteData.author.name}
           </a>
         </p>
+        {
+          demoNotice && (
+            <p>
+              {noticeBefore}
+              <a href={studioHref} class="text-foreground font-semibold hover:underline">
+                {t.demo.studio}
+              </a>
+              {noticeAfter}
+            </p>
+          )
+        }
       </div>
 
       <ul class="flex flex-wrap items-center gap-2">

@@ -9,6 +9,12 @@ const siteData: SiteDataProps = {
     "A free Astro 7 blog theme built for reading: an editorial home, a post page tuned for eight minutes of attention, topic archives, author pages, client-side search, and a bilingual layer that costs one line per language.",
   useViewTransitions: true,
 
+  // VIDER CETTE VALEUR AVANT DE PUBLIER VOTRE PROPRE SITE.
+  // Ce champ porte la ligne de pied de page qui dit que ce site est une
+  // demonstration du theme Reef. Une chaine vide, et la ligne disparait :
+  // c'est la seule edition a faire, aucun composant a ouvrir.
+  demoNotice: "demo.notice",
+
   author: {
     name: "Aloha Pixel",
     email: "aloha@alohapixel.app",

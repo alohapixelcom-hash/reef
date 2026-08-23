@@ -161,6 +161,10 @@ docs/           the five convention files, one per subsystem
 ## Before you deploy
 
 - [ ] `site` in astro.config.mjs points at your real domain.
+- [ ] `demoNotice` in src/config/siteData.json.ts emptied. It ships holding
+      the one footer line saying this site is a demo of the Reef theme, with a
+      link to the studio. Empty the string and the line stops rendering; no
+      component to open.
 - [ ] `pnpm og` ran after your rebrand, so the cards in public/og/ carry your
       colors and not Reef Notes'.
 - [ ] Legal copy in src/config/legalData.json.ts reviewed by a human who may
