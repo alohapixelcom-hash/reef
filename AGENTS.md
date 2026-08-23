@@ -142,3 +142,22 @@ pages, the selfchecks passing, no em dash anywhere, no file over 400 lines,
 the aloha-review skill returning SHIP (or you fixed what it found), and if
 the change was structural, the wiki got a sync entry. Then, and only then,
 the task is finished.
+
+## Skills de gout (anti design generique)
+
+Quatre skills vivent dans .claude/skills/ pour tout travail de DESIGN sur ce
+theme (audit, retouche, extension, refonte partielle) :
+
+- hallmark : les tells du design genere par IA, nommes un par un, et les
+  gabarits de structure pour ne pas retomber dessus. Verbes : audit, redesign.
+- taste-skill : lire le brief avant de coder, regler variance, motion et
+  densite, choisir une direction au lieu du defaut LLM.
+- redesign-skill : la check-list d'audit d'un existant (typo, couleur, layout,
+  etats, contenu, composants), a derouler avant toute retouche visuelle.
+- design-md : dix design.md de produits de reference (Apple, Linear, Stripe,
+  Vercel...), la boussole de gout.
+
+Ordre de priorite en cas de conflit : .claude/rules/ et le present fichier
+GAGNENT toujours sur ces skills. Elles affinent le gout, elles ne changent ni
+les tokens, ni la limite de 400 lignes, ni le francais sans accents des
+commentaires, ni l'interdiction des noms de palette dans le markup.

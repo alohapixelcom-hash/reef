@@ -100,3 +100,12 @@ find public src -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.webp" -
 # license declared by each font package
 node -e "console.log(require('@fontsource-variable/space-grotesk/package.json').license)"
 ```
+
+## Skills de design embarquees (.claude/skills/)
+
+- hallmark - MIT - copyright 2026 Hallmark contributors - github.com/Nutlope/hallmark
+- taste-skill et redesign-skill - MIT - copyright 2026 Leonxlnx - github.com/Leonxlnx/taste-skill
+- design-md (10 fichiers de reference) - MIT - copyright 2026 VoltAgent - github.com/voltagent/awesome-design-md
+
+Ces skills guident les assistants IA qui travaillent sur le theme. Elles ne
+sont pas chargees au build et ne pesent rien dans le site produit.
