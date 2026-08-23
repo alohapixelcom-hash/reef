@@ -43,56 +43,60 @@ const MEDIA = "https://alohapixel.com/wp-content/uploads";
 // dit quelque chose du texte qu'elle annonce, et c'est note ici pour que le
 // prochain qui en change une sache ce qu'il casse.
 const MANIFEST = {
-  // Le premier ecran : la vague qui deroule devant la cote verte. C'est la
-  // photo de la maison, et le logo du theme est une vague.
+  // Le premier ecran : la vague qui se creuse. C'est la photo de la maison, et
+  // le logo du theme est une vague.
   "reef-hero-vague.webp": {
     url: `${MEDIA}/2024/10/mountains-to-the-sea-scaled.webp`,
     minWidth: 1920,
   },
 
-  // Mesurer chez le lecteur : des trains de houle, ca se compte au rivage.
+  // Mesurer chez le lecteur : une baie se mesure depuis le promontoire, pas
+  // depuis le large.
   "covers/reef-mesurer-lecteur.webp": {
-    url: `${MEDIA}/2026/08/ap-longue-plage-et-trains-de-houle.webp`,
+    url: `${MEDIA}/2026/04/Hanauma-bay-in-Honolulu-on-the-island-of-Oahu-Hawaii.webp`,
     minWidth: 1200,
   },
-  // Un bon brief : la ligne d'ecume dit ou s'arrete le lagon et ou commence le large.
+  // Un bon brief : la ligne d'eau dit exactement ou s'arrete une chose et ou
+  // commence l'autre.
   "covers/reef-bon-brief.webp": {
-    url: `${MEDIA}/2026/08/ap-ecume-et-lagon-turquoise-vus-du-ciel.webp`,
+    url: `${MEDIA}/2026/04/Island-with-coral-reef-at-sunrise-on-Great-Barrier-Reef-split-photo.webp`,
     minWidth: 1200,
   },
-  // Mode sombre : le meme lieu, la lumiere inversee.
+  // Mode sombre : la meme cote, la lumiere inversee.
   "covers/reef-mode-sombre.webp": {
-    url: `${MEDIA}/2026/08/ap-grotte-lagon-poster.webp`,
+    url: `${MEDIA}/2026/05/Lava-vom-Kilauea-trifft-aufs-Meer-auf-Hawaii.webp`,
     minWidth: 1200,
   },
-  // Une collection est un contrat : une pepiniere declare sa structure avant de pousser.
+  // Une collection est un contrat : la tortue tient sa route parce que le recif
+  // dessous a une structure.
   "covers/reef-collections-contrat.webp": {
-    url: `${MEDIA}/2026/08/ap-pepiniere-de-coraux-sous-la-surface.webp`,
+    url: `${MEDIA}/2024/10/Hawaiian-Green-Sea-Turtle-cruises-3-scaled-1.webp`,
     minWidth: 1200,
   },
   // Le cout d'une police : ce qui parait leger de loin pese de pres.
   "covers/reef-cout-police.webp": {
-    url: `${MEDIA}/2026/08/ap-jardin-de-corail-banc-poissons-orange.webp`,
+    url: `${MEDIA}/2025/04/Maui-Hawaii.webp`,
     minWidth: 1200,
   },
   // Un budget de performance : une vague a un budget avant de casser.
   "covers/reef-budget-performance.webp": {
-    url: `${MEDIA}/2026/08/ap-vague-turquoise-qui-se-creuse.webp`,
+    url: `${MEDIA}/2025/04/mountains-to-the-sea.webp`,
     minWidth: 1200,
   },
-  // Une echelle typographique : un escalier, et on voit la marche suivante.
+  // Une echelle typographique : des paliers qui s'etagent, et on voit le
+  // suivant sans compter.
   "covers/reef-echelle-typo.webp": {
-    url: `${MEDIA}/2026/08/ap-escalier-colimacon-phare-vue-plongeante-1.webp`,
+    url: `${MEDIA}/2026/04/maui-sunrise.webp`,
     minWidth: 1200,
   },
   // Du HTML qui vieillit bien : la falaise est toujours la.
   "covers/reef-html-qui-vieillit.webp": {
-    url: `${MEDIA}/2026/08/ap-falaises-vertes-plongeant-dans-la-mer.webp`,
+    url: `${MEDIA}/2026/05/Na-Pali-Coast-scaled.webp`,
     minWidth: 1200,
   },
   // Chiffrer une refonte : vue du ciel, on mesure au lieu de deviner.
   "covers/reef-prix-refonte.webp": {
-    url: `${MEDIA}/2026/05/Na-Pali-Coast-scaled.webp`,
+    url: `${MEDIA}/2026/04/Beautiful-aerial-view-of-spectacular-Na-Pali-coast-Kauai.webp`,
     minWidth: 1200,
   },
 };

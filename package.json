@@ -1,8 +1,19 @@
 {
   "name": "reef",
   "type": "module",
-  "version": "1.0.2",
-  "private": true,
+  "version": "1.0.3",
+  "description": "Reef, a free bilingual Astro 7 blog theme by Aloha Pixel. Reading-first typography, MDX collections, art-directed light and dark modes, owned SEO, Capacitor-ready.",
+  "license": "MIT",
+  "author": "Aloha Pixel (https://alohapixel.app)",
+  "homepage": "https://reef.alohapixel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alohapixelcom-hash/reef.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alohapixelcom-hash/reef/issues"
+  },
+  "keywords": ["astro", "astro-theme", "blog-theme", "tailwindcss", "mdx", "i18n", "capacitor"],
   "packageManager": "pnpm@11.22.0",
   "engines": {
     "node": ">=22.12.0"

@@ -7,7 +7,7 @@
 <h1 align="center">Reef</h1>
 
 <p align="center">
-  <b>A free, bilingual, dark-by-default blog theme for Astro 7.</b><br>
+  <b>A free, bilingual blog theme for Astro 7, light by default.</b><br>
   Reading-first typography, MDX collections, art-directed light and dark modes,<br>
   owned SEO, and an iOS / Android build from the same source.
 </p>
@@ -43,7 +43,7 @@ notebook: build logs, type specimens, and the unglamorous half of freelancing.
 Every word lives in a typed dictionary or in a Markdown post, never inside a
 component.
 
-Reef is built to be read. Buyers get clean, commented, strictly typed source
+Reef is built to be read. You get clean, commented, strictly typed source
 with a maintained wiki and agent tooling, not a black box.
 
 ## What is in the box, counted from this repo
@@ -201,14 +201,19 @@ checklist Apple reviewers care about, is in
 - .claude/skills/: `aloha-review` (the quality bar) and `wiki` (the knowledge
   base maintainer).
 - wiki/: start at wiki/overview.md; each subsystem has its own anchored page.
-- THIRD-PARTY.md: the complete honest inventory (three OFL fonts, permissive
-  npm packages, zero stock assets).
+- THIRD-PARTY.md: the complete honest inventory (two OFL fonts, permissive
+  npm packages, and the photographs that ship with the demo).
 
 ## License
 
-Commercial license, full text in LICENSE. In short: one license per developer
-who edits the source; build unlimited commercial end products for yourself or
-clients; modify anything; no attribution required. The one prohibition:
-redistributing Reef itself, modified or not, as a theme, starter, template,
-kit or component library, or publishing its source. Provided as is, without
-warranty.
+MIT, full text in LICENSE. Use it, fork it, sell what you build with it, no
+attribution required. Republishing Reef itself as your own theme is what the
+MIT license already allows, so there is nothing to negotiate here.
+
+One thing is carved out and it is stated plainly in LICENSE section 2: the
+photographs in src/assets/ are Aloha Pixel's own and are not part of the MIT
+grant. They are there so the demo reads like a real publication. Swap them for
+yours before you publish - scripts/covers.mjs is a plain list of URLs, and a
+post with no cover falls back to a typographic card.
+
+Provided as is, without warranty.

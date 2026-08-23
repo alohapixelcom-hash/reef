@@ -37,11 +37,29 @@ or traced. They are covered by the theme LICENSE.
 
 ## Images and photos
 
-There are none. The theme ships zero photographs and zero stock imagery.
-The only raster files in the repository are the Open Graph cards in public/og/,
-generated locally by scripts/og.mjs from an original SVG template that reads
-the theme's own color tokens. The favicon is an original inline SVG data URI
-built in src/layouts/BaseHead.astro. Nothing to credit, nothing to license.
+The theme ships eleven photographs: one full-bleed hero and ten article covers.
+They are not stock. They are Aloha Pixel's own archive, and they are NOT part of
+the MIT grant that covers the code - LICENSE section 2 states the split in full.
+
+They are not versioned as blobs either. scripts/covers.mjs is a plain manifest of
+URLs pointing at the Aloha Pixel media library, and `pnpm build` fetches them
+into src/assets/ before Astro compiles. The script also refuses any source
+narrower than the slot needs (1920 px for the hero, 1200 px for a cover), so a
+blurry image fails the build instead of reaching a reader.
+
+Subjects, in order of the manifest: a wave hollowing out (hero), Hanauma bay,
+an island reef split at the waterline, lava reaching the ocean, a green turtle
+over a reef, the Maui coast, the same wave again, palms against a sunrise, the
+Na Pali cliffs, and an aerial of the Na Pali coast.
+
+To make the theme yours: change the URLs in scripts/covers.mjs, or drop the
+`cover` field from a post and the layout falls back to a typographic card.
+Nothing in the code depends on a specific image.
+
+Everything else raster in the repository is generated, not sourced: the Open
+Graph cards in public/og/ are produced locally by scripts/og.mjs from an
+original SVG template that reads the theme's own color tokens, and the favicon
+is an original inline SVG data URI built in src/layouts/BaseHead.astro.
 
 ## Demo copy
 
