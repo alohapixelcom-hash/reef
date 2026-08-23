@@ -161,3 +161,10 @@ Ordre de priorite en cas de conflit : docs/conventions/ et le present fichier
 GAGNENT toujours sur ces skills. Elles affinent le gout, elles ne changent ni
 les tokens, ni la limite de 400 lignes, ni le francais sans accents des
 commentaires, ni l'interdiction des noms de palette dans le markup.
+
+## La doctrine de design
+
+Avant d'ajouter une section, une couleur, une police ou un effet : lire
+docs/design.md. C'est la position de la maison, ce qu'elle refuse et ce
+qu'elle fait a la place. La liste de controle de fin de fichier se passe
+avant chaque publication.
