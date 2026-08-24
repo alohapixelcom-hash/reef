@@ -150,3 +150,4 @@ Before adding a section, a colour, a typeface or an effect, read
 docs/design.md. It is the house position: what it refuses, what it does
 instead, and why. The checklist at the end of that file is run before every
 release.
+
