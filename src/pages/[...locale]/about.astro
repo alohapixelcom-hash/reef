@@ -89,10 +89,14 @@ const schemas = [
           accentWord={t.about.valuesAccent}
           lede={t.about.valuesLede}
         />
-        <ol class="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
+        {/* Une liste, pas trois cartes egales en rangee. Trois regles ne sont
+            pas trois offres : elles se lisent l'une apres l'autre, chacune sur
+            sa ligne, separees par un filet. Le numero descend dans la marge,
+            ou il numerote sans se faire passer pour un chiffre cle. */}
+        <ol class="divide-border border-border mt-10 flex flex-col divide-y border-t">
           {
             t.about.values.map((value, index) => (
-              <li class="border-border bg-card rounded-card flex flex-col gap-3 border p-6">
+              <li class="grid gap-x-8 gap-y-2 py-7 md:grid-cols-[4rem_minmax(0,1fr)] md:py-9">
                 {/* Pas d'italique sur ce numero. Space Grotesk n'a pas de coupe
                     italique : le navigateur en fabriquait une oblique, qui
                     penche les chiffres sans les redessiner et se voit tout de
@@ -100,15 +104,19 @@ const schemas = [
                     en toutes lettres dans prose.css, et ce numero etait le
                     dernier endroit du theme qui l'enfreignait. */}
                 <span
-                  class="font-display text-primary text-2xl font-semibold tabular-nums"
+                  class="font-display text-muted-foreground/60 text-sm font-semibold tracking-[0.18em] tabular-nums md:pt-1.5"
                   aria-hidden="true"
                 >
-                  {index + 1}
+                  {String(index + 1).padStart(2, "0")}
                 </span>
-                <h3 class="font-display text-foreground text-xl font-semibold tracking-tight">
-                  {value.title}
-                </h3>
-                <p class="text-muted-foreground text-[0.95rem] leading-relaxed">{value.text}</p>
+                <div class="flex flex-col gap-2">
+                  <h3 class="font-display text-foreground text-xl font-semibold tracking-tight md:text-2xl">
+                    {value.title}
+                  </h3>
+                  <p class="text-muted-foreground measure-wide text-[0.95rem] leading-relaxed">
+                    {value.text}
+                  </p>
+                </div>
               </li>
             ))
           }
@@ -124,12 +132,24 @@ const schemas = [
         accentWord={t.about.writersAccent}
         lede={t.about.writersLede}
       />
-      <ul class="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {/* Des portraits de tailles inegales, pas une rangee de vignettes
+          identiques. Deux personnes qui n'ecrivent pas la meme chose n'ont
+          aucune raison d'occuper deux colonnes jumelles : la premiere prend la
+          largeur et le grand portrait, la suivante descend d'un cran et se
+          tient plus serree. La regle vaut pour n signatures : une sur deux
+          est large, l'autre est etroite et decalee. */}
+      <ul class="mt-10 grid grid-cols-1 items-start gap-x-8 gap-y-10 md:grid-cols-12">
         {
-          authors.map((author) => {
+          authors.map((author, index) => {
             const slug = entrySlug(author.id);
+            const wide = index % 2 === 0;
             return (
-              <li class="flex">
+              <li
+                class:list={[
+                  "flex",
+                  wide ? "md:col-span-7" : "md:col-span-5 md:mt-12",
+                ]}
+              >
                 <AuthorCard
                   {author}
                   {locale}
@@ -137,6 +157,7 @@ const schemas = [
                   count={counts[slug] ?? 0}
                   as="h3"
                   showLinks
+                  avatarSize={wide ? "xl" : "lg"}
                   class="w-full"
                 />
               </li>

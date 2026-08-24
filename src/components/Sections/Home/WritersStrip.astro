@@ -1,11 +1,19 @@
 ---
 // src/components/Sections/Home/WritersStrip.astro - la rangee des signatures de l'accueil : qui ecrit ici, et combien chacun a publie.
-import AuthorCard from "@components/Cards/AuthorCard.astro";
+//
+// Une LISTE, et non trois fiches egales cote a cote. Trois cartes de meme
+// gabarit en rangee est le motif le plus reconnaissable des pages assemblees,
+// et il ment ici deux fois : il annonce autant de signatures que de colonnes,
+// et il donne le meme poids a deux personnes qui n'ont pas ecrit la meme
+// chose. Une signature par ligne, le portrait a gauche, le texte a droite, un
+// filet entre les lignes : c'est la forme d'un ours de journal, et c'est ce
+// que cette section est.
 import SectionHeader from "@components/Sections/Global/SectionHeader.astro";
 import { Icon } from "@components/svg/icons";
+import { Avatar } from "@components/ui/avatar";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
-import { getLocale, useTranslations } from "@i18n";
+import { fmt, getLocale, useTranslations } from "@i18n";
 import { entrySlug } from "@i18n/content";
 import type { CollectionEntry } from "astro:content";
 
@@ -39,28 +47,61 @@ const active = authors.filter((author) => (counts[entrySlug(author.id)] ?? 0) > 
       lede={t.home.authorsLede}
     />
 
-    <ul class="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+    <ul class="divide-border border-border mt-10 flex flex-col divide-y border-t">
       {
         active.map((author) => {
           const slug = entrySlug(author.id);
+          const count = counts[slug] ?? 0;
+          const countLabel = count === 1 ? t.authors.countOne : fmt(t.authors.countLabel, { count });
           return (
-            <li class="flex">
-              <AuthorCard
-                {author}
-                {locale}
-                href={`${routes.authors}${slug}/`}
-                count={counts[slug] ?? 0}
-                as="h3"
-                class="w-full"
+            <li class="group relative grid items-start gap-x-6 gap-y-3 py-7 sm:grid-cols-[auto_minmax(0,1fr)_auto] md:py-8">
+              {/* Le portrait garde sa colonne sur telephone aussi : c'est lui
+                  qui distingue une ligne de la suivante quand le texte, lui,
+                  se ressemble d'une signature a l'autre. */}
+              <Avatar
+                name={author.data.name}
+                src={author.data.avatar?.src}
+                size="xl"
+                alt=""
+                class="size-14 sm:size-20"
               />
+
+              <div class="flex min-w-0 flex-col gap-2">
+                <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <h3 class="font-display text-foreground text-xl font-semibold tracking-tight">
+                    <a href={`${routes.authors}${slug}/`} class="after:absolute after:inset-0 after:content-['']">
+                      {author.data.name}
+                    </a>
+                  </h3>
+                  <p class="text-muted-foreground font-sans text-sm">{author.data.role}</p>
+                </div>
+
+                <p class="text-muted-foreground measure-wide text-[0.95rem] leading-relaxed">
+                  {author.data.bio}
+                </p>
+
+                <p class="text-muted-foreground font-sans text-xs font-semibold tracking-[0.14em] uppercase">
+                  {countLabel}
+                </p>
+              </div>
+
+              {/* La fleche vit dans sa propre colonne : posee en absolu,
+                  elle passait sous la biographie des que la ligne se
+                  resserrait. */}
+              <span
+                class="text-muted-foreground group-hover:text-foreground hidden self-center transition-colors duration-200 sm:block"
+                aria-hidden="true"
+              >
+                <Icon name="arrow-right" size={18} />
+              </span>
             </li>
           );
         })
       }
     </ul>
 
-    {/* Fer a gauche : apres trois fiches, l'oeil revient a la marge, et c'est
-        la qu'on lui tend la suite. Rien sur cette page ne se range au centre. */}
+    {/* Fer a gauche : apres la liste, l'oeil revient a la marge, et c'est la
+        qu'on lui tend la suite. Rien sur cette page ne se range au centre. */}
     <div class="mt-10 flex justify-start">
       <Button href={routes.authors} variant="ghost" size="md">
         {t.home.authorsCta}

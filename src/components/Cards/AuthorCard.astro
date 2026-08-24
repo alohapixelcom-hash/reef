@@ -18,6 +18,10 @@ type Props = {
   locale: Locale;
   /** Affiche la rangee de liens externes. Reservee aux pages qui ont la place. */
   showLinks?: boolean;
+  /** Taille du portrait. Deux fiches cote a cote n'ont pas a porter le meme :
+   *  c'est l'inegalite des portraits qui empeche une rangee de fiches de se
+   *  lire comme un gabarit rempli. */
+  avatarSize?: "lg" | "xl";
   as?: "h2" | "h3";
   class?: string;
 };
@@ -28,6 +32,7 @@ const {
   count,
   locale,
   showLinks = false,
+  avatarSize = "xl",
   as: Tag = "h3",
   class: className,
 }: Props = Astro.props;
@@ -47,7 +52,7 @@ const links = author.data.links;
   data-slot="author-card"
 >
   <div class="flex items-center gap-4">
-    <Avatar name={author.data.name} src={author.data.avatar?.src} size="xl" alt="" />
+    <Avatar name={author.data.name} src={author.data.avatar?.src} size={avatarSize} alt="" />
     <div class="flex min-w-0 flex-col gap-0.5">
       <Tag class="font-display text-foreground text-xl font-semibold tracking-tight">
         <a href={href} class="after:absolute after:inset-0 after:content-['']">
