@@ -16,7 +16,8 @@ La direction artistique est froide et faite pour la lecture : neutre encre
 bleu nuit, corail en action, aigue-marine reef en second accent, Space Grotesk
 en affichage et Instrument Sans en corps ; le mot d'accent garde la police du
 titre, en corail, souligné d'une vague corail (la marque Aloha Pixel est une
-vague). Le thème est sombre et français par défaut.
+vague). Le thème est clair par défaut, avec un mode sombre composé
+plutôt qu'inversé ; l'anglais tient la racine, le français vit sous /fr/.
 
 ## 1. Ce que le dépôt contient, mesuré
 
@@ -33,8 +34,7 @@ Chiffres recomptés depuis la source (`pnpm build` vert, `astro check` à 0/0/0)
 | Utilitaires `animate-*` | 55 au catalogue, plus 3 animations de marque |
 | Langues | 2 (anglais à la racine, français sous /fr/) |
 | Pages de wiki | 11 |
-| Fichiers de règles agent | 5 |
-| Skills agent | 2 |
+| Fichiers de conventions (`docs/conventions/`) | 5 |
 | Dépendances d'exécution | 10, chacune tracée dans THIRD-PARTY.md |
 
 ## 2. Les sous-systèmes
