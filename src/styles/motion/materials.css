@@ -74,7 +74,14 @@
  * chasse, ce qui se lit comme du texte pose sur du verre et non comme du texte
  * delave. */
 .vibrant {
-  color: color-mix(in oklab, currentColor 88%, transparent);
+  /* AUCUNE couleur ici, et c est le point. Cette classe habille du texte pose
+   * sur une image : elle epaissit et desserre, rien de plus. Elle a longtemps
+   * porte color: color-mix(in oklab, currentColor 88%, transparent), ce qui
+   * PARAIT inoffensif et ne l est pas : currentColor se resout sur la couleur
+   * HERITEE, donc la declaration jetait le text-white/85 pose sur l element et
+   * reprenait la couleur du parent. Sur une page en theme clair, le parent est
+   * l encre sombre : le texte devenait invisible sur la photographie. La
+   * couleur vient de l utilitaire, toujours. */
   font-weight: 500;
   letter-spacing: 0.006em;
 }
@@ -192,7 +199,6 @@
   }
 
   .vibrant {
-    color: currentColor;
     font-weight: 600;
   }
 
