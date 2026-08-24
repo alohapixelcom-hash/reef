@@ -207,6 +207,18 @@ checklist Apple reviewers care about, is in
 - THIRD-PARTY.md: the complete honest inventory (two OFL fonts, permissive
   npm packages, and the photographs that ship with the demo).
 
+## Questions
+
+Issues are turned off on this repository, and that is deliberate: support for
+this theme is handled in one place rather than two.
+
+- Something is wrong with the theme, or you want to tell us it helped:
+  https://alohapixel.app/contact/
+- The rest of the family, and the paid siblings:
+  https://alohapixel.app/themes/
+
+Pull requests are welcome all the same.
+
 ## License
 
 MIT, full text in LICENSE. Use it, fork it, sell what you build with it, no
