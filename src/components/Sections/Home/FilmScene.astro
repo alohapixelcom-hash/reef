@@ -289,6 +289,26 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     );
   }
 
+  /* Sous 1024 px, le voile devient VERTICAL, et cette regle passe APRES celle
+   * du repli : sous cette borne la section est toujours en .film--flat, dont
+   * le selecteur est plus fort. Le degrade horizontal est dense a gauche et
+   * ouvert a droite, ce qui suppose une colonne de texte qui s'arrete au
+   * milieu. Sur telephone le texte prend toute la largeur : sa fin de ligne
+   * tombe dans la partie ouverte, et sur une photographie claire elle devient
+   * illisible. Un degrade vertical, dense derriere toute la bande de texte,
+   * regle le probleme sans toucher au cadrage de la photo. */
+  @media (max-width: 63.99rem) {
+    .film__veil,
+    .film--flat .film__veil {
+      background: linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--reef-background) 82%, transparent) 0%,
+        color-mix(in oklab, var(--reef-background) 90%, transparent) 55%,
+        color-mix(in oklab, var(--reef-background) 72%, transparent) 100%
+      );
+    }
+  }
+
   /* Les elements de texte partent invisibles UNIQUEMENT quand le script est la
      pour les relacher. Sans cette classe posee par le script, un lecteur dont
      le JavaScript a echoue verrait une section vide : l'etat de depart est

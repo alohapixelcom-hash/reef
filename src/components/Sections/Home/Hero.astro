@@ -88,11 +88,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
         grand ecran, puis s'ouvrir franchement pour laisser la vague entiere.
         Le noir est ici un canal alpha, pas une couleur : il n'a donc pas de
         token, et il n'en veut pas. */}
-    <div
-      class="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/88 from-0% via-black/60 via-42% to-transparent to-80%"
-      aria-hidden="true"
-    >
-    </div>
+    <div class="hero-veil pointer-events-none absolute inset-0" aria-hidden="true"></div>
     <div
       class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/30"
       aria-hidden="true"
@@ -202,3 +198,39 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     </div>
   </section>
 </div>
+
+<style>
+  /* Le voile horizontal, ecrit ici plutot qu'en utilitaires de degrade : c'est
+   * la seule facon d'en donner une seconde version sous une media query sans
+   * faire dependre le resultat de l'ordre d'emission des feuilles. Les valeurs
+   * sont celles d'avant, au pourcentage pres. */
+  .hero-veil {
+    background: linear-gradient(
+      90deg,
+      rgb(0 0 0 / 0.88) 0%,
+      rgb(0 0 0 / 0.6) 42%,
+      rgb(0 0 0 / 0) 80%
+    );
+  }
+
+  /* Sous 1024 px, le voile de lecture devient VERTICAL. Le degrade horizontal
+   * est dense a gauche et ouvert a droite : il suppose une colonne de texte
+   * qui s'arrete avant le milieu. Sur telephone le titre et le chapeau
+   * occupent toute la largeur, leurs fins de ligne tombent dans la partie
+   * ouverte, et sur une photographie claire elles deviennent illisibles.
+   *
+   * La couleur est lue sur --reef-background, jamais sur --color-background :
+   * l'alias semantique est substitue sur :root, il vaut donc la valeur CLAIRE
+   * et repeindrait la vague en blanc. Dans .deep-scene, --reef-background
+   * porte bien l'encre sombre de la scene. */
+  @media (max-width: 63.99rem) {
+    .hero-veil {
+      background: linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--reef-background) 82%, transparent) 0%,
+        color-mix(in oklab, var(--reef-background) 90%, transparent) 55%,
+        color-mix(in oklab, var(--reef-background) 72%, transparent) 100%
+      );
+    }
+  }
+</style>
