@@ -106,7 +106,7 @@ export const frPages: Pick<
     nameLabel: "Votre nom",
     namePlaceholder: "Ada Lovelace",
     emailLabel: "Email",
-    emailPlaceholder: "vous@exemple.com",
+    emailPlaceholder: "vous@example.com",
     subjectLabel: "Objet",
     subjectPlaceholder: "Une ligne suffit",
     messageLabel: "Message",
