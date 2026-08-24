@@ -127,4 +127,4 @@ does not spell out the demo publication.
 Read ui/README.md, imitate Button, use only floor-3 tokens, try the
 platform before writing a script, put `data-slot` on every part root, keep
 44px touch targets, export the tv config through index.ts, stay under 400
-lines, one-line header, then run the aloha-review skill on it.
+lines, one-line header, then run the review checklist at the end of docs/design.md on it.

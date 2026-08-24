@@ -12,10 +12,11 @@ rule files it imports are binding, not advisory:
 - docs/conventions/motion.md - the animation ladder and reduced motion
 - docs/conventions/seo.md - BaseHead, JSON-LD constructors, endpoints
 
-Two skills exist for you: `aloha-review` (run it on your own work before
-calling it done) and `wiki` (sync it after structural changes, ask it
-before re-deriving how something works). The wiki itself lives in wiki/;
-start with wiki/overview.md.
+Two things carry the rest of the context. The review checklist at the end
+of docs/design.md, which you run on your own work before calling it done.
+And the wiki in wiki/, which explains how each subsystem actually works:
+start with wiki/overview.md, and add a sync entry there after a structural
+change.
 
 ## What this theme is
 
@@ -139,32 +140,13 @@ node src/js/pagination.selfcheck.ts
 
 `pnpm check` at 0 errors, 0 warnings, 0 hints, `pnpm build` green with 55
 pages, the selfchecks passing, no em dash anywhere, no file over 400 lines,
-the aloha-review skill returning SHIP (or you fixed what it found), and if
-the change was structural, the wiki got a sync entry. Then, and only then,
-the task is finished.
+the review checklist at the end of docs/design.md passed (or you fixed
+what it found), and if the change was structural, the wiki got a sync
+entry. Then, and only then, the task is finished.
 
-## Skills de gout (anti design generique)
+## The design doctrine
 
-Les conventions de DESIGN de la maison sont dans docs/conventions/ pour tout travail sur ce
-theme (audit, retouche, extension, refonte partielle) :
-
-- hallmark : les tells du design genere par IA, nommes un par un, et les
-  gabarits de structure pour ne pas retomber dessus. Verbes : audit, redesign.
-- taste-skill : lire le brief avant de coder, regler variance, motion et
-  densite, choisir une direction au lieu du defaut LLM.
-- redesign-skill : la check-list d'audit d'un existant (typo, couleur, layout,
-  etats, contenu, composants), a derouler avant toute retouche visuelle.
-- design-md : dix design.md de produits de reference (Apple, Linear, Stripe,
-  Vercel...), la boussole de gout.
-
-Ordre de priorite en cas de conflit : docs/conventions/ et le present fichier
-GAGNENT toujours sur ces skills. Elles affinent le gout, elles ne changent ni
-les tokens, ni la limite de 400 lignes, ni le francais sans accents des
-commentaires, ni l'interdiction des noms de palette dans le markup.
-
-## La doctrine de design
-
-Avant d'ajouter une section, une couleur, une police ou un effet : lire
-docs/design.md. C'est la position de la maison, ce qu'elle refuse et ce
-qu'elle fait a la place. La liste de controle de fin de fichier se passe
-avant chaque publication.
+Before adding a section, a colour, a typeface or an effect, read
+docs/design.md. It is the house position: what it refuses, what it does
+instead, and why. The checklist at the end of that file is run before every
+release.

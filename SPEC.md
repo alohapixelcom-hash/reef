@@ -62,15 +62,14 @@ Chiffres recomptés depuis la source (`pnpm build` vert, `astro check` à 0/0/0)
 - **Formulaire de contact** : écrit dans `contact.astro` mais livré sans
   `action`, pour ne pas imposer d'hébergeur ni de prestataire à l'acheteur.
 
-## 3. Les deux skills agent
+## 3. La base de connaissance et la revue
 
-**`wiki`** : une base de connaissance markdown que l'agent maintient. Trois
-opérations, `sync`, `ask`, `lint`. Chaque page porte un frontmatter et cite du
-`chemin:ligne` réel, pour que la dérive soit détectable.
+**`wiki/`** : une base de connaissance markdown maintenue avec le code. Chaque
+page porte un frontmatter et cite du `chemin:ligne` reel, pour que la derive
+soit detectable.
 
-**`aloha-review`** : une revue de code exigeante (portes mécaniques, conformité
-au système de design, audit zéro-JS, accessibilité, structure), qui rend un
-verdict SHIP, POLISH ou REWORK avec une preuve `chemin:ligne` par constat.
+**La revue** : la liste de controle en fin de `docs/design.md`, quinze points
+a passer avant toute publication, avec une preuve `chemin:ligne` par constat.
 
 ## 4. Règles non négociables
 
