@@ -1,5 +1,5 @@
 ---
-// src/components/Sections/Home/Hero.astro - le premier ecran : une vague en pleine page, le message a gauche, l'action a droite.
+// src/components/Sections/Home/Hero.astro - le premier ecran : une vague en pleine page, l'accroche et le titre a gauche, le chapeau et l'action a droite.
 //
 // Ce que ce hero corrige
 // ----------------------
@@ -112,89 +112,104 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     >
     </div>
 
-    {/* Deux colonnes : ce qu'on dit a gauche, ce qu'on fait a droite.
+    {/* Le patron maison du premier ecran, le meme sur les six sites : deux
+        colonnes inegales, la ligne d'accroche et le titre a gauche, le chapeau
+        et les deux boutons a droite.
 
         La colonne de droite portait une pile de trois fiches en perspective.
         Elle est partie, et la regle qui l'a fait partir vaut pour tout ce
         qu'on serait tente d'y remettre : un objet decoratif qui ne se clique
         pas, ne se lit pas et ne dit rien du contenu occupe la moitie du
-        premier ecran pour rien. Une pile de rectangles inclines est de ceux-la.
+        premier ecran pour rien. Ne pas la remplacer par un autre. Ce qui
+        occupe maintenant cette moitie est ce qu'on demande au lecteur de
+        comprendre puis de faire, le chapeau et les deux boutons. La
+        photographie porte l'image a elle seule.
 
-        Ne pas la remplacer par un autre. Ce qui occupe maintenant cette
-        moitie est ce qu'on demande au lecteur de faire, les deux boutons, et
-        de quoi decider, les trois nombres. La photographie porte l'image a
-        elle seule. */}
-    {/* min-h-[80svh] et content-center : le premier ecran doit peser quatre
+        lg:items-end cale la colonne de droite sur le bas du titre : le chapeau
+        et les boutons repondent alors a l'accroche au lieu de flotter a cote
+        d'elle.
+
+        min-w-0 sur les deux colonnes, sinon un mot long du titre elargit sa
+        piste de grille et fait deborder la page en largeur.
+
+        Aucun order-* : sous 1024 px les deux colonnes s'empilent dans l'ordre
+        du document, qui est deja le bon - accroche, titre, chapeau, boutons,
+        puis la bande des nombres qui suit la grille. */}
+    {/* min-h-[80svh] et justify-center : le premier ecran doit peser quatre
         cinquiemes de la hauteur reelle, pas ce que sa marge interieure lui
         donne par hasard. svh et non vh parce que la barre d'adresse mobile
         fait varier vh en cours de defilement, et un hero qui saute pendant
-        qu'on le lit est pire qu'un hero trop court. content-center range les
-        rangees au milieu de la hauteur restante quand le contenu est plus
-        court qu'elle ; sans lui, la grille tasserait tout en haut. */}
+        qu'on le lit est pire qu'un hero trop court. */}
     <div
-      class="container-page relative z-10 grid min-h-[80svh] content-center gap-10 pt-28 pb-14 sm:gap-14 sm:pt-32 md:pt-40 md:pb-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.72fr)] lg:items-center lg:gap-x-16 lg:pt-44 lg:pb-24"
+      class="container-page relative z-10 flex min-h-[80svh] flex-col justify-center pt-28 pb-14 sm:pt-32 md:pt-40 md:pb-20 lg:pt-44 lg:pb-24"
     >
-      {/* --- Colonne de gauche : ce qu'on dit ----------------------------- */}
-      <div class="flex flex-col items-start">
-        <p
-          class="text-muted-foreground flex items-center gap-3 text-xs font-medium tracking-[0.18em] uppercase"
-        >
-          <span class="bg-primary inline-block h-px w-8 shrink-0" aria-hidden="true"></span>
-          {t.home.eyebrow}
-        </p>
+      <div
+        class="grid w-full gap-10 sm:gap-14 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-end lg:gap-x-16"
+      >
+        {/* --- Colonne de gauche : ce qu'on dit ---------------------------- */}
+        <div class="flex min-w-0 flex-col items-start">
+          <p
+            class="text-muted-foreground flex items-center gap-3 text-xs font-medium tracking-[0.18em] uppercase"
+          >
+            <span class="bg-primary inline-block h-px w-8 shrink-0" aria-hidden="true"></span>
+            {t.home.eyebrow}
+          </p>
 
-        <h1 id="hero-title" class="font-display text-display-lg lg:text-display-xl mt-6 max-w-3xl">
-          {
-            word ? (
-              <Fragment>
-                {before}
-                <span class="accent-script">{word}</span>
-                {after}
-              </Fragment>
-            ) : (
-              title
-            )
-          }
-        </h1>
-
-        {/* Le chapeau et les compteurs passent en blanc franc plutot qu'en
-            muted : le gris de texte secondaire a ete calcule pour un aplat
-            sombre, pas pour une photographie qui bouge sous lui. */}
-        <p class="measure-wide mt-6 leading-relaxed text-white/85 md:text-lg lg:text-xl">
-          {t.home.heroLede}
-        </p>
-      </div>
-
-      {/* --- Colonne de droite : ce qu'on demande de faire ----------------
-          Les deux boutons, puis les trois nombres qui repondent a la seule
-          question qu'un lecteur se pose avant de cliquer, "y a-t-il de quoi
-          lire". Ils etaient l'un sous le chapeau et l'autre sous le titre,
-          dans la colonne de gauche : la moitie droite de l'ecran ne portait
-          alors qu'une illustration. */}
-      <div class="flex flex-col items-start gap-8">
-        <div class="flex flex-wrap items-center gap-3">
-          <Button href={routes.posts} variant="primary" size="lg">
-            {t.home.heroPrimary}
-            <Icon name="arrow-right" size={18} />
-          </Button>
-          <Button href={routes.about} variant="outline" size="lg">{t.home.heroSecondary}</Button>
+          <h1 id="hero-title" class="font-display text-display-lg lg:text-display-xl mt-6">
+            {
+              word ? (
+                <Fragment>
+                  {before}
+                  <span class="accent-script">{word}</span>
+                  {after}
+                </Fragment>
+              ) : (
+                title
+              )
+            }
+          </h1>
         </div>
 
-        {
-          ledger.length > 0 && (
-            <dl class="flex w-full flex-wrap gap-x-10 gap-y-4 border-t border-white/25 pt-6">
-              {t.home.heroLedger.map((label, i) => (
-                <div class="flex flex-col gap-0.5">
-                  <dd class="font-display text-3xl leading-none font-bold tabular-nums md:text-4xl">
-                    {ledger[i] ?? 0}
-                  </dd>
-                  <dt class="text-xs tracking-[0.14em] text-white/75 uppercase">{label}</dt>
-                </div>
-              ))}
-            </dl>
-          )
-        }
+        {/* --- Colonne de droite : ce qu'on demande de faire ---------------
+            Fer a gauche DANS sa colonne, jamais centre : deux blocs centres
+            l'un sous l'autre n'ont plus de ligne de depart commune.
+
+            Le chapeau passe en blanc franc plutot qu'en muted : le gris de
+            texte secondaire a ete calcule pour un aplat sombre, pas pour une
+            photographie qui bouge sous lui. */}
+        <div class="flex min-w-0 flex-col items-start lg:justify-end lg:pb-2">
+          <p class="measure-wide leading-relaxed text-white/85 md:text-lg lg:text-xl">
+            {t.home.heroLede}
+          </p>
+
+          <div class="mt-8 flex flex-wrap items-center gap-3">
+            <Button href={routes.posts} variant="primary" size="lg">
+              {t.home.heroPrimary}
+              <Icon name="arrow-right" size={18} />
+            </Button>
+            <Button href={routes.about} variant="outline" size="lg">{t.home.heroSecondary}</Button>
+          </div>
+        </div>
       </div>
+
+      {/* Les trois nombres repondent a la seule question qu'un lecteur se pose
+          avant de cliquer, "y a-t-il de quoi lire". Ils restent HORS de la
+          grille, pleine largeur et en bas du panneau : ranges dans une colonne
+          ils deviendraient un argument de plus au lieu du socle du cadre. */}
+      {
+        ledger.length > 0 && (
+          <dl class="mt-12 flex w-full flex-wrap gap-x-10 gap-y-4 border-t border-white/25 pt-6 md:mt-16">
+            {t.home.heroLedger.map((label, i) => (
+              <div class="flex flex-col gap-0.5">
+                <dd class="font-display text-3xl leading-none font-bold tabular-nums md:text-4xl">
+                  {ledger[i] ?? 0}
+                </dd>
+                <dt class="text-xs tracking-[0.14em] text-white/75 uppercase">{label}</dt>
+              </div>
+            ))}
+          </dl>
+        )
+      }
     </div>
   </section>
 </div>
