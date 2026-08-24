@@ -73,7 +73,7 @@ export const frReading: Pick<Dictionary, "post" | "archive" | "newsletter"> = {
     lede:
       "Un court résumé de ce que nous avons publié et de ce que nous avons raté. Pas de pixel espion, pas de séquence automatique, un clic pour partir définitivement.",
     emailLabel: "Votre email",
-    placeholder: "vous@exemple.com",
+    placeholder: "vous@example.com",
     submit: "S'abonner",
     note: "Un email par mois. Désinscription depuis n'importe lequel.",
     success: "Presque fini. Confirmez l'inscription depuis l'email que nous venons d'envoyer.",

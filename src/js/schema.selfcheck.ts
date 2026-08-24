@@ -18,27 +18,27 @@ function is(actual: unknown, expected: unknown, message: string): void {
 }
 
 // organization : les champs absents disparaissent, ils ne trainent pas en undefined.
-const org = organization({ name: "Lagoon", url: "https://lagoon.example.com/" });
+const org = organization({ name: "Lagoon", url: "https://example.com/" });
 is(
   org,
-  { "@context": "https://schema.org", "@type": "Organization", name: "Lagoon", url: "https://lagoon.example.com/" },
+  { "@context": "https://schema.org", "@type": "Organization", name: "Lagoon", url: "https://example.com/" },
   "organization stays minimal without optional fields",
 );
 is(
-  organization({ name: "Lagoon", url: "https://lagoon.example.com/", sameAs: ["https://x.com/lagoon"] }).sameAs,
-  ["https://x.com/lagoon"],
+  organization({ name: "Lagoon", url: "https://example.com/", sameAs: ["https://x.com"] }).sameAs,
+  ["https://x.com"],
   "organization keeps its social profiles",
 );
 
 // website : forme exacte.
-const site = website({ name: "Lagoon", url: "https://lagoon.example.com/", description: "A customer insight platform." });
+const site = website({ name: "Lagoon", url: "https://example.com/", description: "A customer insight platform." });
 is(
   site,
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Lagoon",
-    url: "https://lagoon.example.com/",
+    url: "https://example.com/",
     description: "A customer insight platform.",
   },
   "website carries name, url and description",
@@ -48,7 +48,7 @@ is(
 const post = article({
   title: "Reading the room at scale",
   description: "How Lagoon turns raw feedback into decisions.",
-  url: "https://lagoon.example.com/blog/reading-the-room/",
+  url: "https://example.com/blog/reading-the-room/",
   datePublished: new Date("2026-05-04T08:00:00.000Z"),
   authorName: "Maya Chen",
 });
@@ -63,7 +63,7 @@ is(
   article({
     title: "t",
     description: "d",
-    url: "https://lagoon.example.com/blog/t/",
+    url: "https://example.com/blog/t/",
     datePublished: "2026-05-04",
     authorName: "Maya Chen",
   }).datePublished,
@@ -95,14 +95,14 @@ is(
 
 // breadcrumbList : positions 1-based, ordre conserve.
 const trail = breadcrumbList([
-  { name: "Home", url: "https://lagoon.example.com/" },
-  { name: "Blog", url: "https://lagoon.example.com/blog/" },
+  { name: "Home", url: "https://example.com/" },
+  { name: "Blog", url: "https://example.com/blog/" },
 ]);
 is(
   trail.itemListElement,
   [
-    { "@type": "ListItem", position: 1, name: "Home", item: "https://lagoon.example.com/" },
-    { "@type": "ListItem", position: 2, name: "Blog", item: "https://lagoon.example.com/blog/" },
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://example.com/" },
+    { "@type": "ListItem", position: 2, name: "Blog", item: "https://example.com/blog/" },
   ],
   "breadcrumb positions are 1-based and ordered",
 );
@@ -111,7 +111,7 @@ is(
 const app = softwareApplication({
   name: "Lagoon",
   description: "A customer insight platform.",
-  url: "https://lagoon.example.com/",
+  url: "https://example.com/",
   price: 0,
 });
 is(app.applicationCategory, "BusinessApplication", "applicationCategory defaults sensibly");
@@ -122,7 +122,7 @@ checks += 1;
 assert.ok(
   !(
     "aggregateRating" in
-    softwareApplication({ name: "Lagoon", description: "d", url: "https://lagoon.example.com/", ratingValue: 4.8 })
+    softwareApplication({ name: "Lagoon", description: "d", url: "https://example.com/", ratingValue: 4.8 })
   ),
   "a rating value alone is not enough for an AggregateRating",
 );
