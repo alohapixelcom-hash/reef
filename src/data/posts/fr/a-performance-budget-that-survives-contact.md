@@ -66,7 +66,7 @@ Un budget que personne n'automatise expire discrètement vers la sixième semain
 Les tailles sont en kibioctets, les temps en millisecondes, et le fichier est compris directement par la ligne de commande Lighthouse :
 
 ```bash
-npx lighthouse "https://recette.exemple.com/journal/premier-article/" \
+npx lighthouse "https://recette.example.com/journal/premier-article/" \
   --budget-path=./perf/budget.json \
   --form-factor=mobile \
   --output=json --output-path=./perf/rapport.json \

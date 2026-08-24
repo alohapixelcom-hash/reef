@@ -99,7 +99,7 @@ Avant d'écrire la moindre ligne, passez cinq minutes sur les données de terrai
 ```bash
 curl -s "https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=$CRUX_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"origin":"https://exemple.com","formFactor":"PHONE"}' \
+  -d '{"origin":"https://example.com","formFactor":"PHONE"}' \
   | jq '.record.metrics | to_entries[] | {(.key): .value.percentiles.p75}'
 ```
 
