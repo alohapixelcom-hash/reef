@@ -3,7 +3,7 @@
   "role": "Performance engineer",
   "bio": "Noor joined from a retail platform where a hundred milliseconds had a price tag attached, and brought the habit of measuring before arguing. She owns the studio's field data pipeline and the uncomfortable meeting where we show clients what their site does on a five year old phone.",
   "links": [
-    { "label": "GitHub", "href": "https://github.com/noorbenali" },
-    { "label": "Newsletter", "href": "https://slowpages.dev" }
+    { "label": "GitHub", "href": "https://github.com" },
+    { "label": "Newsletter", "href": "https://example.com" }
   ]
 }

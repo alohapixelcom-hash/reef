@@ -3,7 +3,7 @@
   "role": "Ingénieure performance",
   "bio": "Noor vient d'une plateforme de commerce en ligne où cent millisecondes avaient une valeur chiffrée, et elle en a gardé l'habitude de mesurer avant de discuter. Elle s'occupe de la collecte des données de terrain du studio et de la réunion inconfortable où l'on montre au client ce que donne son site sur un téléphone de cinq ans d'âge.",
   "links": [
-    { "label": "GitHub", "href": "https://github.com/noorbenali" },
-    { "label": "Infolettre", "href": "https://slowpages.dev" }
+    { "label": "GitHub", "href": "https://github.com" },
+    { "label": "Infolettre", "href": "https://example.com" }
   ]
 }

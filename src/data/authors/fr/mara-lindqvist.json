@@ -3,7 +3,7 @@
   "role": "Fondatrice et développeuse web",
   "bio": "Mara a ouvert le studio en 2016, après huit ans passés en agence, et écrit encore la majeure partie du HTML qui part en production. Ce sont les parties ingrates d'un projet qui l'intéressent : le nommage, la modélisation des données et la clause de contrat que personne n'a envie de lire.",
   "links": [
-    { "label": "Site", "href": "https://maralindqvist.se" },
-    { "label": "Mastodon", "href": "https://mastodon.social/@mara" }
+    { "label": "Site", "href": "https://example.com" },
+    { "label": "Mastodon", "href": "https://mastodon.social" }
   ]
 }

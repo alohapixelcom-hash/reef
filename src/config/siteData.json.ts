@@ -9,16 +9,20 @@ const siteData: SiteDataProps = {
     "A free Astro 7 blog theme built for reading: an editorial home, a post page tuned for eight minutes of attention, topic archives, author pages, client-side search, and a bilingual layer that costs one line per language.",
   useViewTransitions: true,
 
-  // VIDER CETTE VALEUR AVANT DE PUBLIER VOTRE PROPRE SITE.
-  // Ce champ porte la ligne de pied de page qui dit que ce site est une
-  // demonstration du theme Reef. Une chaine vide, et la ligne disparait :
-  // c'est la seule edition a faire, aucun composant a ouvrir.
-  demoNotice: "demo.notice",
+  // VIDE VOLONTAIREMENT. Le catalogue de themes Astro refuse toute mention
+  // d'une entreprise reelle dans une demonstration : la ligne de pied de page
+  // qui citait le studio est donc eteinte. Le mecanisme reste entier, champ,
+  // composant et cles i18n compris, et se rallume en remettant "demo.notice"
+  // dans ce champ une fois le theme accepte.
+  demoNotice: "",
 
+  // Identite NEUTRE, pour la meme raison : une demo ne porte ni nom
+  // d'utilisateur reel, ni domaine que l'on ne possede pas. L'acheteur met les
+  // siens ici, et le pied de page suit.
   author: {
-    name: "Aloha Pixel",
-    email: "aloha@alohapixel.app",
-    twitter: "alohapixel",
+    name: "Example Studio",
+    email: "hello@example.com",
+    twitter: "",
   },
 
   defaultImage: {

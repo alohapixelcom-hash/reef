@@ -3,7 +3,7 @@
   "role": "Designer d'interface",
   "bio": "Tomas dessine directement dans le navigateur, ce qui est une façon polie de dire qu'il refait ses propres maquettes trois fois avant de les montrer. Il tranche les questions de typographie et de couleur du studio, et tient à jour un tableau de tous les rapports de contraste sur lesquels nous nous sommes disputés.",
   "links": [
-    { "label": "Portfolio", "href": "https://abaroa.studio" },
-    { "label": "Are.na", "href": "https://www.are.na/tomas-abaroa" }
+    { "label": "Portfolio", "href": "https://example.com" },
+    { "label": "Are.na", "href": "https://www.are.na" }
   ]
 }
