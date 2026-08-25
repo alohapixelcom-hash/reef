@@ -48,14 +48,15 @@
 // cycle de vie du routeur client (voir l'en-tete de ce module).
 //
 // LA VIDEO VIENT DE PEXELS, licence libre pour l'usage commercial, sans
-// attribution exigee : une grotte sous-marine, un rai de lumiere, un plongeur
-// en contre-jour. PHOTOS.md donne la page d'origine. La version precedente
+// attribution exigee : une vague vue de dessous, qui roule et se referme, l'eau
+// claire et la lumiere qui traverse la crete. Tournee a Hawaii. PHOTOS.md donne
+// la page d'origine. La version precedente
 // etait hebergee par la maison, ce qui faisait dependre la demonstration d'un
 // serveur qui n'est pas celui de l'acheteur, et ce fichier-la n'etait pas
 // redistribuable.
 //
 // Les trois adresses de video pointent le meme fichier : Pexels n'en publie
-// qu'un seul rendu pour ce plan, 1920 par 1080, 5,7 Mo. En portrait la scene
+// qu'un seul rendu utile pour ce plan, 1920 par 1080, 9 Mo. En portrait la scene
 // l'agrandit pour couvrir, c'est prevu par le moteur. Les deux affiches sont
 // deux recadrages de la vignette, demandes en WebP a la volee.
 //
@@ -81,13 +82,13 @@ interface Props {
 }
 
 const {
-  src = "https://videos.pexels.com/video-files/34413488/14578462_1920_1080_60fps.mp4",
-  srcHd = "https://videos.pexels.com/video-files/34413488/14578462_1920_1080_60fps.mp4",
-  srcPortrait = "https://videos.pexels.com/video-files/34413488/14578462_1920_1080_60fps.mp4",
-  poster = "https://images.pexels.com/videos/34413488/aquarium-coralgarden-scuba-dive-adventure-nature-zerogravity-34413488.jpeg?auto=compress&cs=srgb&fm=webp&w=1920&h=1080&fit=crop",
-  posterPortrait = "https://images.pexels.com/videos/34413488/aquarium-coralgarden-scuba-dive-adventure-nature-zerogravity-34413488.jpeg?auto=compress&cs=srgb&fm=webp&w=608&h=1080&fit=crop",
+  src = "https://videos.pexels.com/video-files/4863640/4863640-hd_1920_1080_24fps.mp4",
+  srcHd = "https://videos.pexels.com/video-files/4863640/4863640-hd_1920_1080_24fps.mp4",
+  srcPortrait = "https://videos.pexels.com/video-files/4863640/4863640-hd_1920_1080_24fps.mp4",
+  poster = "https://images.pexels.com/videos/4863640/hawaii-electricbeach-4863640.jpeg?auto=compress&cs=srgb&fm=webp&w=1920&h=1080&fit=crop",
+  posterPortrait = "https://images.pexels.com/videos/4863640/hawaii-electricbeach-4863640.jpeg?auto=compress&cs=srgb&fm=webp&w=608&h=1080&fit=crop",
   from = 0,
-  to = 9,
+  to = 12,
 }: Props = Astro.props;
 
 const locale = getLocale(Astro);
