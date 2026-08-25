@@ -1,6 +1,6 @@
 LICENSE - Reef is free and open source under the MIT license. The photographs
-shipped with it are not: they belong to Aloha Pixel and travel with the theme
-as demo material only. Both rules are written in full below.
+shipped with it come from Pexels and carry the Pexels licence, which is at
+least as permissive. Both rules are written in full below.
 
 ===============================================================================
 1. THE CODE - MIT LICENSE
@@ -29,28 +29,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ===============================================================================
-2. THE PHOTOGRAPHS - NOT COVERED BY THE MIT GRANT
+2. THE PHOTOGRAPHS - PEXELS LICENCE
 ===============================================================================
 
 The MIT license above covers the source code, the styles, the icons, the
-documentation and the build scripts. It does not cover the photographs.
+documentation and the build scripts.
 
-The images fetched by scripts/covers.mjs into src/assets/ and src/assets/covers/
-are photographs owned by Aloha Pixel. They are shipped so the demo looks like a
-real publication instead of grey rectangles, and they are licensed to you for
-exactly that: running, evaluating and modifying Reef.
+The ten photographs in src/assets/ and src/assets/covers/ come from Pexels and
+are used under the Pexels licence: https://www.pexels.com/license/
 
-You may keep them while you develop. Replace them before you publish. You may
-not redistribute them on their own, sell them, or use them in a product where
-the photograph is the thing being sold.
+That licence is free for commercial and personal use, requires no attribution,
+and allows modification. PHOTOS.md at the root of this repository lists every
+file with the Pexels page it came from, so the provenance of each image can be
+checked in one place.
 
-Deleting them is safe and supported: point the entries of scripts/covers.mjs at
-your own images, or remove the `cover` field from a post and the layout falls
-back to a typographic card. Nothing in the code depends on a specific image.
+You may keep these photographs in the site you publish with Reef, or replace
+them with your own. Both are inside the licence. The one restriction the Pexels
+licence carries has nothing to do with using this theme: an unaltered photo may
+not be resold as a stock image, a print or a poster.
 
-Why the split: the code is the theme, and a theme nobody may republish is not
-a theme. The photographs are a working studio's archive, and giving them away
-under MIT would give away work that has nothing to do with Astro.
+The zip archive of Reef ships every photograph already, so a build from the
+archive needs no network. A build from the repository fetches them once from
+Pexels through scripts/covers.mjs, which is a plain list of URLs.
+
+Deleting them is safe and supported: remove the `cover` field from a post and
+the layout falls back to a typographic card. Nothing in the code depends on a
+specific image.
 
 ===============================================================================
 3. DEMO CONTENT
