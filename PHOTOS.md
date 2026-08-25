@@ -1,12 +1,12 @@
-<!-- PHOTOS.md - where every photograph in this theme comes from, and what you
-     may do with it. One page, no ambiguity. -->
+<!-- PHOTOS.md - where every photograph and the one video in this theme come
+     from, and what you may do with them. One page, no ambiguity. -->
 
 # Photo credits and licence
 
-Every photograph shipped with Reef comes from **Pexels** and is used under the
-[Pexels licence](https://www.pexels.com/license/).
+Every photograph and the video shipped with Reef come from **Pexels** and are
+used under the [Pexels licence](https://www.pexels.com/license/).
 
-What that licence gives you, as the buyer of this theme:
+What that licence gives you, as a user of this theme:
 
 - Free for commercial and personal projects.
 - No attribution required (this page exists because we prefer to be explicit).
@@ -18,9 +18,9 @@ The one thing the Pexels licence does not allow, and it has nothing to do with
 using this theme: reselling an unaltered photograph as a stock photo, a print or
 a poster. Do not do that, and you are inside the licence.
 
-The archive you bought already contains every one of these files, in
-`src/assets/`, at the exact crop the demo shows. Building from the zip needs no
-network.
+The archive of Reef already contains every one of these image files, in
+`src/assets/`, at the exact crop the demo shows. Building from the archive needs
+no network.
 
 Building from the repository fetches them once: `scripts/covers.mjs` is a plain
 list of Pexels URLs, run by `pnpm build` before Astro compiles. Earlier releases
@@ -42,6 +42,22 @@ theme depends on a server of ours any more.
 | `src/assets/covers/reef-mesurer-lecteur.webp` | Sunset over the ocean | [Pexels #14281585](https://www.pexels.com/photo/14281585/) |
 | `src/assets/covers/reef-prix-refonte.webp` | Cliff and cove seen from the air | [Pexels #8332588](https://www.pexels.com/photo/8332588/) |
 
+## The video
+
+The scroll-driven scene on the home page plays one clip, also from Pexels and
+under the same licence.
+
+| What | Subject | Source |
+|---|---|---|
+| Home page motion scene | Diver in a sunlit underwater cave | [Pexels video #34413488](https://www.pexels.com/video/diver-exploring-sunlit-underwater-cave-34413488/) |
+
+It is streamed from the Pexels CDN rather than shipped in the archive: the file
+weighs 5.7 MB, which does not belong in a theme download, and Pexels serves it
+with byte ranges, which the scene needs in order to seek. The five addresses
+(three video, two posters) are the default props of the scene component, in one
+block at the top of the file. Point them at your own video and nothing else
+changes.
+
 ## Replacing them
 
 Drop your own file in place, keep the same name and the same aspect ratio, and
@@ -51,7 +67,7 @@ at your own URL, or delete the entry, and the build stops fetching ours.
 
 ## Everything else you see
 
-No other raster image ships with this theme. Every icon, every product
-illustration and every decorative shape is original SVG or CSS drawn for this
-house, covered by the theme LICENSE. The Open Graph cards in `public/og/` are
-generated locally by `scripts/og.mjs` from an original SVG template.
+No other raster image and no other video ship with this theme. Every icon and
+every decorative shape is original SVG or CSS drawn for this house, covered by
+the theme LICENSE. The Open Graph cards in `public/og/` are generated locally by
+`scripts/og.mjs` from an original SVG template.

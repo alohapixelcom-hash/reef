@@ -10,7 +10,7 @@
 // s'arrete, l'image s'arrete. Il remonte, l'image remonte. C'est ce lien
 // direct qui fait l'effet, et aucune animation en boucle ne le remplace.
 //
-// Le portage vient de la home d'alohapixel.com, ou le procede tourne en
+// Le portage vient de la home d'Aloha Pixel, ou le procede tourne en
 // production. Les garde-fous ci-dessous ne sont pas theoriques : ils sont la
 // parce que le cas s'est produit.
 //
@@ -47,7 +47,18 @@
 // Le moteur vit dans ./_film.ts : limite de 400 lignes par fichier, et surtout
 // cycle de vie du routeur client (voir l'en-tete de ce module).
 //
-// Les fichiers pointent vers alohapixel.com parce que c'est la demonstration.
+// LA VIDEO VIENT DE PEXELS, licence libre pour l'usage commercial, sans
+// attribution exigee : une grotte sous-marine, un rai de lumiere, un plongeur
+// en contre-jour. PHOTOS.md donne la page d'origine. La version precedente
+// etait hebergee par la maison, ce qui faisait dependre la demonstration d'un
+// serveur qui n'est pas celui de l'acheteur, et ce fichier-la n'etait pas
+// redistribuable.
+//
+// Les trois adresses de video pointent le meme fichier : Pexels n'en publie
+// qu'un seul rendu pour ce plan, 1920 par 1080, 5,7 Mo. En portrait la scene
+// l'agrandit pour couvrir, c'est prevu par le moteur. Les deux affiches sont
+// deux recadrages de la vignette, demandes en WebP a la volee.
+//
 // Qui installe le theme remplace les cinq adresses ci-dessous par les
 // siennes : c'est le seul endroit a changer.
 import { Icon } from "@components/svg/icons";
@@ -70,13 +81,13 @@ interface Props {
 }
 
 const {
-  src = "https://alohapixel.com/wp-content/uploads/2026/08/ap-grotte-long-1920.mp4",
-  srcHd = "https://alohapixel.com/wp-content/uploads/2026/08/ap-grotte-long-2560.mp4",
-  srcPortrait = "https://alohapixel.com/wp-content/uploads/2026/08/ap-grotte-mobile.mp4",
-  poster = "https://alohapixel.com/wp-content/uploads/2026/08/ap-grotte-poster.webp",
-  posterPortrait = "https://alohapixel.com/wp-content/uploads/2026/08/ap-grotte-mobile-poster.webp",
+  src = "https://videos.pexels.com/video-files/34413488/14578462_1920_1080_60fps.mp4",
+  srcHd = "https://videos.pexels.com/video-files/34413488/14578462_1920_1080_60fps.mp4",
+  srcPortrait = "https://videos.pexels.com/video-files/34413488/14578462_1920_1080_60fps.mp4",
+  poster = "https://images.pexels.com/videos/34413488/aquarium-coralgarden-scuba-dive-adventure-nature-zerogravity-34413488.jpeg?auto=compress&cs=srgb&fm=webp&w=1920&h=1080&fit=crop",
+  posterPortrait = "https://images.pexels.com/videos/34413488/aquarium-coralgarden-scuba-dive-adventure-nature-zerogravity-34413488.jpeg?auto=compress&cs=srgb&fm=webp&w=608&h=1080&fit=crop",
   from = 0,
-  to = 18,
+  to = 9,
 }: Props = Astro.props;
 
 const locale = getLocale(Astro);
