@@ -150,9 +150,18 @@ single quotation - and then it reads as deliberate because it is the exception.
   rules between the items - all of these say more and cost less.
 - Cards inside cards. One containment layer. If a bordered box contains
   bordered boxes, remove the outer one.
-- The full-viewport centred hero with one sentence and one button. Heroes are
-  `min-h-[80svh]`, they sit inside the page rather than replacing it, and they
-  carry enough to decide with.
+- The full-viewport centred hero with one sentence and one button. A hero
+  fills the first screen, frame included: `min-h-[calc(100svh-1rem)]`, then
+  `sm:calc(100svh-1.5rem)` and `md:calc(100svh-2rem)`, one value per step
+  because the frame around the panel is `p-2 / p-3 / p-4`. It is never a bare
+  `80svh`: that leaves a pale band under the panel on arrival and the hero
+  reads as short. And never a fixed pixel value, so it follows any screen.
+  What fills it is what matters: the hero sits inside the page rather than
+  replacing it, and it carries enough to decide with.
+
+  Padding does NOT change that height. `box-sizing` is `border-box`, so
+  padding is counted inside `min-height`: it pushes the content down inside a
+  box that does not move. Only `min-height` changes the height.
 - Uniform radii everywhere. Containers are soft, the things inside them are
   tight. When every corner has the same radius the page looks extruded.
 - Pill badges announcing a version or a status above a title. The version
