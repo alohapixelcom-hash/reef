@@ -2,7 +2,7 @@
 // src/components/Sections/Global/SectionHeader.astro - en-tete de section : surtitre, titre a mot d'accent, chapeau.
 //
 // Le surtitre de Reef n'est pas une pastille : c'est un intitule de rubrique de
-// magazine, en petites capitales espacees, precede d'un filet corail. Une
+// magazine, en petites capitales espacees, precede d'un filet turquoise. Une
 // pastille dit "interface", un filet dit "publication", et c'est exactement la
 // distance qui separe ce theme de son grand frere.
 import { tv, type VariantProps } from "tailwind-variants";
@@ -42,7 +42,8 @@ export const sectionHeader = tv({
 
 type Props = VariantProps<typeof sectionHeader> & {
   title: string;
-  /** Le mot du titre passe en italique corail. Un seul par titre, toujours. */
+  /** Le mot du titre garde la police du titre, passe au turquoise et porte la
+   *  vague (.accent-script). Un seul par titre, toujours. */
   accentWord?: string;
   /** Intitule de rubrique au-dessus du titre : nomme la section, jamais une phrase. */
   eyebrow?: string;
@@ -83,7 +84,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
 ---
 
 <div class={root({ class: className })} data-slot="section-header">
-  {/* Le filet corail est pose meme quand la section n'a pas de surtitre. Une
+  {/* Le filet est pose meme quand la section n'a pas de surtitre. Une
       page dont certaines sections s'ouvrent sur un filet et d'autres sur un
       titre nu se lit comme deux mises en page cousues ensemble : le filet est
       la ponctuation qui annonce une section, et une ponctuation intermittente

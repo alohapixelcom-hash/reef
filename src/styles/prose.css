@@ -3,7 +3,7 @@
  * Importee par global.css, pas par les pages : elle n'existe pas seule et son
  * ordre dans la cascade compte. Elle vit dans un fichier separe parce que
  * global.css passait les 400 lignes du depot, et parce que c'est LA piece que
- * l'acheteur ouvrira pour regler son propre confort de lecture.
+ * l'utilisateur ouvrira pour regler son propre confort de lecture.
  *
  * Ecrite a la main, SANS @tailwindcss/typography. Le plugin est un bon defaut
  * generique, mais il impose ses variables de couleur, sa mesure et ses marges :
@@ -133,8 +133,8 @@
 
   /* La citation change de VOIX, pas seulement de marge : elle passe dans la
    * grotesque d'affichage, un corps au-dessus du texte courant, derriere un
-   * filet corail. C'est ce qui dit "ce n'est plus moi qui parle" mieux qu'un
-   * filet seul.
+   * filet dans le primaire. C'est ce qui dit "ce n'est plus moi qui parle"
+   * mieux qu'un filet seul.
    *
    * Pas d'italique : l'italique d'accent est bannie de toute la famille, et
    * Space Grotesk n'a pas de coupe italique - un font-style: italic pose
@@ -369,8 +369,8 @@
     color: var(--color-primary);
     /* En grotesque d'affichage, graisse basse : une lettrine de trois lignes
      * en Space Grotesk 700 est un pave noir qui ecrase le paragraphe. A 400,
-     * le grand corps corail suffit a ouvrir le texte, sans italique fabriquee
-     * (la famille n'a plus de police italique d'accent). */
+     * le grand corps dans le primaire suffit a ouvrir le texte, sans italique
+     * fabriquee (la famille n'a plus de police italique d'accent). */
     font-family: var(--font-display);
     font-size: 3.4em;
     font-weight: 400;
