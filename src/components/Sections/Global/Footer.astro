@@ -3,7 +3,7 @@
 //
 // Le pied de page de Reef reste sur le papier chaud du site au lieu de basculer
 // en aplat sombre comme celui d'Aloha. Un blog qui se termine par une grande
-// dalle noire annonce une page de vente ; ici la page se ferme comme un ourlet.
+// dalle noire annonce une page commerciale ; ici la page se ferme comme un ourlet.
 //
 // Les colonnes viennent de getFooterData : trois seulement, et chaque entree
 // mene a une page que le theme construit vraiment. Un pied de page de blog qui
@@ -68,7 +68,7 @@ const creditHref = siteData.author.twitter
   : `mailto:${siteData.author.email}`;
 
 // --- Ligne de demonstration ------------------------------------------------
-// Elle n'existe que si siteData.demoNotice est renseigne : l'acheteur vide ce
+// Elle n'existe que si siteData.demoNotice est renseigne : l'utilisateur vide ce
 // champ et la ligne disparait. Le champ porte la cle i18n a afficher, et
 // toute autre valeur est prise telle quelle, pour qui prefere sa propre
 // phrase. Le texte lui-meme vit dans les dictionnaires, jamais ici.
@@ -107,7 +107,7 @@ const columnLink =
         {/* --- Inscription a la lettre ------------------------------------
             Formulaire de DEMONSTRATION : il n'envoie rien. Il n'a ni action ni
             point d'arrivee, volontairement, parce que le theme ne choisit pas
-            de prestataire d'emailing a la place de son acheteur. Pour le
+            de prestataire d'emailing a la place de son utilisateur. Pour le
             brancher : poser action="..." et method="post" vers l'URL de
             formulaire de votre fournisseur (Buttondown, Listmonk, EmailOctopus,
             Mailchimp), et verifier le nom attendu pour le champ email. Le

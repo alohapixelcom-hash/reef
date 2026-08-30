@@ -7,7 +7,7 @@
  *   pnpm covers        telecharge src/assets/*.webp et src/assets/covers/*.webp
  *
  * Pourquoi un script et pas des fichiers versionnes : dix photographies dans
- * un depot, c'est un depot qui grossit a chaque retouche et un acheteur qui
+ * un depot, c'est un depot qui grossit a chaque retouche et un utilisateur qui
  * telecharge des octets qu'il remplacera. `pnpm build` appelle donc ce script
  * avant `astro build` : les fichiers arrivent, Astro les optimise comme
  * n'importe quel asset local, et le rendu final reste 100 pour cent statique.
@@ -17,7 +17,7 @@
  * doit pas casser un build. Si le fichier n'existe pas non plus, on arrete :
  * mieux vaut un build rouge qu'une page publiee avec une image manquante.
  *
- * Qui achete le theme remplace ce manifeste par ses propres adresses, ou
+ * Qui installe le theme remplace ce manifeste par ses propres adresses, ou
  * supprime l'appel dans "build" et depose ses images a la main.
  */
 
@@ -29,8 +29,8 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 // Toutes les photographies viennent de Pexels et sont utilisees sous licence
 // Pexels : usage commercial libre, aucune attribution exigee, modification
 // autorisee. PHOTOS.md, a la racine, donne pour chaque fichier la page Pexels
-// d'ou il vient. Les archives vendues contiennent deja ces images : ce script
-// ne sert qu'a une compilation faite depuis le depot.
+// d'ou il vient. L'archive de Reef contient deja ces images : ce script ne sert
+// qu'a une compilation faite depuis le depot.
 //
 // Les parametres de l'adresse ne sont pas decoratifs : fm=webp demande le WebP
 // plutot que le JPEG d'origine, et w/h/fit=crop fixent le cadrage exact, celui
