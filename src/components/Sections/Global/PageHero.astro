@@ -49,7 +49,8 @@ type Props = VariantProps<typeof pageHero> & {
   /** Surtitre court au-dessus du titre : nomme la section, jamais une phrase. */
   eyebrow?: string;
   title: string;
-  /** Le mot du titre passe en italique corail. Un seul, toujours. */
+  /** Le mot du titre garde la police du titre, passe au turquoise et porte la
+   *  vague (.accent-script). Un seul, toujours. */
   accentWord?: string;
   lede?: string;
   /** Maillons apres l'accueil ; le dernier, sans href, devient la page courante. */
@@ -83,11 +84,11 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
 ---
 
 <section class={root({ class: className })} data-slot="page-hero">
-  {/* Un halo, un seul, et dans l'aigue-marine plutot que dans le corail. Une
-      page d'archive est une page de CLASSEMENT : elle prend donc le second
-      accent, celui des sujets et des etats, et laisse le corail aux actions.
-      Il derive tres lentement, comme ceux du premier ecran : c'est ce qui
-      rattache une page interieure a l'accueil sans lui voler sa scene. */}
+  {/* Un halo, un seul, et dans l'aigue-marine de la maison. Une page d'archive
+      est une page de CLASSEMENT : le halo reprend donc la teinte des sujets et
+      des etats, sans monter au niveau d'un appel a l'action. Il derive tres
+      lentement, comme ceux du premier ecran : c'est ce qui rattache une page
+      interieure a l'accueil sans lui voler sa scene. */}
   <div
     class="animate-drift-slow pointer-events-none absolute -top-1/2 -right-[12%] size-[34rem] rounded-full opacity-25 blur-3xl dark:opacity-50"
     style="background: radial-gradient(circle, var(--color-reef-400) 0%, transparent 70%)"
