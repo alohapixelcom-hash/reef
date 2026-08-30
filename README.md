@@ -1,4 +1,4 @@
-<!-- README.md - the sales page of the repo: what Reef is, what it contains, how to run it, what to do before deploying. -->
+<!-- README.md - the front page of the repo: what Reef is, what it contains, how to run it, what to do before deploying. -->
 
 <p align="center">
   <img src="https://alohapixel.app/astro-preview/reef.jpg" alt="Reef, a free bilingual blog theme for Astro, shown on desktop and on an iPhone" width="900">
@@ -38,7 +38,7 @@ paginated blog, topic and author pages, a reading column with a table of
 contents, and a per-language RSS feed. In English and in French, from the same
 source.
 
-The demo publication is Reef Notes, a fictional two-person web studio's
+The demo publication is Reef Notes, a fictional three-person web studio's
 notebook: build logs, type specimens, and the unglamorous half of freelancing.
 Every word lives in a typed dictionary or in a Markdown post, never inside a
 component.
@@ -49,7 +49,7 @@ with a maintained wiki and agent tooling, not a black box.
 ## What is in the box, counted from this repo
 
 Numbers below were counted from the source, not estimated (snapshot
-2026-08-15; `pnpm build` green, `pnpm check` clean).
+2026-08-30; `pnpm build` green, `pnpm check` clean).
 
 | What | Count |
 |---|---|
@@ -59,11 +59,11 @@ Numbers below were counted from the source, not estimated (snapshot
 | Demo content entries | 9 posts, 3 authors, 5 topics, in 2 languages |
 | UI primitive families (src/components/ui) | 36, across 63 .astro files |
 | Primitive files that need a script tag | 10 of 63; the rest are pure HTML and CSS |
-| Section components | 22 |
+| Section components | 24 |
 | Original hand-drawn icons | 60 |
 | animate-* utilities (motion catalog + brand tokens) | 55 + 3 |
 | Languages, from one page source each | 2 (English at the root, French under /fr/) |
-| Runtime dependencies | 10, every one listed in THIRD-PARTY.md |
+| Runtime dependencies | 9, every one listed in THIRD-PARTY.md |
 
 ## Why it feels expensive
 
@@ -96,7 +96,7 @@ Astro 7 (static output, no adapter), Tailwind CSS 4 (CSS-first, no config
 file), tailwind-variants, @astrojs/mdx (Markdown and MDX posts) and
 @astrojs/sitemap, self-hosted fonts via Fontsource (Space Grotesk, Instrument
 Sans, both OFL); the accent word of a heading keeps the heading font under a
-coral wave underline, so no third font loads. Node >= 22.12 and pnpm. No
+turquoise wave underline, so no third font loads. Node >= 22.18 and pnpm. No
 React, no animation library, no WebGL.
 
 ## Quick start
@@ -129,7 +129,7 @@ node src/js/pagination.selfcheck.ts
 src/
   components/
     ui/         36 primitive families (button, dialog, tabs, reveal, ...)
-    Sections/   22 sections, grouped by page (Home/, Post/, Archive/, Search/, Global/, Legal/)
+    Sections/   24 sections, grouped by page (Home/, Post/, Archive/, Search/, Global/, Legal/)
     svg/icons/  the 60-icon original set
   config/       typed site data: siteData, navData, legalData
   content.config.ts  the posts, authors and topics collections, zod schemas
@@ -155,21 +155,23 @@ docs/           the five convention files, one per subsystem
    per language under the same slug.
 5. **src/i18n/ui/en/** and **src/i18n/ui/fr/**: all the interface copy. Nothing
    displayed lives in a component.
-6. **src/config/navData.json.ts** and **legalData.json.ts**: your links and the
-   legal page, with bracketed fields.
+6. **src/config/navData.json.ts** and **legalData.json.ts**: your links, and the
+   privacy and terms copy. The bracketed fields to fill in are not there: they
+   are in the legal notice, in src/i18n/ui/en/pages.ts and src/i18n/ui/fr/pages.ts.
 
 ## Before you deploy
 
 - [ ] `site` in astro.config.mjs points at your real domain.
-- [ ] `demoNotice` in src/config/siteData.json.ts emptied. It ships holding
-      the one footer line saying this site is a demo of the Reef theme, with a
-      link to the studio. Empty the string and the line stops rendering; no
-      component to open.
+- [ ] `demoNotice` in src/config/siteData.json.ts is already empty, so the
+      footer line saying "this site is a demo" does not render. Only put a key
+      back in that field if you want the line; there is no component to open.
 - [ ] `pnpm og` ran after your rebrand, so the cards in public/og/ carry your
       colors and not Reef Notes'.
 - [ ] Legal copy in src/config/legalData.json.ts reviewed by a human who may
-      legally have an opinion; it ships as a generic starting point, in both
-      languages, and neither is legal advice.
+      legally have an opinion, and the bracketed fields of the legal notice
+      (src/i18n/ui/en/pages.ts and src/i18n/ui/fr/pages.ts) filled in. It all
+      ships as a generic starting point, in both languages, and none of it is
+      legal advice.
 - [ ] The demo posts, authors and topics replaced with your own.
 - [ ] The contact form points at your own endpoint, or is removed. It ships
       with no `action` on purpose (the note is at the top of contact.astro).
@@ -214,7 +216,7 @@ this theme is handled in one place rather than two.
 
 - Something is wrong with the theme, or you want to tell us it helped:
   https://alohapixel.app/contact/
-- The rest of the family, and the paid siblings:
+- The rest of the family:
   https://alohapixel.app/themes/
 
 Pull requests are welcome all the same.
@@ -225,10 +227,12 @@ MIT, full text in LICENSE. Use it, fork it, sell what you build with it, no
 attribution required. Republishing Reef itself as your own theme is what the
 MIT license already allows, so there is nothing to negotiate here.
 
-One thing is carved out and it is stated plainly in LICENSE section 2: the
-photographs in src/assets/ are Aloha Pixel's own and are not part of the MIT
-grant. They are there so the demo reads like a real publication. Swap them for
-yours before you publish - scripts/covers.mjs is a plain list of URLs, and a
-post with no cover falls back to a typographic card.
+The photographs are covered separately, and LICENSE section 2 says so in full:
+the ten photographs in src/assets/ come from Pexels and carry the Pexels
+licence, which is free for commercial and personal use, requires no attribution
+and allows redistribution. Keep them in the site you publish with Reef, or
+replace them with your own; both are inside the licence. scripts/covers.mjs is a
+plain list of URLs, and a post with no cover falls back to a typographic card.
+PHOTOS.md names the Pexels page of every single file.
 
 Provided as is, without warranty.

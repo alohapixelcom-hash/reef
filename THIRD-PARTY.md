@@ -4,10 +4,10 @@
 
 Everything in Reef that we did not create ourselves is listed here, with its
 license and where it lives. If it is not on this page, it was made for this
-theme. This inventory is what makes Reef safe to buy, ship and resell as part
-of your end products.
+theme. This inventory is what makes Reef safe to ship and to reuse inside your
+own products.
 
-Verified against the repository on 2026-08-14 (packages read from
+Verified against the repository on 2026-08-30 (packages read from
 node_modules metadata, assets listed with find over public/ and src/).
 
 ## Fonts
@@ -25,8 +25,9 @@ bundling, self-hosting and commercial use.
 The imports live at the top of src/layouts/BaseHead.astro. Each package
 carries its own LICENSE file in node_modules; the license fields above were
 read from the packages' own metadata. The accent word of a big title loads no
-extra font: it keeps the heading font and carries a coral wave underline
-(--accent-wave, an original inline SVG covered by the theme LICENSE).
+extra font: it keeps the heading font, turns the house turquoise and carries a
+turquoise wave underline (--accent-wave, an original inline SVG covered by the
+theme LICENSE). Coral is the second accent, rationed.
 
 ## Icons
 
@@ -37,20 +38,28 @@ or traced. They are covered by the theme LICENSE.
 
 ## Images and photos
 
-The theme ships eleven photographs: one full-bleed hero and ten article covers.
-They are not stock. They are Aloha Pixel's own archive, and they are NOT part of
-the MIT grant that covers the code - LICENSE section 2 states the split in full.
+The theme ships ten photographs: one full-bleed hero and nine article covers.
+They come from Pexels and are used under the Pexels licence
+(https://www.pexels.com/license/), which is free for commercial and personal
+use, requires no attribution and allows modification and redistribution. That is
+the split LICENSE section 2 states in full: MIT for the code, Pexels for the
+photographs, and both permissive.
 
-They are not versioned as blobs either. scripts/covers.mjs is a plain manifest of
-URLs pointing at the Aloha Pixel media library, and `pnpm build` fetches them
-into src/assets/ before Astro compiles. The script also refuses any source
-narrower than the slot needs (1920 px for the hero, 1200 px for a cover), so a
-blurry image fails the build instead of reaching a reader.
+You may keep these photographs in the site you publish with Reef, or replace
+them with your own. Both are inside the licence. The one thing the Pexels licence
+forbids has nothing to do with using a theme: reselling an unaltered photo as a
+stock image, a print or a poster.
 
-Subjects, in order of the manifest: a wave hollowing out (hero), Hanauma bay,
-an island reef split at the waterline, lava reaching the ocean, a green turtle
-over a reef, the Maui coast, the same wave again, palms against a sunrise, the
-Na Pali cliffs, and an aerial of the Na Pali coast.
+They are not versioned as blobs. scripts/covers.mjs is a plain manifest of
+images.pexels.com URLs, and `pnpm build` fetches them into src/assets/ before
+Astro compiles. The script also refuses any source narrower than the slot needs
+(1920 px for the hero, 1200 px for a cover), so a blurry image fails the build
+instead of reaching a reader.
+
+PHOTOS.md, at the root of this repository, lists every file with the Pexels page
+it came from, so each image can be checked one by one. The home page also plays
+one video, Pexels video 4863640, under the same licence; it is streamed from the
+Pexels CDN and PHOTOS.md credits it too.
 
 To make the theme yours: change the URLs in scripts/covers.mjs, or drop the
 `cover` field from a post and the layout falls back to a typographic card.

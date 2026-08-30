@@ -49,10 +49,10 @@ under the same licence.
 
 | What | Subject | Source |
 |---|---|---|
-| Home page motion scene | Diver in a sunlit underwater cave | [Pexels video #34413488](https://www.pexels.com/video/diver-exploring-sunlit-underwater-cave-34413488/) |
+| Home page motion scene | A wave breaking, filmed from underwater at Electric Beach, Hawaii | [Pexels video #4863640](https://www.pexels.com/video/hawaii-electricbeach-4863640/) |
 
 It is streamed from the Pexels CDN rather than shipped in the archive: the file
-weighs 5.7 MB, which does not belong in a theme download, and Pexels serves it
+weighs 9 MB, which does not belong in a theme download, and Pexels serves it
 with byte ranges, which the scene needs in order to seek. The five addresses
 (three video, two posters) are the default props of the scene component, in one
 block at the top of the file. Point them at your own video and nothing else
