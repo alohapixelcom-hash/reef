@@ -54,7 +54,7 @@ pyftsubset SourceSerif4-Variable.ttf \
   --unicodes="U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+2122"
 ```
 
-Deux avertissements tirés de l'expérience. D'abord, le gain est plus faible qu'annoncé pour un caractère purement latin, parce qu'un sous-ensemble latin représente déjà l'essentiel du fichier : les chiffres spectaculaires qu'on cite viennent du retrait du cyrillique et du grec d'une police panéeuropéenne. Ensuite, attention à `--layout-features`. Retirez `kern` et vos titres se désagrègent. Retirez `liga` et certaines polices perdent le `fi` sur lequel vous comptiez. Et si le site est multilingue, souvenez-vous que le français réclame les guillemets chevrons et la ligature œ, tous deux hors de la plage ASCII, qui disparaissent sans bruit si vous découpez de mémoire plutôt que d'après le contenu réel.
+Deux avertissements tirés de l'expérience. D'abord, le gain est plus faible qu'annoncé pour un caractère purement latin, parce qu'un sous-ensemble latin représente déjà l'essentiel du fichier : les chiffres spectaculaires qu'on cite viennent du retrait du cyrillique et du grec d'une police paneuropéenne. Ensuite, attention à `--layout-features`. Retirez `kern` et vos titres se désagrègent. Retirez `liga` et certaines polices perdent le `fi` sur lequel vous comptiez. Et si le site est multilingue, souvenez-vous que le français réclame les guillemets chevrons et la ligature œ, tous deux hors de la plage ASCII, qui disparaissent sans bruit si vous découpez de mémoire plutôt que d'après le contenu réel.
 
 Le bon réflexe consiste à déclarer aussi le sous-ensemble en CSS, pour que le navigateur puisse éviter un téléchargement inutile sur une page donnée :
 
