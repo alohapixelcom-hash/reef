@@ -50,6 +50,12 @@ found the docs and the code disagreeing in several places.
   not exist (a conventions page and an islands folder), and the worker's
   fallback locale, which sent every other language to /fr/ instead of the
   default.
+- Two more found by re-reading the pushed tree: src/i18n/config.ts sent a
+  translator to src/i18n/routes.ts, a file that has never existed here, and
+  described the dictionaries as flat files instead of folders. URL segments
+  are not translated at all: they are written once in navData.json.ts and
+  localizePath only prefixes the language. And motion/index.css announced
+  five families in its header while importing six.
 
 ## 2026-08-16 - wave accent
 

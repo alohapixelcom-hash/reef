@@ -1,11 +1,16 @@
 // src/i18n/config.ts - la liste des langues du site. Ajouter une langue commence ici, et seulement ici.
 //
 // Le theme est bilingue par defaut (anglais, francais). Pour en ajouter une
-// troisieme il faut exactement trois gestes :
+// troisieme il faut exactement deux gestes :
 //   1. ajouter le code ci-dessous dans `locales` et sa fiche dans `localeMeta` ;
-//   2. creer src/i18n/ui/<code>.ts en copiant en.ts (TypeScript refusera de
-//      compiler tant qu'une seule cle manque : c'est le filet de securite) ;
-//   3. traduire les slugs dans src/i18n/routes.ts.
+//   2. creer le dossier src/i18n/ui/<code>/ en copiant src/i18n/ui/en/
+//      (TypeScript refusera de compiler tant qu'une seule cle manque : c'est le
+//      filet de securite).
+//
+// Les segments d'URL, eux, ne se traduisent pas : /blog/, /topics/ et /authors/
+// sont ecrits une seule fois dans src/config/navData.json.ts, et localizePath
+// se contente de leur ajouter le prefixe de langue. Qui veut /fr/journal/
+// change le segment la-bas, pour toutes les langues a la fois.
 //
 // Aucune page n'est a dupliquer : les routes vivent sous src/pages/[...locale]/
 // et se generent pour chaque langue de cette liste.
