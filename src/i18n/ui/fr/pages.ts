@@ -15,7 +15,7 @@ export const frPages: Pick<
   home: {
     metaTitle: "Reef Notes, le carnet de bord d'un studio web indépendant",
     metaDescription:
-      "Journaux de chantier, temps de chargement, typographie et gestion d'un petit studio web. En français et en anglais, quelques notes par mois, écrites par les deux personnes qui font le travail.",
+      "Journaux de chantier, temps de chargement, typographie et gestion d'un petit studio web. En français et en anglais, quelques notes par mois, écrites par les trois personnes qui font le travail.",
     eyebrow: "Reef Notes",
     heroTitle: "Notes d'un petit studio web",
     heroAccent: "petit",
@@ -44,7 +44,7 @@ export const frPages: Pick<
     aboutTitle: "Le studio derrière les notes",
     aboutAccent: "studio",
     aboutLede:
-      "L'un construit, l'autre dessine, les deux écrivent. Trois ou quatre projets par an, et tout ce qu'ils nous apprennent finit ici.",
+      "L'un construit, l'une mesure, l'autre dessine, et tous les trois écrivent. Trois ou quatre projets par an, et tout ce qu'ils nous apprennent finit ici.",
     aboutCta: "Notre façon de travailler",
   },
 
@@ -54,7 +54,7 @@ export const frPages: Pick<
     metaDescription:
       "Qui tient Reef Notes, comment le studio travaille, ce que nous acceptons et ce que nous refusons, et pourquoi les notes de chantier sont publiées plutôt que classées.",
     eyebrow: "À propos",
-    title: "Un studio à deux qui note tout",
+    title: "Un studio à trois qui note tout",
     accent: "note",
     lede:
       "Nous dessinons et construisons des sites pour de petites équipes. Reef Notes est l'endroit où atterrissent les notes de travail, parce que la partie utile d'un projet n'est presque jamais la capture d'écran.",
@@ -82,9 +82,9 @@ export const frPages: Pick<
         text: "Si une réponse demande plus de cinq minutes d'explication, elle devient un article. Le client reçoit le lien, nous récupérons notre après-midi.",
       },
     ],
-    writersTitle: "Nous deux",
-    writersAccent: "deux",
-    writersLede: "Deux biographies courtes, des intitulés honnêtes, et tous les articles que chacun a signés.",
+    writersTitle: "Nous trois",
+    writersAccent: "trois",
+    writersLede: "Trois biographies courtes, des intitulés honnêtes, et tous les articles que chacun a signés.",
     writersCta: "Tous les auteurs",
     contactTitle: "Travailler ensemble",
     contactLede:
@@ -121,7 +121,7 @@ export const frPages: Pick<
     directCta: "Écrire au studio",
     nextTitle: "Ce qui se passe ensuite",
     nextSteps: [
-      "Une réponse courte sous deux jours ouvrés, écrite par l'un de nous deux.",
+      "Une réponse courte sous deux jours ouvrés, écrite par l'un de nous trois.",
       "S'il s'agit d'un projet, vous recevez trois questions avant le moindre chiffre.",
       "S'il s'agit d'une correction, l'article est repris et crédité dans la semaine.",
     ],
@@ -154,7 +154,7 @@ export const frPages: Pick<
     title: "Qui écrit ici",
     accent: "écrit",
     lede:
-      "Deux personnes partagent ce carnet. Chaque article porte une signature, et chaque signature mène à tout ce que son auteur a écrit.",
+      "Trois personnes partagent ce carnet. Chaque article porte une signature, et chaque signature mène à tout ce que son auteur a écrit.",
     roleLabel: "Rôle",
     linksLabel: "Ailleurs",
     postsBy: "Articles de {name}",
@@ -204,7 +204,7 @@ export const frPages: Pick<
   },
 
   // --- Mentions legales ----------------------------------------------------
-  // Les passages entre crochets sont a completer par l'acheteur. Ce texte ne
+  // Les passages entre crochets sont a completer par l'utilisateur. Ce texte ne
   // vaut pas un avis juridique, et sa version anglaise pas davantage : les deux
   // disent la meme chose, aucune ne fait foi sur l'autre.
   legal: {

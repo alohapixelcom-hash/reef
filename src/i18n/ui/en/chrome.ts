@@ -37,7 +37,7 @@ export const enChrome = {
   // qui aligne six colonnes copie un SaaS et sert d'egout a liens morts.
   footer: {
     tagline:
-      "Reef Notes is the working notebook of a two-person web studio. Build logs, load times, type specimens, and the parts of freelancing nobody puts on a landing page.",
+      "Reef Notes is the working notebook of a three-person web studio. Build logs, load times, type specimens, and the parts of freelancing nobody puts on a landing page.",
     colRead: "Read",
     colStudio: "The studio",
     colLegal: "Legal",

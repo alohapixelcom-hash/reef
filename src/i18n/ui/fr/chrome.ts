@@ -29,7 +29,7 @@ export const frChrome: Pick<Dictionary, "nav" | "footer" | "common"> = {
   // --- Pied de page --------------------------------------------------------
   footer: {
     tagline:
-      "Reef Notes est le carnet de bord d'un studio web à deux. Journaux de chantier, temps de chargement, spécimens typographiques, et les côtés du métier d'indépendant dont personne ne fait une page de vente.",
+      "Reef Notes est le carnet de bord d'un studio web à trois. Journaux de chantier, temps de chargement, spécimens typographiques, et les côtés du métier d'indépendant dont personne ne fait une page d'accueil.",
     colRead: "Lire",
     colStudio: "Le studio",
     colLegal: "Légal",

@@ -81,7 +81,7 @@ export const enReading = {
 
   // --- Newsletter ----------------------------------------------------------
   // Le bloc vit dans le pied de page et en fin d'article. Il n'appelle aucun
-  // prestataire : l'acheteur branche le sien sur le formulaire deja ecrit.
+  // prestataire : l'utilisateur branche le sien sur le formulaire deja ecrit.
   newsletter: {
     title: "One email, once a month",
     accent: "once",

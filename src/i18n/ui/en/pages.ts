@@ -6,7 +6,7 @@
 //
 // Le blog de demonstration s'appelle Reef Notes : le carnet d'un studio web
 // independant. Le registre est celui d'un artisan qui montre son etabli, pas
-// celui d'une page de vente. Concret, chiffre quand c'est possible, jamais une
+// celui d'une page commerciale. Concret, chiffre quand c'est possible, jamais une
 // promesse qu'un billet ne tient pas juste en dessous.
 
 export const enPages = {
@@ -14,7 +14,7 @@ export const enPages = {
   home: {
     metaTitle: "Reef Notes, a working notebook from an independent web studio",
     metaDescription:
-      "Build logs, load times, typography and the business of running a small web studio. Written in English and French, a few notes a month, by the two people doing the work.",
+      "Build logs, load times, typography and the business of running a small web studio. Written in English and French, a few notes a month, by the three people doing the work.",
     eyebrow: "Reef Notes",
     heroTitle: "Notes from a small web studio",
     heroAccent: "small",
@@ -45,7 +45,7 @@ export const enPages = {
     aboutTitle: "The studio behind the notes",
     aboutAccent: "studio",
     aboutLede:
-      "One builds, one designs, both write. Three or four projects a year, and everything we learn on them ends up here.",
+      "One builds, one measures, one designs, and all three write. Three or four projects a year, and everything we learn on them ends up here.",
     aboutCta: "How we work",
   },
 
@@ -55,7 +55,7 @@ export const enPages = {
     metaDescription:
       "Who runs Reef Notes, how the studio works, what we take on and what we turn down, and why the working notes are published instead of filed away.",
     eyebrow: "About",
-    title: "A two-person studio that writes things down",
+    title: "A three-person studio that writes things down",
     accent: "writes",
     lede:
       "We design and build websites for small teams. Reef Notes is where the working notes end up, because the useful part of a project is almost never the screenshot.",
@@ -83,8 +83,8 @@ export const enPages = {
         text: "If an answer takes more than five minutes to explain, it becomes a post. Clients get the link, we get our afternoon back.",
       },
     ],
-    writersTitle: "The two of us",
-    writersAccent: "two",
+    writersTitle: "The three of us",
+    writersAccent: "three",
     writersLede: "Short bios, honest job titles, and every post each of us has signed.",
     writersCta: "All authors",
     contactTitle: "Working together",
@@ -95,7 +95,7 @@ export const enPages = {
 
   // --- Contact -------------------------------------------------------------
   // Le formulaire est complet et non monte : le theme ne choisit pas de
-  // prestataire d'envoi a la place de son acheteur. La copie, elle, est prete.
+  // prestataire d'envoi a la place de son utilisateur. La copie, elle, est prete.
   contact: {
     metaTitle: "Contact",
     metaDescription:
@@ -157,7 +157,7 @@ export const enPages = {
     title: "Who writes here",
     accent: "writes",
     lede:
-      "Two people share this notebook. Every post carries a byline, and every byline leads to everything that person has written.",
+      "Three people share this notebook. Every post carries a byline, and every byline leads to everything that person has written.",
     roleLabel: "Role",
     linksLabel: "Elsewhere",
     postsBy: "Posts by {name}",
@@ -212,7 +212,7 @@ export const enPages = {
   // --- Mentions legales ----------------------------------------------------
   // La page /legal/ porte SON propre texte ici, parce qu'elle n'en a pas
   // ailleurs : src/config/legalData.json.ts ne couvre que la confidentialite et
-  // les conditions. Les passages entre crochets sont a completer par l'acheteur,
+  // les conditions. Les passages entre crochets sont a completer par l'utilisateur,
   // et ce texte ne vaut pas un avis juridique.
   legal: {
     eyebrow: "Legal",
