@@ -1,6 +1,13 @@
 // src/js/schema.selfcheck.ts - self-check des constructeurs JSON-LD, sans framework.
 // Lancer : node src/js/schema.selfcheck.ts
 // (Node 22.18+ execute le TypeScript directement ; avant, ajouter --experimental-strip-types.)
+//
+// L'identite du jeu d'essai est volontairement neutre : Example Studio,
+// example.com, Example Author. Ce fichier est le meme dans les cinq themes de
+// la maison, et il portait la marque de demonstration de l'un d'eux. Un
+// acheteur qui ouvrait le sien y lisait donc le nom d'un produit absent du
+// theme achete. Un jeu d'essai n'appartient a aucun theme : il ne nomme ni un
+// produit reel, ni la demonstration d'un voisin.
 import assert from "node:assert/strict";
 import {
   article,
@@ -18,44 +25,44 @@ function is(actual: unknown, expected: unknown, message: string): void {
 }
 
 // organization : les champs absents disparaissent, ils ne trainent pas en undefined.
-const org = organization({ name: "Lagoon", url: "https://example.com/" });
+const org = organization({ name: "Example Studio", url: "https://example.com/" });
 is(
   org,
-  { "@context": "https://schema.org", "@type": "Organization", name: "Lagoon", url: "https://example.com/" },
+  { "@context": "https://schema.org", "@type": "Organization", name: "Example Studio", url: "https://example.com/" },
   "organization stays minimal without optional fields",
 );
 is(
-  organization({ name: "Lagoon", url: "https://example.com/", sameAs: ["https://x.com"] }).sameAs,
+  organization({ name: "Example Studio", url: "https://example.com/", sameAs: ["https://x.com"] }).sameAs,
   ["https://x.com"],
   "organization keeps its social profiles",
 );
 
 // website : forme exacte.
-const site = website({ name: "Lagoon", url: "https://example.com/", description: "A customer insight platform." });
+const site = website({ name: "Example Studio", url: "https://example.com/", description: "A demonstration site, used here as a fixture." });
 is(
   site,
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Lagoon",
+    name: "Example Studio",
     url: "https://example.com/",
-    description: "A customer insight platform.",
+    description: "A demonstration site, used here as a fixture.",
   },
   "website carries name, url and description",
 );
 
 // article : dates normalisees, noeuds imbriques sans @context.
 const post = article({
-  title: "Reading the room at scale",
-  description: "How Lagoon turns raw feedback into decisions.",
+  title: "A title the fixture can assert on",
+  description: "How the fixture exercises every builder.",
   url: "https://example.com/blog/reading-the-room/",
   datePublished: new Date("2026-05-04T08:00:00.000Z"),
-  authorName: "Maya Chen",
+  authorName: "Example Author",
 });
 is(post["@type"], "Article", "article declares its type");
 is(post.datePublished, "2026-05-04T08:00:00.000Z", "a Date is converted to ISO 8601");
 is(post.mainEntityOfPage, post.url, "mainEntityOfPage mirrors the canonical url");
-is(post.author, { "@type": "Person", name: "Maya Chen" }, "author is a nested Person without @context");
+is(post.author, { "@type": "Person", name: "Example Author" }, "author is a nested Person without @context");
 assert.ok(!("dateModified" in post), "an absent dateModified is not serialized");
 assert.ok(!("publisher" in post), "an absent publisher is not serialized");
 checks += 2;
@@ -65,7 +72,7 @@ is(
     description: "d",
     url: "https://example.com/blog/t/",
     datePublished: "2026-05-04",
-    authorName: "Maya Chen",
+    authorName: "Example Author",
   }).datePublished,
   "2026-05-04",
   "a preformatted date string passes through untouched",
@@ -73,7 +80,7 @@ is(
 
 // faqPage : une paire Question/Answer par entree.
 const faq = faqPage([
-  { question: "Does Lagoon integrate with Slack?", answer: "Yes, natively." },
+  { question: "Does this fixture cover every builder?", answer: "Yes, all six." },
   { question: "Is there a free plan?", answer: "Yes, up to three seats." },
 ]);
 is(
@@ -81,8 +88,8 @@ is(
   [
     {
       "@type": "Question",
-      name: "Does Lagoon integrate with Slack?",
-      acceptedAnswer: { "@type": "Answer", text: "Yes, natively." },
+      name: "Does this fixture cover every builder?",
+      acceptedAnswer: { "@type": "Answer", text: "Yes, all six." },
     },
     {
       "@type": "Question",
@@ -109,8 +116,8 @@ is(
 
 // softwareApplication : les defauts s'appliquent, un prix de zero survit a compact().
 const app = softwareApplication({
-  name: "Lagoon",
-  description: "A customer insight platform.",
+  name: "Example Studio",
+  description: "A demonstration site, used here as a fixture.",
   url: "https://example.com/",
   price: 0,
 });
@@ -122,7 +129,7 @@ checks += 1;
 assert.ok(
   !(
     "aggregateRating" in
-    softwareApplication({ name: "Lagoon", description: "d", url: "https://example.com/", ratingValue: 4.8 })
+    softwareApplication({ name: "Example Studio", description: "d", url: "https://example.com/", ratingValue: 4.8 })
   ),
   "a rating value alone is not enough for an AggregateRating",
 );
