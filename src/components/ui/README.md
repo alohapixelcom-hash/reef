@@ -15,8 +15,8 @@ Règles, toutes obligatoires :
    pagination réutilise `button`, il n'invente pas ses classes).
 3. **Zéro JS d'abord.** La plateforme d'abord : `<dialog>` natif,
    `<details>` natif, ancres, `:focus-within`. Un `<script>` court et partagé
-   seulement quand la plateforme ne suffit pas. React n'entre jamais ici
-   (les îlots vivent dans `src/components/islands`).
+   seulement quand la plateforme ne suffit pas. React n'entre jamais ici :
+   ce thème n'a aucun îlot.
 4. **`data-slot="<nom>"`** sur l'élément racine de chaque partie, pour le
    ciblage CSS et les tests.
 5. **Accessibilité non négociable.** Rôles et `aria-*` corrects, ordre de

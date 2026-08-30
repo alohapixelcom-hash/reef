@@ -1,9 +1,11 @@
 // src/worker.ts - worker de la demo : choisit la langue du visiteur puis sert les fichiers statiques.
-// Ce fichier ne sert QU'A la demo en ligne, il ne fait pas partie du theme vendu.
+// Ce fichier ne sert QU'A la demo en ligne, il ne fait pas partie du theme.
 
 const LOCALES = ["en", "fr"];
 const ROOT_LOCALE = "en";
-const FALLBACK_LOCALE = "fr";
+// Repli quand ni le cookie ni Accept-Language ne designent une langue servie :
+// l'anglais, qui tient la racine et porte le x-default.
+const FALLBACK_LOCALE = "en";
 const LOCALE_COOKIE = "aloha_locale";
 
 // Lit un cookie precis sans parser tout l'entete : on cherche une seule cle.

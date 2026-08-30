@@ -1,4 +1,4 @@
-# wrangler.toml - deploiement de la demo en ligne (reef-demo). Ne concerne pas le theme vendu.
+# wrangler.toml - deploiement de la demo en ligne (reef-demo). Ne concerne pas le theme lui-meme.
 
 name = "reef-demo"
 main = "src/worker.ts"

@@ -12,11 +12,13 @@ dist/
 # Cloudflare Wrangler local state
 .wrangler/
 
-# Local environment and secrets. Copy .env.example to .env, never commit .env.
+# Variables d'environnement locales. Le theme n'en demande aucune pour
+# construire ni pour se deployer ; ce fichier reste ignore par principe.
 .env
 
-# Cartes Open Graph : generees par `pnpm og`, refabriquees au build.
-public/og/
+# Les cartes Open Graph de public/og/ sont VERSIONNEES : `pnpm og` ne tourne pas
+# au build, un clone doit donc les trouver deja la. Les regenerer apres un
+# rebrand, puis les commiter.
 
 # Photographies de la demo : rapatriees par `pnpm covers`, refabriquees au build.
 src/assets/covers/

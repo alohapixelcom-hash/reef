@@ -16,10 +16,10 @@
 /**
  * Le type est declare ici plutot qu'importe de "@capacitor/cli".
  *
- * Pourquoi : le theme annonce huit dependances et les tient. Importer le type
- * obligerait tout acheteur a installer Capacitor pour que `pnpm check` passe,
- * meme s'il ne fait jamais d'application. Ce serait une dependance imposee pour
- * une ligne de typage.
+ * Pourquoi : le theme annonce neuf dependances d'execution et les tient.
+ * Importer le type obligerait tout utilisateur a installer Capacitor pour que
+ * `pnpm check` passe, meme s'il ne fait jamais d'application. Ce serait une
+ * dependance imposee pour une ligne de typage.
  *
  * Des que vous installez Capacitor, remplacez tout ce bloc par :
  *   import type { CapacitorConfig } from "@capacitor/cli";

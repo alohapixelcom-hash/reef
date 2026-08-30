@@ -24,7 +24,7 @@
   ],
   "packageManager": "pnpm@11.22.0",
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.18.0"
   },
   "scripts": {
     "app": "astro build && node scripts/app.mjs",

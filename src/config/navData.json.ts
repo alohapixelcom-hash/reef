@@ -70,7 +70,7 @@ export function getFooterData(locale: Locale): FooterColumn[] {
  * Les routes que les composants ne doivent jamais ecrire en dur.
  *
  * Un theme dont une carte d'article contient "/blog/" en clair oblige son
- * acheteur a rouvrir les composants le jour ou son blog vit sous /journal/.
+ * utilisateur a rouvrir les composants le jour ou son blog vit sous /journal/.
  * Toutes les cibles qui varient d'un site a l'autre passent donc par ici, et
  * un seul fichier suffit a tout rediriger.
  */

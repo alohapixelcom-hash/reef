@@ -1,4 +1,4 @@
-// src/config/types/configDataTypes.ts - types partagés par tous les fichiers de config de src/config.
+// src/config/types/configDataTypes.ts - types partages par tous les fichiers de config de src/config.
 
 export interface SiteDataProps {
   name: string;
@@ -22,7 +22,7 @@ export interface SiteDataProps {
 export interface SiteSettingsProps {
   /** Monte le ClientRouter d'Astro dans BaseHead : navigations avec view transitions. */
   useViewTransitions: boolean;
-  /** Autorise les animations d'entrée (Reveal, compteurs, marquee). Le garde prefers-reduced-motion reste global. */
+  /** Autorise les animations d'entree (Reveal, compteurs, marquee). Le garde prefers-reduced-motion reste global. */
   useAnimations: boolean;
 }
 
@@ -31,14 +31,14 @@ export interface NavItem {
   href: string;
   description?: string;
   /** Sous-entrees optionnelles. La nav de Reef est plate : le champ reste la
-   *  pour l'acheteur qui ajoutera une rubrique a tiroirs, pas pour le theme. */
+   *  pour l'utilisateur qui ajoutera une rubrique a tiroirs, pas pour le theme. */
   children?: NavItem[];
 }
 
 export interface FooterColumn {
   /** Titre de colonne (Product, Company, Resources, Legal). */
   title: string;
-  /** Les liens réutilisent NavItem : text + href suffisent ici. */
+  /** Les liens reutilisent NavItem : text + href suffisent ici. */
   links: NavItem[];
 }
 
@@ -63,7 +63,7 @@ export interface FaqItem {
 
 export interface LegalSection {
   title: string;
-  /** Un paragraphe de copie générique, prêt à être édité par l'acheteur. */
+  /** Un paragraphe de copie generique, pret a etre edite par l'utilisateur. */
   body: string;
 }
 
@@ -71,7 +71,7 @@ export interface LegalDocument {
   title: string;
   /** Description meta pour le <head> de la page. */
   description: string;
-  /** Date ISO (YYYY-MM-DD), affichée telle quelle par le template. */
+  /** Date ISO (YYYY-MM-DD), affichee telle quelle par le template. */
   lastUpdated: string;
   sections: LegalSection[];
 }
@@ -79,8 +79,8 @@ export interface LegalDocument {
 /**
  * Les routes que les composants doivent connaitre sans les ecrire en dur.
  *
- * Un theme vendu dont une carte d'article contient "/posts/" en clair oblige
- * son acheteur a rouvrir les composants le jour ou son blog vit sous
+ * Un theme dont une carte d'article contient "/posts/" en clair oblige
+ * son utilisateur a rouvrir les composants le jour ou son blog vit sous
  * /journal/. Toutes les cibles qui varient d'un site a l'autre passent donc
  * par ici, et un seul fichier suffit a tout rediriger.
  *

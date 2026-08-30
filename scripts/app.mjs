@@ -11,8 +11,9 @@
  *   2. Le manifeste demarre sur une URL absolue : au demarrage a froid, la
  *      coquille ouvrirait le site en ligne au lieu du bundle embarque.
  *
- * Rien d'autre n'est touche. Le HTML, le CSS et les ilots sont identiques entre
- * le build web et le build application : un seul code, un seul rendu.
+ * Rien d'autre n'est touche. Le HTML et le CSS sont identiques entre le build
+ * web et le build application : un seul code, un seul rendu. Ce theme n'a
+ * aucun ilot.
  *
  * Idempotent : relancer le script sur un dossier deja traite ne change rien.
  */
