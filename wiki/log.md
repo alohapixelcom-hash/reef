@@ -19,6 +19,28 @@ dated entry.
   `action` and stays that way until a user wires it to an endpoint. Not a
   bug; recorded so nobody "fixes" it.
 
+## 2026-08-30 - 1.5.4, what the sold archive did not have
+
+Second pass of the day. The 1.5.3 archives on the store were built before
+most of that day's corrections landed, so this release exists to make the
+file a buyer downloads equal to the repository.
+
+- `docs/design.md` was rewritten. The doctrine described four themes in
+  tables that should have held five, refused two typefaces the flagship of
+  the house actually uses, and claimed no theme here ships an animation
+  library while `motion` and `three` sat in Aloha's dependencies. It now
+  names its own exceptions instead of hiding them, and it ends with the list
+  of what the house still owes itself.
+- `src/js/schema.selfcheck.ts` carried the demo brand of another theme, in
+  all five repositories. A fixture belongs to no theme: the identity is now
+  Example Studio, example.com, Example Author.
+- `pnpm-lock.yaml` is versioned. The repository pinned pnpm and pinned not a
+  single package version, so a fresh clone resolved whatever the registry
+  served that day.
+- Verified before shipping, not asserted: `pnpm install --frozen-lockfile`,
+  then `pnpm check` with zero errors, zero warnings and zero hints, then
+  `pnpm build` emitting the 55 pages the README claims.
+
 ## 2026-08-30 - audit of the public repository
 
 A pass over every claim the repository makes about itself, after an audit
