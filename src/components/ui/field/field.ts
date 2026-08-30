@@ -8,8 +8,8 @@ export const field = tv({
     labelClass: "text-foreground text-sm font-semibold",
     control: "contents",
     hintClass: "text-muted-foreground text-xs leading-relaxed",
-    // L'erreur emprunte le corail de la marque et non un rouge pur : elle doit
-    // se voir sans hurler, et rester dans la palette.
+    // L'erreur emprunte le primaire de la marque et non un rouge pur : elle
+    // doit se voir sans hurler, et rester dans la palette.
     errorClass: "text-primary text-xs font-medium leading-relaxed",
     star: "text-primary ml-0.5",
   },

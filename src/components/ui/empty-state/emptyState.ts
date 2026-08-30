@@ -19,10 +19,10 @@ export const emptyState = tv({
     tone: {
       // Rien a signaler : c'est juste vide.
       neutral: {},
-      // Une recherche sans resultat : le lagon, couleur des etats "ok".
+      // Une recherche sans resultat : l'accent secondaire, pose sans alarmer.
       search: { ring: "text-accent/40", art: "text-accent" },
-      // Quelque chose a echoue : le corail, jamais du rouge pur, qui jurerait
-      // avec la palette et crierait plus fort que necessaire.
+      // Quelque chose a echoue : le primaire, jamais du rouge pur, qui
+      // jurerait avec la palette et crierait plus fort que necessaire.
       error: { ring: "text-primary/40", art: "text-primary" },
     },
   },

@@ -59,8 +59,8 @@
   animation: heartbeat 1.9s ease-in-out infinite;
 }
 
-/* Halo respirant : suit --color-primary, donc corail en clair comme en
- * sombre. Un seul par ecran, sur le CTA que la page veut vraiment vendre. */
+/* Halo respirant : suit --color-primary, donc le turquoise de la maison dans
+ * les deux modes. Un seul par ecran, sur l'appel a l'action qui compte. */
 @utility animate-glow-pulse {
   animation: glow-pulse 3.2s ease-in-out infinite;
 }
