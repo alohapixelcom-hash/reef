@@ -194,7 +194,7 @@ const ancrageH = darkArg ? hexToHsl(darkArg).h : teinteAncrage(accent.h);
 
 const coralRamp = ramp(accent.h, Math.max(0.5, accent.s), CORAL_STOPS, accent.l, 400);
 // La couleur de marque est rendue au pixel pres sur le pas 400 : c'est celle
-// que l'acheteur a tapee, elle ne doit pas etre approchee.
+// que l'utilisateur a tapee, elle ne doit pas etre approchee.
 coralRamp[400] = accentHex.toLowerCase();
 const inkRamp = rampeFixe(ancrageH, INK_STOPS);
 const paperRamp = rampeFixe(ancrageH, PAPER_STOPS);

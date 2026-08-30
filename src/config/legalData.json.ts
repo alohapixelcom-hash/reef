@@ -4,10 +4,12 @@ import type { Locale } from "@i18n";
 import type { LegalDocument } from "./types/configDataTypes";
 
 // Deux documents rendus par le meme template de page. La copie est volontairement
-// generique ("nous", "le service") : l'acheteur remplace les passages entre crochets
-// et fait valider le tout par son conseil. Ceci n'est pas un avis juridique, et la
-// version francaise n'en est pas davantage une : les deux textes disent la meme
-// chose, aucun ne fait foi sur l'autre.
+// generique ("nous", "le service") : l'utilisateur l'adapte et la fait valider par
+// son conseil. Aucun passage entre crochets ici : les champs a completer vivent
+// dans les mentions legales, sous src/i18n/ui/en/pages.ts et son equivalent
+// francais. Ceci n'est pas un avis juridique, et la version francaise n'en est
+// pas davantage une : les deux textes disent la meme chose, aucun ne fait foi
+// sur l'autre.
 
 type LegalPages = { privacy: LegalDocument; terms: LegalDocument };
 
