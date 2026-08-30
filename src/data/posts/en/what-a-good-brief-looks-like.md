@@ -6,7 +6,7 @@ author: en/mara-lindqvist
 topic: en/studio
 tags: ["freelance", "process", "clients"]
 cover: ../../../assets/covers/reef-bon-brief.webp
-coverAlt: "A coastline from the air: a white line of surf between the turquoise lagoon and the dense green shore"
+coverAlt: "A coral reef under clear blue water, every colony holding its own place in the structure"
 featured: false
 draft: false
 ---

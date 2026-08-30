@@ -6,7 +6,7 @@ author: en/tomas-abaroa
 topic: en/typography
 tags: ["typography", "css", "scale"]
 cover: ../../../assets/covers/reef-echelle-typo.webp
-coverAlt: "Looking down the spiral stair of a lighthouse, the steps winding away between turquoise tiled walls"
+coverAlt: "Palm trees in silhouette against a tropical sunset, their crowns stacked in tiers up the orange sky"
 featured: true
 draft: false
 ---

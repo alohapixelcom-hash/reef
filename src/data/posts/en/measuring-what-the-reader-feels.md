@@ -7,7 +7,7 @@ author: en/noor-benali
 topic: en/performance
 tags: ["web vitals", "rum", "measurement"]
 cover: ../../../assets/covers/reef-mesurer-lecteur.webp
-coverAlt: "A long beach seen from the air, parallel lines of swell arriving on the sand in the morning haze"
+coverAlt: "The sun sitting on the horizon over the ocean, its light spread flat across the water"
 featured: false
 draft: false
 ---

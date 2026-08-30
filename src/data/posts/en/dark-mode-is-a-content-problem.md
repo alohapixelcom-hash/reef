@@ -6,7 +6,7 @@ author: en/tomas-abaroa
 topic: en/design
 tags: ["design", "dark mode", "css"]
 cover: ../../../assets/covers/reef-mode-sombre.webp
-coverAlt: "The mouth of a sea cave opening onto a turquoise lagoon, daylight coming in from the far end"
+coverAlt: "Lava erupting in Hawaii Volcanoes National Park, an incandescent orange fountain against dark rock"
 featured: false
 draft: false
 ---

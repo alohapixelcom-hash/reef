@@ -6,7 +6,7 @@ author: en/tomas-abaroa
 topic: en/typography
 tags: ["typography", "fonts", "performance"]
 cover: ../../../assets/covers/reef-cout-police.webp
-coverAlt: "A school of small orange fish swimming in blue water above a garden of coloured coral"
+coverAlt: "Green palms leaning over a beach in French Polynesia, turquoise water behind them"
 featured: false
 draft: false
 ---

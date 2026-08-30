@@ -6,7 +6,7 @@ author: en/mara-lindqvist
 topic: en/studio
 tags: ["freelance", "pricing", "contracts"]
 cover: ../../../assets/covers/reef-prix-refonte.webp
-coverAlt: "The Na Pali coast from the air, green cliffs falling into a turquoise lagoon"
+coverAlt: "A cliff at sea seen from the air, green slopes falling into turquoise water"
 featured: false
 draft: true
 ---

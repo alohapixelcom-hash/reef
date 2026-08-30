@@ -7,7 +7,7 @@ author: en/mara-lindqvist
 topic: en/craft
 tags: ["astro", "zod", "content"]
 cover: ../../../assets/covers/reef-collections-contrat.webp
-coverAlt: "A coral nursery fixed to its frame below the surface, in blue water crossed by light"
+coverAlt: "A sea turtle gliding over a coral reef, holding its line above the structure below"
 featured: false
 draft: false
 ---
