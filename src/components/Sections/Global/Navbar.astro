@@ -55,7 +55,13 @@ const subscribeHref = "#newsletter";
 {/* La barre respecte l'encoche (safe-area) et traverse les navigations sans
     etre reconstruite : elle ne clignote pas et garde son etat retracte. */}
 <header
-  class="fixed inset-x-0 z-50 [top:max(0.75rem,env(safe-area-inset-top))]"
+    {/* Le decalage du haut est ecrit ICI, dans la classe, et nulle part
+        ailleurs. Le bloc <style is:global> plus bas porte des regles
+        [data-header]{top:...} qui NE S APPLIQUENT PAS : l utilitaire Tailwind
+        les bat. 0.5rem, la meme valeur que sur les six sites de la maison,
+        pour que la pilule flotte au lieu de se coller au bord du cadre.
+        L encoche l emporte toujours : env() reste dans le max(). */}
+    class="fixed inset-x-0 z-50 [top:max(0.5rem,env(safe-area-inset-top))]"
   data-header
   transition:persist
 >
