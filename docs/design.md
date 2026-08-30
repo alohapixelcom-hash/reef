@@ -7,7 +7,9 @@ guide in the usual sense - it does not tell you which blue to use. It tells you
 which decisions have already been made, which shapes are refused, and what has
 to be true before a page ships.
 
-Read it before you add a section. Read it again before you add an effect.
+Read it before you add a section, and again before you add an effect. The family
+is five themes - Aloha, Reef, Kai, Koa, Swell - and six sites, the five
+demonstrations plus the shop.
 
 ## Why this file exists
 
@@ -25,26 +27,29 @@ So the doctrine is mostly a list of refusals, and for each refusal, the thing
 we do instead. A refusal without a replacement is just a gap, and gaps get
 filled with defaults.
 
+Where the house does not obey its own rule, this file says so by name. A
+doctrine describing an imaginary house is worth less than none: the first
+person to run `grep` finds the gap, and then nothing else here is believed.
+
 ## The one test
 
 Before anything ships, one question: **would a reader be able to name the
 studio that made this from the page alone?**
 
 If the answer is no, the page is not finished. Not wrong - unfinished. It means
-nothing on it is ours yet.
-
-Everything below is in service of that question.
+nothing on it is ours yet, and everything below is in service of that question.
 
 ---
 
 ## 1. Type
 
 **The pairing is the design.** Every theme has exactly two families: a display
-face that carries the character, and Instrument Sans for everything a reader
+face that carries the character, and a body face for everything a reader
 actually reads. The display face is what makes each theme itself.
 
 | Theme | Display | Body |
 |---|---|---|
+| Aloha | Inter Tight | Roboto |
 | Reef | Space Grotesk | Instrument Sans |
 | Kai | Archivo | Instrument Sans |
 | Koa | Syne | Instrument Sans |
@@ -54,10 +59,17 @@ Two families. Never three, never one. A page set entirely in its body face is a
 document, not a design; a page with four families is a ransom note.
 
 **What is refused.** Inter, Roboto, Open Sans, Poppins, Montserrat, Lato,
-Nunito, and `system-ui` as a display face. Not because they are bad faces -
-Inter is an excellent face - but because they are the ones every tool reaches
-for first, and a reader who has seen forty generated pages this month has seen
-all forty in Inter.
+Nunito, and `system-ui` as a display face, when they arrive as a default. Not
+because they are bad faces - Inter is an excellent face - but because they are
+the ones every tool reaches for first, and a reader who has seen forty
+generated pages this month has seen all forty in Inter.
+
+**Aloha is the exception in the table above, and it is named rather than
+hidden.** It carries Inter Tight and Roboto, two of the faces this section
+refuses, set at weight 800 with negative tracking, which is a place no default
+puts them; it was also built before this file was written. That is an
+explanation, not an exemption. The rule stands, one theme is outside it, and
+Aloha's next major version is where that gets settled.
 
 **The accent word.** Every big title carries exactly one word in the accent
 role. That word keeps the display face and its weight. It does not become an
@@ -78,7 +90,7 @@ in `--accent-wave` in `tokens.css`, one per colour mode.
 largest display. Negative letter-spacing on the big steps only - a tracked-out
 body face reads as a slide, not a page.
 
-**Measure.** Prose lives between 45 and 75 characters. `.measure-prose` and
+**Measure.** Prose lives between 45 and 75 characters; `.measure-prose` and
 `.measure-wide` exist so nobody has to guess. A full-width paragraph on a
 1440 px screen is unreadable no matter how good the face is.
 
@@ -88,49 +100,70 @@ body face reads as a slide, not a page.
 
 **One anchor hue per theme, one accent, and neutrals tinted toward the anchor.**
 
+The anchor is what `--color-primary` resolves to. These are the literal values
+it resolves to in light mode, read from `src/styles/tokens.css`, not the
+palette shade the ramp is named after:
+
 | Theme | Anchor | Accent |
 |---|---|---|
-| Reef | turquoise `#1a9fc4` | coral `#f95c36` |
-| Kai | abyss blue `#336c93` | coral |
-| Koa | fern `#5c7350` | coral |
-| Swell | violet `#8b4dff` | coral |
+| Aloha | lagoon `#16646f` | coral `#f95c36` |
+| Reef | reef turquoise `#147ea0` | coral `#e6411c` |
+| Kai | abyss blue `#235476` | coral `#f95c36` |
+| Koa | fern `#45593c` | coral `#f95c36` |
+| Swell | electric violet `#7326f5` | coral `#f95c36` |
 
-The anchor hue is the action colour. It is what `--color-primary` resolves to
-in every theme, so it is what buttons, links and focus rings are made of: the
-colour a reader learns to associate with "this responds".
+Each anchor is the 600 shade of its ramp rather than the 500 the palette is
+built around, for one reason: button labels are white, and 500 falls under a
+4.5 contrast ratio. In dark mode the anchor climbs one step lighter, to 400,
+and to 300 in Koa. The anchor is the action colour: buttons, links and focus
+rings are made of it, and it is what a reader learns to read as "this responds".
 
-Coral is the second voice, mapped to `--color-accent`, and it is the one thing
-all four themes share. It is the only warm note in an otherwise cold house, and
-it is rationed: an eyebrow, a marker, one call to action per screen. It never
-becomes the dominant colour of a page, because an accent that dominates is not
-an accent, it is a second background.
+Coral is the second voice, mapped to `--color-accent`, and its ramp is identical
+to the hex in all five themes. It is the only warm note in an otherwise cold
+house, and it is rationed: an eyebrow, a marker, the wave under an accent word.
+It never dominates a page, because an accent that dominates is a second
+background. Reef alone takes coral a step darker in light mode, its ground being
+paler than the other four.
 
 **What is refused.**
 
-- Background gradients on heroes. Especially purple to blue, and especially
-  behind centred text. If a hero needs depth it gets a photograph, not a mesh.
+- Background gradients used INSTEAD of a photograph on a hero. Especially
+  purple to blue, and especially behind centred text. If a hero needs depth it
+  gets a photograph. A tinted ground under a photograph is a different thing
+  and is allowed; a mesh where the picture should be is not.
 - Gradient-filled headlines (`background-clip: text`). Solid ink, always. A
   headline that needs a gradient to be interesting has the wrong words in it.
-- Pure `#000` and pure `#fff`. Every neutral in every theme is tinted toward
-  its anchor. `#0a0f17` is not black, it is the darkest turquoise we allow.
+- Pure `#000`, anywhere, as a colour. Every dark ground in the family is the
+  darkest shade of its own anchor: `#0a0f17` in Reef, `#021c24` in Aloha,
+  `#0f0f13` in Kai, `#111110` in Koa, `#060b1a` in Swell. None of them is black.
 - The thick coloured stripe down one edge of a card.
 
-**Light is the default.** All six sites open light and offer dark. Dark-first
-was the earlier house position and it was wrong for a simple reason: a theme is
-judged in the two seconds before anyone touches a toggle, and dark-by-default
-made every theme in the family look like the same dark theme.
+**Where pure white is allowed, and it is exactly three places.** A hex is not a
+colour when it is an alpha channel: `color-mix(in oklab, #ffffff 14%,
+transparent)` and a mask written `#000` are opacity, and they pass. Beyond
+that, `#ffffff` survives as the fill of a light card and as the text on a
+primary or accent fill where contrast demands it. Both are unanimous.
 
-Both modes are composed, neither is an inversion. In dark mode, shadows become
-luminous borders and inner glows, because a drop shadow on a dark surface is
-invisible and the depth has to come from somewhere.
+The light page ground is where the family is not unanimous, and pretending
+otherwise would be the kind of claim this file exists to prevent: Reef tints
+its paper `#fbfcfe`, Koa tints its `#f8f7f4`, and Aloha, Kai and Swell leave
+theirs white. Two tint, three do not, and the house has never decided which.
+
+**Light is the default.** All six sites open light and offer dark. Dark-first
+was the earlier house position and it was wrong: a theme is judged in the two
+seconds before anyone touches a toggle, and dark-by-default made every theme in
+the family look like the same dark theme. Both modes are composed, neither is
+an inversion: in dark mode shadows become luminous borders and inner glows,
+because a drop shadow on a dark surface is invisible and the depth has to come
+from somewhere.
 
 **The token contract.** Three floors: the raw palette, semantic aliases, and
 the utilities that markup is allowed to touch. Markup writes `bg-background`,
 `text-foreground`, `border-border`. It never writes `bg-ink-900`. This is not
 tidiness - `pnpm rebrand` repaints a whole theme by editing the first floor
-only, and one leaked palette class in a component breaks that promise for the
-user. `docs/conventions/tailwind.md` holds the full contract and the grep that
-enforces it.
+only, and one leaked palette class in a component breaks that promise for
+whoever installs it. `docs/conventions/tailwind.md` holds the full contract and
+the grep that enforces it.
 
 ---
 
@@ -140,8 +173,8 @@ enforces it.
 and repeated it. Text sits left. Sections lead from the left. The eye gets a
 single starting line to come back to on every scroll.
 
-Centre something when centring is the point - a closing call to action, a
-single quotation - and then it reads as deliberate because it is the exception.
+Centre something when centring is the point, a closing call to action or a
+single quotation, and it reads as deliberate because it is the exception.
 
 **What is refused.**
 
@@ -153,15 +186,12 @@ single quotation - and then it reads as deliberate because it is the exception.
 - The full-viewport centred hero with one sentence and one button. A hero
   fills the first screen, frame included: `min-h-[calc(100svh-1rem)]`, then
   `sm:calc(100svh-1.5rem)` and `md:calc(100svh-2rem)`, one value per step
-  because the frame around the panel is `p-2 / p-3 / p-4`. It is never a bare
-  `80svh`: that leaves a pale band under the panel on arrival and the hero
-  reads as short. And never a fixed pixel value, so it follows any screen.
-  What fills it is what matters: the hero sits inside the page rather than
-  replacing it, and it carries enough to decide with.
-
-  Padding does NOT change that height. `box-sizing` is `border-box`, so
-  padding is counted inside `min-height`: it pushes the content down inside a
-  box that does not move. Only `min-height` changes the height.
+  because the frame around the panel is `p-2 / p-3 / p-4`. Never a bare
+  `80svh`, which leaves a pale band under the panel on arrival, and never a
+  fixed pixel value. Padding does NOT change that height: `box-sizing` is
+  `border-box`, so padding pushes the content down inside a box that does not
+  move. What fills the screen is what matters, and it carries enough to decide
+  with.
 - Uniform radii everywhere. Containers are soft, the things inside them are
   tight. When every corner has the same radius the page looks extruded.
 - Pill badges announcing a version or a status above a title. The version
@@ -174,39 +204,42 @@ single quotation - and then it reads as deliberate because it is the exception.
 
 **Cards are not the only container.** A border plus a shadow plus a white fill
 is one option among several: a tinted ground with no border, spacing alone, a
-single hairline rule. Varying the containment across a page is most of what
-makes it look composed.
+single hairline rule. Varying containment across a page is most of what makes
+it look composed.
 
 ---
 
 ## 4. Photography
 
 **Photographs, never gradients - and the licence is part of the design.**
-Every hero and every cover in this family is a photograph. Since 1.3.0 they
-come from Pexels, chosen one by one and listed in `PHOTOS.md` with the page
-each one came from.
+Every hero and every cover in this family is a photograph. They come from
+Pexels, chosen one by one and listed in `PHOTOS.md` with the page each one came
+from.
 
-The rule is not "our own photographs". The rule is: **a photograph whose
-licence the user can verify, named in `THIRD-PARTY.md` and traceable in
-`PHOTOS.md`.** A studio archive would satisfy it too. Nothing else does.
+What decides an image is its licence, not where it came from. Most subscription
+stock libraries forbid redistributing their assets inside a template that is
+itself resold; an image like that in a theme is a liability with a border
+radius, however good it looks. The Pexels licence allows commercial use,
+modification, and redistribution inside a product like this one; it forbids
+only reselling an unaltered photo as stock, which is not what a theme does.
 
-The Pexels licence clears that bar and that is why it was chosen: it allows
-commercial use, modification and redistribution inside a product like this one,
-and forbids only reselling an unaltered photo as stock, which is not what a
-theme does. A theme that ships an image its user has no right to publish is not
-a theme, it is a liability with a border radius.
+So the rule is not "our own photographs". The rule is: **a photograph whose
+licence anyone can verify, named in `THIRD-PARTY.md` and traceable in
+`PHOTOS.md`.** A studio archive satisfies it too. Nothing else does.
 
-**Every hero carries one.** A gradient with two blurred halos is what a hero
-looks like when there was no photograph available. There is always a
-photograph available.
+**Every hero carries one.** A gradient with two blurred halos and nothing
+behind it is what a hero looks like when there was no photograph available.
+There is always a photograph available. Aloha is the one hero that runs both,
+a photograph over a tinted ground with two drifting halos above it; the four
+others carry the photograph alone, and they are the better argument.
 
 **How they are wired.** Images are not versioned as binaries. Each theme has a
 build script holding a manifest of URLs, and `pnpm build` fetches them into
-`src/assets` before Astro compiles. The script reads the WebP header and
-refuses any source narrower than the slot needs - 1920 px for a full-bleed
-hero, 1200 px for a card. A blurry image fails the build instead of reaching a
-reader. Repositories stay light, and a user swaps the whole image set by
-editing a list of URLs.
+`src/assets` before Astro compiles. Every entry carries its own minimum width
+and the script reads the WebP header to enforce it: 1920 px for a full-bleed
+hero, 1200 px for a card, 1800 px for the one full-width band between the two.
+A blurry image fails the build instead of reaching a reader, repositories stay
+light, and the whole image set is swapped by editing a list of URLs.
 
 **The veil.** Text over a photograph needs a scrim, and the scrim has to hold on
 the brightest frame of the image, not the average one. Ours is a horizontal
@@ -215,12 +248,12 @@ photograph is still a photograph. Two numbers matter - it starts around 90 %
 and it must not reach 0 % before the text column ends.
 
 One trap, and it has bitten this codebase twice. Inside a dark scene the scrim
-must read the theme's own background variable, never `var(--color-background)`.
-The semantic alias is substituted on `:root`, which means it computes to the
-*light* value, and that computed value inherits down into the dark subtree. The
-scrim then paints white over the photograph. If a dark section is missing
-`.on-dark` or `.dark`, force the value on the section itself rather than
-reaching for a palette name in the markup.
+must read the theme's own background variable, never `var(--color-background)`:
+the semantic alias is substituted on `:root`, computes to the *light* value,
+and that computed value inherits down into the dark subtree, so the scrim
+paints white over the photograph. If a dark section is missing `.on-dark` or
+`.dark`, force the value on the section itself rather than reaching for a
+palette name in the markup.
 
 ---
 
@@ -234,9 +267,19 @@ reaching for a palette name in the markup.
    `StaggerReveal`.
 3. Scroll-driven CSS - `animation-timeline: view()`, no JavaScript.
 
-There is no fourth rung. No theme in this house ships an animation library.
-Anything the first three cannot express gets redesigned until they can, and
-that constraint has never once cost us a page.
+**Four of the five themes stop there and ship no animation library at all.**
+Reef, Kai, Koa and Swell depend on Astro, Tailwind, two fonts and nothing else
+that moves; every effect in them is CSS or a `requestAnimationFrame` loop
+written by hand.
+
+Aloha is the exception, it is deliberate, and it is declared in its
+`THIRD-PARTY.md`: `motion` drives springs and gestures inside its three React
+islands, and `three` renders the optional WebGL ocean. Neither is a shortcut
+past the ladder. `three` is never imported statically - it arrives through
+`await import("three")` inside an IntersectionObserver, so a reader who never
+reaches the hero never downloads it, and it does not initialise at all under
+reduced motion. That is what the exception costs, and what it is required to
+pay to exist.
 
 **Reduced motion is enforced three times**, and the repetition is not
 redundancy. Globally in `global.css`, because it collapses every transition.
@@ -249,18 +292,18 @@ from inside their own script, immediately before observing it. With JavaScript
 off, nothing was ever hidden. Any `opacity: 0` sitting in markup or in an
 unguarded CSS rule is a bug waiting for a slow connection.
 
-**A heavy effect pays a toll.** One exists in this family - the scroll-scrubbed
-film sequence, where the reader's scroll drives a video playhead. It earned its
-place by clearing every rung of this ladder:
+**A heavy effect pays a toll.** Two exist here: the scroll-driven film
+sequence, where the reader's scroll moves a video playhead, in Aloha and Reef;
+and Aloha's WebGL ocean. Both clear five conditions before they land:
 
-- it never initialises under reduced motion, under Save-Data, or on a
-  2g-class connection;
-- it loads nothing until a real scroll gesture, proximity to the viewport, and
-  an idle browser all hold at once;
-- it pauses off-viewport and in hidden tabs;
-- it re-installs on `astro:page-load` behind a `data-*-ready` guard and tears
-  down on `astro:before-swap`, through a single AbortController;
-- it degrades to a still frame that carries the whole message on its own.
+- never initialise under reduced motion, under Save-Data, or on a 2g-class
+  connection;
+- load nothing until a real scroll gesture, proximity to the viewport, and an
+  idle browser all hold at once;
+- pause off-viewport and in hidden tabs;
+- re-install on `astro:page-load` behind a `data-*-ready` guard and tear down
+  on `astro:before-swap`, through a single AbortController;
+- degrade to a still frame that carries the whole message on its own.
 
 Any future effect clears the same five before it lands. Most will not, which is
 the point.
@@ -281,18 +324,20 @@ game-changing, effortless, revolutionary, "take your X to the next level", and
 any sentence that would survive being moved to a different company's website.
 
 **Write the concrete thing instead.** Not "streamline your workflow" but "eight
-products, and that is the whole shop". Not "trusted by industry leaders" but
-the number of projects taken in a year and why it is that number. Specificity
-is the cheapest differentiator available and almost nobody spends it.
+products, and that is the whole shop". Not "trusted by industry leaders" but the
+number of projects taken in a year and why it is that number. Specificity is the
+cheapest differentiator available and almost nobody spends it.
 
-**Numbers are real or absent.** Counters in this family count something
-countable - pages built, primitives, icons drawn. They are never rounded up to
-look better, and there is never a fifth one added because four looked sparse.
+**Numbers are real or absent.** Counters here count something countable - pages
+built, primitives, icons drawn - are never rounded up, and never gain a fifth
+entry because four looked sparse.
 
-**Demo content is labelled as demo content.** Reef Notes, Nalu, Vela and Onda
-are inventions, their authors and clients and testimonials are inventions, and
-every theme says so in its LICENSE and its README. A fictional testimonial
-presented as real is not a design decision, it is a lie with a border radius.
+**Demo content is labelled as demo content.** Lagoon in Aloha, Reef Notes in
+Reef, Nalu in Kai, Vela in Koa, Onda in Swell: five inventions, and their
+authors, clients and testimonials are inventions too. Every theme says so in
+its LICENSE, in its README, and in the header comment of
+`src/config/siteData.json.ts`. A fictional testimonial presented as real is not
+a design decision, it is a lie with a border radius.
 
 ---
 
@@ -302,7 +347,7 @@ Before a page ships, walk it once looking only for these. Finding one is a
 problem. Finding two in the same viewport means the page was assembled, not
 designed.
 
-- [ ] A gradient behind a hero, or filling a headline
+- [ ] A gradient standing in for a hero photograph, or filling a headline
 - [ ] Three equal cards in a row
 - [ ] A card inside a card
 - [ ] One font doing display and body
@@ -310,7 +355,7 @@ designed.
 - [ ] A pill badge above a title
 - [ ] A row of round numbers
 - [ ] Everything centred
-- [ ] `#000` or `#fff` used literally
+- [ ] `#000` used as a colour, or `#ffffff` outside the three places above
 - [ ] A hero with no photograph
 - [ ] A decorative element that cannot be clicked, read, or explained
 - [ ] Copy that would survive a find-and-replace of the company name
@@ -320,7 +365,16 @@ designed.
 
 That last one has cost this house more than every visual tell combined. A
 feature list is checked in thirty seconds. If the page says the theme ships a
-library, the library is in `package.json`, or the sentence goes.
+library, the library is in `package.json`, or the sentence goes. This file was
+itself rewritten on that rule: it once claimed no theme here ships an animation
+library, while `motion` and `three` sat in Aloha's dependencies, and it listed
+four themes in tables that should have held five.
+
+**What the house currently owes itself**, kept here so it stays visible: Aloha
+carries two refused faces and two decorative halos over a hero that already has
+a photograph, and three themes leave the light page ground pure white where two
+tint it. Both are decisions, not accidents, and neither has been taken for the
+whole house yet.
 
 ---
 
@@ -332,14 +386,14 @@ redesign skills published at tasteskill.dev by Leonxlnx, VoltAgent's collection
 of design documents from studios whose work holds up, and Apple's Human
 Interface Guidelines as distilled by dickwu's apple-design-skill.
 
-Nothing here is copied from any of them. What is written above is this
-studio's own position, argued from its own files, and every rule points at a
-real decision in a real theme. Those references are named because reading them
-made this file better, and because a house that refuses assembled work should
-not pretend it arrived at everything alone.
+Nothing here is copied from any of them. What is written above is this studio's
+own position, argued from its own files, and every rule points at a real
+decision in a real theme. They are named because reading them made this file
+better, and because a house that refuses assembled work should not pretend it
+arrived at everything alone.
 
 The disagreements are ours too. This house keeps a single accent word in a big
 title where some of that work would remove it, because the wave beneath it is
 the mark. It keeps light as the default where much of the field has settled on
-dark. And it ships one heavy effect, once, where a stricter reading would ship
-none.
+dark. And it ships two heavy effects, in two themes, where a stricter reading
+would ship none.
