@@ -181,15 +181,24 @@ makes it look composed.
 
 ## 4. Photography
 
-**Only Aloha Pixel photographs.** No stock, ever. Every image in every theme
-comes from the studio's own archive - the wave that gives the logo its shape,
-the Na Pali coast, the Kilauea lava reaching the sea, a green turtle over a
-reef, palms against a sunrise.
+**Photographs, never gradients - and the licence is part of the design.**
+Every hero and every cover in this family is a photograph. Since 1.3.0 they
+come from Pexels, chosen one by one and listed in `PHOTOS.md` with the page
+each one came from.
 
-This is not sentimentality. A photograph carries a light that no gradient can
-compute, and a photograph nobody else can use is the one asset in a theme that
-cannot be copied. It is also the fastest way to answer the one test at the top
-of this file.
+This changed for a reason worth stating, because the earlier position was the
+opposite and it was wrong. This file used to say "only Aloha Pixel
+photographs, no stock, ever". The images it described were Adobe Express
+assets, which a subscription licence forbids redistributing inside a resold
+template. A theme that ships an image its buyer has no right to publish is not
+a theme, it is a liability with a border radius. The Pexels licence allows
+commercial use, modification, and redistribution inside a product like this
+one; it forbids only reselling an unaltered photo as stock, which is not what
+a theme does.
+
+So the rule is not "our own photographs". The rule is: **a photograph whose
+licence the buyer can verify, named in `THIRD-PARTY.md` and traceable in
+`PHOTOS.md`.** A studio archive would satisfy it too. Nothing else does.
 
 **Every hero carries one.** A gradient with two blurred halos is what a hero
 looks like when there was no photograph available. There is always a
