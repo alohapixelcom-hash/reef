@@ -54,19 +54,24 @@ const subscribeHref = "#newsletter";
 
 {/* La barre respecte l'encoche (safe-area) et traverse les navigations sans
     etre reconstruite : elle ne clignote pas et garde son etat retracte. */}
-<header
-    {/* Le decalage du haut vit dans le bloc <style is:global> plus bas, en
-        regles [data-header]{top:...}, et NULLE PART ailleurs. Aucun utilitaire
-        Tailwind de top ici : un utilitaire bat la regle globale et fige la
-        barre a une seule valeur, ce qui colle la pilule au bord de la fenetre
-        et la fait deborder au-dessus du cadre arrondi du panneau.
+{/* Le decalage du haut vit dans le bloc <style is:global> plus bas, en
+    regles [data-header]{top:...}, et NULLE PART ailleurs. Aucun utilitaire
+    Tailwind de top ici : un utilitaire bat la regle globale et fige la
+    barre a une seule valeur, ce qui colle la pilule au bord de la fenetre
+    et la fait deborder au-dessus du cadre arrondi du panneau.
 
-        Les trois paliers (1.25 / 1.5 / 1.75rem) suivent le cadre p-2 / p-3 /
-        p-4 : la pilule tombe TOUJOURS a l interieur du panneau, avec la meme
-        respiration que le bord gauche. En etat retracte elle remonte, voir la
-        regle [data-shrunk] plus bas. L encoche l emporte toujours : env()
-        reste dans le max(). */}
-    class="fixed inset-x-0 z-50"
+    Les trois paliers (1.25 / 1.5 / 1.75rem) suivent le cadre p-2 / p-3 /
+    p-4 : la pilule tombe TOUJOURS a l interieur du panneau, avec la meme
+    respiration que le bord gauche. En etat retracte elle remonte, voir la
+    regle [data-shrunk] plus bas. L encoche l emporte toujours : env()
+    reste dans le max().
+
+    Ce commentaire etait pose A L INTERIEUR de la balise ouvrante : astro
+    check ne parvenait plus a parser le fichier et sortait douze erreurs. Un
+    commentaire se met AU-DESSUS de la balise, jamais entre le nom et sa
+    premiere prop. */}
+<header
+  class="fixed inset-x-0 z-50"
   data-header
   transition:persist
 >
