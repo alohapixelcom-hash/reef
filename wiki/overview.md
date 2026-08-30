@@ -18,9 +18,9 @@ updated: 2026-08-15
 # Architecture overview
 
 Reef is a fully static Astro 7 blog theme. There is no adapter and no server
-runtime, on purpose (astro.config.mjs): the buyer deploys plain HTML anywhere.
+runtime, on purpose (astro.config.mjs): the user deploys plain HTML anywhere.
 The demo publication is a fictional web-studio notebook named Reef Notes; the
-theme itself is called Reef, and it is sold by Aloha Pixel.
+theme itself is called Reef, published by Aloha Pixel under the MIT licence.
 
 The product is a PUBLICATION: posts, the authors who write them, the topics
 that group them, and the pages that lead to them. Everything else (about,
@@ -37,13 +37,13 @@ Bottom to top, each layer only knows the one below it:
 2. **Primitives**: 36 families in src/components/ui, pure .astro, variants
    via exported tv() configs, platform-native behavior first
    (see [ui-primitives](subsystems/ui-primitives.md)).
-3. **Sections**: 22 components in src/components/Sections, grouped by page
+3. **Sections**: 24 components in src/components/Sections, grouped by page
    (Home, Post, Archive, Search, Global, Legal). They compose primitives and
    carry the page-level markup.
 4. **Pages**: src/pages assembles Sections inside BaseLayout, adds SEO
    metadata and JSON-LD (see [seo](subsystems/seo.md)).
 
-There is no fifth layer. No island, no React, no animation library: ten
+There is no fifth layer. No island, no React, no animation library: nine
 runtime dependencies in total.
 
 Sideways of the cake: src/js holds pure logic (JSON-LD constructors,
@@ -117,4 +117,4 @@ from one brand color, scripts/rebrand.mjs), `pnpm og` (regenerates the
 public/og/*.png cards, scripts/og.mjs), `pnpm app` (build tuned for a
 Capacitor shell, scripts/app.mjs). Selfchecks run directly with Node:
 `node src/js/schema.selfcheck.ts` and `node src/js/pagination.selfcheck.ts`.
-Node >= 22.12 required. Path aliases live in tsconfig.json.
+Node >= 22.18 required. Path aliases live in tsconfig.json.

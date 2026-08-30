@@ -30,7 +30,7 @@ Reef is built for all three:
 |---|---|---|
 | No server | Any SSR route, image endpoint or form action 404s | The theme is 100 % static, no adapter, and the contact form (`contact.astro`) ships with no `action`, deliberately not wired |
 | Relative paths | Absolute `/foo/` links can resolve outside the bundle | `trailingSlash: "always"` plus directory builds keep every internal link a real folder |
-| The notch | Content slides under the status bar and the home indicator | `viewport-fit=cover` in `BaseHead.astro:55` and `env(safe-area-inset-*)` on every fixed element |
+| The notch | Content slides under the status bar and the home indicator | `viewport-fit=cover` in `BaseHead.astro:78` and `env(safe-area-inset-*)` on every fixed element |
 
 ## The commands
 
@@ -96,7 +96,7 @@ below which iOS zooms the page when a field takes focus and never zooms back.
 ## What is deliberately not included
 
 No native plugin is bundled. A theme that shipped push notifications and a
-camera plugin would force every buyer to carry them, and would tie the theme to
+camera plugin would force every user to carry them, and would tie the theme to
 plugin versions that move faster than a design system. The theme guarantees the
 build is loadable and the layout is correct. The plugins are one `npm install`
 away and belong to the app, not to the theme.

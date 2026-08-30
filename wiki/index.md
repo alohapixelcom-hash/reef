@@ -10,10 +10,8 @@ updated: 2026-08-15
 # Reef wiki
 
 The map of how this theme actually works, anchored to real files with
-path:line citations. Maintained by the `wiki` skill
-(docs/conventions/wiki.md): `sync` after changes, `ask` for questions,
-`lint` for health checks. When a page and the code disagree, the code wins
-and the page gets fixed.
+path:line citations. When a page and the code disagree, the code wins and the
+page gets fixed.
 
 ## Pages
 

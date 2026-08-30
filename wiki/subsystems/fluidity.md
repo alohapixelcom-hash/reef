@@ -118,8 +118,8 @@ unfolds from its right corner, where the button that was just pressed is.
 
 ## The preferences almost nobody ships
 
-Three system settings reshape this layer. A sold theme that ignores them breaks
-for a slice of its buyers' users.
+Three system settings reshape this layer. A theme that ignores them breaks for
+a slice of its users' own visitors.
 
 - `prefers-reduced-motion` cuts every animation and the gesture layer with it
   (global.css, plus a local guard in scroll.css because a `view()` timeline

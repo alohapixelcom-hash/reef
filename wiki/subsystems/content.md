@@ -47,7 +47,7 @@ All shapes live in one place, src/config/types/configDataTypes.ts, and each
 file default-exports one typed object:
 
 - siteData.json.ts: name, title, description, author, default OG image.
-  The first file a buyer edits (its own header says so).
+  The first file a user edits (its own header says so).
 - siteSettings.json.ts: two switches, useViewTransitions and useAnimations,
   declared with `satisfies` so literal types survive. BaseHead reads the first
   to mount the ClientRouter.
@@ -55,7 +55,7 @@ file default-exports one typed object:
   truth for site links.
 - legalData.json.ts: the legal documents (title, description, lastUpdated,
   sections) rendered by one legal template; the copy is deliberately generic
-  and marked for buyer review.
+  and marked for user review.
 
 ## Pure helpers around content
 

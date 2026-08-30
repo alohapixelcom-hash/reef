@@ -3,7 +3,7 @@
 title: Wiki log
 summary: Dated journal of code changes reflected in the wiki, and the list of open threads.
 sources: []
-updated: 2026-08-16
+updated: 2026-08-30
 ---
 
 # Wiki log
@@ -16,8 +16,40 @@ dated entry.
 ## Open threads
 
 - The contact form runs in demo mode by design: contact.astro ships with no
-  `action` and stays that way until a buyer wires it to an endpoint. Not a
+  `action` and stays that way until a user wires it to an endpoint. Not a
   bug; recorded so nobody "fixes" it.
+
+## 2026-08-30 - audit of the public repository
+
+A pass over every claim the repository makes about itself, after an audit
+found the docs and the code disagreeing in several places.
+
+- Reef is free and MIT everywhere it is described. "Commercial theme",
+  "sold by Aloha Pixel", "buyer" and the paid-archive paragraph of DEPLOY.md
+  are gone; the reader of this repo is a user.
+- One story about the photographs, in LICENSE, PHOTOS.md, THIRD-PARTY.md,
+  README, SPEC and DEPLOY: ten Pexels photographs (one hero, nine covers)
+  under the Pexels licence, redistribution allowed. THIRD-PARTY.md no longer
+  claims a studio archive outside the MIT grant, and no longer counts eleven.
+- The home video is credited to the file it actually loads: Pexels video
+  4863640, a wave filmed from underwater at Electric Beach, Hawaii, 9 MB.
+- Seven article covers got a coverAlt that describes the photograph the build
+  actually fetches. The Pexels pages were re-read one by one; PHOTOS.md was
+  right and the alt texts had drifted.
+- The accent colour is stated as it is coded: the accent word keeps the
+  heading font, turns the house turquoise and carries a turquoise wave;
+  coral is the second accent, rationed.
+- ThemeInit falls back to light, and the docs say so.
+- Counts recounted: 24 Sections, 9 runtime dependencies. 55 pages, 36 UI
+  families, 63 .astro files, 60 icons and 55+3 animations were already right.
+- The demo studio has three people in the copy, as it has always had three in
+  src/data/authors/.
+- Removed: .env.example, a leftover from another theme (it pointed at
+  src/actions/ files that do not exist here). Fixed: dead path:line citations
+  in docs/conventions/ and in this wiki, two links pointing at files that do
+  not exist (a conventions page and an islands folder), and the worker's
+  fallback locale, which sent every other language to /fr/ instead of the
+  default.
 
 ## 2026-08-16 - wave accent
 
@@ -26,10 +58,11 @@ The accent word of headings dropped its separate font.
 - The separate accent font is gone (package, import, tokens): the
   italic-serif accent word is banned across the whole family - it had become
   the marker of generated sites, not a signature.
-- The accent word keeps the heading font, stays coral, and carries a coral
-  WAVE underline (`--accent-wave`, the Aloha Pixel brand mark is a wave).
-  One wave per mode: coral-500 stroke in light, coral-400 in dark and in the
-  deep scene, matching the primary.
+- The accent word keeps the heading font, turns the house turquoise, and
+  carries a turquoise WAVE underline (`--accent-wave`, the Aloha Pixel brand
+  mark is a wave). One wave per mode: reef-600 stroke in light, reef-400 in
+  dark and in the deep scene, matching the primary. Coral stays as the second
+  accent, rationed.
 - Blockquote, dropcap and the giant card initials moved from the serif to
   the display grotesque; `--font-serif`/`--font-script` remain as aliases of
   `--font-display`. Two fonts load instead of three.
@@ -55,7 +88,7 @@ The theme's look was rebuilt around reading.
 - Code state: `pnpm build` green, 55 pages, `astro check` at 0/0/0. Two
   selfchecks pass: schema (29 assertions) and pagination.
 - Inventory: 36 primitive families (63 .astro files, 10 with a script tag) in
-  src/components/ui; 22 Sections; 60 original icons in
+  src/components/ui; 24 Sections; 60 original icons in
   src/components/svg/icons/icons.ts; 55 animate-* utilities in src/styles/motion
   plus 3 brand animations in tokens.css; 3 content collections (posts, authors,
   topics). There is no React and no island.

@@ -20,7 +20,7 @@ updated: 2026-08-15
 No SEO package is installed. The layer is four hand-written pieces: a head
 component, a set of JSON-LD constructors, three text endpoints, and an OG
 image generator. The single source of the production origin is `site` in
-astro.config.mjs:11; everything below derives absolute URLs from it.
+astro.config.mjs:10; everything below derives absolute URLs from it.
 
 The site is bilingual, so every tag below has a language dimension:
 hreflang alternates, `og:locale`, a per-language RSS feed and the sitemap's
@@ -31,17 +31,18 @@ See [i18n.md](i18n.md) for the contract.
 
 One component writes the entire `<head>`:
 
-- Title policy at :29 ("Title | Brand" unless the brand is already in the
-  title), description defaulting to siteData (:22).
-- Canonical at :33-36, aligned with `trailingSlash: "always"`
-  (astro.config.mjs:15); file routes keep their extension.
-- Full Open Graph (:70-77) and twitter card (:79-84) blocks, with image alt.
+- Title policy at :41 ("Title | Brand" unless the brand is already in the
+  title), description defaulting to siteData (:34).
+- Canonical at :45-48, aligned with `trailingSlash: "always"`
+  (astro.config.mjs:14); file routes keep their extension.
+- Full Open Graph (:106-113) and twitter card (:120-125) blocks, with image
+  alt.
 - Favicon generated at build: the brand colors are regex-extracted from
-  tokens.css imported raw (:9, :41-45) and injected into an inline SVG data
-  URI (:47-49). A rebrand repaints the favicon with no asset to edit.
-- theme-color follows the scheme (:66-67), sitemap and RSS discovery links
-  (:62-63), optional noindex (:59), ClientRouter last (:89).
-- The `<slot />` at :87 receives the JSON-LD scripts from pages.
+  tokens.css imported raw (:21, :65-68) and injected into an inline SVG data
+  URI (:71-72). A rebrand repaints the favicon with no asset to edit.
+- theme-color follows the scheme (:102-103), sitemap and RSS discovery links
+  (:87-93), optional noindex (:84), ClientRouter last (:130).
+- The `<slot />` at :128 receives the JSON-LD scripts from pages.
 
 ## JSON-LD constructors (src/js/schema.ts)
 
@@ -52,8 +53,8 @@ website, article and breadcrumbList; faqPage and softwareApplication ship in the
 module but no page declares them. Shared behavior: `compact()` strips undefined
 keys (:13-15), dates normalize to ISO 8601 (:18-20), nested Person and
 Organization nodes carry no `@context`, and a price of zero survives
-(:146-147). The selfcheck (src/js/schema.selfcheck.ts, 29 assertions, run with
-`node src/js/schema.selfcheck.ts`) pins all of this.
+(:146-147). The selfcheck (src/js/schema.selfcheck.ts, 29 assertions, run
+with `node src/js/schema.selfcheck.ts`) pins all of this.
 
 Usage pattern: pages build an array of nodes and inject them through
 `<Fragment slot="head">`. Placement as built: the home carries organization +
@@ -77,8 +78,7 @@ sitemap too; keep them in step.
 ## OG images
 
 scripts/og.mjs renders the public/og/*.png cards (1200x630) from an SVG
-template whose colors come from tokens.css (og.mjs:24-27), rasterized by
-sharp. `pnpm og` regenerates them; run it
-after `pnpm rebrand`. Pages choose their card through the `image` prop of
-BaseLayout, whose shape requires alt text
-(src/layouts/BaseHead.astro:12-18).
+template whose colors come from tokens.css (og.mjs:29-31), rasterized by
+sharp. `pnpm og` regenerates them; run it after `pnpm rebrand`. Pages choose
+their card through the `image` prop of BaseLayout, whose shape requires alt
+text (src/layouts/BaseHead.astro:27).

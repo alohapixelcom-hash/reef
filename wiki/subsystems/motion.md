@@ -22,8 +22,8 @@ docs/conventions/motion.md; this page maps the moving parts.
 Six families imported by motion/index.css:22-27: fades, slides, zooms,
 attention, materials, scroll. Together they declare 55 `animate-*` utilities
 via Tailwind 4 `@utility`, each embedding its own keyframes. tokens.css adds
-the three brand animations rise, marquee and pulse-slow (tokens.css:148-150,
-keyframes :258-286). Conventions, written at motion/index.css:6-19:
+the three brand animations rise, marquee and pulse-slow (tokens.css:145-147,
+keyframes :277-305). Conventions, written at motion/index.css:6-19:
 
 - entries and exits play once with fill both, so cascades are inline
   animation-delay on children and nothing flashes its final state early;
@@ -31,7 +31,7 @@ keyframes :258-286). Conventions, written at motion/index.css:6-19:
 - tuning happens at the element ([animation-duration:1.2s], the
   --motion-travel / --motion-scale / --motion-float / --motion-parallax
   knobs), never by editing the catalog;
-- three shared easings at motion/index.css:30-33, the expo-out being the
+- three shared easings at motion/index.css:31-34, the expo-out being the
   same curve as animate-rise.
 
 The scroll family (motion/scroll.css) drives animations with
@@ -54,7 +54,7 @@ observes the root and fans out incremental delays to its direct children
 
 ## Reduced motion: three layers, three reasons
 
-1. Global kill switch: src/styles/global.css:130-138 collapses every CSS
+1. Global kill switch: src/styles/global.css:307-316 collapses every CSS
    animation, transition and smooth scroll under prefers-reduced-motion.
    Written once so no component depends on discipline.
 2. Local guard in motion/scroll.css:17-26: a view() timeline ignores

@@ -84,7 +84,7 @@ files. Each one names, in its header, the platform gap it fills.
 ## Notable primitives
 
 A few primitives exist because the market does not ship them; each is the part
-a buyer of another theme would write by hand.
+a user of another theme would write by hand.
 
 ### empty-state
 
@@ -116,7 +116,7 @@ from one site to the next: blog, topics, authors, about, contact, legal.
 Navbar, Footer and the reading pages all read from it.
 
 This is deliberate and it is the fix to the most common complaint about bought
-themes: a navbar with a hard-coded path forces the buyer to open component
+themes: a navbar with a hard-coded path forces the user to open component
 internals to rebrand. One file redirects the whole theme.
 
 The same rule applies to the brand name: the chrome reads `siteData.name`, it

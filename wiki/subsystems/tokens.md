@@ -20,9 +20,10 @@ floors, and markup is only ever allowed to touch the third.
 
 Reef is made to be read, so the palette is quiet and cold. The neutral is a
 deep blue-night ink, not a warm grey; the light surface is a faintly blue
-paper. The house coral is the one warm accent, and a frank aquamarine reef
-blue is the second accent that marks a topic or a link. The night version is
-the same roles reassigned, not a second stylesheet.
+paper. The frank aquamarine reef blue is the action colour, the one every
+button, link and accent word is made of; the house coral is the one warm note,
+kept as a rationed second accent. The night version is the same roles
+reassigned, not a second stylesheet.
 
 ## Floor 1: raw palette
 
@@ -31,22 +32,25 @@ Inside `@theme`: three colour ramps and the non-colour tokens.
 - **Ink**, the neutral. A very deep, cool blue (deep water, night), never a
   neutral grey: ink-50 `#f3f6fa` is the faintly blue paper, ink-950 `#0a0f17`
   the ink.
-- **Coral**, the house accent, the thread that says Aloha, Reef, Swell, Koa and
-  Kai come from one workshop. coral-500 in light, coral-400 in dark.
-- **Reef**, the second accent and the signature of the theme. A frank
-  aquamarine (reef-500 `#1a9fc4`, reef-400 `#3fc0e0`) that marks topics, links
-  and quiet states, never a flat background under long text.
+- **Reef**, the action colour and the signature of the theme. A frank
+  aquamarine (reef-600 `#147ea0` in light, reef-400 `#3fc0e0` in dark) that
+  carries `--color-primary`: buttons, links, focus rings and the wave under the
+  accent word.
+- **Coral**, the second accent, the thread that says Aloha, Reef, Swell, Koa and
+  Kai come from one workshop. coral-600 in light, coral-400 in dark, and
+  rationed: an eyebrow, a marker, one call to action per screen, never a page.
 - **Typography**: `--font-display` Space Grotesk (headings), `--font-sans`
   Instrument Sans (body and interface); only these two fonts load.
   `--font-serif` and `--font-script` are compatibility aliases of the display
-  font: the accent word of a big title keeps the heading font and carries a
-  coral wave underline (`--accent-wave`, one per mode since the primary coral
-  changes between light and dark), never an italic serif. The display scale
-  runs to 5.5rem; both variable families load the weight axis only.
+  font: the accent word of a big title keeps the heading font, turns the house
+  turquoise and carries a turquoise wave underline (`--accent-wave`, one per
+  mode since the primary turquoise changes between light and dark), never an
+  italic serif. The display scale runs to 5.5rem; both variable families load
+  the weight axis only.
 - **Radii**: card 0.875rem, panel 1.25rem, pill 999px. Buttons are pills; cards
   and panels are gently rounded, which reads as calm on a page of prose.
 - **Brand animations**: rise, marquee, pulse-slow (`--animate-*` at
-  tokens.css:148-150, keyframes :258-286).
+  tokens.css:145-147, keyframes :277-305).
 
 ## Floor 2: semantic aliases, and why `inline` matters
 
@@ -111,7 +115,7 @@ contract:
 
 The `.dark` class on `<html>` is applied before first paint by
 src/components/ui/theme-toggle/ThemeInit.astro (localStorage key "reef-theme").
-The default is dark, on purpose, and the system preference is not followed; a
+The default is light, on purpose, and the system preference is not followed; a
 stored choice always wins. It is re-applied after every view transition on
 astro:after-swap, because the swap replaces the server-rendered `<html>`
 attributes. Tailwind's `dark:` variant is bound to that class by the
