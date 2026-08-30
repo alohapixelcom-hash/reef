@@ -7,7 +7,7 @@ author: fr/mara-lindqvist
 topic: fr/craft
 tags: ["astro", "zod", "contenu"]
 cover: ../../../assets/covers/reef-collections-contrat.webp
-coverAlt: "Pépinière de coraux fixés sur leur support sous la surface, dans une eau bleue traversée par la lumière"
+coverAlt: "Une tortue de mer glissant au-dessus d'un récif corallien, tenant sa route au-dessus de la structure"
 featured: false
 draft: false
 ---

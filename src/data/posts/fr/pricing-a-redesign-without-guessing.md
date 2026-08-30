@@ -6,7 +6,7 @@ author: fr/mara-lindqvist
 topic: fr/studio
 tags: ["freelance", "tarification", "contrats"]
 cover: ../../../assets/covers/reef-prix-refonte.webp
-coverAlt: "Côte de Na Pali vue du ciel, falaises verdoyantes plongeant dans un lagon turquoise"
+coverAlt: "Une falaise en bord de mer vue du ciel, versants verts plongeant dans une eau turquoise"
 featured: false
 draft: true
 ---

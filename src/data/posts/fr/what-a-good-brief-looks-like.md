@@ -6,7 +6,7 @@ author: fr/mara-lindqvist
 topic: fr/studio
 tags: ["freelance", "process", "clients"]
 cover: ../../../assets/covers/reef-bon-brief.webp
-coverAlt: "Vue aérienne d'une côte : ligne d'écume blanche entre le lagon turquoise et la végétation dense du rivage"
+coverAlt: "Un récif corallien sous une eau bleue et claire, chaque colonie tenant sa place dans la structure"
 featured: false
 draft: false
 ---

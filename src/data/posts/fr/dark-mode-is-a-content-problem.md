@@ -6,7 +6,7 @@ author: fr/tomas-abaroa
 topic: fr/design
 tags: ["design", "mode sombre", "css"]
 cover: ../../../assets/covers/reef-mode-sombre.webp
-coverAlt: "Ouverture d'une grotte marine sur un lagon turquoise, la lumière du jour entrant par le fond"
+coverAlt: "Lave en éruption au parc national des volcans d'Hawaii, une fontaine orange incandescente sur la roche sombre"
 featured: false
 draft: false
 ---

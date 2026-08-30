@@ -7,7 +7,7 @@ author: fr/noor-benali
 topic: fr/performance
 tags: ["web vitals", "rum", "mesure"]
 cover: ../../../assets/covers/reef-mesurer-lecteur.webp
-coverAlt: "Longue plage vue du ciel, trains de houle parallèles arrivant sur le sable dans la brume du matin"
+coverAlt: "Le soleil posé sur l'horizon au-dessus de l'océan, sa lumière étalée à plat sur l'eau"
 featured: false
 draft: false
 ---

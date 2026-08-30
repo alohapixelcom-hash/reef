@@ -6,7 +6,7 @@ author: fr/tomas-abaroa
 topic: fr/typography
 tags: ["typographie", "css", "echelle"]
 cover: ../../../assets/covers/reef-echelle-typo.webp
-coverAlt: "Vue plongeante sur l'escalier en colimaçon d'un phare, les marches s'enroulant entre des murs de faïence turquoise"
+coverAlt: "Palmiers en silhouette sur un coucher de soleil tropical, leurs couronnes étagées sur le ciel orangé"
 featured: true
 draft: false
 ---
