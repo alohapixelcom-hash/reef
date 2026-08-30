@@ -293,7 +293,7 @@ off, nothing was ever hidden. Any `opacity: 0` sitting in markup or in an
 unguarded CSS rule is a bug waiting for a slow connection.
 
 **A heavy effect pays a toll.** Two exist here: the scroll-driven film
-sequence, where the reader's scroll moves a video playhead, in Aloha and Reef;
+sequence, where the reader's scroll moves a video playhead, in all five themes;
 and Aloha's WebGL ocean. Both clear five conditions before they land:
 
 - never initialise under reduced motion, under Save-Data, or on a 2g-class
@@ -395,5 +395,4 @@ arrived at everything alone.
 The disagreements are ours too. This house keeps a single accent word in a big
 title where some of that work would remove it, because the wave beneath it is
 the mark. It keeps light as the default where much of the field has settled on
-dark. And it ships two heavy effects, in two themes, where a stricter reading
-would ship none.
+dark. And it ships two heavy effects where a stricter reading would ship none.
