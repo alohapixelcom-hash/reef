@@ -8,16 +8,18 @@
 
 Reef expose une écriture : une publication, ses billets, les auteurs qui les
 signent et les sujets qui les regroupent. Trois collections de contenu typées
-(billets, auteurs, sujets), billets en Markdown ou MDX, flux RSS par langue,
-aucune photo. La publication de démonstration s'appelle Reef Notes et elle est
-fictive : l'acheteur remplace Reef Notes et garde Reef.
+(billets, auteurs, sujets), billets en Markdown ou MDX, flux RSS par langue, et
+dix photographies Pexels (un héros, neuf couvertures) livrées avec la
+démonstration. La publication de démonstration s'appelle Reef Notes et elle est
+fictive : l'utilisateur remplace Reef Notes et garde Reef.
 
 La direction artistique est froide et faite pour la lecture : neutre encre
-bleu nuit, corail en action, aigue-marine reef en second accent, Space Grotesk
-en affichage et Instrument Sans en corps ; le mot d'accent garde la police du
-titre, en corail, souligné d'une vague corail (la marque Aloha Pixel est une
-vague). Le thème est clair par défaut, avec un mode sombre composé
-plutôt qu'inversé ; l'anglais tient la racine, le français vit sous /fr/.
+bleu nuit, turquoise reef en action, corail en second accent rationné, Space
+Grotesk en affichage et Instrument Sans en corps ; le mot d'accent garde la
+police du titre, passe au turquoise de la maison et porte une vague turquoise
+(la marque Aloha Pixel est une vague). Le thème est clair par défaut, avec un
+mode sombre composé plutôt qu'inversé ; l'anglais tient la racine, le français
+vit sous /fr/.
 
 ## 1. Ce que le dépôt contient, mesuré
 
@@ -29,19 +31,19 @@ Chiffres recomptés depuis la source (`pnpm build` vert, `astro check` à 0/0/0)
 | Collections de contenu | 3 (billets, auteurs, sujets), validées par zod |
 | Contenu de démonstration | 9 billets, 3 auteurs, 5 sujets, dans 2 langues |
 | Primitives UI (`src/components/ui`) | 36 familles, 63 fichiers `.astro` |
-| Composants Section | 22 |
+| Composants Section | 24 |
 | Icônes dessinées à la main | 60 |
 | Utilitaires `animate-*` | 55 au catalogue, plus 3 animations de marque |
 | Langues | 2 (anglais à la racine, français sous /fr/) |
 | Pages de wiki | 11 |
 | Fichiers de conventions (`docs/conventions/`) | 5 |
-| Dépendances d'exécution | 10, chacune tracée dans THIRD-PARTY.md |
+| Dépendances d'exécution | 9, chacune tracée dans THIRD-PARTY.md |
 
 ## 2. Les sous-systèmes
 
-- **Tokens Tailwind v4 CSS-first** : palette brute (ink le neutre, coral
-  l'action, reef le second accent), puis alias sémantiques `--reef-*`, puis
-  utilitaires. Le markup n'écrit qu'un rôle (`bg-primary`), jamais une couleur.
+- **Tokens Tailwind v4 CSS-first** : palette brute (ink le neutre, reef le
+  turquoise d'action, coral le second accent), puis alias sémantiques
+  `--reef-*`, puis utilitaires. Le markup n'écrit qu'un rôle (`bg-primary`), jamais une couleur.
   Le mode sombre ne fait que réaffecter l'étage 2, et `.on-dark` repeint un
   sous-arbre sombre dans une page claire.
 - **Primitives zéro-JS d'abord** : `Dialog` est un `<dialog>` natif, `Accordion`
@@ -60,16 +62,16 @@ Chiffres recomptés depuis la source (`pnpm build` vert, `astro check` à 0/0/0)
 - **Self-checks** : `schema.selfcheck.ts` et `pagination.selfcheck.ts`, sans
   framework de test.
 - **Formulaire de contact** : écrit dans `contact.astro` mais livré sans
-  `action`, pour ne pas imposer d'hébergeur ni de prestataire à l'acheteur.
+  `action`, pour ne pas imposer d'hébergeur ni de prestataire à l'utilisateur.
 
 ## 3. La base de connaissance et la revue
 
 **`wiki/`** : une base de connaissance markdown maintenue avec le code. Chaque
-page porte un frontmatter et cite du `chemin:ligne` reel, pour que la derive
-soit detectable.
+page porte un frontmatter et cite du `chemin:ligne` réel, pour que la dérive
+soit détectable.
 
-**La revue** : la liste de controle en fin de `docs/design.md`, quinze points
-a passer avant toute publication, avec une preuve `chemin:ligne` par constat.
+**La revue** : la liste de contrôle en fin de `docs/design.md`, quinze points
+à passer avant toute publication, avec une preuve `chemin:ligne` par constat.
 
 ## 4. Règles non négociables
 

@@ -2,9 +2,10 @@
 
 # Working in Reef, as an agent
 
-Reef is a commercial Astro theme. Buyers read the source; every file you
-touch is part of the product. This page is the operating manual. The five
-rule files it imports are binding, not advisory:
+Reef is a free Astro theme, published under the MIT licence. The whole
+community reads the source; every file you touch is part of the product.
+This page is the operating manual. The five rule files it imports are
+binding, not advisory:
 
 - docs/conventions/astro.md - pure .astro, platform first, static only
 - docs/conventions/tailwind.md - the token contract, what markup may write
@@ -25,15 +26,15 @@ piece, a paginated blog, topic and author pages, a reading column, and a
 per-language RSS feed. The content is three Astro content collections (posts,
 authors, topics) with zod schemas. There is no shop, no pricing, no CMS and no
 server. The demo publication is fictional and named **Reef Notes**; the theme
-is named **Reef**. A buyer replaces Reef Notes and keeps Reef.
+is named **Reef**. A user replaces Reef Notes and keeps Reef.
 
 ## Stack
 
 Astro 7 (static output, no adapter), Tailwind CSS 4 (CSS-first config, no
 tailwind.config.js), tailwind-variants, @astrojs/mdx (Markdown and MDX posts)
 and @astrojs/sitemap, Fontsource for Space Grotesk and Instrument Sans (the
-only two fonts: the accent word keeps the heading font under a coral wave
-underline). Node >= 22.12, pnpm. Demo copy is bilingual, for a fictional
+only two fonts: the accent word keeps the heading font under a turquoise wave
+underline). Node >= 22.18, pnpm. Demo copy is bilingual, for a fictional
 publication named Reef Notes.
 
 **No React, no WebGL, no animation library.** Reef has zero islands and nine
@@ -45,7 +46,7 @@ this repo is a design failure, not a feature.
 ```text
 src/
   components/
-    Sections/   22 sections (Home/, Post/, Archive/, Search/, Global/, Legal/)
+    Sections/   24 sections (Home/, Post/, Archive/, Search/, Global/, Legal/)
     svg/icons/  60 original icons, name union derived from icons.ts
     ui/         36 primitive families, see ui/README.md (the contract)
   config/       siteData, navData, legalData; types in config/types/
@@ -95,8 +96,9 @@ node src/js/pagination.selfcheck.ts
    CSS before any `<script>`. There is no React and no island in this theme.
 7. Buttons are pills (rounded-pill). Cards float (bg-card rounded-card
    shadow-float). Sections breathe (py-24 md:py-32). Exactly one accent-script
-   word per big title: it keeps the heading font, turns coral and carries the
-   coral wave underline (--accent-wave). Never an italic serif.
+   word per big title: it keeps the heading font, turns the house turquoise and
+   carries the turquoise wave underline (--accent-wave). Coral is the second
+   accent, rationed. Never an italic serif.
 8. Bilingual is mandatory: `export const getStaticPaths = localePaths;` on
    every page under [...locale]/ (dynamic routes multiply it), every internal
    href through `localizePath()`, and the French is written, not translated. A
@@ -123,8 +125,9 @@ node src/js/pagination.selfcheck.ts
   global.css. Components written with semantic roles rarely need `dark:` at
   all; needing it for a color role means the token layer is the fix.
 - **The theme does NOT follow the system colour scheme.** ThemeInit reads
-  `localStorage` (key "reef-theme") and falls back to dark, on purpose. A
-  screenshot in light mode needs the key set to `light` before first paint.
+  `localStorage` (key "reef-theme") and falls back to light, on purpose: most
+  visitors prefer light, and a stored choice always wins. A screenshot in dark
+  mode needs the key set to `dark` before first paint.
 - trailingSlash is "always": internal hrefs end with /, and paginated list
   URLs come from the pagination helper (src/js/pagination.ts), not string
   concatenation.
@@ -132,7 +135,7 @@ node src/js/pagination.selfcheck.ts
   reduced-motion guard because view() timelines ignore the global collapse.
   Never strip the double @media/@supports nesting in motion/scroll.css.
 - The contact form (contact.astro) ships with no `action`, on purpose.
-  Wiring it to an endpoint is the buyer's documented decision, not a fix.
+  Wiring it to an endpoint is the user's documented decision, not a fix.
 - Draft posts build (for preview) but must stay out of lists, RSS and
   llms.txt: filter with data.draft !== true, like the existing readers.
 
@@ -150,4 +153,3 @@ Before adding a section, a colour, a typeface or an effect, read
 docs/design.md. It is the house position: what it refuses, what it does
 instead, and why. The checklist at the end of that file is run before every
 release.
-
