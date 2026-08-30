@@ -4,13 +4,13 @@
 
 ## Static output is the product
 
-- No adapter, on purpose (astro.config.mjs:17-20). The theme compiles to
-  plain HTML and imposes no host on the buyer. Never add an adapter, an
+- No adapter, on purpose (astro.config.mjs:16-17). The theme compiles to
+  plain HTML and imposes no host on its user. Never add an adapter, an
   endpoint that needs a server, or `export const prerender = false`.
 - The contact form (contact.astro) ships with no `action` and no `method`: it
   is written but deliberately not wired. Keep it that way; its activation steps
   are documented in its own header.
-- `trailingSlash: "always"` (astro.config.mjs:15). Every internal link ends
+- `trailingSlash: "always"` (astro.config.mjs:14). Every internal link ends
   with `/` (see src/config/navData.json.ts). List URLs are built with
   `buildPageHref` from src/js/pagination.ts:64, never by string concatenation.
 
@@ -28,7 +28,7 @@
 
 ## Scripts must survive view transitions
 
-The ClientRouter is on (src/layouts/BaseHead.astro:89), so a page's scripts
+The ClientRouter is on (src/layouts/BaseHead.astro:130), so a page's scripts
 run once and the DOM is later swapped underneath them. Every script follows
 one of these proven patterns:
 
@@ -37,12 +37,12 @@ one of these proven patterns:
 - Document-level delegation that survives swaps by construction, like
   src/components/ui/_dialog.ts.
 - Re-apply `<html>` state on `astro:after-swap`, like
-  src/components/ui/theme-toggle/ThemeInit.astro:25 (the swap replaces the
+  src/components/ui/theme-toggle/ThemeInit.astro:39 (the swap replaces the
   server-rendered attributes, including `.dark`).
 - Clean up on `astro:before-swap` when a script holds a resource, like an
   IntersectionObserver or a listener bound to `window`.
 
-`assetsInlineLimit: 0` (astro.config.mjs:34-37) keeps even tiny scripts as
+`assetsInlineLimit: 0` (astro.config.mjs:54-57) keeps even tiny scripts as
 files so they are not re-inlined and re-run unpredictably; do not remove it.
 
 ## Page assembly
@@ -56,10 +56,11 @@ constructors from @js/schema, then `Navbar`, a `<main>` of Sections, and
 ## Content and imports
 
 - Collections are defined once in src/content.config.ts with glob loaders,
-  zod schemas and a validated `reference("authors")` (line 15). Drafts are
-  excluded from lists with `data.draft !== true`, as in src/pages/rss.xml.ts.
+  zod schemas and a validated `reference("authors")` (line 25). Drafts are
+  excluded from lists with `data.draft !== true`, as in
+  src/pages/[...locale]/rss.xml.ts.
 - Imports use the tsconfig aliases (@components/*, @config/*, @layouts/*,
-  @styles/*, @js/*; tsconfig.json:8-13). No `../../` ladders.
+  @styles/*, @js/*; tsconfig.json:8-12). No `../../` ladders.
 - Wrapper components that change tag use `Polymorphic`
   (src/components/ui/reveal/Reveal.astro:7), not string-typed `as` props.
 

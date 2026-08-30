@@ -8,7 +8,7 @@
   (tsconfig.json:2-5). Code must pass `pnpm check` clean. No `any`; use
   `unknown` at open boundaries, as the JSON-LD node does
   (src/js/schema.ts:4-8).
-- Imports go through the aliases (tsconfig.json:8-13): `@components/*`,
+- Imports go through the aliases (tsconfig.json:8-12): `@components/*`,
   `@config/*`, `@layouts/*`, `@styles/*`, `@js/*`. Relative imports only
   inside a component's own folder (a primitive importing its sibling).
 

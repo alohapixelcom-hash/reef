@@ -5,8 +5,8 @@
 ## There is no tailwind.config.js
 
 Tailwind 4 is configured in CSS. The whole design system lives in
-src/styles/tokens.css, loaded by src/styles/global.css:1-3 through the
-Vite plugin (astro.config.mjs:33). Adding a config file would be a bug.
+src/styles/tokens.css, loaded by src/styles/global.css:4 through the
+Vite plugin (astro.config.mjs:53). Adding a config file would be a bug.
 
 ## The three floors of tokens.css
 
@@ -49,9 +49,9 @@ color. Anything else that styles something fails.
 
 ## Dark mode
 
-`.dark` on `<html>`, wired by the `@custom-variant` in global.css:5 and
+`.dark` on `<html>`, wired by the `@custom-variant` in global.css:8 and
 applied pre-render by src/components/ui/theme-toggle/ThemeInit.astro. The
-semantic tokens invert themselves (tokens.css:135-149), so a component
+semantic tokens invert themselves (tokens.css:230-246), so a component
 written with floor-3 roles is dark-ready with zero `dark:` classes. Reach
 for `dark:` only for effects a role cannot express; if you are writing
 `dark:bg-...` for a color role, the token layer is the place to fix.
@@ -72,5 +72,6 @@ for `dark:` only for effects a role cannot express; if you are writing
 - Sections breathe: `py-24 md:py-32`.
 - Display headings: `font-display` (Space Grotesk), and exactly one word per
   big title wrapped in `<span class="accent-script">`: it keeps the heading
-  font, turns coral and carries the coral wave underline (`--accent-wave`).
-  Never an italic serif.
+  font, turns the house turquoise and carries the turquoise wave underline
+  (`--accent-wave`). Coral is the second accent, rationed. Never an italic
+  serif.

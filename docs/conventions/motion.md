@@ -6,7 +6,7 @@
 
 1. CSS catalog. 55 `animate-*` utilities in src/styles/motion/ (six
    families imported by motion/index.css:22-27) plus the three brand
-   animations in tokens.css:148-150 (`animate-rise|marquee|pulse-slow`).
+   animations in tokens.css:145-147 (`animate-rise|marquee|pulse-slow`).
 2. Viewport-triggered reveals: `Reveal` and `StaggerReveal`
    (src/components/ui/reveal, src/components/ui/stagger-reveal), one shared
    IntersectionObserver each.
@@ -28,12 +28,12 @@
   `[animation-duration:1.2s]` for tempo, the `--motion-travel`,
   `--motion-scale`, `--motion-float`, `--motion-parallax` knobs for
   amplitude, and the three shared easings (`--motion-ease-out|in|spring`,
-  index.css:30-33).
+  index.css:31-34).
 
 ## Nothing is hidden without JavaScript
 
 `Reveal` and `StaggerReveal` only hide content from inside their script,
-just before observing (Reveal.astro:27-31, StaggerReveal.astro:29-35). With
+just before observing (Reveal.astro:29-31, StaggerReveal.astro:32-34). With
 JavaScript off, nothing was ever hidden. Any new entrance effect must keep
 this property: no `opacity-0` in markup that a script is supposed to remove.
 Both wrappers re-init on `astro:page-load` and mark processed nodes with a
@@ -42,7 +42,7 @@ Both wrappers re-init on `astro:page-load` and mark processed nodes with a
 ## Reduced motion is enforced three times, for three reasons
 
 1. Globally: the `prefers-reduced-motion` block in
-   src/styles/global.css:130-138 collapses every CSS animation and
+   src/styles/global.css:307-316 collapses every CSS animation and
    transition. Components do not need their own guard.
 2. Locally in scroll.css:17-26: a `view()` timeline ignores
    `animation-duration`, so the global collapse cannot reach it. The double
@@ -74,9 +74,10 @@ exception is instructive.
 The home page carries a scroll-scrubbed sequence
 (src/components/Sections/Home/FilmScene.astro, engine in `_film.ts`): the
 video's playhead is tied to scroll position, so the reader's hand advances the
-image. It is not a background video. It was added on the owner's explicit and
-repeated request, as a port of the effect running in production on
-alohapixel.com, and it supersedes the earlier "no video" line here.
+image. It is not a background video. It is a port of an effect already running
+in production on alohapixel.app, kept because the scrubbed playhead is the whole
+point of the section and no CSS rung expresses it; it supersedes the earlier
+"no video" line here.
 
 It earned its place by clearing the sobriety ladder in full, and any future
 heavy effect must clear the same one before it lands:

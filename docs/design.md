@@ -101,7 +101,7 @@ colour a reader learns to associate with "this responds".
 
 Coral is the second voice, mapped to `--color-accent`, and it is the one thing
 all four themes share. It is the only warm note in an otherwise cold house, and
-it is rationed: an eyebrow, a marker, the wave under an accent word. It never
+it is rationed: an eyebrow, a marker, one call to action per screen. It never
 becomes the dominant colour of a page, because an accent that dominates is not
 an accent, it is a second background.
 
@@ -129,7 +129,7 @@ the utilities that markup is allowed to touch. Markup writes `bg-background`,
 `text-foreground`, `border-border`. It never writes `bg-ink-900`. This is not
 tidiness - `pnpm rebrand` repaints a whole theme by editing the first floor
 only, and one leaked palette class in a component breaks that promise for the
-buyer. `docs/conventions/tailwind.md` holds the full contract and the grep that
+user. `docs/conventions/tailwind.md` holds the full contract and the grep that
 enforces it.
 
 ---
@@ -165,7 +165,7 @@ single quotation - and then it reads as deliberate because it is the exception.
 - Uniform radii everywhere. Containers are soft, the things inside them are
   tight. When every corner has the same radius the page looks extruded.
 - Pill badges announcing a version or a status above a title. The version
-  number belongs in the changelog. Nobody buys a theme because it reached
+  number belongs in the changelog. Nobody picks a theme because it reached
   1.0.2.
 - Rows of large round numbers. If a figure is real and it decides something,
   put it where the decision is made, in a sentence, and let it be odd. Round
@@ -186,19 +186,15 @@ Every hero and every cover in this family is a photograph. Since 1.3.0 they
 come from Pexels, chosen one by one and listed in `PHOTOS.md` with the page
 each one came from.
 
-This changed for a reason worth stating, because the earlier position was the
-opposite and it was wrong. This file used to say "only Aloha Pixel
-photographs, no stock, ever". The images it described were Adobe Express
-assets, which a subscription licence forbids redistributing inside a resold
-template. A theme that ships an image its buyer has no right to publish is not
-a theme, it is a liability with a border radius. The Pexels licence allows
-commercial use, modification, and redistribution inside a product like this
-one; it forbids only reselling an unaltered photo as stock, which is not what
-a theme does.
-
-So the rule is not "our own photographs". The rule is: **a photograph whose
-licence the buyer can verify, named in `THIRD-PARTY.md` and traceable in
+The rule is not "our own photographs". The rule is: **a photograph whose
+licence the user can verify, named in `THIRD-PARTY.md` and traceable in
 `PHOTOS.md`.** A studio archive would satisfy it too. Nothing else does.
+
+The Pexels licence clears that bar and that is why it was chosen: it allows
+commercial use, modification and redistribution inside a product like this one,
+and forbids only reselling an unaltered photo as stock, which is not what a
+theme does. A theme that ships an image its user has no right to publish is not
+a theme, it is a liability with a border radius.
 
 **Every hero carries one.** A gradient with two blurred halos is what a hero
 looks like when there was no photograph available. There is always a
@@ -209,7 +205,7 @@ build script holding a manifest of URLs, and `pnpm build` fetches them into
 `src/assets` before Astro compiles. The script reads the WebP header and
 refuses any source narrower than the slot needs - 1920 px for a full-bleed
 hero, 1200 px for a card. A blurry image fails the build instead of reaching a
-reader. Repositories stay light, and a buyer swaps the whole image set by
+reader. Repositories stay light, and a user swaps the whole image set by
 editing a list of URLs.
 
 **The veil.** Text over a photograph needs a scrim, and the scrim has to hold on

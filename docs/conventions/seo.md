@@ -8,17 +8,18 @@ src/layouts/BaseHead.astro writes every meta, canonical, OG, twitter,
 favicon and feed tag by hand. No SEO package enters this repo; if a tag is
 missing, add it there, readable and diffable. BaseLayout passes its
 `title/description/image/type/noindex` props straight through
-(src/layouts/BaseLayout.astro:24-26).
+(src/layouts/BaseLayout.astro:31).
 
 - Title: `"Title | Brand"` unless the title already carries the brand, which
-  the home page does on purpose (BaseHead.astro:29, src/pages/index.astro:21).
+  the home page does on purpose (BaseHead.astro:41,
+  src/pages/[...locale]/index.astro:61).
 - Every page sets a written-for-humans `description`; the site-wide fallback
   (siteData.description) is for utility pages only.
 - Canonical: one URL shape, derived from `trailingSlash: "always"`
-  (astro.config.mjs:15) and computed in BaseHead.astro:33-36. File routes
+  (astro.config.mjs:14) and computed in BaseHead.astro:45-48. File routes
   (rss.xml, robots.txt) keep their extension.
 - The single source of the production origin is `site` in
-  astro.config.mjs:11. It feeds canonical, OG, sitemap, robots.txt and
+  astro.config.mjs:10. It feeds canonical, OG, sitemap, robots.txt and
   llms.txt at once; never hardcode the domain elsewhere.
 
 ## JSON-LD: constructors only
@@ -36,10 +37,11 @@ injected through the head slot:
 </Fragment>
 ```
 
-as done in src/pages/index.astro:48-55. Never hand-write a JSON-LD object in
-a page: the constructors compact away undefined keys, normalize dates to
-ISO 8601, and keep nested nodes free of `@context`. Their behavior is pinned
-by src/js/schema.selfcheck.ts (run: `node src/js/schema.selfcheck.ts`).
+as done in src/pages/[...locale]/index.astro:66-73. Never hand-write a
+JSON-LD object in a page: the constructors compact away undefined keys,
+normalize dates to ISO 8601, and keep nested nodes free of `@context`. Their
+behavior is pinned by src/js/schema.selfcheck.ts
+(run: `node src/js/schema.selfcheck.ts`).
 
 Placement map:
 
@@ -49,7 +51,7 @@ Placement map:
 - Blog post: article + breadcrumbList (blog/[id].astro).
 - Topic and author archives: breadcrumbList.
 - `faqPage` and `softwareApplication` exist in the constructors and are unused
-  here. Leave them: a buyer who adds a pricing page should not have to write
+  here. Leave them: a user who adds a pricing page should not have to write
   them.
 
 ## The plain-text surface
@@ -69,8 +71,8 @@ sitemap too; keep them in step.
 ## Images and indexing
 
 - OG images are generated, branded, static files: `pnpm og` renders
-  public/og/*.png (1200x630) from the theme tokens (scripts/og.mjs:24-27).
-  Re-run it after `pnpm rebrand`. Pages pass their card via the `image`
-  prop; alt text is mandatory in that prop's shape.
-- `noindex` is a prop, not a habit (BaseHead.astro:59): draft posts and
+  public/og/*.png (1200x630) from the theme tokens (scripts/og.mjs:29-31,
+  SVG template at :76-106). Re-run it after `pnpm rebrand`. Pages pass their
+  card via the `image` prop; alt text is mandatory in that prop's shape.
+- `noindex` is a prop, not a habit (BaseHead.astro:84): draft posts and
   utility pages use it; everything else stays indexable.
