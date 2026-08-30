@@ -201,7 +201,7 @@ export function bindSheetGesture(dialog: HTMLDialogElement): void {
   dialog.addEventListener("pointercancel", finish, { passive: true });
 
   // Une fermeture par la croix, par Escape ou par le scrim doit repartir d'un
-  // etat propre : sinon la reouverture suivante hériterait de la transformation.
+  // etat propre : sinon la reouverture suivante heriterait de la transformation.
   dialog.addEventListener("close", () => {
     animation?.stop();
     animation = null;
