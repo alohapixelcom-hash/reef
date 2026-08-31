@@ -13,6 +13,18 @@ nothing needed updating. Open threads are questions or known gaps waiting on
 a decision; close them by editing this list and noting the resolution in a
 dated entry.
 
+## 2026-08-31 - 1.6.2, the light ground stops being white
+
+- The light page ground is tinted in all six themes: the theme's own neutral at
+  50, with the section band moved to the 100 so the two-beat rhythm is
+  unchanged. A card is filled `#ffffff`, so on a white ground the card and the
+  paper it sat on were the same colour and a hairline was the only thing saying
+  which was on top. `docs/design.md` had recorded this as an open question
+  since the file was written; it is decided there too.
+- Nothing else changed here. Reef already tinted its paper and its licence is
+  MIT, so this release is the family number and nothing more, which is the
+  point of the family number.
+
 ## 2026-08-31 - 1.6.1, the wave under the accent word was cut in half
 
 - `@keyframes reveal-up` clipped to exactly the element box, and a display
