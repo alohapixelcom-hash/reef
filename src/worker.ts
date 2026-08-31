@@ -5,6 +5,11 @@ const LOCALES = ["en", "fr"];
 const ROOT_LOCALE = "en";
 // Repli quand ni le cookie ni Accept-Language ne designent une langue servie :
 // l'anglais, qui tient la racine et porte le x-default.
+//
+// Ce repli ne concerne en pratique que les robots : un navigateur envoie
+// toujours Accept-Language. Le poser sur le francais revient donc a repondre
+// 302 a Googlebot sur chaque adresse racine, et la moitie anglaise du site
+// sort de l'index alors que les balises hreflang la declarent canonique.
 const FALLBACK_LOCALE = "en";
 const LOCALE_COOKIE = "aloha_locale";
 
