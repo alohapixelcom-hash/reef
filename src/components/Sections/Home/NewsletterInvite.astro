@@ -24,6 +24,8 @@ import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, useTranslations } from "@i18n";
+import { Image } from "astro:assets";
+import heroVague from "../../../assets/reef-hero-vague.webp";
 
 const locale = getLocale(Astro);
 const t = useTranslations(locale);
@@ -51,18 +53,37 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     id="newsletter"
     aria-labelledby="invite-title"
   >
-    <div
-      class="animate-drift pointer-events-none absolute -top-1/3 -left-1/5 size-[34rem] rounded-full opacity-30 blur-3xl"
-      style="background: radial-gradient(circle, var(--color-coral-500) 0%, transparent 68%)"
+    {/* La photographie, tout au fond. Ce bloc portait deux halos flous, un
+        corail en haut a gauche et un turquoise en bas a droite, qui derivaient
+        lentement. Ils donnaient a la fin de page un coin orange, et cette
+        temperature-la est exactement celle que le public associe aux pages
+        generees par une machine : le meme effet se retrouve sur des milliers
+        de sites, donc il ne dit plus rien de la maison.
+
+        C'est la photographie du premier ecran, recadree sur le bas. La section
+        se donnait deja pour mission de "refermer la page sur la scene qui l'a
+        ouverte" : elle le fait maintenant avec la scene elle-meme au lieu d'une
+        imitation en CSS. Un seul fichier pour les deux emplacements, donc rien
+        de plus a telecharger.
+
+        Decorative au sens strict, le titre dit deja ce que fait ce bandeau :
+        alt vide et aria-hidden. Chargee paresseusement, c'est le bas de la
+        page et personne ne l'attend. */}
+    <Image
+      src={heroVague}
+      alt=""
+      widths={[720, 1200, 1800]}
+      sizes="100vw"
+      loading="lazy"
+      decoding="async"
+      class="pointer-events-none absolute inset-0 -z-30 size-full object-cover object-[center_78%]"
       aria-hidden="true"
-    >
-    </div>
-    <div
-      class="animate-drift-slow pointer-events-none absolute -right-1/6 -bottom-1/3 size-[30rem] rounded-full opacity-50 blur-3xl"
-      style="background: radial-gradient(circle, var(--color-reef-500) 0%, transparent 70%)"
-      aria-hidden="true"
-    >
-    </div>
+    />
+
+    {/* Le voile : dense a gauche, la ou le texte et le formulaire se posent,
+        ouvert a droite pour que la photo existe vraiment. Il bascule en
+        vertical sous 1024 px, quand le texte occupe toute la largeur. */}
+    <div class="invite-veil pointer-events-none absolute inset-0 -z-20" aria-hidden="true"></div>
 
     <div class="container-page relative z-10 grid gap-12 py-16 md:py-24 lg:grid-cols-12 lg:gap-16">
       <div class="flex flex-col gap-5 lg:col-span-7">
@@ -120,3 +141,36 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     </div>
   </section>
 </div>
+
+<style>
+  /* Le voile du bandeau d'invitation.
+
+     La couleur est lue sur --reef-background, que .deep-scene force a l'encre
+     juste au-dessus. Passer par var(--color-background) donnerait la valeur
+     calculee sur :root, c'est-a-dire le papier, et repeindrait la photo.
+
+     Les paliers sont denses : la photographie est claire a gauche, et un
+     formulaire blanc sur une ecume blanche ne se lit pas. */
+  .invite-veil {
+    background: linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--reef-background) 94%, transparent) 0%,
+      color-mix(in oklab, var(--reef-background) 86%, transparent) 52%,
+      color-mix(in oklab, var(--reef-background) 42%, transparent) 100%
+    );
+  }
+
+  /* Sous 1024 px le texte occupe toute la largeur et tombe donc sur la partie
+     ouverte du degrade. Sur une image claire, le texte blanc n'est plus
+     lisible : le voile devient vertical. */
+  @media (max-width: 63.99rem) {
+    .invite-veil {
+      background: linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--reef-background) 92%, transparent) 0%,
+        color-mix(in oklab, var(--reef-background) 94%, transparent) 58%,
+        color-mix(in oklab, var(--reef-background) 84%, transparent) 100%
+      );
+    }
+  }
+</style>
