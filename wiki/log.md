@@ -13,6 +13,14 @@ nothing needed updating. Open threads are questions or known gaps waiting on
 a decision; close them by editing this list and noting the resolution in a
 dated entry.
 
+## 2026-08-31 - 1.6.1, the wave under the accent word was cut in half
+
+- `@keyframes reveal-up` clipped to exactly the element box, and a display
+  title's accent word paints its wave BELOW that box. The house mark arrived
+  sliced across the middle, on the largest heading of the page and nowhere
+  else, which is why it survived every review. The mask now bleeds on three
+  sides; the top edge, the one that actually reveals, is unchanged.
+
 ## 2026-08-31 - 1.6.0, the redirect only robots could see
 
 - The demo worker answered `302` toward `/fr/` to any client that sent no
