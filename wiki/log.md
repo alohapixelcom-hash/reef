@@ -3,7 +3,7 @@
 title: Wiki log
 summary: Dated journal of code changes reflected in the wiki, and the list of open threads.
 sources: []
-updated: 2026-08-30
+updated: 2026-08-31
 ---
 
 # Wiki log
@@ -12,6 +12,19 @@ Newest entry first. Every `wiki sync` appends an entry here, even when
 nothing needed updating. Open threads are questions or known gaps waiting on
 a decision; close them by editing this list and noting the resolution in a
 dated entry.
+
+## 2026-08-31 - 1.6.0, the redirect only robots could see
+
+- The demo worker answered `302` toward `/fr/` to any client that sent no
+  `Accept-Language` header. Browsers always send one, so the fallback only ever
+  applied to crawlers: Googlebot was redirected away from the English pages that
+  the hreflang set declares canonical, on every root URL. The fallback is the
+  root language again, which is what Reef had all along.
+- `docs/design.md` now describes six themes. Nalu joins the family: it is the
+  storefront of a WooCommerce shop, read headless from the public Store API at
+  build time.
+- The whole family moves to 1.6.0 together, so a buyer of the pass still has one
+  number to remember, now for six archives.
 
 ## Open threads
 
