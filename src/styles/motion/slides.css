@@ -120,13 +120,25 @@
   }
 }
 
+/* Le masque saigne de trois cotes, et ce n'est pas un reglage esthetique.
+ *
+ * Le rectangle de decoupe valait exactement la boite de l'element. Or un mot
+ * d'accent peint sa vague EN DEHORS de sa boite : le fond est pose a
+ * `calc(100% - 4px)` sur une boite en ligne dont la hauteur est celle du texte,
+ * pas celle du texte plus son souligne. Le masque coupait donc la vague en deux
+ * dans le titre d'ouverture, la ou la police d'affichage est la plus grande, et
+ * seulement la. La marque de la maison arrivait tranchee sur le premier ecran.
+ *
+ * Le bord haut reste le seul mobile : c'est lui qui devoile. Les trois autres
+ * gardent un jeu constant, donc le mouvement est exactement le meme et rien ne
+ * deborde avant l'heure, le rectangle de depart etant vide. */
 @keyframes reveal-up {
   from {
-    clip-path: inset(100% 0 0 0);
+    clip-path: inset(calc(100% + 0.6em) -0.25em -0.6em -0.25em);
     transform: translateY(0.75rem);
   }
   to {
-    clip-path: inset(0 0 0 0);
+    clip-path: inset(0 -0.25em -0.6em -0.25em);
     transform: translateY(0);
   }
 }
