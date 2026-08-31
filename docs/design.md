@@ -147,11 +147,13 @@ transparent)` and a mask written `#000` are opacity, and they pass. Beyond
 that, `#ffffff` survives as the fill of a light card and as the text on a
 primary or accent fill where contrast demands it. Both are unanimous.
 
-The light page ground is where the family is not unanimous, and pretending
-otherwise would be the kind of claim this file exists to prevent: Reef tints
-its paper `#fbfcfe`, Koa tints its `#f8f7f4`, Nalu tints its `#f5f8f7`, and
-Aloha, Kai and Swell leave theirs white. Three tint, three do not, and the house
-has never decided which.
+The light page ground is tinted, in all six, and the argument that settled it
+is not taste: a card is filled `#ffffff`, so on a white ground the card and the
+paper are the same colour and a one-pixel rule is the only thing saying which
+is on top. A card that does not lift is a framed paragraph. The tint is the 50
+of each theme's own neutral and the section band drops to the 100, so the
+two-beat rhythm is unchanged: Reef `#fbfcfe`, Koa `#f8f7f4`, Nalu `#f5f8f7`,
+Aloha `#f2f8fa`, Swell `#f4f6fc`, Kai `#f7f7f8`.
 
 **Light is the default.** Every site in the house opens light and offers dark. Dark-first
 was the earlier house position and it was wrong: a theme is judged in the two
@@ -231,9 +233,9 @@ licence anyone can verify, named in `THIRD-PARTY.md` and traceable in
 
 **Every hero carries one.** A gradient with two blurred halos and nothing
 behind it is what a hero looks like when there was no photograph available.
-There is always a photograph available. Aloha is the one hero that runs both,
-a photograph over a tinted ground with two drifting halos above it; the four
-others carry the photograph alone, and they are the better argument.
+There is always one. Aloha ran both for a while, and the comment in its own
+hero said the halos dirtied the image while keeping them anyway. They are gone:
+all six carry the photograph alone.
 
 **How they are wired.** Images are not versioned as binaries. Each theme has a
 build script holding a manifest of URLs, and `pnpm build` fetches them into
@@ -373,10 +375,8 @@ library, while `motion` and `three` sat in Aloha's dependencies, and it listed
 four themes in tables that should have held five.
 
 **What the house currently owes itself**, kept here so it stays visible: Aloha
-carries two refused faces and two decorative halos over a hero that already has a
-photograph; three themes leave the light page ground white where three tint it;
-and the two shops sell nearly the same eight objects, so a buyer who opens both
-demos sees one store twice. Decisions, not accidents, none of them taken yet.
+carries two of the faces this file refuses, and that one waits for its next
+major version, because changing the face of the flagship is not a patch.
 
 ---
 
