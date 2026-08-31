@@ -1,7 +1,7 @@
 {
   "name": "reef",
   "type": "module",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Reef, a free bilingual Astro 7 blog theme by Aloha Pixel. Reading-first typography, MDX collections, art-directed light and dark modes, owned SEO, Capacitor-ready.",
   "license": "MIT",
   "author": "Aloha Pixel (https://alohapixel.app)",
