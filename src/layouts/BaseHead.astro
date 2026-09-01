@@ -58,17 +58,46 @@ const xDefault = alternates.find((alt) => alt.locale === defaultLocale);
 // og:locale veut du snake_case (en_US), pas du BCP-47 (en-US).
 const ogLocale = localeMeta[locale].intl.replace("-", "_");
 const ogAlternates = alternates.filter((alt) => !alt.current);
+// Les couleurs de marque sont RESOLUES depuis tokens.css au moment du build.
+//
+// Ce bloc nommait des entrees de palette et portait un hexa de repli par
+// couleur. Deux fautes, et la seconde etait la plus couteuse : un repli est
+// une valeur figee, donc le jour ou la lecture rate, le favicon et la barre du
+// navigateur se peignent dans l'ANCIENNE marque sans que rien ne le signale.
+// Un theme repeint par `pnpm rebrand` qui garde le favicon du voisin est un
+// defaut que l'acheteur decouvre en production.
+//
+// On demande donc des ROLES, pas des couleurs : le fond du favicon est le
+// `background` sombre, la barre du navigateur le `background` de chaque mode.
+// Le resolveur suit les var() a travers les trois etages de tokens.css
+// (@theme pour les familles, :root pour la version claire, .dark pour la
+// sombre) et LEVE une erreur s'il n'aboutit pas. Un build qui echoue vaut
+// mieux qu'un favicon qui ment.
+const cssBlock = (pattern: RegExp): string => pattern.exec(tokensRaw)?.[1] ?? "";
+const themeBlock = cssBlock(/@theme\s*\{([\s\S]*?)\n\}/);
+const inlineBlock = cssBlock(/@theme inline\s*\{([\s\S]*?)\n\}/);
+const lightBlock = cssBlock(/\n:root\s*\{([\s\S]*?)\n\}/);
+const darkBlock = cssBlock(/\n\.dark[^{]*\{([\s\S]*?)\n\}/);
 
-// Les couleurs de marque sont lues dans tokens.css au moment du build : un
-// pnpm rebrand repeint aussi le favicon et la barre du navigateur, sans autre edition.
-const tokenColor = (name: string, fallback: string): string =>
-  new RegExp(`--color-${name}:\\s*(#[0-9a-fA-F]{3,8})`).exec(tokensRaw)?.[1] ?? fallback;
-const ink = tokenColor("ink-950", "#0a0f17");
-const coral = tokenColor("coral-500", "#f95c36");
-const reef = tokenColor("reef-500", "#1a9fc4");
+function resolveToken(name: string, scope: string, depth = 0): string {
+  if (depth > 8) throw new Error(`tokens.css : chaine de var() circulaire sur --${name}`);
+  for (const source of [scope, inlineBlock, themeBlock, lightBlock]) {
+    const hit = new RegExp(`--${name}:\\s*([^;]+);`).exec(source);
+    if (!hit) continue;
+    const value = hit[1].trim();
+    const indirect = /^var\(--([a-z0-9-]+)\)$/.exec(value);
+    return indirect ? resolveToken(indirect[1], scope, depth + 1) : value;
+  }
+  throw new Error(`tokens.css : jeton --${name} introuvable, le favicon ne peut pas etre peint`);
+}
+
+const groundDark = resolveToken("color-background", darkBlock);
+const groundLight = resolveToken("color-background", lightBlock);
+const wave = resolveToken("color-accent", darkBlock);
+const crest = resolveToken("color-primary", darkBlock);
 
 // Favicon : deux vagues, corail et lagon, sur fond ocean. SVG inline en data-uri, aucun fichier a servir.
-const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="${ink}"/><path d="M32 52V26" stroke="${coral}" stroke-width="7" stroke-linecap="round"/><path d="M32 34 22 24M32 38l10-10" stroke="${coral}" stroke-width="6" stroke-linecap="round"/><path d="M14 52h36" stroke="${reef}" stroke-width="5" stroke-linecap="round" opacity="0.9"/></svg>`;
+const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="${groundDark}"/><path d="M32 52V26" stroke="${wave}" stroke-width="7" stroke-linecap="round"/><path d="M32 34 22 24M32 38l10-10" stroke="${wave}" stroke-width="6" stroke-linecap="round"/><path d="M14 52h36" stroke="${crest}" stroke-width="5" stroke-linecap="round" opacity="0.9"/></svg>`;
 const faviconHref = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
 ---
 
@@ -98,9 +127,11 @@ const faviconHref = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
 {alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
 {xDefault && <link rel="alternate" hreflang="x-default" href={xDefault.href} />}
 
-{/* La barre du navigateur suit le theme : blanche en clair, ocean profond en sombre. */}
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content={ink} />
+{/* La barre du navigateur suit le theme : le fond clair de la page en
+    clair, le fond sombre en sombre. Les deux sont resolus depuis
+    --color-background, donc un rebranding les emmene avec lui. */}
+<meta name="theme-color" media="(prefers-color-scheme: light)" content={groundLight} />
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content={groundDark} />
 
 {/* Open Graph, complet : l'apercu de partage est la premiere impression du site. */}
 <meta property="og:type" content={type} />
