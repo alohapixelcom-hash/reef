@@ -11,6 +11,7 @@
       "Bash(pnpm lint:house)",
       "Bash(pnpm verify)",
       "Bash(pnpm verify:*)",
+      "Bash(pnpm poster)",
       "Bash(pnpm og)",
       "Bash(pnpm rebrand:*)",
       "Bash(pnpm astro:*)",
@@ -22,6 +23,10 @@
       "Bash(git log:*)"
     ],
     "ask": [],
-    "deny": ["Read(./.env)", "Read(./.env.*)", "Read(./**/.env)"]
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/.env)"
+    ]
   }
 }

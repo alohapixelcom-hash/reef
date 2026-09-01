@@ -34,6 +34,7 @@
     "dev": "astro dev",
     "lint:house": "node scripts/house.mjs",
     "og": "node scripts/og.mjs",
+    "poster": "node scripts/poster.mjs",
     "preview": "astro preview",
     "rebrand": "node scripts/rebrand.mjs",
     "test": "node scripts/checks.mjs",
