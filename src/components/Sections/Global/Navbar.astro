@@ -32,8 +32,15 @@ const isActive = (href: string): boolean =>
 
 // Lien de nav : il herite de la couleur de la barre au lieu de la fixer, ce qui
 // le laisse lisible en clair comme en sombre sans une seule variante dark:.
+// Aucune classe d'affichage dans une chaine partagee. Le seul appelant
+// d'aujourd'hui n'en souffre pas, mais Aloha portait la meme chaine et le
+// piege s'y est declenche : un "hidden lg:inline-flex" pose par l'appelant
+// perd contre le "inline-flex" de la chaine, parce que Tailwind emet
+// .inline-flex apres .hidden et que les deux pesent pareil. Le lien restait
+// visible sur telephone. On retire la cause partout, pas seulement la ou elle
+// a deja mordu.
 const navLink = [
-  "inline-flex min-h-11 items-center rounded-pill px-3.5",
+  "min-h-11 items-center rounded-pill px-3.5",
   "font-sans text-[0.9rem] font-medium whitespace-nowrap text-current",
   "transition-colors duration-200 hover:bg-current/8",
 ].join(" ");
@@ -83,7 +90,7 @@ const subscribeHref = "#newsletter";
     >
       <a
         href={routes.home}
-        class="flex shrink-0 items-center gap-2 text-current"
+        class="flex min-h-11 shrink-0 items-center gap-2 text-current"
         aria-label={t.nav.brandHome}
         data-header-brand
       >
@@ -97,7 +104,7 @@ const subscribeHref = "#newsletter";
             <li>
               <a
                 href={item.href}
-                class:list={[navLink, isActive(item.href) && "bg-current/8 font-semibold"]}
+                class:list={["inline-flex", navLink, isActive(item.href) && "bg-current/8 font-semibold"]}
                 aria-current={isActive(item.href) ? "page" : undefined}
               >
                 {item.text}
