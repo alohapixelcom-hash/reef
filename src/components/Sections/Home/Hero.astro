@@ -98,16 +98,19 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     {/* Les deux halos existaient pour donner un centre a un fond vide. Le fond
         n'est plus vide : la photo a sa propre lumiere, et deux nappes floues
         par dessus la salissent au lieu de la servir. Ils restent, tres bas, et
-        seulement pour rechauffer les bords ou la photo s'assombrit. */}
+        seulement pour rechauffer les bords ou la photo s'assombrit.
+        Ils citaient deux entrees de palette. Ils citent maintenant l'accent et
+        la couleur d'ancrage, ce qui les fait suivre le mode clair ou sombre et
+        survivre a un `pnpm rebrand` sans edition. */}
     <div
       class="animate-drift pointer-events-none absolute -top-2/5 -right-1/4 size-[42rem] rounded-full opacity-12 blur-3xl"
-      style="background: radial-gradient(circle, var(--color-coral-500) 0%, transparent 68%)"
+      style="background: radial-gradient(circle, var(--color-accent) 0%, transparent 68%)"
       aria-hidden="true"
     >
     </div>
     <div
       class="animate-drift-slow pointer-events-none absolute -bottom-1/4 -left-1/5 size-[38rem] rounded-full opacity-20 blur-3xl"
-      style="background: radial-gradient(circle, var(--color-reef-500) 0%, transparent 70%)"
+      style="background: radial-gradient(circle, var(--color-primary) 0%, transparent 70%)"
       aria-hidden="true"
     >
     </div>
