@@ -201,6 +201,16 @@
    *
    * Turquoise 600 et non 500 en mode clair : le texte des boutons est blanc,
    * et 500 le fait passer sous le rapport de contraste de 4,5. */
+  /* Les quatre halos, poses en radial-gradient() et donc hors de portee d'une
+     classe utilitaire. Ils vivent ICI parce que la regle de la maison veut
+     qu'aucun nom de palette ne sorte de ce fichier, et un composant qui ecrit
+     --color-reef-500 le fait sortir. topicTone.ts pretendait deja les garder
+     dans les tokens : c'est maintenant vrai. */
+  --halo-coral: var(--color-coral-500);
+  --halo-reef: var(--color-reef-500);
+  --halo-ink: var(--color-ink-300);
+  --halo-page: var(--color-reef-400);
+
   --reef-primary: var(--color-reef-600);
   --reef-primary-foreground: #ffffff;
   /* La vague du mot d'accent (.accent-script) : le trait de la marque (le logo
