@@ -4,6 +4,7 @@ import AuthorCard from "@components/Cards/AuthorCard.astro";
 import Footer from "@components/Sections/Global/Footer.astro";
 import Navbar from "@components/Sections/Global/Navbar.astro";
 import PageHero from "@components/Sections/Global/PageHero.astro";
+import PhoneShot from "@components/Sections/Global/PhoneShot.astro";
 import SectionHeader from "@components/Sections/Global/SectionHeader.astro";
 import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
@@ -93,34 +94,43 @@ const schemas = [
             pas trois offres : elles se lisent l'une apres l'autre, chacune sur
             sa ligne, separees par un filet. Le numero descend dans la marge,
             ou il numerote sans se faire passer pour un chiffre cle. */}
-        <ol class="divide-border border-border mt-10 flex flex-col divide-y border-t">
-          {
-            t.about.values.map((value, index) => (
-              <li class="grid gap-x-8 gap-y-2 py-7 md:grid-cols-[4rem_minmax(0,1fr)] md:py-9">
-                {/* Pas d'italique sur ce numero. Space Grotesk n'a pas de coupe
-                    italique : le navigateur en fabriquait une oblique, qui
-                    penche les chiffres sans les redessiner et se voit tout de
-                    suite. La regle vaut pour toute la famille, elle est ecrite
-                    en toutes lettres dans prose.css, et ce numero etait le
-                    dernier endroit du theme qui l'enfreignait. */}
-                <span
-                  class="font-display text-muted-foreground/60 text-sm font-semibold tracking-[0.18em] tabular-nums md:pt-1.5"
-                  aria-hidden="true"
-                >
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <div class="flex flex-col gap-2">
-                  <h3 class="font-display text-foreground text-xl font-semibold tracking-tight md:text-2xl">
-                    {value.title}
-                  </h3>
-                  <p class="text-muted-foreground measure-wide text-[0.95rem] leading-relaxed">
-                    {value.text}
-                  </p>
-                </div>
-              </li>
-            ))
-          }
-        </ol>
+        {/* Sur grand ecran la colonne de gauche garde sa mesure de lecture et
+            la place restante accueille le telephone : la section ne s'etale
+            pas, elle se remplit. En dessous de lg le cadre n'existe pas, donc
+            le dessin de telephone n'est pas montre a quelqu'un qui tient deja
+            un telephone, et son image n'est jamais telechargee. */}
+        <div class="mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-16">
+          <ol class="divide-border border-border flex flex-col divide-y border-t">
+            {
+              t.about.values.map((value, index) => (
+                <li class="grid gap-x-8 gap-y-2 py-7 md:grid-cols-[4rem_minmax(0,1fr)] md:py-9">
+                  {/* Pas d'italique sur ce numero. Space Grotesk n'a pas de coupe
+                      italique : le navigateur en fabriquait une oblique, qui
+                      penche les chiffres sans les redessiner et se voit tout de
+                      suite. La regle vaut pour toute la famille, elle est ecrite
+                      en toutes lettres dans prose.css, et ce numero etait le
+                      dernier endroit du theme qui l'enfreignait. */}
+                  <span
+                    class="font-display text-muted-foreground/60 text-sm font-semibold tracking-[0.18em] tabular-nums md:pt-1.5"
+                    aria-hidden="true"
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <div class="flex flex-col gap-2">
+                    <h3 class="font-display text-foreground text-xl font-semibold tracking-tight md:text-2xl">
+                      {value.title}
+                    </h3>
+                    <p class="text-muted-foreground measure-wide text-[0.95rem] leading-relaxed">
+                      {value.text}
+                    </p>
+                  </div>
+                </li>
+              ))
+            }
+          </ol>
+
+          <PhoneShot class="hidden lg:block" />
+        </div>
       </div>
     </section>
 
