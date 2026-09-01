@@ -96,7 +96,7 @@ const columnLink =
           remplir. La description garde sa longueur de ligne confortable par
           measure-prose, ce qui protege la lecture sans figer la colonne. */}
       <div class="flex flex-col gap-6 lg:col-span-4">
-        <a href={routes.home} class="flex items-center gap-2" aria-label={t.nav.brandHome}>
+        <a href={routes.home} class="flex min-h-11 items-center gap-2" aria-label={t.nav.brandHome}>
           <Icon name="wave" size={22} class="text-primary" />
           <span class="font-display text-xl font-semibold tracking-tight">{siteData.name}</span>
         </a>
