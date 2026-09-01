@@ -123,6 +123,13 @@ const items = headings.filter((heading) => heading.depth === 2 || heading.depth 
   .toc-link {
     display: flex;
     align-items: center;
+    /* 44 px par entree, dans le volet comme dans le rail. Le rail est vise a la
+       souris plus souvent qu'au doigt, mais WCAG 2.5.8 ne fait pas la
+       difference, et un sommaire est justement la liste ou une cible trop
+       courte fait ouvrir la ligne d'a cote. Mesure : 36 px de haut et zero
+       espace autour sur les huit billets, a 1440 px. */
+    min-block-size: 2.75rem;
+    padding-block: 0.4rem;
     border-inline-start: 2px solid var(--color-border);
     padding-inline-start: 0.9rem;
     font-family: var(--font-sans);
@@ -154,16 +161,6 @@ const items = headings.filter((heading) => heading.depth === 2 || heading.depth 
     font-weight: 500;
   }
 
-  /* Dans le <details>, chaque entree tient la cible tactile de 44 px. */
-  .toc-box .toc-link {
-    min-block-size: 2.75rem;
-    padding-block: 0.4rem;
-  }
-
-  /* Dans le rail, le pointeur est fin et la place est comptee : on resserre. */
-  .toc-rail .toc-link {
-    padding-block: 0.4rem;
-  }
 </style>
 
 <script>
