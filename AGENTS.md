@@ -95,6 +95,7 @@ pnpm preview    # serve dist/
 pnpm check      # astro check; must be 0/0/0 before you finish
 pnpm rebrand "#7a59ff"   # repaint tokens.css from one brand color
 pnpm og         # regenerate public/og/*.png from the tokens
+pnpm poster     # re-shoot the phone mockup of the home page into public/
 
 pnpm test       # every *.selfcheck.ts and *.test.ts under src/, found by name
 pnpm lint:house # the four mechanical rules of this page, with their exemptions
@@ -116,6 +117,11 @@ work is done".
   measure taste. Hierarchy, balance and rhythm stay the review checklist at the
   end of docs/design.md, run by a human. It also declares contrast
   UNMEASURABLE over a background image rather than inventing a number.
+- `pnpm poster` is not a check, it is a chore with a deadline: the phone
+  mockup of the home page holds a SCREENSHOT, so it goes stale the moment the
+  brand, the hero copy or the first screen changes. Re-run it after
+  `pnpm rebrand` and after any redesign of the first screen, or the frame
+  will keep showing the demo to a buyer who has already replaced it.
 - Nothing here opens the site in a real browser on a real phone. The two worst
   defects of 31 August 2026 were both found by a human on an iPhone, and both
   are now covered by `pnpm verify`. The next one will not be.
