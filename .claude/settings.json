@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(pnpm install)",
+      "Bash(pnpm dev)",
+      "Bash(pnpm build)",
+      "Bash(pnpm preview)",
+      "Bash(pnpm check)",
+      "Bash(pnpm test)",
+      "Bash(pnpm lint:house)",
+      "Bash(pnpm verify)",
+      "Bash(pnpm verify:*)",
+      "Bash(pnpm og)",
+      "Bash(pnpm rebrand:*)",
+      "Bash(pnpm astro:*)",
+      "Bash(pnpm exec astro:*)",
+      "Bash(pnpm run:*)",
+      "Bash(node scripts/:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "ask": [],
+    "deny": ["Read(./.env)", "Read(./.env.*)", "Read(./**/.env)"]
+  }
+}
