@@ -1,0 +1,121 @@
+---
+// src/components/Sections/Global/PhoneShot.astro - le telephone dessine qui montre le premier ecran du site sur mobile.
+//
+// Le cadre est DESSINE, pas photographie : aucune image d'habillage a charger,
+// aucune a licencier, et il se repeint avec le reste le jour ou la couleur de
+// marque change, parce qu'il n'utilise que des roles semantiques.
+//
+// Il n'a pas d'encoche, et c'est voulu : elle mangeait le haut de l'ecran,
+// c'est-a-dire exactement ce que ce bloc essaie de montrer. Le cadre et le
+// rapport 9/19,5 suffisent a le faire lire comme un telephone.
+//
+// Ce qui est dedans est une CAPTURE, pas un iframe. Un cadre qui recharge le
+// site dans le site double le poids de la page, rejoue ses animations et
+// double ses requetes ; l'image pese quarante kilo-octets et ne bouge pas.
+//
+// La contrepartie est qu'une capture vieillit. `pnpm poster` la refabrique
+// depuis dist/, et c'est la commande a lancer apres `pnpm rebrand`, apres un
+// changement de texte d'accueil ou apres un redessin du premier ecran. Sans
+// elle, le telephone montrerait la demonstration d'origine dans un site
+// devenu celui de son acheteur.
+//
+// `contain: paint` isole le cadre du reste de la page : ce qui se repeint
+// dedans ne force pas le navigateur a reexaminer ce qui l'entoure.
+//
+// Le composant ne pose AUCUNE classe d'affichage. C'est a l'appelant d'ecrire
+// `hidden lg:block` s'il ne veut le cadre que sur grand ecran : une classe
+// d'affichage cuite dans une chaine partagee est le piege connu de la maison,
+// Tailwind emettant `.block` apres `.hidden`.
+//
+// La largeur se regle par la variable `--phone-width`, jamais par une classe
+// `max-w-*`, et ce n'est pas une preference. Astro porte les styles scopes sur
+// un attribut, donc `.phone[data-astro-cid-...]` compte deux selecteurs quand
+// une utilitaire Tailwind n'en compte qu'un : un `max-w-[13rem]` pose par
+// l'appelant perdrait en silence contre le `max-width` d'ici. Un bouton de
+// reglage passe par la cascade des variables, ou l'appelant a le dernier mot :
+//
+//   <PhoneShot class="hidden [--phone-width:13rem] lg:block" />
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
+interface Props {
+  /** Classes posees sur le cadre, pour le caler et decider ou il apparait. */
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+// La capture vit dans public/ : servie par le meme domaine que la page, donc
+// aucune requete vers un tiers et aucune licence a produire, puisqu'il s'agit
+// du site lui-meme.
+const SHOT = "reef-iphone-poster.webp";
+
+// Si la capture n'a pas encore ete fabriquee, le bloc ne rend RIEN. Un cadre de
+// telephone vide, ou pire une image cassee, est un defaut visible; une absence
+// ne l'est pas. Le controle a lieu au build, sur le disque, donc il ne coute
+// rien au visiteur, et il rend `pnpm poster` facultatif au lieu d'obligatoire.
+//
+// Le chemin part de process.cwd() et NON de import.meta.url : au build, Vite a
+// deja regroupe ce composant dans un paquet, et import.meta.url y designe le
+// paquet, pas ce fichier. Astro resout sa configuration depuis le repertoire
+// courant, donc public/ s'y trouve toujours.
+const hasShot = existsSync(join(process.cwd(), "public", SHOT));
+---
+
+{/* Decoratif au sens strict : ce que le telephone montre est la page ou se
+    trouve deja le visiteur, donc alt vide et aria-hidden. Un lecteur d'ecran
+    qui annoncerait ce cadre ferait lire deux fois le meme site. */}
+{
+  hasShot && (
+    <div class:list={["phone", className]} aria-hidden="true">
+      <div class="phone__screen">
+        <img
+          class="phone__shot"
+          src={`/${SHOT}`}
+          alt=""
+          width="560"
+          height="1213"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .phone {
+    position: relative;
+    width: 100%;
+    max-width: var(--phone-width, 17rem);
+    margin-inline: auto;
+    aspect-ratio: 9 / 19.5;
+    padding: 0.55rem;
+    border-radius: 2.75rem;
+    background: var(--color-foreground);
+    contain: paint;
+    box-shadow:
+      0 1.5rem 3.5rem -1rem color-mix(in oklab, var(--color-foreground) 45%, transparent),
+      inset 0 0 0 1px color-mix(in oklab, var(--color-background) 22%, transparent);
+  }
+
+  .phone__screen {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 2.25rem;
+    background: color-mix(in oklab, var(--color-foreground) 88%, var(--color-background));
+  }
+
+  /* La capture est prise dans un viewport iPhone : son rapport est deja celui
+     de l'ecran, donc `cover` ne recadre rien et le site s'affiche en entier,
+     comme sur un vrai telephone. L'ancrage en haut protege le premier ecran si
+     un jour le cadre change de proportion. */
+  .phone__shot {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+</style>
