@@ -9,7 +9,7 @@
 // plafond de 400 lignes que ce depot s'impose. L'outil de verification est
 // tenu a la regle qu'il fait respecter.
 
-export const PROBE = ({ TARGET_MIN, asked }) => {
+export const PROBE = ({ asked }) => {
   // ATTENTION : on ne demande PAS sa largeur a la fenetre.
   //
   // Sur un contexte mobile, quand le document deborde, Chromium ELARGIT la
@@ -89,18 +89,27 @@ export const PROBE = ({ TARGET_MIN, asked }) => {
     const past = Math.round(r.right - VW);
     if (past <= 1) continue;
     // Un ancetre qui clippe transforme le depassement en amputation, SAUF
-    // quand cet ancetre est un rail.
+    // quand le contenu reste JOIGNABLE.
     //
-    // Un carrousel, un marquee, une rangee qui se fait glisser au doigt : le
-    // contenu y sort du cadre par construction, et il revient d'un geste. Le
-    // signe qui les distingue d'un accident de mise en page, c'est le RAPPORT.
-    // Une piste porte un contenu bien plus large que sa boite (1748 px dans
-    // 350 sur le carrousel d'avis d'Aloha, soit cinq fois) ; une barre qui
-    // deborde d'un bouton depasse de quelques pour cent (19 px sur 390, la
-    // nuit du 31 aout). Au-dela d'une fois et demie, on est sur une piste.
+    // Deux facons de rester joignable, et la premiere est la seule qui ne se
+    // devine pas. Un ancetre qui DEFILE vraiment (overflow-x auto ou scroll,
+    // et une largeur de contenu superieure a sa boite) ramene le contenu d'un
+    // geste : la recherche s'arrete la, meme si un ancetre plus haut clippe.
+    // Sans cette sortie, une barre de rubriques qui se fait glisser au doigt
+    // sur telephone puis se replie en pastilles sur ecran large etait comptee
+    // comme amputee autant de fois qu'elle portait de rubriques, et une
+    // page en produisait cent cinquante a elle seule.
+    //
+    // La seconde est un RAPPORT. Une piste porte un contenu bien plus large
+    // que sa boite (1748 px dans 350 sur le carrousel d'avis d'Aloha, soit
+    // cinq fois) ; une barre cassee deborde de quelques pour cent (19 px sur
+    // 390, la nuit du 31 aout). Au-dela d'une fois et demie, on est sur une
+    // piste, meme quand elle clippe sans defiler.
     let clipped = false;
     for (let n = el.parentElement; n && !clipped; n = n.parentElement) {
       const o = getComputedStyle(n);
+      const defile = o.overflowX === "auto" || o.overflowX === "scroll";
+      if (defile && n.scrollWidth > n.clientWidth + 1) break;
       if (o.overflowX !== "hidden" && o.overflowX !== "clip") continue;
       if (n.scrollWidth > n.clientWidth * 1.5) break;
       clipped = true;
