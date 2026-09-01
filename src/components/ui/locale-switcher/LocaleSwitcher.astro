@@ -37,8 +37,15 @@ const compact = locales.length <= 2;
 // bien une ancre des qu'on lui donne un href.
 const reload = { "data-astro-reload": true };
 
+// min-h-11 min-w-11, soit 44 px : la regle de cible tactile de la maison, qui
+// etait ecrite dans AGENTS.md et pas tenue ici. Les pastilles mesuraient
+// 36 x 24, et c'est le genre de defaut qu'aucune relecture n'attrape parce
+// qu'il se voit tres bien et se touche tres mal. La pastille garde son allure :
+// le texte reste en text-xs, c'est la BOITE qui grandit, et dans une barre deja
+// haute de 44 px cela ne coute aucune hauteur.
 const segment = [
-  "font-display rounded-pill px-2.5 py-1 text-xs font-bold tracking-wide uppercase",
+  "font-display rounded-pill inline-flex min-h-11 min-w-11 items-center justify-center",
+  "px-2.5 text-xs font-bold tracking-wide uppercase",
   "transition-colors duration-200",
 ].join(" ");
 ---
