@@ -19,12 +19,13 @@ export const topicTone = {
     // Portee en text-* et non en bg-*, parce que c'est une lettre et pas un
     // rectangle.
     ghost: "text-primary",
-    // Le halo de la couverture du billet a la une. Une valeur de palette et
-    // non un role : un halo se pose dans un radial-gradient(), qui n'accepte
-    // pas une classe utilitaire. C'est la SEULE entree de cette table qui cite
-    // une couleur, et elle reste dans le fichier des tokens, pas dans un
-    // composant.
-    halo: "var(--color-coral-500)",
+    // Le halo de la couverture du billet a la une. Un halo se pose dans un
+    // radial-gradient(), qui n'accepte pas une classe utilitaire : il lui faut
+    // donc une couleur. Elle est declaree dans tokens.css sous --halo-*, et
+    // cette table ne fait que la citer. La phrase precedente affirmait deja
+    // que la couleur restait dans les tokens alors qu'elle etait ecrite ici,
+    // en clair, avec son nom de palette.
+    halo: "var(--halo-coral)",
   },
   reef: {
     dot: "bg-accent",
@@ -32,7 +33,7 @@ export const topicTone = {
     hover: "hover:border-accent/40",
     rule: "bg-accent",
     ghost: "text-accent",
-    halo: "var(--color-reef-500)",
+    halo: "var(--halo-reef)",
   },
   ink: {
     dot: "bg-foreground",
@@ -40,7 +41,7 @@ export const topicTone = {
     hover: "hover:border-foreground/30",
     rule: "bg-foreground",
     ghost: "text-foreground",
-    halo: "var(--color-ink-300)",
+    halo: "var(--halo-ink)",
   },
 } as const;
 

@@ -1,3 +1,4 @@
+// src/config/siteData.json.ts - l'identite de la publication : nom, auteur, adresse, reseaux.
 import type { SiteDataProps } from "./types/configDataTypes";
 
 // Tout ce qui identifie la publication vit ici. C'est le premier fichier que

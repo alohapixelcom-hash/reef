@@ -24,7 +24,10 @@ dist/
 src/assets/covers/
 src/assets/*.webp
 
-# Outillage local des assistants de code : utile en local, jamais publie.
-# Les conventions de la maison, elles, sont versionnees dans docs/conventions/.
-.claude/
-CLAUDE.md
+# Outillage local des autres assistants de code : jamais publie.
+# CLAUDE.md et .claude/settings.json, eux, font partie du produit : ils
+# disent a l'agent de l'acheteur ou sont les regles de la maison et ce
+# qu'il a le droit de lancer. Les conventions restent versionnees dans
+# docs/conventions/.
+.cursor/
+.windsurf/
