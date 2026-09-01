@@ -97,7 +97,7 @@ function walk(dir, out = []) {
 const MAX_LINES = 400;
 
 /** Regle 2 : aucun fichier au-dessus de 400 lignes. */
-function checkLength(file, text) {
+function checkLength(_file, text) {
   // Un fichier bien forme finit par un saut de ligne, et split("\n") rend
   // alors un dernier element vide qui n'est pas une ligne. Sans ce retrait le
   // controle comptait un de trop et accusait tout fichier de 400 lignes d'en
@@ -125,7 +125,7 @@ const DASHES = [
   [String.fromCharCode(0x00ad), "tiret conditionnel invisible"],
 ];
 
-function checkDashes(file, text) {
+function checkDashes(_file, text) {
   const found = [];
   text.split("\n").forEach((line, i) => {
     for (const [ch, label] of DASHES) {
