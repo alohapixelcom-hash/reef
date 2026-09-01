@@ -97,11 +97,25 @@ export const LISIBILITE = ({ TARGET_MIN }) => {
     .filter((x) => x.box && x.box.r - x.box.x > 0);
 
   /* --- 3. Contraste, calcule sur le fond REEL ---------------------- */
+  // Chromium ne convertit PAS oklab(), oklch() ni color-mix() en rgb() : le
+  // panneau de verre de la barre rend "oklab(1 0 0 / 0.1)", qu'une lecture par
+  // expression reguliere prenait pour une absence de fond. La boucle remontait
+  // alors jusqu'au fond du document et annoncait 1,03 pour 1 sur du texte blanc
+  // pose sur une photographie sombre, parfaitement lisible. Un canevas d'un
+  // pixel resout n'importe quelle syntaxe de couleur, alpha compris, parce que
+  // c'est le moteur lui-meme qui peint.
+  const pixel = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+  pixel.globalCompositeOperation = "copy";
   const rgb = (value) => {
-    const m = /rgba?\(([^)]+)\)/.exec(value);
-    if (!m) return null;
-    const [r, g, b, a] = m[1].split(",").map((n) => parseFloat(n));
-    return { r, g, b, a: a === undefined ? 1 : a };
+    if (!value || value === "transparent" || value === "none") return null;
+    // Une valeur que le moteur refuse laisse fillStyle inchange : c'est le seul
+    // signal disponible pour distinguer "illisible" de "noir".
+    pixel.fillStyle = "#ff00ff";
+    pixel.fillStyle = value;
+    if (pixel.fillStyle === "#ff00ff" && !/^#f{0,1}f0{2}f{2}$|magenta/i.test(value)) return null;
+    pixel.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = pixel.getImageData(0, 0, 1, 1).data;
+    return { r, g, b, a: a / 255 };
   };
   const lum = ({ r, g, b }) => {
     const f = (c) => {

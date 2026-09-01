@@ -134,10 +134,10 @@ work is done".
    hyphens only.
 4. Code comments are in French **without accents**. Displayed copy is in the
    dictionary, with accents, and never in a component.
-5. Markup uses semantic tokens only (bg-background, text-foreground,
-   bg-card, bg-primary, text-muted-foreground, border-border, bg-surface,
-   text-accent, ring-ring). Palette names (ink-*, coral-*, reef-*) and raw
-   hex never leave src/styles.
+5. Markup uses semantic tokens only (bg-background, text-foreground, bg-card,
+   bg-primary, text-muted-foreground, border-border, bg-surface, text-accent,
+   text-accent-text, ring-ring). Palette names (ink-*, coral-*, reef-*) and
+   raw hex never leave src/styles.
 6. Zero JavaScript by default. Native `<dialog>`, `<details>`, anchors and
    CSS before any `<script>`. There is no React and no island in this theme.
 7. Buttons are pills (rounded-pill). Cards float (bg-card rounded-card

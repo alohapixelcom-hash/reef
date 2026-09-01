@@ -44,7 +44,14 @@ export default defineConfig({
       // Deux themes, commutes par la classe .dark : un bloc de code qui reste
       // clair sur une page sombre est la premiere chose qu'on remarque, et la
       // derniere qu'on pardonne a un theme de blog.
-      themes: { light: "github-light", dark: "github-dark-dimmed" },
+      //
+      // La variante "high-contrast" en clair n'est pas un gout : "github-light"
+      // pose ses commentaires et ses noms de propriete a 3,49 pour 1 sur le
+      // fond du bloc, quand WCAG AA en demande 4,5 pour du texte courant. Un
+      // billet technique dont le code est le contenu principal ne peut pas se
+      // permettre de le rendre a la limite du lisible. Le sombre passe deja,
+      // il ne bouge pas.
+      themes: { light: "github-light-high-contrast", dark: "github-dark-dimmed" },
       wrap: true,
     },
   },

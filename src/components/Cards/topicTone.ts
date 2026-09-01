@@ -29,10 +29,10 @@ export const topicTone = {
   },
   reef: {
     dot: "bg-accent",
-    chip: "bg-accent/15 text-accent",
+    chip: "bg-accent/15 text-accent-text",
     hover: "hover:border-accent/40",
     rule: "bg-accent",
-    ghost: "text-accent",
+    ghost: "text-accent-text",
     halo: "var(--halo-reef)",
   },
   ink: {
