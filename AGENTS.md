@@ -4,14 +4,35 @@
 
 Reef is a free Astro theme, published under the MIT licence. The whole
 community reads the source; every file you touch is part of the product.
-This page is the operating manual. The five rule files it imports are
-binding, not advisory:
+This page is the operating manual. The five rule
+files below are LOADED into context by the @ syntax rather than merely
+cited: a rule an agent has to decide to go and open is a rule a hurried
+agent skips.
 
-- docs/conventions/astro.md - pure .astro, platform first, static only
-- docs/conventions/tailwind.md - the token contract, what markup may write
-- docs/conventions/typescript.md - strict types, selfchecks, derived types
-- docs/conventions/motion.md - the animation ladder and reduced motion
-- docs/conventions/seo.md - BaseHead, JSON-LD constructors, endpoints
+@docs/conventions/astro.md
+@docs/conventions/tailwind.md
+@docs/conventions/typescript.md
+@docs/conventions/motion.md
+@docs/conventions/seo.md
+
+In order: pure .astro and platform first; the token contract and what markup
+may write; strict types, selfchecks and derived types; the animation ladder
+and reduced motion; BaseHead, the JSON-LD constructors and the endpoints.
+
+**Climb this ladder before you add anything.** It is the operating form of the
+refusals in docs/design.md, and it is five questions, in this order. Does the
+page need it at all, or is it there to look busy? Does it already exist under
+src/components/ui, where sixty-four primitives are waiting? Can the platform do
+it with no script, which is the house default and not an aspiration: a native
+dialog, details, radio inputs with :has(), scroll-snap, a scroll timeline, an
+anchor? Can CSS alone do it? Only then is it written, and what gets written is
+the smallest version that works and that you can explain. Removing a section is
+a better answer than tuning it, and a shape a reader already knows beats a
+shape that is interesting to build.
+
+What none of that excuses: understanding the problem before touching it,
+validating anything that crosses a boundary, the error path, and
+accessibility. Those are never the place to be economical.
 
 Two things carry the rest of the context. The review checklist at the end
 of docs/design.md, which you run on your own work before calling it done.
@@ -75,10 +96,29 @@ pnpm check      # astro check; must be 0/0/0 before you finish
 pnpm rebrand "#7a59ff"   # repaint tokens.css from one brand color
 pnpm og         # regenerate public/og/*.png from the tokens
 
-# selfchecks (no test framework, plain Node):
-node src/js/schema.selfcheck.ts
-node src/js/pagination.selfcheck.ts
+pnpm test       # every *.selfcheck.ts and *.test.ts under src/, found by name
+pnpm lint:house # the four mechanical rules of this page, with their exemptions
+pnpm verify     # the render bench: Playwright over dist/ at 390, 768, 1440
 ```
+
+**What each check does NOT see.** This matters more than the list above,
+because it is what stops "the build is green" from being mistaken for "the
+work is done".
+
+- `pnpm build` does not type-check. A green build with a broken type is normal.
+- `pnpm check` types `.astro` and `.ts` but never EXECUTES a line, so a
+  selfcheck it type-checks can still be failing.
+- `pnpm test` runs pure logic. It has never seen a pixel.
+- `pnpm lint:house` counts lines and characters. It cannot tell whether a
+  header comment is TRUE, only that one is present.
+- `pnpm verify` measures what was painted: overflow, clipped content, ink
+  collisions, contrast, touch targets, heading order, alt text. It cannot
+  measure taste. Hierarchy, balance and rhythm stay the review checklist at the
+  end of docs/design.md, run by a human. It also declares contrast
+  UNMEASURABLE over a background image rather than inventing a number.
+- Nothing here opens the site in a real browser on a real phone. The two worst
+  defects of 31 August 2026 were both found by a human on an iPhone, and both
+  are now covered by `pnpm verify`. The next one will not be.
 
 ## Non-negotiable conventions
 
