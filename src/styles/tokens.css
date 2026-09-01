@@ -162,6 +162,7 @@
   --color-primary: var(--reef-primary);
   --color-primary-foreground: var(--reef-primary-foreground);
   --color-accent: var(--reef-accent);
+  --color-accent-text: var(--reef-accent-text);
   --color-accent-foreground: var(--reef-accent-foreground);
   --color-border: var(--reef-border);
   --color-ring: var(--reef-ring);
@@ -219,6 +220,21 @@
    * turquoise 400 en sombre. */
   --accent-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 10' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q 6 2.5 12 7 T 24 7 T 36 7 T 48 7' fill='none' stroke='%23147ea0' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
   --reef-accent: var(--color-coral-600);
+  /* L'accent QUAND IL PORTE DU TEXTE, et rien d'autre.
+   *
+   * Le corail de la maison est fait pour se voir : sur un fond clair il plafonne
+   * a 2,6 - 3,7 pour 1 face au blanc et aux fonds pales, la ou WCAG AA demande
+   * 4,5 pour du texte courant. Mesure sur les six themes, 188 occurrences.
+   *
+   * Deux facons de repondre. Changer l'accent, et le theme perd sa couleur.
+   * Ou separer les deux emplois : la couleur DECORATIVE ne bouge pas d'un
+   * pixel (bg-accent, border-accent, les degrades, la vague du titre), et le
+   * TEXTE en accent prend une marche plus sombre de la MEME rampe. C'est le
+   * second choix, parce qu'un lecteur ne doit pas avoir a deviner un mot.
+   *
+   * En sombre la question ne se pose pas : l'accent y est deja entre 5,2 et
+   * 7,1 pour 1. Le bloc sombre renvoie donc simplement vers l'accent. */
+  --reef-accent-text: var(--color-coral-700);
   --reef-accent-foreground: #ffffff;
   --reef-border: color-mix(in oklab, var(--color-ink-950) 12%, transparent);
   --reef-ring: var(--color-reef-600);
@@ -249,6 +265,9 @@
   /* Le primaire passe en turquoise 400 : la vague du mot d'accent suit. */
   --accent-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 10' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q 6 2.5 12 7 T 24 7 T 36 7 T 48 7' fill='none' stroke='%233fc0e0' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
   --reef-accent: var(--color-coral-400);
+  /* En sombre, l'accent passe deja largement AA sur les trois fonds : le texte
+   * en accent garde donc exactement la couleur de l'accent. */
+  --reef-accent-text: var(--reef-accent);
   --reef-accent-foreground: var(--color-ink-950);
   --reef-border: color-mix(in oklab, var(--color-paper-50) 15%, transparent);
   --reef-ring: var(--color-reef-400);

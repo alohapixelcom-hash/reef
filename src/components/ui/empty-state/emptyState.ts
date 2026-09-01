@@ -20,7 +20,7 @@ export const emptyState = tv({
       // Rien a signaler : c'est juste vide.
       neutral: {},
       // Une recherche sans resultat : l'accent secondaire, pose sans alarmer.
-      search: { ring: "text-accent/40", art: "text-accent" },
+      search: { ring: "text-accent-text/40", art: "text-accent-text" },
       // Quelque chose a echoue : le primaire, jamais du rouge pur, qui
       // jurerait avec la palette et crierait plus fort que necessaire.
       error: { ring: "text-primary/40", art: "text-primary" },

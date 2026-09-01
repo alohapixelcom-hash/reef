@@ -19,7 +19,18 @@ Vite plugin (astro.config.mjs:53). Adding a config file would be a bug.
 3. Utilities, the only floor markup touches: `bg-background`,
    `text-foreground`, `bg-card`, `text-card-foreground`, `bg-primary`,
    `text-primary-foreground`, `bg-muted`, `text-muted-foreground`,
-   `border-border`, `bg-surface`, `text-accent`, `ring-ring`.
+   `border-border`, `bg-surface`, `text-accent`, `text-accent-text`, `ring-ring`.
+
+An eleventh role joined the list on 1 September 2026, and it is the only one
+that exists for a measurement rather than for a meaning: `text-accent-text`.
+The house coral is built to be seen, so on a pale ground it lands between 2.6
+and 3.7 to 1, where WCAG AA asks 4.5 for body text. Rather than repaint the
+brand, the two jobs were split: `bg-accent`, `border-accent`, the gradients and
+the title wave keep the exact coral they always had, and any accent that
+carries TEXT or an icon uses `text-accent-text`, one step darker on the same
+ramp. In dark mode the accent already clears AA, so the token simply points
+back at it. Writing `text-accent` on a piece of text is now a bug: the utility
+still exists, because `--color-accent` still has to name the decorative colour.
 
 Hard rule: palette names never appear in markup. No `bg-ink-900`, no
 `text-coral-400`, no raw hex. Those names exist only inside tokens.css and
