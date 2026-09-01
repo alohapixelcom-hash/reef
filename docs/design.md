@@ -49,12 +49,7 @@ actually reads. The display face is what makes each theme itself.
 
 | Theme | Display | Body |
 |---|---|---|
-| Aloha | Inter Tight | Roboto |
-| Nalu | Gabarito | Instrument Sans |
 | Reef | Space Grotesk | Instrument Sans |
-| Kai | Archivo | Instrument Sans |
-| Koa | Syne | Instrument Sans |
-| Swell | Bricolage Grotesque | Instrument Sans |
 
 Two families. Never three, never one: a page set entirely in its body face is a
 document, and a page with four families is a ransom note.
@@ -65,7 +60,7 @@ because they are bad faces - Inter is an excellent face - but because they are
 the ones every tool reaches for first, and a reader who has seen forty
 generated pages this month has seen all forty in Inter.
 
-**Aloha is the exception in the table above, and it is named rather than
+**Aloha is the exception in the family, and it is named rather than
 hidden.** It carries Inter Tight and Roboto, two of the faces this section
 refuses, set at weight 800 with negative tracking, which is a place no default
 puts them, and it was built before this file was written. That is an
@@ -107,12 +102,7 @@ palette shade the ramp is named after:
 
 | Theme | Anchor | Accent |
 |---|---|---|
-| Aloha | lagoon `#16646f` | coral `#f95c36` |
-| Nalu | jade `#0d7663` | coral `#f95c36` |
 | Reef | reef turquoise `#147ea0` | coral `#e6411c` |
-| Kai | abyss blue `#235476` | coral `#f95c36` |
-| Koa | fern `#45593c` | coral `#f95c36` |
-| Swell | electric violet `#7326f5` | coral `#f95c36` |
 
 Each anchor is the 600 shade of its ramp rather than the 500 the palette is
 built around, for one reason: button labels are white, and 500 falls under a
@@ -136,8 +126,7 @@ paler than the other four.
 - Gradient-filled headlines (`background-clip: text`). Solid ink, always: a
   headline needing a gradient to be interesting has the wrong words in it.
 - Pure `#000`, anywhere, as a colour. Every dark ground in the family is the
-  darkest shade of its own anchor: `#0a0f17` in Reef, `#021c24` in Aloha,
-  `#0f0f13` in Kai, `#111110` in Koa, `#060b1a` in Swell, `#0d1211` in Nalu.
+  darkest shade of its own anchor, `#0a0f17` here.
   None of them is black.
 - The thick coloured stripe down one edge of a card.
 
@@ -152,8 +141,7 @@ is not taste: a card is filled `#ffffff`, so on a white ground the card and the
 paper are the same colour and a one-pixel rule is the only thing saying which
 is on top. A card that does not lift is a framed paragraph. The tint is the 50
 of each theme's own neutral and the section band drops to the 100, so the
-two-beat rhythm is unchanged: Reef `#fbfcfe`, Koa `#f8f7f4`, Nalu `#f5f8f7`,
-Aloha `#f2f8fa`, Swell `#f4f6fc`, Kai `#f7f7f8`.
+two-beat rhythm is unchanged.
 
 **Light is the default.** Every site in the house opens light and offers dark. Dark-first
 was the earlier house position and it was wrong: a theme is judged in the two
