@@ -68,6 +68,8 @@ observes the root and fans out incremental delays to its direct children
 
 ## No heavy effect
 
-There is no canvas and no WebGL. The heaviest thing that moves is a set of
-blurred radial-gradient halos in the hero (src/styles/global.css) that drift
-slowly, and that collapse with everything else under reduced motion.
+There is no canvas and no WebGL, and nothing loops on its own. The heaviest
+thing that moves is an entrance reveal, which plays once and stops. A set of
+blurred radial-gradient halos used to drift in the hero; they were removed from
+the whole family on 2 September 2026, because a blurred disc drifting behind a
+title is the mark of a page assembled by a machine.

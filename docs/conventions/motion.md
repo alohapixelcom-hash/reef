@@ -97,5 +97,5 @@ heavy effect must clear the same one before it lands:
 - degrade to a still frame that carries the whole message. If the fallback is
   not readable on its own, the effect has not earned the right to run.
 
-Everything else on the page stays cheap: the most expensive remaining thing is
-a set of blurred radial-gradient halos in the hero that drift slowly.
+Everything else on the page stays cheap, and nothing loops on its own: the
+entrance reveals play once and stop, and the page is still after that.

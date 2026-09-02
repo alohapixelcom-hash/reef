@@ -3,7 +3,7 @@
 title: Wiki log
 summary: Dated journal of code changes reflected in the wiki, and the list of open threads.
 sources: []
-updated: 2026-08-31
+updated: 2026-09-02
 ---
 
 # Wiki log
@@ -12,6 +12,40 @@ Newest entry first. Every `wiki sync` appends an entry here, even when
 nothing needed updating. Open threads are questions or known gaps waiting on
 a decision; close them by editing this list and noting the resolution in a
 dated entry.
+
+## 2026-09-02 - 1.7.0, the halos are gone and the language switch is a switch
+
+- The drifting halos left every scene: the hero, the annex page header and the
+  404. Two blurred discs on long periods, one warm and one cool, are the single
+  most recognisable mark of a page assembled by a machine, and the warm one
+  passed BEHIND the hero title, staining the photograph at the exact place the
+  text has to stay readable. The two house classes that held their palette
+  colours went with them, because a house class that no longer serves anything
+  is an invitation to reuse it. docs/design.md, docs/conventions/tailwind.md,
+  docs/conventions/motion.md and wiki/subsystems/{motion,tokens}.md were
+  corrected in the same change rather than left describing a theme that no
+  longer exists.
+- The language switcher is an actual switch now. It was two pills side by side,
+  one filled and one not: that imitates a switch without being one, and nothing
+  ever moved. The cursor is a single piece that slides between the two
+  languages. Its position is written by the server as a CSS variable, so it is
+  already on the right side with JavaScript off; the script only moves it
+  BEFORE the page leaves, because changing language reloads the document and
+  the cursor would otherwise jump on arrival instead of sliding at departure.
+- Two defects were found while rewriting it, and both were invisible in review.
+  The cookie listener bound to the FIRST switcher found on the page, so a click
+  in the footer or in the mobile drawer never recorded the choice; it is a
+  delegated listener now, which also survives view transitions by
+  construction. And a `display` written in a component's scoped style outranks
+  any Tailwind utility, because Astro suffixes the selector with the scope
+  attribute: the switcher then ignored the bar's own request to hide itself and
+  appeared on iPhone, wedged between the wordmark and the buy button. The
+  display is an utility now, and callers correct it with a VARIANT
+  (`max-sm:hidden`, `sm:hidden`), never with a base utility, because a variant
+  is always emitted after the base ones and therefore wins for a readable
+  reason.
+- The whole family takes the same number, 1.7.0, and Kona joins the shelf at
+  it. Nothing else in this theme changed.
 
 ## 2026-08-31 - 1.6.2, the light ground stops being white
 
