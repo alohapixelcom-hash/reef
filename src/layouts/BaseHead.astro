@@ -91,14 +91,28 @@ function resolveToken(name: string, scope: string, depth = 0): string {
   throw new Error(`tokens.css : jeton --${name} introuvable, le favicon ne peut pas etre peint`);
 }
 
+// Seuls les deux fonds restent lus ici : ils peignent la barre du navigateur
+// (theme-color). L'accent et le primaire l'etaient aussi, pour dessiner le
+// favicon ; ils sont partis avec lui vers scripts/favicon.mjs, qui relit les
+// memes jetons avec le meme resolveur.
 const groundDark = resolveToken("color-background", darkBlock);
 const groundLight = resolveToken("color-background", lightBlock);
-const wave = resolveToken("color-accent", darkBlock);
-const crest = resolveToken("color-primary", darkBlock);
 
-// Favicon : deux vagues, corail et lagon, sur fond ocean. SVG inline en data-uri, aucun fichier a servir.
-const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="${groundDark}"/><path d="M32 52V26" stroke="${wave}" stroke-width="7" stroke-linecap="round"/><path d="M32 34 22 24M32 38l10-10" stroke="${wave}" stroke-width="6" stroke-linecap="round"/><path d="M14 52h36" stroke="${crest}" stroke-width="5" stroke-linecap="round" opacity="0.9"/></svg>`;
-const faviconHref = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
+// LE FAVICON N'EST PLUS DESSINE ICI. Il l'a ete longtemps, en SVG inline dans
+// une data-uri : aucun fichier a servir, aucune requete de plus, et le dessin
+// suivait un pnpm rebrand sans rien regenerer. C'etait elegant et c'etait faux.
+//
+// Google ne montre un favicon dans ses resultats que s'il peut le CRAWLER, et
+// il ne lit que des images matricielles : sa documentation liste BMP, GIF, ICO,
+// PNG, JPEG, PPM et TIFF. Le SVG n'y est pas, et une data-uri n'est pas une
+// adresse a crawler. Un site livre ainsi sort dans les resultats avec le globe
+// gris generique. Le defaut ne se voit dans aucun navigateur, dans aucun audit
+// de page et dans aucun test : il ne se voit que dans une page de resultats.
+//
+// Le dessin vit maintenant dans scripts/favicon.mjs, qui ecrit favicon.svg,
+// favicon.ico (16, 32 et 48), favicon-96.png et apple-touch-icon.png dans
+// public/ a chaque build. Un pnpm rebrand les repeint comme avant, puisque le
+// script relit les memes jetons. Ici il ne reste que les liens.
 ---
 
 <meta charset="utf-8" />
@@ -112,7 +126,13 @@ const faviconHref = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
 <link rel="canonical" href={canonical.href} />
 {noindex && <meta name="robots" content="noindex, nofollow" />}
 
-<link rel="icon" href={faviconHref} type="image/svg+xml" />
+{/* L'ordre compte pour les navigateurs, pas pour Google : le SVG est
+    prefere quand il est compris, l'ICO sert de repli et reste ce que
+    Googlebot-Image sait lire. L'ICO est aussi a /favicon.ico, l'adresse que
+    tout navigateur demande de lui-meme meme sans balise. */}
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="sitemap" href="/sitemap-index.xml" />
 <link
   rel="alternate"

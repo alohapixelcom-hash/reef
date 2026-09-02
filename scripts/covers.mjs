@@ -42,8 +42,8 @@ const MANIFEST = {
   // Le premier ecran : la vague qui se creuse. C'est la photo de la maison, et
   // le logo du theme est une vague.
   "reef-hero-vague.webp": {
-    url: `${PEXELS}/29275767/pexels-photo-29275767.jpeg?auto=compress&cs=srgb&fm=webp&w=1920&h=1081&fit=crop`,
-    minWidth: 1920,
+    url: `${PEXELS}/29275767/pexels-photo-29275767.jpeg?auto=compress&cs=srgb&fm=webp&w=2560&h=1441&fit=crop`,
+    minWidth: 2560,
   },
   // Mesurer chez le lecteur : le soleil pose sur l'horizon donne l'echelle que
   // le large ne donne pas.
