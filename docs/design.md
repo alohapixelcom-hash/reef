@@ -220,11 +220,15 @@ So the rule is not "our own photographs". The rule is: **a photograph whose
 licence anyone can verify, named in `THIRD-PARTY.md` and traceable in
 `PHOTOS.md`.** A studio archive satisfies it too. Nothing else does.
 
-**Every hero carries one.** A gradient with two blurred halos and nothing
-behind it is what a hero looks like when there was no photograph available.
-There is always one. Aloha ran both for a while, and the comment in its own
-hero said the halos dirtied the image while keeping them anyway. They are gone:
-all six carry the photograph alone.
+**Every hero carries one, and nothing floats on top of it.** A gradient with
+two blurred halos and nothing behind it is what a hero looks like when there
+was no photograph available. There is always one. Aloha ran both for a while,
+and the comment in its own hero said the halos dirtied the image while keeping
+them anyway. On 2 September 2026 the halos left the family entirely, heroes and
+annexes alike: a blurred disc drifting behind a title is the single most
+recognisable mark of a page assembled by a machine, and the warm one passed
+BEHIND the title, staining the photograph at the exact place the text has to
+stay readable. All seven carry the photograph alone.
 
 **How they are wired.** Images are not versioned as binaries. Each theme has a
 build script holding a manifest of URLs, and `pnpm build` fetches them into
