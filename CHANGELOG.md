@@ -3,10 +3,24 @@
 # Reef - changelog
 
 Every theme in the family carries the same version number, so a number that
-moves here moved in all six. The dated working notes behind each entry, with
+moves here moved in all seven. The dated working notes behind each entry, with
 the reasoning and the files, are in `wiki/log.md`.
 
-Current version: **1.6.3**.
+Current version: **1.7.0**.
+
+## 1.7.0 - 2026-09-02
+
+A seventh theme joins, and the whole family takes its number.
+
+- Kona ships. It is a headless storefront for an existing Shopify shop: the
+  catalogue is read at build time from the shop's own public JSON, so there is
+  no app to install, no Storefront token to mint and nothing to change on the
+  shop. See kona.alohapixel.app.
+- Not one line of code changed in THIS theme. Three files differ from 1.6.3 and
+  all three are paperwork: `package.json` for the number, this changelog, and
+  `docs/design.md` because the family is seven themes and two of them are
+  headless. Every other byte is the byte of 1.6.3. Reef stays MIT and its
+  LICENSE does not move: the commercial agreement never covered it.
 
 ## 1.6.3 - 2026-09-01
 
