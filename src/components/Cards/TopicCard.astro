@@ -1,28 +1,48 @@
 ---
-// src/components/Cards/TopicCard.astro - la carte d'un sujet : vague en filigrane, nom, description, nombre de billets, et l'accent declare par le contenu.
+// src/components/Cards/TopicCard.astro - la carte d'un sujet : bord de couleur, sur-titre, nom, description, et la ligne de pied.
 //
 // L'accent d'un sujet est un NOM (coral, reef, ink), jamais une couleur : le
 // contenu declare une intention, la table topicTone la traduit en tokens. C'est
 // ce qui permet de repeindre le theme sans rouvrir un seul fichier de contenu.
 //
-// Pourquoi une vague en filigrane, et plus une initiale geante
-// ------------------------------------------------------------
-// Un sujet doit se reconnaitre AVANT d'etre lu : cinq cartes de texte cote a
-// cote ne donnent que cinq rectangles gris. Il faut donc une silhouette par
-// carte.
+// DEUX ORNEMENTS ONT ETE ESSAYES ICI, ET LES DEUX SONT PARTIS
+// -----------------------------------------------------------
+// Le probleme est reel et il ne change pas : un sujet doit se reconnaitre
+// AVANT d'etre lu, et cinq cartes de texte cote a cote ne donnent que cinq
+// rectangles gris. Il faut donc une silhouette par carte.
 //
-// La premiere reponse etait l'initiale du sujet, posee tres grande en fond.
-// Elle a ete retiree, et la raison merite d'etre ecrite pour qu'on ne la
-// repose pas : la lettre geante en filigrane est un tic visuel que le public
-// associe aux pages generees. Le reproche est arrive de l'exterieur, sur la
-// vignette d'un billet, et il valait pour toutes les cartes du theme.
+// La premiere reponse a ete l'initiale du sujet, posee tres grande en fond.
+// Retiree : la lettre geante en filigrane est un tic que le public associe aux
+// pages fabriquees a la chaine, et le reproche est venu de l'exterieur.
 //
-// La vague le remplace, et ce n'est pas un motif de substitution choisi au
-// hasard : le logo de la maison EST une vague, et c'est deja elle qui souligne
-// le mot d'accent des grands titres. La carte porte donc la signature de la
-// marque plutot qu'une lettre que n'importe quel theme pourrait poser. Elle
-// prend la couleur du sujet, elle deborde du coin, et elle se lit a toutes les
-// densites parce que c'est un trace, pas une image.
+// La seconde a ete une vague, qui debordait des deux bords du bas. Retiree le
+// 2 septembre 2026, et il faut ecrire pourquoi pour ne pas la reposer : une
+// vague coloree tracee en travers d'un bloc de texte fait joli cinq secondes
+// et fait toc ensuite. Elle passait sous les lignes de la description, donc
+// elle salissait la seule chose qu'on est venu lire, et cinq cartes portant
+// chacune sa vague donnaient une page qui gondole. Un motif repete cinq fois
+// n'est plus une signature, c'est un papier peint.
+//
+// LA TROISIEME REPONSE N'EST PAS UN DESSIN, C'EST UNE STRUCTURE
+// -------------------------------------------------------------
+// Ce qui fait qu'une grille de cartes de texte se lit comme une composition et
+// non comme un mur, ce n'est pas un ornement pose dessus : c'est la hierarchie,
+// un point d'ancrage commun, et un signal de couleur qui ne se dessine pas.
+// Trois choses, donc, et rien d'autre :
+//
+//   1. UN BORD DE COULEUR sur toute la largeur du haut. Il remplace le filet
+//      de quarante pixels qui se perdait dans le coin. Cinq cartes cote a cote
+//      deviennent cinq fiches d'index a onglets colores : on les distingue du
+//      bout de l'oeil, sans qu'un seul trait n'ait ete trace sur le texte.
+//   2. LE COMPTE EN SUR-TITRE, en petites capitales, dans la couleur du sujet.
+//      C'est le patron de la maison (sur-titre, puis titre), et il donne au nom
+//      un appui : un titre pose tout en haut d'une carte flotte.
+//   3. UNE LIGNE DE PIED. Elle donne aux cartes une ligne de base commune quand
+//      leurs descriptions n'ont pas la meme longueur, ce qui est le vrai defaut
+//      d'une grille de texte : sans elle, chaque fleche se pose ou elle veut.
+//
+// La description est bornee a trois lignes et non quatre, pour la meme raison :
+// trois lignes tiennent dans la meme hauteur d'une carte a l'autre.
 import { Icon } from "@components/svg/icons";
 import { fmt, useTranslations, type Locale } from "@i18n";
 import type { CollectionEntry } from "astro:content";
@@ -51,7 +71,7 @@ const countLabel = count === 1 ? t.topics.countOne : fmt(t.topics.countLabel, { 
 
 <article
   class:list={[
-    "group border-border bg-card rounded-card relative flex flex-col gap-3 overflow-hidden border p-7",
+    "group border-border bg-card rounded-card relative flex flex-col overflow-hidden border",
     "transition-[border-color,transform,box-shadow] duration-300",
     "hover:shadow-float hover:-translate-y-0.5",
     tone.hover,
@@ -59,59 +79,50 @@ const countLabel = count === 1 ? t.topics.countOne : fmt(t.topics.countLabel, { 
   ]}
   data-slot="topic-card"
 >
-  {/* La vague deborde des deux bords en bas : entierement contenue elle aurait
-      l'air d'un logo pose dans un coin, coupee elle a l'air d'un fond sur
-      lequel le texte est imprime. */}
-  <svg
-    class:list={[
-      "pointer-events-none absolute -right-6 -bottom-4 -left-6 w-[calc(100%+3rem)] select-none",
-      "opacity-[0.16] transition-opacity duration-300 group-hover:opacity-30",
-      tone.ghost,
-    ]}
-    viewBox="0 0 200 60"
-    fill="none"
-    preserveAspectRatio="none"
-    aria-hidden="true"
-  >
-    <path
-      d="M0 34c20-16 40-16 60 0s40 16 60 0 40-16 60 0 40 16 60 0"
-      stroke="currentColor"
-      stroke-width="3"
-      stroke-linecap="round"></path>
-    <path
-      d="M0 48c20-12 40-12 60 0s40 12 60 0 40-12 60 0 40 12 60 0"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"></path>
-  </svg>
+  {/* Le bord de couleur. Trois pixels, toute la largeur, en haut : c'est le
+      seul endroit ou la couleur d'un sujet peut se voir sans se poser sur du
+      texte. Il est pose en element et non en border-top, parce qu'une bordure
+      superieure de trois pixels sur une carte qui en a deja une d'un pixel
+      donne deux traits de largeurs differentes au meme endroit. */}
+  <span class:list={["h-[3px] w-full shrink-0", tone.rule]} aria-hidden="true"></span>
 
-  <span class:list={["relative h-0.5 w-10 rounded-pill", tone.rule]} aria-hidden="true"></span>
-
-  <Tag class="font-display text-foreground relative text-xl font-bold tracking-tight">
-    {/* Le lien couvre toute la carte via ::after : un seul arret de tabulation,
-        et pourtant la surface cliquable est celle que le doigt vise. */}
-    <a href={href} class="after:absolute after:inset-0 after:content-['']">
-      {topic.data.name}
-    </a>
-  </Tag>
-
-  {/* La description garde sa mesure meme quand la carte s'elargit. Sur une
-      carte de deux tiers de page, une description qui va d'un bord a l'autre
-      donne des lignes de cent trente signes : plus personne ne les lit, et la
-      carte cesse d'etre une carte pour devenir un paragraphe encadre. */}
-  <p class="text-muted-foreground relative line-clamp-4 max-w-[62ch] text-[0.95rem] leading-relaxed">
-    {topic.data.description}
-  </p>
-
-  <p class="relative mt-auto flex items-center gap-2 pt-2">
-    <span class:list={["rounded-pill px-2.5 py-1 text-xs font-medium", tone.chip]}>
+  <div class="flex flex-1 flex-col gap-3 p-7">
+    {/* Le compte en sur-titre. Il etait en bas, dans une pastille teintee ;
+        il monte au-dessus du nom, ou il sert a quelque chose : il dit la
+        taille du sujet avant qu'on decide de l'ouvrir. */}
+    <p class:list={["text-xs font-semibold tracking-[0.14em] uppercase", tone.ghost]}>
       {countLabel}
-    </span>
-    <span
-      class="text-muted-foreground group-hover:text-foreground ml-auto transition-colors duration-200"
-      aria-hidden="true"
-    >
-      <Icon name="arrow-right" size={18} />
-    </span>
-  </p>
+    </p>
+
+    <Tag class="font-display text-foreground text-2xl leading-tight font-bold tracking-tight">
+      {/* Le lien couvre toute la carte via ::after : un seul arret de tabulation,
+          et pourtant la surface cliquable est celle que le doigt vise. */}
+      <a href={href} class="after:absolute after:inset-0 after:content-['']">
+        {topic.data.name}
+      </a>
+    </Tag>
+
+    {/* La description garde sa mesure meme quand la carte s'elargit. Sur une
+        carte de deux tiers de page, une description qui va d'un bord a l'autre
+        donne des lignes de cent trente signes : plus personne ne les lit, et la
+        carte cesse d'etre une carte pour devenir un paragraphe encadre. */}
+    <p class="text-muted-foreground line-clamp-3 max-w-[62ch] text-[0.95rem] leading-relaxed">
+      {topic.data.description}
+    </p>
+
+    {/* La ligne de pied, et la fleche posee dessus. mt-auto la colle en bas
+        quelle que soit la hauteur du texte : c'est ce qui aligne les fleches
+        d'une carte a l'autre au lieu de les laisser suivre le paragraphe. */}
+    <p class="border-border mt-auto flex items-center gap-2 border-t pt-4">
+      <span class="text-muted-foreground group-hover:text-foreground text-sm font-semibold transition-colors duration-200">
+        {t.topics.readTopic}
+      </span>
+      <span
+        class="text-muted-foreground group-hover:text-foreground ml-auto transition-[color,transform] duration-200 group-hover:translate-x-0.5"
+        aria-hidden="true"
+      >
+        <Icon name="arrow-right" size={18} />
+      </span>
+    </p>
+  </div>
 </article>
