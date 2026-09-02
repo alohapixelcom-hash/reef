@@ -8,9 +8,10 @@ which decisions have already been made, which shapes are refused, and what has
 to be true before a page ships.
 
 Read it before you add a section, and again before you add an effect. The family
-is six themes - Aloha, Reef, Kai, Koa, Swell, Nalu. Nalu is the only headless
-one: its catalogue is read from a WooCommerce store instead of from files, which
-changes where the data lives and nothing about the rules below.
+is seven themes - Aloha, Reef, Kai, Koa, Swell, Nalu and Kona. Two of them are
+headless: Nalu reads its catalogue from a WooCommerce shop and Kona from a
+Shopify one, instead of from files, which changes where the data lives and
+nothing about the rules below.
 
 ## Why this file exists
 
@@ -259,10 +260,10 @@ palette name in the markup.
    `StaggerReveal`.
 3. Scroll-driven CSS - `animation-timeline: view()`, no JavaScript.
 
-**Five of the six themes stop there and ship no animation library at all.**
-Reef, Kai, Koa, Swell and Nalu depend on Astro, Tailwind, two fonts and nothing
-else that moves; every effect in them is CSS or a `requestAnimationFrame` loop
-written by hand.
+**Six of the seven themes stop there and ship no animation library at all.**
+Reef, Kai, Koa, Swell, Nalu and Kona depend on Astro, Tailwind, two fonts and
+nothing else that moves; every effect in them is CSS or a `requestAnimationFrame`
+loop written by hand.
 
 Aloha is the exception, it is deliberate, and it is declared in its
 `THIRD-PARTY.md`: `motion` drives springs and gestures inside its three React
