@@ -28,7 +28,7 @@
   },
   "scripts": {
     "app": "astro build && node scripts/app.mjs",
-    "build": "node scripts/covers.mjs && astro build",
+    "build": "node scripts/covers.mjs && node scripts/favicon.mjs && astro build",
     "check": "astro check",
     "covers": "node scripts/covers.mjs",
     "dev": "astro dev",
@@ -38,7 +38,8 @@
     "preview": "astro preview",
     "rebrand": "node scripts/rebrand.mjs",
     "test": "node scripts/checks.mjs",
-    "verify": "node scripts/verify.mjs"
+    "verify": "node scripts/verify.mjs",
+    "favicon": "node scripts/favicon.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.0",
