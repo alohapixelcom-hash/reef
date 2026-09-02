@@ -137,13 +137,18 @@ const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: m
             ]}
             aria-hidden="true"
           >
-            {/* Le halo prend la couleur du sujet, pas celle de la marque : c'est
-                lui qui fait qu'un billet de typographie et un billet de
-                performance n'ont pas la meme couverture. */}
-            <span
-              class="animate-drift-slow absolute -top-1/4 -right-1/4 size-[26rem] rounded-full opacity-45 blur-3xl"
-              style={`background: radial-gradient(circle, ${tone.halo} 0%, transparent 68%)`}
-            ></span>
+            {/* PLUS DE DISQUE FLOUTE. Une teinte de 26rem, floutee au maximum,
+                debordait de ce coin. Elle avait d'abord derive, puis on l'avait
+                immobilisee, et elle restait ce qu'elle etait : une lueur. Celle
+                du premier sujet etait de surcroit CORAIL alors que tout le
+                reste de ce ton, la pastille, la puce et le filet, est en
+                primaire : la couverture ne montrait donc meme pas la couleur du
+                sujet qu'elle illustrait.
+
+                Ce qui distingue les couvertures reste, et se lit mieux : le
+                filet de deux pixels en haut, a la couleur du sujet, et la vague
+                dessinee en bas, a la meme couleur. Un trait et un dessin
+                nomment un sujet ; une nappe floue ne nomme rien. */}
             <span class:list={["absolute inset-x-0 top-0 h-0.5", tone.rule]}></span>
 
             <svg
