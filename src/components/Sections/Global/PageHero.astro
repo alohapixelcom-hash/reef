@@ -84,18 +84,11 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
 ---
 
 <section class={root({ class: className })} data-slot="page-hero">
-  {/* Un halo, un seul, et dans l'aigue-marine de la maison. Une page d'archive
-      est une page de CLASSEMENT : le halo reprend donc la teinte des sujets et
-      des etats, sans monter au niveau d'un appel a l'action. Il derive tres
-      lentement, comme ceux du premier ecran : c'est ce qui rattache une page
-      interieure a l'accueil sans lui voler sa scene. */}
-  <div
-    class="animate-drift-slow pointer-events-none absolute -top-1/2 -right-[12%] size-[34rem] rounded-full opacity-25 blur-3xl dark:opacity-50"
-    style="background: radial-gradient(circle, var(--halo-page) 0%, transparent 70%)"
-    aria-hidden="true"
-  >
-  </div>
-
+  {/* PAS DE HALO. Un disque flou derivait ici, dans l'aigue-marine de la
+      maison, pour rattacher une page interieure a l'accueil. C'est la
+      signature des pages fabriquees a la chaine, et la maison l'interdit. Le
+      rattachement se fait par la typographie et par le fil d'ariane, qui ne
+      derivent pas. */}
   <div class={inner()}>
     {
       trail.length > 0 && (

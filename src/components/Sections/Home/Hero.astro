@@ -67,10 +67,18 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
         aucun decalage de mise en page au chargement.
         Le cadrage tire vers le bas : la ou la vague se creuse. Centre, on ne
         voyait que du ciel. */}
+    {/* 2560 EN PLUS, ET C'EST UNE CORRECTION MESUREE. La liste s'arretait a
+        1920 : sur un portable retine de 1440 points, un emplacement 100vw
+        demande 2880 pixels physiques, le navigateur prenait donc le 1920 et
+        l'ETIRAIT de moitie. La photo de premier ecran, celle qu'on voit
+        avant tout le reste, etait floue sur exactement le materiel que nos
+        acheteurs utilisent. 2560 est la plus grande largeur que la source
+        fournit ; au-dela on etirerait a nouveau, en payant les octets en
+        plus. */}
     <Image
       src={heroVague}
       alt=""
-      widths={[720, 1200, 1920]}
+      widths={[720, 1200, 1920, 2560]}
       sizes="100vw"
       loading="eager"
       fetchpriority="high"
@@ -95,25 +103,17 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     >
     </div>
 
-    {/* Les deux halos existaient pour donner un centre a un fond vide. Le fond
-        n'est plus vide : la photo a sa propre lumiere, et deux nappes floues
-        par dessus la salissent au lieu de la servir. Ils restent, tres bas, et
-        seulement pour rechauffer les bords ou la photo s'assombrit.
-        Ils citaient deux entrees de palette. Ils citent maintenant l'accent et
-        la couleur d'ancrage, ce qui les fait suivre le mode clair ou sombre et
-        survivre a un `pnpm rebrand` sans edition. */}
-    <div
-      class="animate-drift pointer-events-none absolute -top-2/5 -right-1/4 size-[42rem] rounded-full opacity-12 blur-3xl"
-      style="background: radial-gradient(circle, var(--color-accent) 0%, transparent 68%)"
-      aria-hidden="true"
-    >
-    </div>
-    <div
-      class="animate-drift-slow pointer-events-none absolute -bottom-1/4 -left-1/5 size-[38rem] rounded-full opacity-20 blur-3xl"
-      style="background: radial-gradient(circle, var(--color-primary) 0%, transparent 70%)"
-      aria-hidden="true"
-    >
-    </div>
+    {/* PAS DE HALO. Deux nappes floues derivaient ici, l'une sur l'accent en
+        haut a droite, l'autre sur le primaire en bas a gauche. Le commentaire
+        qui vivait a cet endroit disait deja qu'elles salissaient la
+        photographie et les gardait quand meme : c'est la signature exacte des
+        pages fabriquees a la chaine, et la regle de la maison l'interdit
+        desormais dans toute la famille.
+
+        Ce qui donne son relief au premier ecran reste entier et ne bouge pas :
+        la photographie, le voile de lecture en deux couches juste au-dessus,
+        et le degrade qui ancre le haut et le bas du cadre. La photo a sa
+        propre lumiere ; elle n'a jamais eu besoin qu'on lui en ajoute. */}
 
     {/* Le patron maison du premier ecran, le meme sur les six sites : deux
         colonnes inegales, la ligne d'accroche et le titre a gauche, le chapeau

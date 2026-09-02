@@ -1,8 +1,9 @@
 ---
 // src/components/ui/cta-button/CtaButton.astro - un Button enveloppe d'un halo degrade anime : le CTA signature des heros et des bandeaux de fin de page.
-// Le halo gere la montee d'opacite au survol et au focus ; sa pulsation vit
-// sur un calque interne (animate-pulse-slow) pour ne pas se battre avec la
-// transition d'opacite. class est transmise au Button interieur.
+// Le halo gere la montee d'opacite au survol et au focus. Il ne pulse plus et
+// il n'est plus corail : une lueur orange qui respire autour d'un bouton est
+// la signature des pages fabriquees a la chaine. class est transmise au
+// Button interieur.
 import type { HTMLAttributes } from "astro/types";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Button, button } from "../button";
@@ -15,10 +16,16 @@ export const ctaButton = tv({
       "opacity-70 transition-opacity duration-300",
       "group-hover/cta:opacity-100 group-focus-within/cta:opacity-100",
     ],
+    // PLUS DE PULSATION, ET PLUS DE CORAIL. Ce calque etait un degrade
+    // primaire vers accent vers primaire, floute, qui battait en boucle :
+    // une lueur orange qui respire autour d'un bouton est la signature la
+    // plus reconnaissable des pages fabriquees a la chaine, et la maison
+    // n'en veut nulle part. Ce qui reste est une lueur froide et IMMOBILE,
+    // sur la seule couleur primaire, qui monte au survol et au focus : le
+    // bouton repond encore au geste, il ne s'annonce plus tout seul.
     pulse: [
       "absolute inset-0 rounded-pill blur-lg",
-      "bg-linear-to-r from-primary via-accent to-primary",
-      "animate-pulse-slow",
+      "bg-linear-to-r from-primary via-primary/70 to-primary",
     ],
   },
 });
