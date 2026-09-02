@@ -1,7 +1,7 @@
 ---
-// src/components/ui/locale-switcher/LocaleSwitcher.astro - le selecteur de langue.
+// src/components/ui/locale-switcher/LocaleSwitcher.astro - le selecteur de langue : un interrupteur, avec un curseur qui glisse.
 //
-// Deux details le separent d'un selecteur ordinaire :
+// Trois details le separent d'un selecteur ordinaire :
 //
 //   1. Il pointe vers LA MEME page dans l'autre langue, pas vers l'accueil.
 //      C'est le defaut le plus courant des sites multilingues : on lit un
@@ -9,9 +9,45 @@
 //      viennent de getAlternates, exactement la meme source que les balises
 //      hreflang du <head> : les deux ne peuvent pas diverger.
 //
-//   2. Sa forme suit le nombre de langues. Deux langues : un segmente, un seul
-//      geste, aucun menu a ouvrir. Trois ou plus : un menu deroulant, parce
-//      qu'un segmente a cinq cases deborde de la barre sur iPhone.
+//   2. Sa forme suit le nombre de langues. Deux langues : un interrupteur, un
+//      seul geste, aucun menu a ouvrir. Trois ou plus : un menu deroulant,
+//      parce qu'un interrupteur a cinq positions deborde de la barre sur
+//      iPhone.
+//
+//   3. A deux langues, c'est un VRAI interrupteur. Il y a eu ici deux pastilles
+//      posees cote a cote dans une gouttiere : la case active portait un fond,
+//      l'autre non, et rien ne bougeait jamais. Ca imite un interrupteur sans
+//      en etre un, et l'oeil le sent tout de suite. Un interrupteur, c'est UN
+//      objet qui se deplace : le curseur est ici une piece unique, posee sous
+//      les deux libelles, et il glisse d'un cote a l'autre.
+//
+// COMMENT IL GLISSE SANS JAVASCRIPT
+//
+// La position vient d'une variable CSS, --ls-index, valant 0 ou 1, ecrite par
+// le serveur depuis la langue de la page. Le curseur fait exactement une
+// colonne de large et se translate de 100 pour cent de SA propre largeur : il
+// tombe donc au pixel sur l'autre colonne, quelle que soit la largeur du
+// composant et sans qu'aucune mesure ne soit faite. Sans JavaScript, il est
+// deja du bon cote.
+//
+// Le script n'ajoute qu'une chose, et c'est la seule qui ne peut pas venir du
+// CSS : au clic, il deplace le curseur AVANT que la page ne parte. Changer de
+// langue recharge le document (autre lang, autres hreflang), donc sans cela
+// le curseur sauterait a l'arrivee au lieu de glisser au depart. Le geste est
+// ainsi continu : on pousse, ca glisse, la page arrive deja dans cet etat.
+//
+// Deux gestes en plus, empruntes aux interrupteurs du systeme : au survol de
+// l'autre langue le curseur s'avance de sept pour cent vers elle, et pendant
+// l'appui il s'elargit legerement. Ni l'un ni l'autre n'est decoratif : ils
+// disent que l'objet est saisissable, avant meme qu'on ait clique.
+//
+// L'anneau de focus passe par l'utilitaire focus-visible:ring-ring et non par
+// un outline ecrit dans le bloc <style>. Ce n'est pas une preference : le pied
+// de page porte .dark, qui redeclare les variables --aloha-* sur lui-meme. Un
+// utilitaire Tailwind compile vers var(--aloha-ring) et suit donc ce
+// changement ; un var(--color-ring) ecrit a la main est, lui, calcule sur
+// :root, et l'anneau garderait la couleur du theme clair au milieu d'un pied
+// de page sombre.
 //
 // Aucun drapeau : un drapeau designe un pays, pas une langue.
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@components/ui/dropdown";
@@ -30,6 +66,15 @@ const t = useTranslations(locale);
 const alternates = getAlternates(Astro.url, Astro.site, locale);
 const compact = locales.length <= 2;
 
+// La position du curseur, et rien d'autre. Le repli sur 0 n'arrive jamais en
+// pratique (la langue courante est toujours dans la liste) mais un -1 rendu
+// tel quel sortirait le curseur du cadre, et un defaut visuel muet est le pire
+// des defauts.
+const activeIndex = Math.max(
+  0,
+  alternates.findIndex((alt) => alt.current),
+);
+
 // Changer de langue recharge la page au lieu de passer par une view transition :
 // le document cible a un autre lang, un autre dir et d'autres balises hreflang,
 // et le routeur client ne remplace que le corps. Le passer par un objet etale
@@ -37,62 +82,72 @@ const compact = locales.length <= 2;
 // bien une ancre des qu'on lui donne un href.
 const reload = { "data-astro-reload": true };
 
-// min-h-11 min-w-11, soit 44 px : la regle de cible tactile de la maison, qui
-// etait ecrite dans AGENTS.md et pas tenue ici. Les pastilles mesuraient
-// 36 x 24, et c'est le genre de defaut qu'aucune relecture n'attrape parce
-// qu'il se voit tres bien et se touche tres mal. La pastille garde son allure :
-// le texte reste en text-xs, c'est la BOITE qui grandit, et dans une barre deja
-// haute de 44 px cela ne coute aucune hauteur.
-const segment = [
-  "font-display rounded-pill inline-flex min-h-11 min-w-11 items-center justify-center",
-  "px-2.5 text-xs font-bold tracking-wide uppercase",
-  "transition-colors duration-200",
-].join(" ");
+// Les couleurs seules changent d'un variant a l'autre ; la geometrie et le
+// mouvement sont ecrits une fois dans le bloc <style>.
+//
+// La barre est en couleur COURANTE, jamais en roles semantiques : elle passe
+// du verre sombre du hero a la barre claire une fois le hero depasse, donc le
+// seul reperage sur lequel on peut compter est la couleur du texte qu'elle
+// vient de fixer. Le pied de page et le tiroir mobile, eux, ont un fond connu :
+// ils prennent le curseur plein, en fond de page, avec son ombre portee.
+const bar = variant === "bar";
+
+// La piste seule change : dans la barre elle se lit sur la couleur COURANTE,
+// parce que la barre passe du verre sombre du hero au verre clair une fois le
+// hero depasse, et que le seul reperage fiable est alors la couleur du texte
+// qu'elle vient de fixer. Ailleurs, le fond est connu, la piste prend le role
+// muted.
+const track = bar ? "bg-current/10" : "bg-muted";
+
+// LE CURSEUR EST LE MEME PARTOUT, et il est en FOND DE PAGE, pas en couleur
+// courante. Un curseur pose en currentColor donnait un gris sur un gris : la
+// piece bougeait, mais rien ne la faisait exister comme un objet. En fond de
+// page il devient une pastille pleine, et le contraste s'inverse tout seul au
+// bon endroit : blanche sur la piste pale en theme clair, sombre sur la piste
+// ocean en theme sombre, et blanche sur le verre du hero. L'ombre portee et le
+// filet le decollent : c'est ce qui separe un interrupteur d'un aplat.
+const thumb = "bg-background border-border shadow-float border";
+
+// La langue active se lit SUR le curseur, jamais sur la piste : sa couleur est
+// donc celle du texte de page et non la couleur courante. Sans cela, sur le
+// verre sombre du hero, le libelle actif serait blanc sur une pastille blanche.
+const on = "text-foreground";
+const off = bar ? "text-current/60 hover:text-current/90" : "text-muted-foreground hover:text-foreground";
 ---
 
 {
   compact ? (
-    // --- Deux langues : un segmente ---------------------------------------
+    // --- Deux langues : un interrupteur -------------------------------------
     // Le libelle complet reste dans aria-label ; l'oeil lit "EN FR", le lecteur
     // d'ecran entend "English" et "Francais". Les deux publics sont servis.
     <div
-      class:list={[
-        "flex items-center gap-0.5 rounded-pill p-0.5",
-        variant === "bar" ? "bg-current/10" : "bg-muted",
-        className,
-      ]}
+      class:list={["ls grid", bar ? "ls--bar" : "ls--inline", track, className]}
+      style={`--ls-index:${activeIndex}`}
+      data-active={activeIndex}
+      data-slot="locale-switcher"
       role="group"
       aria-label={t.nav.switchLanguage}
-      data-slot="locale-switcher"
     >
+      <span class:list={["ls__thumb", thumb]} aria-hidden="true" />
+
       {alternates.map((alt) =>
         alt.current ? (
-          <span
-            class:list={[
-              segment,
-              variant === "bar"
-                ? "bg-current/15 text-current"
-                : "bg-background text-foreground shadow-float",
-            ]}
-            aria-current="true"
-            lang={alt.hreflang}
-          >
+          <span class:list={["ls__label", on]} aria-current="true" lang={alt.hreflang}>
             <span class="sr-only">{alt.label}, </span>
             <span aria-hidden="true">{alt.short}</span>
           </span>
         ) : (
           <a
+            class:list={[
+              "ls__label ls__link",
+              "focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none",
+              off,
+            ]}
             href={alt.href}
             hreflang={alt.hreflang}
             lang={alt.hreflang}
             aria-label={alt.label}
             data-astro-reload
-            class:list={[
-              segment,
-              variant === "bar"
-                ? "text-current/60 hover:bg-current/10 hover:text-current"
-                : "text-muted-foreground hover:text-foreground",
-            ]}
           >
             <span aria-hidden="true">{alt.short}</span>
           </a>
@@ -143,27 +198,166 @@ const segment = [
   )
 }
 
-<script>
-  // Un choix explicite dans ce selecteur pose un cookie, et ce cookie prime
-  // ensuite sur l'en-tete Accept-Language du navigateur. Sans lui, un
-  // francophone qui veut lire la version anglaise serait renvoye en francais
-  // a chaque navigation : la detection automatique deviendrait une prison.
-  //
-  // Un an de duree : c'est une preference, pas une session. SameSite=Lax pour
-  // qu'elle survive a une arrivee depuis un lien externe, et pas de Secure en
-  // local pour que le developpement fonctionne aussi.
-  function bind(): void {
-    const root = document.querySelector<HTMLElement>("[data-slot='locale-switcher']");
-    if (!root || root.dataset.bound === "true") return;
-    root.dataset.bound = "true";
+<style>
+  /* La piste. Deux colonnes egales, aucune gouttiere : c'est ce qui permet au
+     curseur de faire exactement une colonne et de tomber au pixel sur l'autre
+     en se translatant de sa propre largeur. isolation cree le contexte
+     d'empilement, pour que le curseur reste sous les libelles sans que le
+     z-index n'aille chercher quoi que ce soit dans la page. */
+  /* AUCUN display ICI, ET C'EST LA REGLE LA PLUS IMPORTANTE DE CE FICHIER.
+     Un bloc <style> de composant Astro voit son selecteur suffixe par
+     l'attribut de portee : ".ls" pese donc deux classes et bat n'importe quel
+     utilitaire Tailwind. Ecrire "display: grid" ici annulait le retrait du
+     selecteur sur telephone, et l'interrupteur s'affichait sur iPhone, colle
+     entre le mot-marque et le bouton d'achat. Constate sur une capture en
+     390, pas deduit. C'est le piege d'affichage decrit dans AGENTS.md, dans sa
+     version la plus sournoise, parce que la classe fautive n'est meme pas
+     visible dans le markup.
 
-    root.addEventListener("click", (event) => {
-      const link = (event.target as HTMLElement | null)?.closest?.("a[hreflang]");
+     L'affichage est donc un utilitaire, "grid", pose dans la liste de classes,
+     et l'appelant le corrige avec une VARIANTE, jamais avec un utilitaire de
+     base : "max-sm:hidden" pour retirer la barre du telephone,
+     "sm:hidden" pour retirer celui du tiroir mobile au-dela. Une variante est
+     toujours emise apres les utilitaires de base, donc elle gagne a coup sur ;
+     deux utilitaires de base (grid et hidden) se departageraient sur l'ordre
+     du fichier CSS genere, c'est-a-dire sur rien de lisible. */
+  .ls {
+    position: relative;
+    isolation: isolate;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: var(--ls-pad);
+    border-radius: 999px;
+  }
+
+  /* Deux tailles, et l'ecart n'est pas cosmetique. Dans la barre, le selecteur
+     n'apparait qu'a partir de 640 px, c'est-a-dire sur un appareil a pointeur :
+     36 px de haut suffisent et la barre reste fine. Dans le tiroir mobile et
+     dans le pied de page, on le touche au doigt : 44 px, la cible tactile de
+     la maison, sans exception. */
+  .ls--bar {
+    --ls-pad: 3px;
+    height: 2.25rem;
+  }
+
+  .ls--inline {
+    --ls-pad: 4px;
+    height: 2.75rem;
+  }
+
+  /* Le curseur. Une colonne de large : la piste mesure 100 pour cent moins deux
+     fois la reserve, donc une colonne vaut 50 pour cent moins une reserve. */
+  .ls__thumb {
+    position: absolute;
+    z-index: 0;
+    top: var(--ls-pad);
+    bottom: var(--ls-pad);
+    left: var(--ls-pad);
+    width: calc(50% - var(--ls-pad));
+    border-radius: 999px;
+    translate: calc(var(--ls-index, 0) * 100%) 0;
+    /* La courbe est celle des feuilles du systeme : depart franc, arrivee
+       longue et sans rebond. Une ease-out ordinaire donne un objet qui freine
+       trop tot et qui a l'air leger. */
+    transition:
+      translate 340ms cubic-bezier(0.32, 0.72, 0, 1),
+      scale 220ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  /* flex: 1 1 0 est une ceinture. La disposition est une grille a deux colonnes
+     egales ; si un appelant repassait un jour le composant en flex, les deux
+     libelles garderaient exactement la moitie chacun, ce dont depend le
+     curseur qui se translate de 100 pour cent de sa propre largeur. */
+  .ls__label {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: color 200ms ease;
+  }
+
+  /* Meme graisse des deux cotes : seule la couleur distingue l'actif. Faire
+     grossir la lettre active decalerait l'autre a chaque bascule. */
+  .ls--bar .ls__label {
+    font-size: 0.75rem;
+    min-width: 2.25rem;
+  }
+
+  .ls--inline .ls__label {
+    font-size: 0.8125rem;
+    min-width: 2.75rem;
+  }
+
+  .ls__link {
+    text-decoration: none;
+  }
+
+  /* L'avance au survol : le curseur part de sept pour cent vers la langue
+     visee. Le selecteur ne se declenche que sur le survol du LIEN, donc jamais
+     quand on passe sur la langue deja active. */
+  .ls[data-active="0"]:has(.ls__link:hover) .ls__thumb {
+    translate: 7% 0;
+  }
+
+  .ls[data-active="1"]:has(.ls__link:hover) .ls__thumb {
+    translate: 93% 0;
+  }
+
+  /* L'appui elargit le curseur. 1.03 et pas davantage : la reserve autour de
+     lui fait 3 px, au-dela il toucherait le bord de la piste. */
+  .ls:active .ls__thumb {
+    scale: 1.03 1;
+  }
+</style>
+
+<script>
+  // Une seule ecoute, posee sur le document. La page peut porter TROIS
+  // selecteurs (la barre, le tiroir mobile, le pied de page) : la version
+  // precedente n'en accrochait qu'un seul, celui trouve en premier, donc un
+  // clic dans le pied de page ne posait pas le cookie de langue. Une ecoute
+  // deleguee n'a pas ce defaut, et elle survit aux view transitions sans avoir
+  // a se rebrancher, puisque le document, lui, n'est jamais remplace.
+  function bind(): void {
+    if (document.documentElement.dataset.localeSwitcherBound === "true") return;
+    document.documentElement.dataset.localeSwitcherBound = "true";
+
+    document.addEventListener("click", (event) => {
+      const target = event.target as HTMLElement | null;
+      const link = target?.closest?.("[data-slot='locale-switcher'] a[hreflang]");
       if (!(link instanceof HTMLAnchorElement)) return;
-      const locale = link.getAttribute("hreflang");
-      if (!locale) return;
-      const secure = location.protocol === "https:" ? "; Secure" : "";
-      document.cookie = `aloha_locale=${encodeURIComponent(locale)}; Path=/; Max-Age=31536000; SameSite=Lax${secure}`;
+
+      // 1. Le cookie. Un choix explicite prime ensuite sur l'en-tete
+      //    Accept-Language du navigateur. Sans lui, un francophone qui veut
+      //    lire la version anglaise serait renvoye en francais a chaque
+      //    navigation : la detection automatique deviendrait une prison.
+      //
+      //    Un an de duree : c'est une preference, pas une session. SameSite=Lax
+      //    pour qu'elle survive a une arrivee depuis un lien externe, et pas de
+      //    Secure en local pour que le developpement fonctionne aussi.
+      const chosen = link.getAttribute("hreflang");
+      if (chosen) {
+        const secure = location.protocol === "https:" ? "; Secure" : "";
+        document.cookie = `aloha_locale=${encodeURIComponent(chosen)}; Path=/; Max-Age=31536000; SameSite=Lax${secure}`;
+      }
+
+      // 2. Le glissement, avant le depart. La page va etre rechargee, donc si
+      //    le curseur attendait l'arrivee il sauterait sans jamais glisser.
+      //    L'index se lit dans le DOM plutot que d'etre suppose : c'est la
+      //    position reelle du lien parmi les libelles.
+      const root = link.closest<HTMLElement>("[data-slot='locale-switcher']");
+      if (!root) return;
+      const labels = Array.from(root.querySelectorAll(".ls__label"));
+      const index = labels.indexOf(link);
+      if (index < 0) return;
+      root.dataset.active = String(index);
+      root.style.setProperty("--ls-index", String(index));
     });
   }
 
