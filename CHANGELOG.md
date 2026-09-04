@@ -6,7 +6,23 @@ Every theme in the family carries the same version number, so a number that
 moves here moved in all seven. The dated working notes behind each entry, with
 the reasoning and the files, are in `wiki/log.md`.
 
-Current version: **1.7.0**.
+Current version: **1.7.1**.
+
+## 1.7.1 - 2026-09-04
+
+Aloha's title mask stops clipping letters, and the whole family takes its
+number.
+
+- In Aloha, `SplitReveal` reveals a title word by word behind a mask, and that
+  mask kept cutting descenders, accents and the last glyph of every word once
+  the word had landed. It is now lifted the moment the motion ends. The same
+  release keeps the second hero button of Aloha inside its glass between 1024
+  and 1280 px. Neither fix reaches THIS theme: it does not carry `SplitReveal`,
+  and its demo was measured the same way and has no such overflow.
+- Not one line of code changed in THIS theme. Two files differ from 1.7.0 and
+  both are paperwork: `package.json` for the number, and this changelog.
+  Every other byte is the byte of 1.7.0. Reef stays MIT and its LICENSE does
+  not move.
 
 ## 1.7.0 - 2026-09-02
 
