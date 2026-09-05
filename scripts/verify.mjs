@@ -37,6 +37,16 @@ import { PROBE } from "./verify.probe.mjs";
 const ROOT = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
 const DIST = join(ROOT, "dist");
 const WIDTHS = [390, 768, 1440];
+// LES DEUX MODES, ET POURQUOI LE SOMBRE MANQUAIT. Le 5 septembre 2026 l'editeur
+// a vu, sur l'accueil de alohapixel.com en mode sombre, trois cartes blanches
+// au texte clair : illisibles. Le banc les avait declarees saines parce qu'il
+// ne mesurait que le mode clair. Un jeton qui suit le theme (bg-card) se
+// retourne avec lui ; un blanc ecrit en dur (bg-white) reste blanc sous un
+// texte devenu clair. Le banc mesure donc chaque page dans les deux modes : le
+// sombre est pose par la meme cle de stockage que lit ThemeInit, avant tout
+// script de la page.
+const MODES = ["clair", "sombre"];
+const THEME_KEY = "reef-theme";
 const TARGET_MIN = 44;
 
 let chromium;
@@ -139,12 +149,16 @@ const browser = await chromium.launch({
 });
 const findings = [];
 
-for (const width of WIDTHS) {
+for (const mode of MODES) for (const width of WIDTHS) {
   const context = await browser.newContext({
     viewport: { width, height: 900 },
     deviceScaleFactor: 1,
     reducedMotion: "reduce",
+    colorScheme: mode === "sombre" ? "dark" : "light",
   });
+  if (mode === "sombre") {
+    await context.addInitScript(([k]) => localStorage.setItem(k, "dark"), [THEME_KEY]);
+  }
   for (const route of routes) {
     const page = await context.newPage();
     // Tout ce qui n'est pas servi par le dossier dist/ est refuse. Ce n'est pas
@@ -173,8 +187,8 @@ for (const width of WIDTHS) {
     // double ; le gain est que chacune tient sous le plafond de la maison et
     // se lit d'une traite.
     const arg = { TARGET_MIN, asked: width };
-    for (const f of await page.evaluate(PROBE, arg)) findings.push({ ...f, width, route });
-    for (const f of await page.evaluate(LISIBILITE, arg)) findings.push({ ...f, width, route });
+    for (const f of await page.evaluate(PROBE, arg)) findings.push({ ...f, width, route, mode });
+    for (const f of await page.evaluate(LISIBILITE, arg)) findings.push({ ...f, width, route, mode });
     await page.close();
   }
   await context.close();
@@ -187,7 +201,7 @@ server.close();
 /* Le rapport                                                          */
 /* ------------------------------------------------------------------ */
 
-console.log(`Banc de rendu : ${routes.length} page(s) x ${WIDTHS.length} largeurs (${WIDTHS.join(", ")}px).`);
+console.log(`Banc de rendu : ${routes.length} page(s) x ${WIDTHS.length} largeurs (${WIDTHS.join(", ")}px) x ${MODES.length} modes (${MODES.join(", ")}).`);
 
 if (findings.length === 0) {
   console.log("Aucun defaut de rendu.");
@@ -196,7 +210,7 @@ if (findings.length === 0) {
 
 const byRule = new Map();
 for (const f of findings) {
-  const key = `${f.rule}|${f.route}|${f.detail}|${f.node}`;
+  const key = `${f.rule}|${f.mode}|${f.route}|${f.detail}|${f.node}`;
   const seen = byRule.get(key);
   if (seen) seen.widths.push(f.width);
   else byRule.set(key, { ...f, widths: [f.width] });
@@ -206,7 +220,7 @@ const order = ["coupe", "affichage", "debordement", "encre", "contraste", "cible
 const rows = [...byRule.values()].sort((a, b) => order.indexOf(a.rule) - order.indexOf(b.rule));
 console.error(`\n${rows.length} defaut(s) :\n`);
 for (const r of rows) {
-  console.error(`  [${r.rule}] ${r.route} @ ${r.widths.join("/")}px`);
+  console.error(`  [${r.rule}] ${r.route} @ ${r.widths.join("/")}px${r.mode === "sombre" ? " (sombre)" : ""}`);
   console.error(`      ${r.detail}${r.node ? `  (${r.node})` : ""}`);
 }
 process.exit(1);

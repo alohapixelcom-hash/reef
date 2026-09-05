@@ -67,6 +67,18 @@ written with floor-3 roles is dark-ready with zero `dark:` classes. Reach
 for `dark:` only for effects a role cannot express; if you are writing
 `dark:bg-...` for a color role, the token layer is the place to fix.
 
+A surface written `bg-white` or as a hex value stays white in dark mode while
+its text, written with a token, turns light: on 5 September 2026 three such
+cards on the alohapixel.com home page rendered light text on a white ground,
+unreadable. So a surface ALWAYS carries a role (`bg-card`, `bg-surface`,
+`bg-background`) and its text the matching role (`text-card-foreground`,
+`text-foreground`, `text-muted-foreground`). `bg-white` is admitted only under
+text written with the one ink token that never follows the theme (`text-scrim`
+here, `text-ink` / `text-ink-soft` on alohapixel.com): a white card meant to
+stay white, such as a third-party embed or the hero button on a photograph.
+The render bench (`pnpm verify`) now measures both modes and catches a surface
+that forgot its role.
+
 ## Variants and merging
 
 - Component variants use `tv()` from tailwind-variants, and the config is

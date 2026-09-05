@@ -129,6 +129,7 @@ export const PROBE = ({ asked }) => {
      de sa pastille. Une regle documentee n'est pas une regle tenue. */
   const BREAKPOINT = { sm: 640, md: 768, lg: 1024, xl: 1280, "2xl": 1536 };
   const DISPLAY = /^(block|flex|inline-flex|grid|inline|inline-block|inline-grid|table|contents|flow-root)$/;
+  const sombre = document.documentElement.classList.contains("dark");
   for (const el of document.querySelectorAll(".hidden")) {
     if (getComputedStyle(el).display === "none") continue;
     // Un "hidden sm:flex" DOIT s'afficher a 640 et au-dela : ce n'est pas un
@@ -136,11 +137,23 @@ export const PROBE = ({ asked }) => {
     // d'affichage declaree sur l'element, et on ne signale que si le rendu
     // contredit l'auteur : visible en dessous de sa propre bascule, ou visible
     // alors qu'aucune bascule n'a ete demandee.
-    const classes = typeof el.className === "string" ? el.className.split(/\s+/) : [];
+    // L'attribut, et non la propriete className : sur un <svg>, className est
+    // un SVGAnimatedString, pas une chaine, et l'ancienne lecture rendait une
+    // liste vide. L'icone de l'interrupteur de theme n'avait donc jamais de
+    // bascule aux yeux du banc.
+    const classes = (el.getAttribute("class") ?? "").split(/\s+/);
     let from = Infinity;
     for (const cls of classes) {
       const [prefix, value] = cls.split(":");
       if (value && DISPLAY.test(value) && BREAKPOINT[prefix]) from = Math.min(from, BREAKPOINT[prefix]);
+      // Le mode sombre est une bascule comme les autres. La lune de
+      // l'interrupteur de theme s'ecrit "hidden dark:block" : masquee en clair,
+      // affichee en sombre, et c'est l'auteur qui l'a demande. Depuis que le
+      // banc mesure les deux modes (5 septembre 2026), un element qui porte une
+      // variante dark: d'affichage sur une page dont <html> porte .dark est
+      // affiche a dessein. Sans cette clause, la premiere passe sombre a
+      // signale cette icone sur chacune des cinquante-quatre pages de Reef.
+      if (value && DISPLAY.test(value) && prefix === "dark" && sombre) from = 0;
     }
     if (VW >= from) continue;
     const declared = from === Infinity ? "aucune bascule declaree" : `sa bascule est a ${from}px`;
