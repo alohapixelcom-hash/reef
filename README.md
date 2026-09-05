@@ -1,7 +1,7 @@
 <!-- README.md - the front page of the repo: what Reef is, what it contains, how to run it, what to do before deploying. -->
 
 <p align="center">
-  <img src="https://alohapixel.app/astro-preview/reef.jpg" alt="Reef, a free bilingual blog theme for Astro, shown on desktop and on an iPhone" width="900">
+  <img src="https://alohapixel.app/screenshots/theme-reef.webp" alt="Reef, a free bilingual blog theme for Astro: the home page hero, shown on desktop" width="720">
 </p>
 
 <h1 align="center">Reef</h1>
@@ -223,16 +223,21 @@ Pull requests are welcome all the same.
 
 ## License
 
-MIT, full text in LICENSE. Use it, fork it, sell what you build with it, no
-attribution required. Republishing Reef itself as your own theme is what the
+MIT, full text in [LICENSE](LICENSE), which holds the MIT text and nothing else
+so that GitHub reads it correctly. Use it, fork it, sell what you build with it,
+no attribution required. Republishing Reef itself as your own theme is what the
 MIT license already allows, so there is nothing to negotiate here.
 
-The photographs are covered separately, and LICENSE section 2 says so in full:
-the ten photographs in src/assets/ come from Pexels and carry the Pexels
+The photographs are covered separately, and [NOTICE.md](NOTICE.md) says so in
+full: the ten photographs in src/assets/ come from Pexels and carry the Pexels
 licence, which is free for commercial and personal use, requires no attribution
 and allows redistribution. Keep them in the site you publish with Reef, or
 replace them with your own; both are inside the licence. scripts/covers.mjs is a
 plain list of URLs, and a post with no cover falls back to a typographic card.
 PHOTOS.md names the Pexels page of every single file.
+
+NOTICE.md carries the rest of what the MIT grant does and does not reach: the
+photographs, the demo content, and the fonts and npm packages inventoried in
+THIRD-PARTY.md. Nothing there restricts the MIT grant.
 
 Provided as is, without warranty.
