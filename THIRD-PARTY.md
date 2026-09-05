@@ -42,7 +42,7 @@ The theme ships ten photographs: one full-bleed hero and nine article covers.
 They come from Pexels and are used under the Pexels licence
 (https://www.pexels.com/license/), which is free for commercial and personal
 use, requires no attribution and allows modification and redistribution. That is
-the split LICENSE section 2 states in full: MIT for the code, Pexels for the
+the split NOTICE.md section 1 states in full: MIT for the code, Pexels for the
 photographs, and both permissive.
 
 You may keep these photographs in the site you publish with Reef, or replace
