@@ -19,7 +19,9 @@ const t = useTranslations(locale);
 
 {/* Le titre visible de cette section est celui de la carte : le surtitre sert
     de nom accessible plutot que d'ajouter un second titre qui dirait la meme
-    chose une ligne plus haut. */}
+    chose une ligne plus haut. C'est aussi pourquoi la carte ne porte plus
+    d'etiquette "A la une" : elle aurait dit une troisieme fois ce que ce
+    surtitre dit deja (regle 12, 5 septembre 2026). */}
 <section
   class="container-page py-14 md:py-20"
   aria-labelledby="featured-eyebrow"
@@ -33,5 +35,5 @@ const t = useTranslations(locale);
     {t.home.featuredEyebrow}
   </p>
 
-  <FeaturedPostCard {entry} {locale} label={t.home.featuredLabel} as="h2" />
+  <FeaturedPostCard {entry} {locale} as="h2" />
 </section>
