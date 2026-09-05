@@ -30,16 +30,23 @@ import type { ResolvedPost } from "@js/posts";
 import { Image } from "astro:assets";
 import { topicTone } from "./topicTone";
 
+// PLUS DE PASTILLE "A LA UNE", ET PLUS DE PROP POUR LA PORTER.
+//
+// Une etiquette pleine, arrondie, posee en haut a gauche pour annoncer que ce
+// billet est le billet mis en avant : elle ne disait rien que le surtitre de
+// la section, six pixels au-dessus, ne dise deja ("La note du mois"), et elle
+// poussait le titre vers le bas. C'est la regle 12 de la maison, posee le
+// 5 septembre 2026 : ce qui n'est ni cliquable ni saisissable ne prend pas de
+// pastille, et une pastille qui repete son voisin ne se degraisse pas, elle
+// s'enleve. Le chip de sujet reste : lui est un vrai lien.
 type Props = {
   entry: ResolvedPost;
   locale: Locale;
-  /** Etiquette posee en haut a gauche, du dictionnaire (jamais ecrite en dur). */
-  label?: string;
   as?: "h2" | "h3";
   class?: string;
 };
 
-const { entry, locale, label, as: Tag = "h2", class: className }: Props = Astro.props;
+const { entry, locale, as: Tag = "h2", class: className }: Props = Astro.props;
 const { post, author, topic, slug, topicSlug, minutes } = entry;
 
 const t = useTranslations(locale);
@@ -62,13 +69,6 @@ const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: m
   <div class="grid items-stretch lg:grid-cols-12">
     <div class="flex flex-col gap-5 p-7 sm:p-10 lg:col-span-7 lg:p-12">
       <p class="flex flex-wrap items-center gap-x-3 gap-y-2">
-        {
-          label && (
-            <span class="bg-primary text-primary-foreground font-sans rounded-pill px-3 py-1 text-xs font-medium tracking-[0.12em] uppercase">
-              {label}
-            </span>
-          )
-        }
         <a
           href={topicHref}
           class:list={["font-sans rounded-pill relative z-10 px-2.5 py-1 text-xs font-medium", tone.chip]}
