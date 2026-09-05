@@ -31,3 +31,8 @@ src/assets/*.webp
 # docs/conventions/.
 .cursor/
 .windsurf/
+
+# Systeme et journaux.
+.DS_Store
+Thumbs.db
+*.log
