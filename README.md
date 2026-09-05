@@ -106,6 +106,9 @@ pnpm install
 pnpm dev        # http://localhost:4321
 ```
 
+`pnpm dev` fetches the demo photographs into `src/assets/` before the server
+starts, because the repository does not version them.
+
 All commands:
 
 ```bash
