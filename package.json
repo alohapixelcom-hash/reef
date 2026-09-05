@@ -32,6 +32,7 @@
     "check": "astro check",
     "covers": "node scripts/covers.mjs",
     "dev": "astro dev",
+    "predev": "node scripts/covers.mjs",
     "lint:house": "node scripts/house.mjs",
     "og": "node scripts/og.mjs",
     "poster": "node scripts/poster.mjs",
