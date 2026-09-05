@@ -49,9 +49,15 @@ export default defineConfig({
       // pose ses commentaires et ses noms de propriete a 3,49 pour 1 sur le
       // fond du bloc, quand WCAG AA en demande 4,5 pour du texte courant. Un
       // billet technique dont le code est le contenu principal ne peut pas se
-      // permettre de le rendre a la limite du lisible. Le sombre passe deja,
-      // il ne bouge pas.
-      themes: { light: "github-light-high-contrast", dark: "github-dark-dimmed" },
+      // permettre de le rendre a la limite du lisible.
+      //
+      // Le sombre a ete cru sain jusqu'au 5 septembre 2026, jour ou le banc a
+      // mesure le mode sombre pour la premiere fois : "github-dark-dimmed"
+      // pose ses commentaires (#768390) a 3,88 pour 1 sur son propre fond
+      // (#22272e), sur dix billets. "github-dark-default" les pose a 6,15 et
+      // aucun de ses jetons ne descend sous ce chiffre ; il reste dans la meme
+      // famille GitHub, donc les memes teintes de mot-cle et de chaine.
+      themes: { light: "github-light-high-contrast", dark: "github-dark-default" },
       wrap: true,
     },
   },

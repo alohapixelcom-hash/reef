@@ -198,7 +198,8 @@
     font-size: inherit;
   }
 
-  /* Deux themes Shiki sont emis (github-light et github-dark-dimmed) : les
+  /* Deux themes Shiki sont emis (github-light-high-contrast et
+   * github-dark-default, voir astro.config.mjs) : les
    * couleurs claires arrivent en style inline, les sombres dans des variables
    * --shiki-dark-*. Sans ce bloc, le bloc de code reste clair sur une page
    * sombre, ce qui est la premiere chose qu'on remarque et la derniere qu'on
