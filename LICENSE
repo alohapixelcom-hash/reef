@@ -1,11 +1,3 @@
-LICENSE - Reef is free and open source under the MIT license. The photographs
-shipped with it come from Pexels and carry the Pexels licence, which is at
-least as permissive. Both rules are written in full below.
-
-===============================================================================
-1. THE CODE - MIT LICENSE
-===============================================================================
-
 MIT License
 
 Copyright (c) 2026 Aloha Pixel
@@ -27,50 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-===============================================================================
-2. THE PHOTOGRAPHS - PEXELS LICENCE
-===============================================================================
-
-The MIT license above covers the source code, the styles, the icons, the
-documentation and the build scripts.
-
-The ten photographs in src/assets/ and src/assets/covers/ come from Pexels and
-are used under the Pexels licence: https://www.pexels.com/license/
-
-That licence is free for commercial and personal use, requires no attribution,
-and allows modification. PHOTOS.md at the root of this repository lists every
-file with the Pexels page it came from, so the provenance of each image can be
-checked in one place.
-
-You may keep these photographs in the site you publish with Reef, or replace
-them with your own. Both are inside the licence. The one restriction the Pexels
-licence carries has nothing to do with using this theme: an unaltered photo may
-not be resold as a stock image, a print or a poster.
-
-The zip archive of Reef ships every photograph already, so a build from the
-archive needs no network. A build from the repository fetches them once from
-Pexels through scripts/covers.mjs, which is a plain list of URLs.
-
-Deleting them is safe and supported: remove the `cover` field from a post and
-the layout falls back to a typographic card. Nothing in the code depends on a
-specific image.
-
-===============================================================================
-3. DEMO CONTENT
-===============================================================================
-
-The demo copy, the fictional publication "Reef Notes", its fictional authors,
-their fictional articles and every number quoted in them are demonstration
-material. They are covered by the MIT grant above, and they describe nobody.
-
-Replace them in production. Do not present fictional testimonials, fictional
-ratings or fictional people as real.
-
-===============================================================================
-4. THIRD-PARTY MATERIAL
-===============================================================================
-
-Reef embeds fonts and depends on npm packages that carry their own licenses.
-The complete inventory, with the license of each item, is in THIRD-PARTY.md.
-Nothing in this file overrides those licenses.
