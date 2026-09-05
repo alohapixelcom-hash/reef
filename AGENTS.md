@@ -153,6 +153,19 @@ work is done".
    everywhere, visible focus, reduced motion respected at both layers.
 10. New third-party anything (package, font, asset) gets a THIRD-PARTY.md
     entry in the same change. Photos and icon libraries do not enter at all.
+11. NO DECORATIVE PILL, ANYWHERE. A small rounded, translucent label that
+    carries one word and does nothing - a topic, a category, a reference - is
+    a template tic, not information. It almost always repeats what the title,
+    the section eyebrow or the copy already says, and it pushes what the
+    reader came for further down the page. `rounded-pill` stays the shape of
+    BUTTONS, FIELDS and the topic chips, which are real links; an overline is
+    written in small spaced capitals, the way SectionHeader writes its own.
+    The test: if the element is neither clickable nor fillable, it takes no
+    pill, and a pill that says what its neighbour says is removed rather than
+    restyled. House rule of 5 September 2026: the "A la une" label left
+    Cards/FeaturedPostCard.astro that day, because the section eyebrow above
+    the card already said it. The author card's post count stays: a counter is
+    not a label.
 
 ## Gotchas that have already bitten
 
