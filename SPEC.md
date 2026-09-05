@@ -1,91 +1,93 @@
-# Reef - cahier des charges
+<!-- SPEC.md - the brief for Reef: what the theme contains, how it is built, and the rules that hold it together. -->
 
-> Reef est le thème blog de la famille Aloha Pixel, un thème Astro gratuit,
-> bilingue anglais et français. Ce document dit ce que le thème contient,
-> comment il est construit, et les règles qui le tiennent.
+# Reef - the brief
 
-## 0. Ce dépôt
+> Reef is the blog theme of the Aloha Pixel family, a free Astro theme,
+> bilingual in English and French. This document says what the theme contains,
+> how it is built, and the rules that hold it together.
 
-Reef expose une écriture : une publication, ses billets, les auteurs qui les
-signent et les sujets qui les regroupent. Trois collections de contenu typées
-(billets, auteurs, sujets), billets en Markdown ou MDX, flux RSS par langue, et
-dix photographies Pexels (un héros, neuf couvertures) livrées avec la
-démonstration. La publication de démonstration s'appelle Reef Notes et elle est
-fictive : l'utilisateur remplace Reef Notes et garde Reef.
+## 0. This repository
 
-La direction artistique est froide et faite pour la lecture : neutre encre
-bleu nuit, turquoise reef en action, corail en second accent rationné, Space
-Grotesk en affichage et Instrument Sans en corps ; le mot d'accent garde la
-police du titre, passe au turquoise de la maison et porte une vague turquoise
-(la marque Aloha Pixel est une vague). Le thème est clair par défaut, avec un
-mode sombre composé plutôt qu'inversé ; l'anglais tient la racine, le français
-vit sous /fr/.
+Reef puts writing on display: a publication, its posts, the authors who sign
+them and the topics that group them. Three typed content collections (posts,
+authors, topics), posts in Markdown or MDX, an RSS feed per language, and ten
+Pexels photographs (one hero, nine covers) shipped with the demo. The demo
+publication is called Reef Notes and it is fictional: the user replaces Reef
+Notes and keeps Reef.
 
-## 1. Ce que le dépôt contient, mesuré
+The art direction is cold and made for reading: midnight-blue ink as the
+neutral, reef turquoise for action, coral as a rationed second accent, Space
+Grotesk for display and Instrument Sans for body text; the accent word keeps the
+heading font, turns the house turquoise and carries a turquoise wave (the Aloha
+Pixel mark is a wave). The theme is light by default, with a dark mode composed
+rather than inverted; English holds the root, French lives under /fr/.
 
-Chiffres recomptés depuis la source (`pnpm build` vert, `astro check` à 0/0/0).
+## 1. What the repository contains, measured
 
-| Élément | Quantité |
+Numbers recounted from the source (`pnpm build` green, `astro check` at 0/0/0).
+
+| Item | Count |
 |---|---|
-| Pages rendues par `pnpm build` | 55 |
-| Collections de contenu | 3 (billets, auteurs, sujets), validées par zod |
-| Contenu de démonstration | 9 billets, 3 auteurs, 5 sujets, dans 2 langues |
-| Primitives UI (`src/components/ui`) | 36 familles, 63 fichiers `.astro` |
-| Composants Section | 24 |
-| Icônes dessinées à la main | 60 |
-| Utilitaires `animate-*` | 55 au catalogue, plus 3 animations de marque |
-| Langues | 2 (anglais à la racine, français sous /fr/) |
-| Pages de wiki | 11 |
-| Fichiers de conventions (`docs/conventions/`) | 5 |
-| Dépendances d'exécution | 9, chacune tracée dans THIRD-PARTY.md |
+| Pages rendered by `pnpm build` | 55 |
+| Content collections | 3 (posts, authors, topics), validated by zod |
+| Demo content | 9 posts, 3 authors, 5 topics, in 2 languages |
+| UI primitives (`src/components/ui`) | 36 families, 63 `.astro` files |
+| Section components | 24 |
+| Hand-drawn icons | 60 |
+| `animate-*` utilities | 55 in the catalog, plus 3 brand animations |
+| Languages | 2 (English at the root, French under /fr/) |
+| Wiki pages | 11 |
+| Convention files (`docs/conventions/`) | 5 |
+| Runtime dependencies | 9, each one tracked in THIRD-PARTY.md |
 
-## 2. Les sous-systèmes
+## 2. The subsystems
 
-- **Tokens Tailwind v4 CSS-first** : palette brute (ink le neutre, reef le
-  turquoise d'action, coral le second accent), puis alias sémantiques
-  `--reef-*`, puis utilitaires. Le markup n'écrit qu'un rôle (`bg-primary`), jamais une couleur.
-  Le mode sombre ne fait que réaffecter l'étage 2, et `.on-dark` repeint un
-  sous-arbre sombre dans une page claire.
-- **Primitives zéro-JS d'abord** : `Dialog` est un `<dialog>` natif, `Accordion`
-  un groupe `<details>` ; Escape, backdrop et exclusivité viennent du
-  navigateur. Variants en `tailwind-variants`. 10 des 63 fichiers portent un
+- **CSS-first Tailwind v4 tokens**: raw palette (ink the neutral, reef the
+  action turquoise, coral the second accent), then `--reef-*` semantic aliases,
+  then utilities. The markup writes only a role (`bg-primary`), never a colour.
+  Dark mode only reassigns level 2, and `.on-dark` repaints a dark subtree
+  inside a light page.
+- **Zero-JS-first primitives**: `Dialog` is a native `<dialog>`, `Accordion` a
+  group of `<details>`; Escape, backdrop and exclusivity come from the
+  browser. Variants in `tailwind-variants`. 10 of the 63 files carry a
   `<script>`.
-- **Collections de contenu** : billets (Markdown/MDX), auteurs et sujets (JSON),
-  glob-chargés et validés par zod, classés par langue. Les billets brouillons se
-  construisent pour l'aperçu mais restent hors des listes, du RSS et de llms.txt.
-- **Couche SEO possédée** : `BaseHead` écrit meta, canonical et OG à la main,
-  constructeurs JSON-LD maison (Organization, WebSite, Article, BreadcrumbList),
-  `robots.txt`, `llms.txt` et un flux RSS par langue, sitemap. Zéro paquet SEO.
-- **Catalogue de motion** : portage sans dépendance, 55 utilitaires `animate-*`,
-  garde-fou `prefers-reduced-motion` à trois étages.
-- **Config typée** : données de site en `satisfies` et `as const`, types dérivés.
-- **Self-checks** : `schema.selfcheck.ts` et `pagination.selfcheck.ts`, sans
-  framework de test.
-- **Formulaire de contact** : écrit dans `contact.astro` mais livré sans
-  `action`, pour ne pas imposer d'hébergeur ni de prestataire à l'utilisateur.
+- **Content collections**: posts (Markdown/MDX), authors and topics (JSON),
+  glob-loaded and validated by zod, sorted by language. Draft posts build for
+  preview but stay out of the lists, the RSS and llms.txt.
+- **Owned SEO layer**: `BaseHead` writes meta, canonical and OG by hand,
+  in-house JSON-LD builders (Organization, WebSite, Article, BreadcrumbList),
+  `robots.txt`, `llms.txt` and one RSS feed per language, sitemap. Zero SEO
+  package.
+- **Motion catalog**: a dependency-free port, 55 `animate-*` utilities, a
+  three-level `prefers-reduced-motion` guard.
+- **Typed config**: site data in `satisfies` and `as const`, derived types.
+- **Self-checks**: `schema.selfcheck.ts` and `pagination.selfcheck.ts`, with no
+  test framework.
+- **Contact form**: written in `contact.astro` but shipped with no `action`, so
+  as not to impose a host or a provider on the user.
 
-## 3. La base de connaissance et la revue
+## 3. The knowledge base and the review
 
-**`wiki/`** : une base de connaissance markdown maintenue avec le code. Chaque
-page porte un frontmatter et cite du `chemin:ligne` réel, pour que la dérive
-soit détectable.
+**`wiki/`**: a markdown knowledge base maintained alongside the code. Every page
+carries a frontmatter and quotes a real `path:line`, so that drift is
+detectable.
 
-**La revue** : la liste de contrôle en fin de `docs/design.md`, quinze points
-à passer avant toute publication, avec une preuve `chemin:ligne` par constat.
+**The review**: the checklist at the end of `docs/design.md`, fifteen points to
+go through before any release, with one `path:line` proof per finding.
 
-## 4. Règles non négociables
+## 4. Non-negotiable rules
 
-- **Pas de tiret cadratin ni demi-cadratin nulle part.** Dans le code, les
-  commentaires, la copie, la doc. Des traits d'union simples.
-- **Le markup n'écrit que des rôles sémantiques**, jamais un nom de palette ni
-  un hex.
-- **Zéro JavaScript par défaut** ; le filtre, le tri et le sommaire de lecture ne
-  cachent ou ne réordonnent que du markup déjà rendu par le serveur.
-- **Ni React, ni WebGL, ni bibliothèque d'animation.**
-- **Bilingue par construction** : une source par route, une sortie par langue ;
-  une clé de dictionnaire manquante est une erreur de build. Un billet existe
-  deux fois, sous le même slug.
-- **Accessibilité comprise dans le fini** : cibles tactiles de 44px, aria juste,
-  focus visible, mouvement réduit respecté.
-- **Aucun fichier ne dépasse 400 lignes** ; chaque dépendance tierce est tracée
-  dans `THIRD-PARTY.md` avant d'entrer.
+- **No em dash and no en dash anywhere.** Not in the code, the comments, the
+  copy or the documentation. Plain hyphens.
+- **The markup writes only semantic roles**, never a palette name and never a
+  hex.
+- **Zero JavaScript by default**; the filter, the sort and the reading table of
+  contents only hide or reorder markup already rendered by the server.
+- **No React, no WebGL, no animation library.**
+- **Bilingual by construction**: one source per route, one output per language;
+  a missing dictionary key is a build error. A post exists twice, under the same
+  slug.
+- **Accessibility included in the finish**: 44px touch targets, correct aria,
+  visible focus, reduced motion honoured.
+- **No file goes over 400 lines**; every third-party dependency is tracked in
+  `THIRD-PARTY.md` before it comes in.
