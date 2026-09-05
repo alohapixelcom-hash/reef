@@ -1,41 +1,41 @@
-<!-- DEPLOY.md - comment la demo en ligne est publiee. Ne concerne pas le theme lui-meme. -->
+<!-- DEPLOY.md - how the live demo is published. Does not concern the theme itself. -->
 
-# Déploiement de la démo
+# Deploying the demo
 
-`reef.alohapixel.app` est le Worker Cloudflare **reef-demo**. Depuis le
-19 août 2026 il est publié automatiquement par **Workers Builds** à chaque
-push sur `main`. Il n'y a plus rien à lancer depuis un Mac.
+`reef.alohapixel.app` is the Cloudflare Worker **reef-demo**. Since
+19 August 2026 it has been published automatically by **Workers Builds** on
+every push to `main`. There is nothing left to run from a Mac.
 
-| Réglage | Valeur |
+| Setting | Value |
 |---|---|
-| Dépôt | `alohapixelcom-hash/reef` |
-| Branche de production | `main` |
-| Commande de build | `pnpm run build` |
-| Commande de déploiement | `npx wrangler deploy` |
+| Repository | `alohapixelcom-hash/reef` |
+| Production branch | `main` |
+| Build command | `pnpm run build` |
+| Deploy command | `npx wrangler deploy` |
 
-## Trois choses à ne pas casser
+## Three things not to break
 
-**`packageManager: pnpm@11.22.0` dans package.json.** La CI Cloudflare part
-sinon sur pnpm 10, qui ne lit pas la clé `allowBuilds` de
-`pnpm-workspace.yaml` : esbuild et sharp resteraient sans binaire natif, et
-le build échouerait sans dire pourquoi. Vérifié le 19 août sur aloha, où
-l'erreur exacte était `ERROR packages field missing or empty`.
+**`packageManager: pnpm@11.22.0` in package.json.** Otherwise the Cloudflare CI
+starts on pnpm 10, which does not read the `allowBuilds` key of
+`pnpm-workspace.yaml`: esbuild and sharp would be left with no native binary,
+and the build would fail without saying why. Verified on 19 August on aloha,
+where the exact error was `ERROR packages field missing or empty`.
 
-**`run_worker_first = true` dans wrangler.toml.** Sans lui, Cloudflare sert
-`index.html` directement pour `/` et la redirection de langue ne s'exécute
-jamais. C'est aussi pour cela que le worker teste lui-même l'extension du
-chemin : il voit toutes les requêtes et doit laisser passer les feuilles de
-style.
+**`run_worker_first = true` in wrangler.toml.** Without it, Cloudflare serves
+`index.html` directly for `/` and the language redirect never runs. That is also
+why the worker tests the extension of the path itself: it sees every request and
+has to let stylesheets through.
 
-**`wrangler.toml` et `src/worker.ts` appartiennent à la démo.** Ils publient
-`reef.alohapixel.app` et rien d'autre. Le thème, lui, compile en HTML
-statique et se déploie sur n'importe quel hébergeur sans eux.
+**`wrangler.toml` and `src/worker.ts` belong to the demo.** They publish
+`reef.alohapixel.app` and nothing else. The theme itself compiles to static HTML
+and deploys to any host without them.
 
-## Les images
+## The images
 
-Les photographies de `src/assets/` viennent de Pexels et sont sous licence
-Pexels. Elles ne sont pas versionnées : `scripts/covers.mjs` les rapatrie
-avant chaque build, et l'archive du thème les contient déjà. La licence
-Pexels en autorise la redistribution, donc rien n'est retiré à personne.
-`LICENSE` section 2 et `PHOTOS.md` disent lesquelles, et d'où. Les garder ou
-les remplacer par les siennes revient au même du point de vue de la licence.
+The photographs in `src/assets/` come from Pexels and are under the Pexels
+licence. They are not versioned: `scripts/covers.mjs` fetches them before every
+build, and the archive of the theme already contains them. The Pexels licence
+allows redistribution, so nothing is taken away from anyone. `NOTICE.md`
+section 1 and `PHOTOS.md` say which ones, and where from. Keeping them or
+replacing them with your own comes to the same thing as far as the licence is
+concerned.
