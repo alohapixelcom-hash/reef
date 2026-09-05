@@ -27,7 +27,6 @@ export const enPages = {
     // fournit les nombres : notes publiees, sujets, langues servies.
     heroLedger: ["notes published", "threads", "languages"],
     featuredEyebrow: "Pick of the month",
-    featuredLabel: "Featured",
     latestTitle: "Latest notes",
     latestAccent: "Latest",
     latestLede: "The most recent entries, newest first. Everything older waits in the archive.",
