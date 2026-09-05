@@ -26,7 +26,6 @@ export const frPages: Pick<
     heroRecent: "Dernières notes",
     heroLedger: ["notes publiées", "fils", "langues"],
     featuredEyebrow: "La note du mois",
-    featuredLabel: "À la une",
     latestTitle: "Dernières notes",
     latestAccent: "Dernières",
     latestLede: "Les entrées les plus récentes, de la plus fraîche à la plus ancienne. Le reste attend dans les archives.",
