@@ -36,7 +36,6 @@ function setup(section: HTMLElement): Teardown | null {
   const { signal } = stopper;
 
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const wide = window.matchMedia("(min-width: 1025px)");
   const dense = window.matchMedia("(min-resolution: 1.5dppx)");
 
   const portrait = () => window.innerWidth <= 1024 && window.innerHeight >= window.innerWidth;
@@ -49,7 +48,13 @@ function setup(section: HTMLElement): Teardown | null {
     return Boolean(c.saveData) || /^(slow-)?2g$/.test(c.effectiveType ?? "");
   };
 
-  const animated = () => wide.matches && !reduce.matches && !thrifty();
+  // LA SEQUENCE DEFILE AUSSI SUR TELEPHONE. Le moteur exigeait 1025 px de
+  // large et laissait aux telephones une affiche fixe. Depuis le 5 septembre
+  // 2026 la largeur n'est plus un motif de repli : le clip portrait, choisi
+  // dans load(), existe pour ca, et l'amorce lecture-pause du decodeur aussi.
+  // Les seuls replis qui restent sont ceux du lecteur : mouvement reduit et
+  // economie de donnees.
+  const animated = () => !reduce.matches && !thrifty();
 
   const from = Number(section.dataset.from ?? 0);
   const to = Number(section.dataset.to ?? 0);

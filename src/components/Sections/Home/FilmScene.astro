@@ -262,9 +262,10 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     box-shadow: 0 0 0.85em color-mix(in oklab, var(--reef-accent) 70%, transparent);
   }
 
-  /* Repli. Sous 1025 pixels, en mouvement reduit ou en economie de donnees, la
-     section cesse d'etre une sequence : elle redevient un bloc normal, haut
-     d'un ecran, avec son image d'attente et son texte. Aucun morceau de
+  /* Repli. En mouvement reduit ou en economie de donnees, la section cesse
+     d'etre une sequence : elle redevient un bloc normal, haut d'un ecran, avec
+     son image d'attente et son texte. Depuis le 5 septembre 2026 la largeur
+     n'est plus un motif de repli : la sequence defile aussi sur telephone. Aucun morceau de
      message ne depend de l'animation, c'est la condition pour avoir le droit
      d'animer. */
   .film--flat {

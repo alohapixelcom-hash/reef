@@ -8,21 +8,39 @@ the reasoning and the files, are in `wiki/log.md`.
 
 Current version: **1.7.1**.
 
-## 1.7.1 - 2026-09-04
+## 1.7.1 - 2026-09-05
 
-Aloha's title mask stops clipping letters, and the whole family takes its
-number.
+The filmed sequence scrolls on phones too, the render bench measures dark
+mode, and Aloha's title mask stops clipping letters.
 
+- The filmed sequence of the home page (`_film.ts`) now drives the video with
+  the scroll on phones as well. Until this release the engine required 1025 px
+  of width and left phones a still poster; the portrait clip and the play-pause
+  priming of the decoder were already there for this. The only fallbacks left
+  are the reader's own: reduced motion and data saving. The scene that mounts
+  the engine says so in its comment.
+- The render bench (`pnpm verify`) measures every page in both modes, light
+  and dark, and `docs/conventions/tailwind.md` writes the rule the dark pass
+  enforces: a surface always carries a role (`bg-card`, `bg-background`...)
+  and its text the matching role; `bg-white` is admitted only under an ink
+  that does not follow the theme. The probe reads an SVG's class with
+  `getAttribute` (its `className` is an `SVGAnimatedString`) and honours
+  `dark:` display variants.
 - In Aloha, `SplitReveal` reveals a title word by word behind a mask, and that
   mask kept cutting descenders, accents and the last glyph of every word once
   the word had landed. It is now lifted the moment the motion ends. The same
   release keeps the second hero button of Aloha inside its glass between 1024
   and 1280 px. Neither fix reaches THIS theme: it does not carry `SplitReveal`,
   and its demo was measured the same way and has no such overflow.
-- Not one line of code changed in THIS theme. Two files differ from 1.7.0 and
-  both are paperwork: `package.json` for the number, and this changelog.
-  Every other byte is the byte of 1.7.0. Reef stays MIT and its LICENSE does
-  not move.
+- Code comments in the blog posts were at 3.88 to 1 in dark mode: the dark
+  Shiki theme becomes `github-dark-default` (`astro.config.mjs`,
+  `src/styles/prose.css`).
+- Files that differ from 1.7.0 in THIS theme: `package.json`, this changelog,
+  `scripts/verify.mjs`, `scripts/verify.probe.mjs`,
+  `docs/conventions/tailwind.md`, `src/components/Sections/Home/_film.ts` and
+  `src/components/Sections/Home/FilmScene.astro`, `astro.config.mjs` and
+  `src/styles/prose.css`. Reef stays MIT and its LICENSE does not move. A pass
+  holder still has one number to remember, for seven archives.
 
 ## 1.7.0 - 2026-09-02
 
