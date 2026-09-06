@@ -35,12 +35,33 @@ mode, and Aloha's title mask stops clipping letters.
 - Code comments in the blog posts were at 3.88 to 1 in dark mode: the dark
   Shiki theme becomes `github-dark-default` (`astro.config.mjs`,
   `src/styles/prose.css`).
+- No decorative pill, anywhere: the house rule is written in `AGENTS.md`. The
+  featured post card loses its "Featured" label, which said a third time what
+  the section eyebrow already says, and the prop that carried it
+  (`FeaturedPostCard.astro`, `FeaturedPost.astro`, the `featuredLabel` string
+  in both dictionaries). `rounded-pill` stays the shape of buttons, fields and
+  the topic chips, which are real links.
+- `LICENSE` now holds the MIT text and nothing else, so that GitHub and every
+  license scanner read it correctly; what used to sit around it (the Pexels
+  licence of the photographs, the demo content, the third-party material)
+  moved to `NOTICE.md`, new, and `README.md` and `THIRD-PARTY.md` point there.
+  Reef stays MIT: the grant does not change.
+- The public repository speaks English end to end: `DEPLOY.md` and `SPEC.md`
+  are translated. The README header image answers again.
+- `pnpm dev` works on a clean clone: a `predev` script fetches the demo
+  photographs into `src/assets/` before the server starts, because the
+  repository does not version them, and the README says so. `.gitignore` also
+  keeps system files and logs out of the repository.
 - Files that differ from 1.7.0 in THIS theme: `package.json`, this changelog,
-  `scripts/verify.mjs`, `scripts/verify.probe.mjs`,
-  `docs/conventions/tailwind.md`, `src/components/Sections/Home/_film.ts` and
-  `src/components/Sections/Home/FilmScene.astro`, `astro.config.mjs` and
-  `src/styles/prose.css`. Reef stays MIT and its LICENSE does not move. A pass
-  holder still has one number to remember, for seven archives.
+  `.gitignore`, `AGENTS.md`, `DEPLOY.md`, `LICENSE`, `NOTICE.md`, `README.md`,
+  `SPEC.md`, `THIRD-PARTY.md`, `astro.config.mjs`, `scripts/verify.mjs`,
+  `scripts/verify.probe.mjs`, `docs/conventions/tailwind.md`,
+  `src/styles/prose.css`, `src/components/Sections/Home/_film.ts`,
+  `src/components/Sections/Home/FilmScene.astro`,
+  `src/components/Sections/Home/FeaturedPost.astro`,
+  `src/components/Cards/FeaturedPostCard.astro`, `src/i18n/ui/en/pages.ts` and
+  `src/i18n/ui/fr/pages.ts`. A pass holder still has one number to remember,
+  for seven archives.
 
 ## 1.7.0 - 2026-09-02
 
