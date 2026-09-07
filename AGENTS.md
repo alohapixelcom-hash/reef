@@ -99,7 +99,7 @@ pnpm poster     # re-shoot the phone mockup of the home page into public/
 
 pnpm test       # every *.selfcheck.ts and *.test.ts under src/, found by name
 pnpm lint:house # the four mechanical rules of this page, with their exemptions
-pnpm verify     # the render bench: Playwright over dist/ at 390, 768, 1440
+pnpm verify     # the render bench: Playwright over dist/, five widths, both modes
 ```
 
 **What each check does NOT see.** This matters more than the list above,
@@ -115,8 +115,10 @@ work is done".
 - `pnpm verify` measures what was painted: overflow, clipped content, ink
   collisions, contrast, touch targets, heading order, alt text. It cannot
   measure taste. Hierarchy, balance and rhythm stay the review checklist at the
-  end of docs/design.md, run by a human. It also declares contrast
-  UNMEASURABLE over a background image rather than inventing a number.
+  end of docs/design.md, run by a human. It COMPOSITES translucent grounds and
+  translucent ink, so a tinted chip is measured rather than skipped, and it
+  still declares contrast UNMEASURABLE over a photograph rather than inventing
+  a number.
 - `pnpm poster` is not a check, it is a chore with a deadline: the phone
   mockup of the home page holds a SCREENSHOT, so it goes stale the moment the
   brand, the hero copy or the first screen changes. Re-run it after
