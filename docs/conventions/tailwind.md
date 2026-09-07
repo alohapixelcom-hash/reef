@@ -19,7 +19,8 @@ Vite plugin (astro.config.mjs:53). Adding a config file would be a bug.
 3. Utilities, the only floor markup touches: `bg-background`,
    `text-foreground`, `bg-card`, `text-card-foreground`, `bg-primary`,
    `text-primary-foreground`, `bg-muted`, `text-muted-foreground`,
-   `border-border`, `bg-surface`, `text-accent`, `text-accent-text`, `ring-ring`.
+   `border-border`, `bg-surface`, `text-accent`, `text-accent-text`,
+   `text-primary-text`, `ring-ring`.
 
 An eleventh role joined the list on 1 September 2026, and it is the only one
 that exists for a measurement rather than for a meaning: `text-accent-text`.
@@ -31,6 +32,15 @@ carries TEXT or an icon uses `text-accent-text`, one step darker on the same
 ramp. In dark mode the accent already clears AA, so the token simply points
 back at it. Writing `text-accent` on a piece of text is now a bug: the utility
 still exists, because `--color-accent` still has to name the decorative colour.
+
+A twelfth role joined on 7 September 2026, for the same reason and by the same
+split: `text-primary-text`. The turquoise clears AA on white (4.64) and misses
+it the moment it sits on twelve percent of itself, which is exactly what a
+topic label on a post card does: 3.99 to 1, measured. The decorative primary is
+untouched; primary INK on a tinted ground takes one step darker on the same
+ramp, and points back at the primary in dark mode. The render bench composites
+translucent grounds since the same day, so a ground like that is measured now
+instead of being declared unreadable.
 
 Hard rule: palette names never appear in markup. No `bg-ink-900`, no
 `text-coral-400`, no raw hex. Those names exist only inside tokens.css and
