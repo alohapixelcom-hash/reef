@@ -201,11 +201,18 @@ export const PROBE = ({ asked }) => {
         Math.min(b.right, win.right) - Math.max(b.left, win.left) > 0,
     );
     if (!rects.length) return null;
+    // LA BOITE D'ENCRE EST BORNEE PAR LA FENETRE DE DECOUPE. Une ligne dont la
+    // moitie survit passe le filtre au-dessus, mais elle apportait jusqu'ici son
+    // bord droit ENTIER, celui du texte non coupe. Un role d'auteur en `truncate`
+    // rendait donc une boite qui debordait de 36 px dans la colonne voisine,
+    // alors que l'oeil ne voit qu'une ellipse : le banc a signale 44 faux
+    // chevauchements sur un theme a 1024 px, la premiere largeur ou ce role se
+    // tronque. On coupe ce qu'on mesure la ou le navigateur le coupe.
     return {
-      x: Math.min(...rects.map((b) => b.left)),
-      y: Math.min(...rects.map((b) => b.top)),
-      r: Math.max(...rects.map((b) => b.right)),
-      b: Math.max(...rects.map((b) => b.bottom)),
+      x: Math.max(win.left, Math.min(...rects.map((b) => b.left))),
+      y: Math.max(win.top, Math.min(...rects.map((b) => b.top))),
+      r: Math.min(win.right, Math.max(...rects.map((b) => b.right))),
+      b: Math.min(win.bottom, Math.max(...rects.map((b) => b.bottom))),
     };
   };
   const leaves = [...document.querySelectorAll("p, h1, h2, h3, h4, span, a, li, td, th, button, label")]
