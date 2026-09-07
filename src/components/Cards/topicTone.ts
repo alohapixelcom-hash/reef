@@ -17,7 +17,7 @@
 export const topicTone = {
   coral: {
     dot: "bg-primary",
-    chip: "bg-primary/12 text-primary",
+    chip: "bg-primary/12 text-primary-text",
     hover: "hover:border-primary/40",
     rule: "bg-primary",
     // La couleur du sur-titre. Elle s'appelait ghost et servait a peindre un
