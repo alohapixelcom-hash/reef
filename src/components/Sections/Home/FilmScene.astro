@@ -57,11 +57,23 @@
 //
 // Les trois adresses de video pointent le meme fichier : Pexels n'en publie
 // qu'un seul rendu utile pour ce plan, 1920 par 1080, 9 Mo. En portrait la scene
-// l'agrandit pour couvrir, c'est prevu par le moteur. Les deux affiches sont
-// deux recadrages de la vignette, demandes en WebP a la volee.
+// l'agrandit pour couvrir, c'est prevu par le moteur.
 //
-// Qui installe le theme remplace les cinq adresses ci-dessous par les
-// siennes : c'est le seul endroit a changer.
+// LES DEUX AFFICHES SONT SERVIES PAR LE SITE, PAS PAR UN TIERS. Elles etaient
+// demandees a l'hebergeur de la vignette, qui les livrait bien mais posait
+// deux temoins avec : le rapport Lighthouse de la demonstration plafonnait a
+// 77 en bonnes pratiques pour cette seule raison, et la plus grande image de
+// la page dependait d'un domaine que le theme ne controle pas. La source 4K
+// vit maintenant dans src/assets, et les deux recadrages sont fabriques au
+// build. La video, elle, reste distante : vingt megaoctets n'ont rien a faire
+// dans un depot, et elle ne se charge qu'au defilement, jamais au premier
+// rendu.
+//
+// Qui installe le theme remplace les trois adresses de video ci-dessous et
+// l'image d'affiche par les siennes : c'est le seul endroit a changer.
+import filmPoster from "@assets/film-poster.jpg";
+import { getImage } from "astro:assets";
+
 import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
@@ -81,12 +93,18 @@ interface Props {
   to?: number;
 }
 
+// Les deux recadrages, fabriques au build a partir de la meme source 4K :
+// paysage pour les grands ecrans, portrait pour les telephones, ou une image
+// paysage devrait etre agrandie 1,6 fois pour couvrir.
+const affichePaysage = await getImage({ src: filmPoster, width: 1920, height: 1080, format: "webp" });
+const affichePortrait = await getImage({ src: filmPoster, width: 608, height: 1080, fit: "cover", position: "center", format: "webp" });
+
 const {
   src = "https://videos.pexels.com/video-files/4863640/4863640-hd_1920_1080_24fps.mp4",
   srcHd = "https://videos.pexels.com/video-files/4863640/4863640-hd_1920_1080_24fps.mp4",
   srcPortrait = "https://videos.pexels.com/video-files/4863640/4863640-hd_1920_1080_24fps.mp4",
-  poster = "https://images.pexels.com/videos/4863640/hawaii-electricbeach-4863640.jpeg?auto=compress&cs=srgb&fm=webp&w=1920&h=1080&fit=crop",
-  posterPortrait = "https://images.pexels.com/videos/4863640/hawaii-electricbeach-4863640.jpeg?auto=compress&cs=srgb&fm=webp&w=608&h=1080&fit=crop",
+  poster = affichePaysage.src,
+  posterPortrait = affichePortrait.src,
   from = 0,
   to = 12,
 }: Props = Astro.props;
