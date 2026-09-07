@@ -59,19 +59,19 @@
 // qu'un seul rendu utile pour ce plan, 1920 par 1080, 9 Mo. En portrait la scene
 // l'agrandit pour couvrir, c'est prevu par le moteur.
 //
-// LES DEUX AFFICHES SONT SERVIES PAR LE SITE, PAS PAR UN TIERS. Elles etaient
-// demandees a l'hebergeur de la vignette, qui les livrait bien mais posait
-// deux temoins avec : le rapport Lighthouse de la demonstration plafonnait a
-// 77 en bonnes pratiques pour cette seule raison, et la plus grande image de
-// la page dependait d'un domaine que le theme ne controle pas. La source 4K
-// vit maintenant dans src/assets, et les deux recadrages sont fabriques au
-// build. La video, elle, reste distante : vingt megaoctets n'ont rien a faire
-// dans un depot, et elle ne se charge qu'au defilement, jamais au premier
-// rendu.
+// LES DEUX AFFICHES SONT SERVIES PAR LE SITE, PAS PAR UN TIERS, ET CE SONT SES
+// PROPRES PHOTOS. Demandees a l'hebergeur de la vignette, elles posaient deux
+// temoins tiers : la demonstration plafonnait a 77 en bonnes pratiques pour
+// cette seule raison, et sa plus grande image dependait d'un domaine que le
+// theme ne controle pas. L'affiche est maintenant la photographie de premier
+// ecran du theme, deja dans le depot en 2560 px, et les deux recadrages sont
+// fabriques au build. Regle de la maison : les images d'un site sont SES
+// images, on ne va pas en chercher dehors quand le depot en a. La video reste
+// distante : elle ne se charge qu'au defilement, jamais au premier rendu.
 //
 // Qui installe le theme remplace les trois adresses de video ci-dessous et
 // l'image d'affiche par les siennes : c'est le seul endroit a changer.
-import filmPoster from "@assets/film-poster.jpg";
+import filmPoster from "@assets/reef-hero-vague.webp";
 import { getImage } from "astro:assets";
 
 import { Icon } from "@components/svg/icons";
