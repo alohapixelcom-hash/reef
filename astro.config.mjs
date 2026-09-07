@@ -62,6 +62,22 @@ export default defineConfig({
     },
   },
 
+  // LA FEUILLE DE STYLE VOYAGE DANS LE HTML, ET C'EST MESURE.
+  //
+  // Astro n'inline par defaut que les feuilles de moins de 4 ko et laisse les
+  // autres en fichiers. Sur la demonstration de ce theme, cela faisait TROIS
+  // requetes bloquantes avant le premier pixel, et Lighthouse chiffrait le
+  // blocage a 730 ms sur un telephone.
+  //
+  // "always" les pose toutes dans le <head>. Le prix est connu et assume : la
+  // feuille repart avec chaque page au lieu d'etre mise en cache une fois pour
+  // tout le site, soit une vingtaine de kilo-octets compresses par page au lieu
+  // d'un seul telechargement. Sur un site de contenu ou l'immense majorite des
+  // visites arrive d'un moteur sur UNE page, la premiere vue gagne plus que la
+  // navigation interne ne perd. Qui sert un site ou le visiteur enchaine dix
+  // pages remet "auto" ici, et rien d'autre ne bouge.
+  build: { inlineStylesheets: "always" },
+
   vite: {
     plugins: [tailwindcss()],
     build: {
