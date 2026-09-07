@@ -6,7 +6,62 @@ Every theme in the family carries the same version number, so a number that
 moves here moved in all seven. The dated working notes behind each entry, with
 the reasoning and the files, are in `wiki/log.md`.
 
-Current version: **1.7.1**.
+Current version: **1.7.2**.
+
+## 1.7.2 - 2026-09-07
+
+Astro 7.3, a render bench that measures translucent colours instead of giving
+up in front of them, and everything it found the hour it learned to.
+
+- The whole family moves to Astro 7.3 (`astro@7.3.1`). Nothing else in the
+  dependency tree moved, and the seven themes are green on types, build,
+  selfchecks, house lint and the render bench.
+- `pnpm verify` COMPOSITES COLOURS. Until this release the contrast check
+  declared a ground unreadable as soon as it was not fully opaque, and skipped
+  any ink under 95 percent opacity. Both describe ordinary house writing: a
+  tinted chip on a card, a note written `text-muted-foreground/80`. The bench
+  was therefore silent on a whole family of surfaces a browser paints
+  perfectly well, while Lighthouse read them and failed them. It now stacks
+  the translucent layers onto the first opaque colour underneath, and blends a
+  translucent ink into the result, exactly as the engine paints it. It still
+  refuses the one case it truly cannot read, text over a photograph, and it
+  finds that case from the rectangle of every image, video and canvas on the
+  page instead of guessing from the ancestors.
+- It also measures every element that paints its OWN text. It used to start
+  from a list of tags and keep only those that contained no other, which
+  missed the commonest shape in this codebase: an element carrying an icon AND
+  a word.
+- What it found here, the same hour: the topic label on the post cards was at
+  3.99 to 1 where AA asks 4.5, and the three footer column labels at 3.70. The
+  label takes a twelfth semantic role, `text-primary-text`, one step darker on
+  the turquoise ramp and pointing back at the primary in dark mode, exactly as
+  `text-accent-text` has done for the coral since 1.6.3. The column labels go
+  back to full ink: an attenuated recessive role is how a theme quietly loses
+  AA.
+- The bench stopped changing its mind. It measured 400 ms after its scroll
+  pass and hoped that was enough; on a loaded machine it reported "no h1 on
+  the page" for pages whose title measured 208 by 54 pixels, on different
+  routes at every run. It now waits for a condition instead of a delay: fonts
+  arrived, document height and first title box unchanged from one frame to the
+  next, and a title that exists in the document has a box. A page that really
+  has no h1 answers immediately and is still reported. It also measures five
+  widths instead of three: 1024 is the `lg` breakpoint, where a grid goes to
+  two columns with the least room to do it, and 1280 is the commonest laptop.
+  Neither is coming back out.
+- The stylesheet travels inside the HTML (`build.inlineStylesheets: "always"`).
+  Lighthouse measured 730 ms of render blocking before the first pixel on the
+  demo, from stylesheet requests alone. The trade is written out in
+  `astro.config.mjs`, and one word puts it back.
+- The demo posters are served by the site. They were fetched from the video
+  host, which delivered them and set two third-party cookies on the way: the
+  demo's best practices score was capped at 77 for that alone, and the largest
+  image on the page depended on a domain the theme does not control. The
+  source now lives in `src/assets` and both crops are built. The video stays
+  remote, and still loads only on scroll.
+- Measured on the demo, mobile, served compressed, before and after:
+  best practices 77 to 100, since nothing third-party is fetched any
+  more; accessibility to 100; three render-blocking stylesheet requests down
+  to zero; first paint and largest paint both earlier on every theme.
 
 ## 1.7.1 - 2026-09-05
 
