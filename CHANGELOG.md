@@ -6,7 +6,39 @@ Every theme in the family carries the same version number, so a number that
 moves here moved in all seven. The dated working notes behind each entry, with
 the reasoning and the files, are in `wiki/log.md`.
 
-Current version: **1.7.2**.
+Current version: **1.7.3**.
+
+## 1.7.3 - 2026-09-07
+
+Two family-wide image and font defects, both found by measurement and both
+invisible in the code.
+
+- **The hero srcset gained an 800 breakpoint.** The list ran
+  `[720, 1200, 1920, 2560]` with `sizes="100vw"`. A 412-point phone at 1.75
+  device pixels per point asks for **721** pixels: one more than 720, so the
+  browser climbed to the 1200 candidate and paid over a hundred kilobytes for
+  a single pixel. The same arithmetic hits a 390-point phone at 2x, which asks
+  for 780. An 800 breakpoint catches both and costs the others nothing.
+- **The hero is served as AVIF, with WebP as the fallback.** A first-screen
+  photograph carries grain and detail, which WebP encodes badly: on Nalu the
+  same image went from **186 KB to 42 KB** at identical quality. The
+  `<picture>` keeps WebP for browsers that do not read AVIF, so nobody loses.
+  `fallbackFormat="webp"` is MANDATORY here: without it Astro builds a PNG
+  fallback per breakpoint, close to twenty megabytes of files nobody will ever
+  download but that ship on every deploy.
+- **Both font files are preloaded.** The `@font-face` rules travel in the
+  inlined stylesheet, so the browser only discovers the woff2 after reading
+  the CSS: it paints with the fallback face, then swaps. On Kona that swap
+  moved the first screen by **0.168 of CLS**, over the 0.1 threshold, because
+  its `h1` is bounded in `ch` (a unit that depends on the active font) inside
+  a block centred with `my-auto`. Preloading removes the whole class of
+  defect, not just the instance of the day. `crossorigin` is mandatory on a
+  font preload, or the file is fetched twice.
+
+Measured on the seven demos, Lighthouse mobile, served compressed: Kona 92 to
+99, Nalu 93 to 99, Swell 97 to 98, the others unchanged at 98 or 99.
+Accessibility, best practices and SEO stay at 100 on all seven. CLS is at or
+under 0.003 everywhere, against 0.168 on Kona before.
 
 ## 1.7.2 - 2026-09-07
 
