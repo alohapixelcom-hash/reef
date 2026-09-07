@@ -58,11 +58,18 @@ export const LISIBILITE = ({ TARGET_MIN }) => {
     return { top, bottom, left, right };
   };
 
-  const inked = (el) => {
-    const r = document.createRange();
-    r.selectNodeContents(el);
+  /** Les noeuds de texte qu'un element peint LUI-MEME, sans ses descendants. */
+  const propres = (el) => [...el.childNodes].filter((n) => n.nodeType === 3 && n.textContent.trim());
+
+  const inked = (el, noeuds) => {
     const win = clipWindow(el);
-    const rects = [...r.getClientRects()].filter(
+    const rects = [];
+    for (const n of noeuds) {
+      const r = document.createRange();
+      r.selectNodeContents(n);
+      rects.push(...r.getClientRects());
+    }
+    const gardes = rects.filter(
       (b) =>
         b.width > 0 &&
         b.height > 0 &&
@@ -70,18 +77,35 @@ export const LISIBILITE = ({ TARGET_MIN }) => {
         Math.min(b.bottom, win.bottom) - Math.max(b.top, win.top) > b.height / 2 &&
         Math.min(b.right, win.right) - Math.max(b.left, win.left) > 0,
     );
-    if (!rects.length) return null;
+    if (!gardes.length) return null;
     return {
-      x: Math.min(...rects.map((b) => b.left)),
-      y: Math.min(...rects.map((b) => b.top)),
-      r: Math.max(...rects.map((b) => b.right)),
-      b: Math.max(...rects.map((b) => b.bottom)),
+      x: Math.min(...gardes.map((b) => b.left)),
+      y: Math.min(...gardes.map((b) => b.top)),
+      r: Math.max(...gardes.map((b) => b.right)),
+      b: Math.max(...gardes.map((b) => b.bottom)),
     };
   };
-  const leaves = [...document.querySelectorAll("p, h1, h2, h3, h4, span, a, li, td, th, button, label")]
+
+  // CE QU'ON MESURE : TOUT ELEMENT QUI PEINT SON PROPRE TEXTE.
+  //
+  // La premiere version partait d'une liste de balises et ne gardait que
+  // celles qui n'en contenaient aucune autre. Elle manquait donc exactement la
+  // forme la plus courante de la maison : un element qui porte une icone ET
+  // du texte. La bande de confiance d'Aloha en est faite, et ses huit
+  // wordmarks etaient a 2,51 pour 1 sans que le banc n'en dise rien, pendant
+  // que Lighthouse les signalait. Le critere est maintenant le bon : un
+  // element compte s'il a lui-meme un noeud de texte non vide, et on ne mesure
+  // que CE texte, pas celui de ses enfants, qui seront comptes chez eux.
+  const leaves = [...document.querySelectorAll("body *")]
     .filter((el) => {
-      if (!el.textContent.trim()) return false;
-      if (el.querySelector("p, h1, h2, h3, h4, span, a, li, td, th, button, label")) return false;
+      if (!propres(el).length) return false;
+      // CACHE DE L'ARBRE D'ACCESSIBILITE : pas de contraste a exiger. Le grand
+      // nombre "404" de Koa est pose en encre a quinze pour cent, aria-hidden,
+      // et son commentaire dit pourquoi : c'est le titre qui porte, le nombre
+      // ne fait que dater la scene. Aucun lecteur d'ecran ne l'annonce, aucun
+      // oeil n'a besoin de le lire, et axe l'ignore aussi. Exiger 3 pour 1
+      // dessus reviendrait a punir un decor declare comme tel.
+      if (el.closest('[aria-hidden="true"]')) return false;
       const s = getComputedStyle(el);
       if (s.visibility === "hidden" || s.display === "none" || s.opacity === "0") return false;
       if (replie(el)) return false;
@@ -90,8 +114,8 @@ export const LISIBILITE = ({ TARGET_MIN }) => {
     })
     .map((el) => ({
       el,
-      box: inked(el),
-      text: el.textContent.trim().slice(0, 30),
+      box: inked(el, propres(el)),
+      text: propres(el).map((n) => n.textContent).join(" ").trim().slice(0, 30),
       size: parseFloat(getComputedStyle(el).fontSize),
     }))
     .filter((x) => x.box && x.box.r - x.box.x > 0);
@@ -128,36 +152,73 @@ export const LISIBILITE = ({ TARGET_MIN }) => {
     const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
     return (hi + 0.05) / (lo + 0.05);
   };
-  // Le fond effectif : on remonte les ancetres jusqu'a une couleur opaque. Si
-  // une image de fond est rencontree avant, le contraste n'est PAS calculable
-  // et on le dit, plutot que de mesurer contre une couleur qui n'est pas celle
-  // que l'oeil recoit.
-  const backdrop = (el) => {
+  /* Deux couleurs superposees n'en font qu'une : c'est ce que peint le moteur. */
+  const melange = (dessus, dessous) => ({
+    r: dessus.r * dessus.a + dessous.r * (1 - dessus.a),
+    g: dessus.g * dessus.a + dessous.g * (1 - dessus.a),
+    b: dessus.b * dessus.a + dessous.b * (1 - dessus.a),
+    a: 1,
+  });
+
+  // Les surfaces que cette sonde ne sait PAS lire : une image, une video, une
+  // toile. Leur rectangle est releve une fois pour la page ; un texte qui
+  // tombe dessus est declare non mesurable, quoi qu'en disent ses ancetres.
+  // C'est ce cas, et lui seul, qui justifiait l'ancienne regle "un fond
+  // translucide n'est pas un fond" : le nom de la marque, blanc, pose sur le
+  // panneau de verre de la barre, lui-meme pose sur une photographie en <img>
+  // que la remontee des ancetres ne voit jamais.
+  const medias = [...document.querySelectorAll("img, video, canvas, svg[data-photo]")]
+    .map((m) => m.getBoundingClientRect())
+    .filter((r) => r.width > 0 && r.height > 0);
+
+  /** Melange une pile de couches translucides, du bas vers le haut, sur un socle opaque. */
+  const composer = (couches, socle) => {
+    let fond = socle;
+    for (let i = couches.length - 1; i >= 0; i--) fond = melange(couches[i], fond);
+    return fond;
+  };
+  // LE FOND REEL, PAR COMPOSITION.
+  //
+  // La premiere version s'arretait des qu'un fond avait moins de 95 pour cent
+  // d'opacite et declarait le contraste non mesurable. Elle se taisait donc
+  // sur toute une famille de surfaces parfaitement calculables : une teinte
+  // posee a dix pour cent sur une carte opaque. Lighthouse, lui, compose et
+  // mesure. Le 7 septembre 2026 il a trouve ainsi, sur les sept themes, une
+  // etiquette de rubrique a 3,98 pour 1 la ou il en faut 4,5, que ce banc
+  // avait laissee passer depuis le premier jour.
+  //
+  // On empile donc les couches translucides et on les melange sur la premiere
+  // couleur opaque rencontree. On ne se tait plus que devant ce qu'on ne peut
+  // vraiment pas lire : une image de fond, ou un media qui passe dessous.
+  const backdrop = (el, boite) => {
+    if (boite && medias.some((m) => m.left < boite.r && m.right > boite.x && m.top < boite.b && m.bottom > boite.y)) {
+      return { image: true };
+    }
+    const couches = [];
     for (let node = el; node && node !== document.documentElement; node = node.parentElement) {
       const s = getComputedStyle(node);
       if (s.backgroundImage && s.backgroundImage !== "none") return { image: true };
       const c = rgb(s.backgroundColor);
-      if (c && c.a >= 0.95) return { color: c };
-      // Un fond TRANSLUCIDE n'est pas un fond : c'est un melange avec ce qui
-      // passe dessous, et ce qui passe dessous peut etre une photographie
-      // posee en <img>, que cette boucle ne verra jamais. Le panneau de verre
-      // de la barre en est le cas type : le nom de la marque y est blanc sur
-      // une photo sombre, parfaitement lisible, et la mesure contre le fond du
-      // document annoncait 1,03 pour 1. On declare donc non mesurable, comme
-      // pour une image de fond. Un banc qui invente un chiffre est pire qu'un
-      // banc qui se tait.
-      if (c && c.a > 0.05) return { image: true };
+      if (!c || c.a === 0) continue;
+      if (c.a >= 0.95) return { color: composer(couches, c) };
+      couches.push(c);
     }
-    const c = rgb(getComputedStyle(document.body).backgroundColor);
-    return c && c.a >= 0.95 ? { color: c } : { image: true };
+    const fond = rgb(getComputedStyle(document.body).backgroundColor);
+    return fond && fond.a >= 0.95 ? { color: composer(couches, fond) } : { image: true };
   };
-  for (const { el, text } of leaves) {
+  for (const { el, text, box } of leaves) {
     const s = getComputedStyle(el);
-    const fg = rgb(s.color);
-    if (!fg || fg.a < 0.95) continue;
-    const back = backdrop(el);
+    const encre = rgb(s.color);
+    if (!encre || encre.a < 0.02) continue;
+    const back = backdrop(el, box);
     // Non mesurable : on se tait plutot que d'inventer un chiffre.
     if (back.image) continue;
+    // UNE ENCRE TRANSLUCIDE EST UNE ENCRE MELANGEE A SON FOND. La premiere
+    // version sautait tout texte sous 95 pour cent d'opacite, et se taisait
+    // donc sur une ecriture courante de la maison : text-muted-foreground/70.
+    // Lighthouse relevait 3,7 pour 1 sur les intitules de colonnes d'un pied
+    // de page que ce banc declarait sains.
+    const fg = encre.a >= 0.995 ? encre : melange(encre, back.color);
     const size = parseFloat(s.fontSize);
     const bold = parseInt(s.fontWeight, 10) >= 700;
     const large = size >= 24 || (size >= 18.66 && bold);
