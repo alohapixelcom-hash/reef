@@ -80,6 +80,10 @@
   --color-reef-400: #3fc0e0;
   --color-reef-500: #1a9fc4;
   --color-reef-600: #147ea0;
+  /* Un cinquieme pas, ajoute le 7 septembre 2026 pour la meme raison que
+   * coral-700 : le turquoise 600 porte du TEXTE sur une teinte pale et n'y
+   * atteint que 3,99 pour 1. Il ne peint rien d'autre. */
+  --color-reef-700: #10657f;
 
   /* --- Typographie -------------------------------------------------------
    * Deux polices chargees, pas une de plus : Space Grotesk pour l'affichage,
@@ -162,6 +166,7 @@
   --color-primary: var(--reef-primary);
   --color-primary-foreground: var(--reef-primary-foreground);
   --color-accent: var(--reef-accent);
+  --color-primary-text: var(--reef-primary-text);
   --color-accent-text: var(--reef-accent-text);
   --color-accent-foreground: var(--reef-accent-foreground);
   --color-border: var(--reef-border);
@@ -209,6 +214,16 @@
 
   --reef-primary: var(--color-reef-600);
   --reef-primary-foreground: #ffffff;
+  /* LE PRIMAIRE QUAND IL PORTE DU TEXTE, et rien d'autre. Meme partage que
+   * pour l'accent, et pour une mesure, pas pour un gout : le turquoise 600
+   * passe AA sur le blanc (4,64) et le rate des qu'on le pose sur sa propre
+   * teinte a douze pour cent (3,99 pour 1, releve sur l'etiquette de rubrique
+   * des cartes de billet le 7 septembre 2026). La couleur DECORATIVE ne bouge
+   * pas d'un pixel (bg-primary, border-primary, la vague, la pastille de la
+   * frise) ; le TEXTE en primaire prend une marche plus sombre de la meme
+   * rampe. En sombre le primaire est deja clair sur fond d'encre, le bloc
+   * sombre renvoie donc simplement vers lui. */
+  --reef-primary-text: var(--color-reef-700);
   /* La vague du mot d'accent (.accent-script) : le trait de la marque (le logo
    * est une vague), dessine dans le turquoise du primaire. Le primaire change
    * entre les modes, donc une vague par mode : turquoise 600 ici,
@@ -257,6 +272,7 @@
   --reef-card-foreground: var(--color-paper-50);
   --reef-primary: var(--color-reef-400);
   --reef-primary-foreground: var(--color-ink-950);
+  --reef-primary-text: var(--reef-primary);
   /* Le primaire passe en turquoise 400 : la vague du mot d'accent suit. */
   --accent-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 10' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q 6 2.5 12 7 T 24 7 T 36 7 T 48 7' fill='none' stroke='%233fc0e0' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
   --reef-accent: var(--color-coral-400);
