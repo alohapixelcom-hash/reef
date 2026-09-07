@@ -27,7 +27,7 @@ import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, useTranslations } from "@i18n";
-import { Image } from "astro:assets";
+import { Picture } from "astro:assets";
 
 interface Props {
   /** Trois nombres qui disent combien il y a a lire : notes, sujets, langues. */
@@ -75,10 +75,25 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
         acheteurs utilisent. 2560 est la plus grande largeur que la source
         fournit ; au-dela on etirerait a nouveau, en payant les octets en
         plus. */}
-    <Image
+    {/* 800 EN PLUS, ET C'EST UNE CORRECTION MESUREE. Un telephone de 412
+        points a 1,75 pixel par point demande 721 pixels : un de plus que le
+        palier 720, donc le navigateur montait au palier 1200 et payait plus
+        de cent kilo-octets pour un pixel. Le meme calcul vaut sur un 390 a
+        deux pixels par point, qui en demande 780. Un palier a 800 prend ces
+        deux cas et ne coute rien aux autres. */}
+    {/* AVIF D'ABORD, WEBP EN SECOURS. Une photographie de premier ecran porte
+        du grain et du detail, ce que le WebP encode mal : sur Nalu la meme
+        image est passee de 186 a 42 kilo-octets en AVIF, a qualite identique.
+        Le <picture> garde le WebP pour les navigateurs qui ignorent l'AVIF,
+        donc personne n'y perd. fallbackFormat EST OBLIGATOIRE : sans lui
+        Astro fabrique un PNG de secours par palier, soit pres de vingt
+        megaoctets de fichiers que personne ne telechargera jamais. */}
+    <Picture
       src={heroVague}
+      formats={["avif"]}
+      fallbackFormat="webp"
       alt=""
-      widths={[720, 1200, 1920, 2560]}
+      widths={[720, 800, 1200, 1920, 2560]}
       sizes="100vw"
       loading="eager"
       fetchpriority="high"
