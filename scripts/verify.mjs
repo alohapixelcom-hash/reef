@@ -36,7 +36,21 @@ import { PROBE } from "./verify.probe.mjs";
 
 const ROOT = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
 const DIST = join(ROOT, "dist");
-const WIDTHS = [390, 768, 1440];
+// LES CINQ LARGEURS, ET POURQUOI IL EN MANQUAIT DEUX.
+//
+// Le banc a longtemps mesure 390, 768 et 1440 : un telephone, une tablette, un
+// grand ecran. Il ne regardait donc JAMAIS la bande ou travaille la majorite
+// des visiteurs professionnels, entre 1024 et 1366. Le 3 septembre 2026, sur
+// deux sites de la maison, le second bouton du premier ecran sortait de sa
+// colonne et se faisait couper net par le `overflow-hidden` de la section, de
+// 174 px a 1024, de 125 a 1152, de 75 a 1280. A 1440 il tenait, a 768 la
+// colonne s'empilait : le banc voyait vert aux trois largeurs qu'il
+// connaissait, et le defaut a ete signale par un humain devant son ecran.
+//
+// 1024 est la bascule `lg` de Tailwind, c'est-a-dire l'endroit precis ou une
+// grille passe a deux colonnes avec le moins de place pour le faire. 1280 est
+// l'ordinateur portable le plus courant. Ces deux-la ne se retirent plus.
+const WIDTHS = [390, 768, 1024, 1280, 1440];
 // LES DEUX MODES, ET POURQUOI LE SOMBRE MANQUAIT. Le 5 septembre 2026 l'editeur
 // a vu, sur l'accueil de alohapixel.com en mode sombre, trois cartes blanches
 // au texte clair : illisibles. Le banc les avait declarees saines parce qu'il
@@ -147,6 +161,65 @@ const browser = await chromium.launch({
   ],
   ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
 });
+/**
+ * Attend que la mise en page soit POSEE avant de mesurer.
+ *
+ * POURQUOI CETTE FONCTION EXISTE. Le banc a longtemps mesure 400 ms apres son
+ * parcours de defilement, en esperant que ce delai suffise. Le 7 septembre
+ * 2026 il a rendu trois verdicts differents sur le meme dist/ : vert, puis
+ * cinq "aucun h1 sur la page", puis six, sur des adresses qui changeaient a
+ * chaque passage et arrivaient toujours en RAFALE, par blocs contigus. C'est
+ * la signature d'une machine chargee, pas d'un defaut de page : rejouee a la
+ * main, chacune rendait son titre a 208 x 54 px, visible et peint.
+ *
+ * Un banc qui ne dit pas deux fois la meme chose ne sert a rien : on ne peut
+ * plus distinguer une regression d'un caprice, et l'habitude de relancer
+ * jusqu'au vert finit par masquer un vrai defaut. Le delai fixe est donc
+ * remplace par une CONDITION : les polices sont arrivees, la hauteur du
+ * document et la boite du premier titre ne bougent plus d'une image a
+ * l'autre, et si un h1 existe dans le document, il mesure quelque chose.
+ *
+ * Cette derniere clause ne masque rien : une page reellement SANS h1 n'en a
+ * aucun a attendre, la condition est vraie tout de suite et le defaut est
+ * signale comme avant. Seule la page qui EN A un, mais pas encore pose,
+ * patiente.
+ */
+async function reposer(page) {
+  try {
+    await page.waitForFunction(
+      async () => {
+        await document.fonts.ready;
+        const boite = () => {
+          const t = document.querySelector("h1");
+          if (!t) return "0";
+          const r = t.getBoundingClientRect();
+          return `${Math.round(r.width)}x${Math.round(r.height)}`;
+        };
+        const image = () => new Promise((r) => requestAnimationFrame(() => r()));
+        const lire = () => `${document.body.scrollHeight}|${boite()}`;
+        const avant = lire();
+        await image();
+        await image();
+        if (lire() !== avant) return false;
+        // Un h1 present dans le document doit avoir une boite. Aucun h1 du
+        // tout est une reponse valide : c'est au controle de le dire.
+        const titres = [...document.querySelectorAll("h1")];
+        if (!titres.length) return true;
+        return titres.some((t) => {
+          const r = t.getBoundingClientRect();
+          return r.width > 0 && r.height > 0;
+        });
+      },
+      undefined,
+      { timeout: 5000, polling: 100 },
+    );
+  } catch {
+    // Le repos n'est pas venu en cinq secondes : on mesure quand meme, et le
+    // controle dira ce qu'il voit. Se taire ici serait pire.
+  }
+  await page.waitForTimeout(200);
+}
+
 const findings = [];
 
 for (const mode of MODES) for (const width of WIDTHS) {
@@ -180,7 +253,7 @@ for (const mode of MODES) for (const width of WIDTHS) {
       }
       window.scrollTo(0, 0);
     });
-    await page.waitForTimeout(400);
+    await reposer(page);
     // Deux sondes, executees l'une apres l'autre dans la meme page. Elles ne
     // partagent rien : Playwright serialise chaque fonction et l'evalue dans
     // l'onglet, ou aucun import n'existe. Le prix est une poignee de lignes en
