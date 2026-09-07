@@ -15,6 +15,16 @@
 import "@fontsource-variable/space-grotesk";
 import "@fontsource-variable/instrument-sans";
 import "@fontsource-variable/instrument-sans/wght-italic.css";
+// LES DEUX FICHIERS DE POLICE, PRECHARGES. Les regles @font-face partent dans
+// la feuille en ligne, donc le navigateur ne decouvre le woff2 qu'apres avoir
+// lu le CSS : il peint d'abord avec la police de secours, puis echange. Sur
+// Kona cet echange faisait sauter le premier ecran de 0,168 de CLS, parce que
+// le h1 est borne en ch, une unite qui depend de la police active, et que le
+// bloc est centre par my-auto : la largeur change, le titre se replie
+// autrement, le bloc se recentre. Precharger supprime la classe entiere de
+// defaut, pas seulement le cas du jour.
+import policeAffichage from "@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url";
+import policeTexte from "@fontsource-variable/instrument-sans/files/instrument-sans-latin-wght-normal.woff2?url";
 import siteData from "@config/siteData.json";
 import siteSettings from "@config/siteSettings.json";
 import { defaultLocale, getAlternates, getLocale, localeMeta, localizePath } from "@i18n";
@@ -120,6 +130,12 @@ const groundLight = resolveToken("color-background", lightBlock);
     sur iPhone a encoche, en Safari comme dans une coquille Capacitor. */}
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="generator" content={Astro.generator} />
+
+{/* crossorigin est OBLIGATOIRE sur un preload de police : sans lui le
+    navigateur telecharge le fichier deux fois, une fois en anonyme pour
+    le prechargement et une fois pour @font-face. */}
+<link rel="preload" href={policeAffichage} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={policeTexte} as="font" type="font/woff2" crossorigin />
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
