@@ -125,9 +125,11 @@ const PAPER_STOPS = [
 // Reef : le second accent, la signature du theme. Une aigue-marine franche,
 // plus bleue que le lagon vert d'Aloha, saturee (72 a 78 %) : sujets, etats
 // "publie", liens deja lus. Jamais en concurrence avec le corail sur un meme
-// appel a l'action. Quatre pas seulement, du 300 au 600.
+// appel a l'action. Cinq pas, du 300 au 700, le dernier reserve au TEXTE
+// en primaire (voir --reef-primary-text dans tokens.css).
 const REEF_STOPS = [
   [300, 0.72, 0.78], [400, 0.56, 0.72], [500, 0.44, 0.77], [600, 0.35, 0.78],
+  [700, 0.28, 0.78],
 ];
 
 /* ------------------------------ cli --------------------------------- */
