@@ -205,3 +205,8 @@ The theme's look was rebuilt around reading.
   topics). There is no React and no island.
 - Wiki pages: index, overview, log, and the subsystems tokens, ui-primitives,
   seo, motion, content, i18n, mobile-app and fluidity.
+
+
+## 2026-09-15 - 1.9.0
+
+The demo Worker ignores malformed language cookies and refused language preferences. `src/worker.selfcheck.ts` exercises the actual request handler without a network connection. The page content and design are unchanged.

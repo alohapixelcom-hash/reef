@@ -18,7 +18,13 @@ function readCookie(header: string | null, name: string): string | null {
   if (!header) return null;
   for (const part of header.split(";")) {
     const [key, ...rest] = part.trim().split("=");
-    if (key === name) return decodeURIComponent(rest.join("="));
+    if (key === name) {
+      try {
+        return decodeURIComponent(rest.join("="));
+      } catch {
+        return null;
+      }
+    }
   }
   return null;
 }
@@ -33,7 +39,7 @@ function preferredLocale(header: string | null): string | null {
       const q = params.find((p) => p.trim().startsWith("q="));
       return { tag: (tag ?? "").trim().toLowerCase(), q: q ? Number(q.split("=")[1]) || 0 : 1 };
     })
-    .filter((entry) => entry.tag)
+    .filter((entry) => entry.tag && Number.isFinite(entry.q) && entry.q > 0 && entry.q <= 1)
     .sort((a, b) => b.q - a.q);
   for (const entry of ranked) {
     const base = entry.tag.split("-")[0];

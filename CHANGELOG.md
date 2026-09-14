@@ -6,7 +6,13 @@ Every theme in the family carries the same version number, so a number that
 moves here moved in all seven. The dated working notes behind each entry, with
 the reasoning and the files, are in `wiki/log.md`.
 
-Current version: **1.8.0**.
+Current version: **1.9.0**.
+
+## 1.9.0 - 2026-09-15
+
+- A malformed language cookie no longer interrupts the demo Worker. It falls back to the browser language.
+- Languages explicitly refused with quality zero, or invalid quality values, no longer trigger a redirect.
+- A network-free regression check covers cookies, language priority, assets, existing language paths and cache headers.
 
 ## 1.8.0 - 2026-09-13
 
