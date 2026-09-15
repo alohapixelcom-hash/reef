@@ -6,7 +6,11 @@ Every theme in the family carries the same version number, so a number that
 moves here moved in all seven. The dated working notes behind each entry, with
 the reasoning and the files, are in `wiki/log.md`.
 
-Current version: **1.9.0**.
+Current version: **1.9.1**.
+
+## 1.9.1 - 2026-09-15
+
+- Family release number aligned with the Kona variant-price correction. No runtime change in this theme.
 
 ## 1.9.0 - 2026-09-15
 

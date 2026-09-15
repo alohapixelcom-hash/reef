@@ -210,3 +210,7 @@ The theme's look was rebuilt around reading.
 ## 2026-09-15 - 1.9.0
 
 The demo Worker ignores malformed language cookies and refused language preferences. `src/worker.selfcheck.ts` exercises the actual request handler without a network connection. The page content and design are unchanged.
+
+## 2026-09-15 - 1.9.1
+
+Numero de famille aligne sur le correctif des variantes de Kona.
