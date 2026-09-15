@@ -38,7 +38,7 @@
     "poster": "node scripts/poster.mjs",
     "preview": "astro preview",
     "rebrand": "node scripts/rebrand.mjs",
-    "test": "node scripts/checks.mjs",
+    "test": "node scripts/checks.mjs && node scripts/covers.selfcheck.mjs",
     "verify": "node scripts/verify.mjs",
     "favicon": "node scripts/favicon.mjs"
   },

@@ -118,3 +118,12 @@ public/og/*.png cards, scripts/og.mjs), `pnpm app` (build tuned for a
 Capacitor shell, scripts/app.mjs). Selfchecks run directly with Node:
 `node src/js/schema.selfcheck.ts` and `node src/js/pagination.selfcheck.ts`.
 Node >= 22.18 required. Path aliases live in tsconfig.json.
+
+## Sync 2026-09-15: optional editorial integration
+
+The optional Aloha back office is under development; see docs/backoffice.md for
+its server guard, site-specific permissions and current validation limits.
+Default builds remain static. scripts/covers.json is the tracked image source
+manifest used by both the build and editor. The download cache checks URL,
+width and SHA-256 before reusing a local file. Tests cover cache invalidation
+and preservation of a valid photo when the upstream response is invalid.

@@ -67,3 +67,14 @@ A buyer must use their own services and credentials. Never bind a buyer's instal
 to Aloha Pixel's private store. A distributable standalone setup for the authentication
 service, deployment documentation, live validation and marketing assets remain to be
 completed before releasing this optional feature.
+
+## Image cache and publication time
+
+An unchanged photo is reused only when its source URL and local SHA-256 match
+the previous successful download and its WebP width is sufficient. Changing the
+URL, losing the cached file or corrupting it triggers a download.
+`pnpm covers --refresh` forces a refresh. A non-image response cannot replace a
+valid local photo. The cache lives in `node_modules/.cache/reef-covers.json`; a
+clean installation downloads the photos again. This removes repeated downloads
+when the cache and image files survive, not the rest of the Astro build or queue.
+No fixed publication-time guarantee has been measured for the live back office.

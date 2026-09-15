@@ -21,9 +21,10 @@
  * supprime l'appel dans "build" et depose ses images a la main.
  */
 
-import { mkdirSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, existsSync, readFileSync, writeFileSync, renameSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { createHash } from "node:crypto";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 // Toutes les photographies viennent de Pexels et sont utilisees sous licence
@@ -54,21 +55,39 @@ function largeurWebp(buf) {
   return 0;
 }
 
+// Le cache associe les octets a leur URL : changer le manifeste invalide l'image.
+// Le hash refuse une copie tronquee ou modifiee. --refresh force le reseau.
+const cachePath = join(ROOT, "node_modules/.cache/reef-covers.json");
+let cache = {};
+try { cache = JSON.parse(readFileSync(cachePath, "utf8")); } catch { /* premier build */ }
+const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
+const refresh = process.argv.includes("--refresh");
+let reutilises = 0;
 let telecharges = 0;
 let conserves = 0;
 
 for (const [rel, { url, minWidth }] of Object.entries(MANIFEST)) {
   const out = join(ROOT, "src/assets", rel);
   mkdirSync(dirname(out), { recursive: true });
+  if (!refresh && cache[rel]?.url === url && existsSync(out)) {
+    const local = readFileSync(out);
+    if (largeurWebp(local) >= minWidth && hash(local) === cache[rel].sha256) {
+      reutilises++;
+      continue;
+    }
+  }
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const buf = Buffer.from(await res.arrayBuffer());
     const large = largeurWebp(buf);
-    if (large && large < minWidth) {
+    if (large < minWidth) {
       throw new Error(`${large} px de large, il en faut ${minWidth}`);
     }
-    writeFileSync(out, buf);
+    // Valider avant de remplacer la copie existante, puis remplacement atomique.
+    writeFileSync(`${out}.tmp`, buf);
+    renameSync(`${out}.tmp`, out);
+    cache[rel] = { url, sha256: hash(buf) };
     telecharges++;
   } catch (err) {
     if (existsSync(out) && largeurWebp(readFileSync(out)) >= minWidth) {
@@ -80,5 +99,7 @@ for (const [rel, { url, minWidth }] of Object.entries(MANIFEST)) {
   }
 }
 
-console.log(`${telecharges} visuels rapatries dans src/assets/` +
+mkdirSync(dirname(cachePath), { recursive: true });
+writeFileSync(cachePath, JSON.stringify(cache));
+console.log(`${reutilises} visuels reutilises sans reseau, ${telecharges} visuels rapatries dans src/assets/` +
   (conserves ? `, ${conserves} conserves depuis la copie locale` : ""));
