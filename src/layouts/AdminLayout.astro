@@ -1,7 +1,6 @@
 ---
 // src/layouts/AdminLayout.astro - coquille du back office interne Aloha, adaptee aux langues Reef.
 import AdminShell from "@components/Sections/BackOffice/AdminShell.astro";
-import Navbar from "@components/Sections/Global/Navbar.astro";
 import BaseLayout from "./BaseLayout.astro";
 import siteData from "@config/siteData.json";
 import { getLocale, localizePath } from "@i18n";
@@ -13,8 +12,7 @@ const locale = getLocale(Astro);
 const t = backofficeCopy[locale];
 ---
 <BaseLayout {title} noindex>
-  <Navbar />
-  <AdminShell brand={siteData.name} home={localizePath("/", locale)} space={t.space} {title} {login} accentWord={title.split(" ")[0]}
+  <AdminShell compact brand={siteData.name} home={localizePath("/", locale)} space={t.space} {title} {login} accentWord={title.split(" ")[0]}
     navigation={[{ href: localizePath("/secret-spot/", locale), label: t.articles, icon: "file-text" }, { href: localizePath("/secret-spot/rubriques/", locale), label: t.categories, icon: "folder" }]}
     logout={demo ? "" : t.logout} logoutUrl={localizePath("/secret-spot/connexion/", locale)} back={t.back} connected={t.connected}>
     <slot />
