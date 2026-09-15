@@ -1,5 +1,5 @@
 ---
-// AdminShell.astro - coquille commune issue de Kai, navigation et compte adaptes aux modules actives.
+// AdminShell.astro - socle visuel issu du back office SaaS alohapixel.app, modules adaptes au theme.
 import { Icon, type IconName } from "@components/svg/icons";
 import { Breadcrumb } from "@components/ui/breadcrumb";
 interface Props {
@@ -15,25 +15,28 @@ const at = accentWord ? title.toLowerCase().indexOf(accentWord.toLowerCase()) : 
 const before = at >= 0 ? title.slice(0, at) : title;
 const word = at >= 0 ? title.slice(at, at + accentWord.length) : "";
 const after = at >= 0 ? title.slice(at + accentWord.length) : "";
-const railLink = "flex min-h-11 shrink-0 items-center gap-2.5 rounded-pill px-4 py-2.5 font-sans text-[0.9rem] font-semibold whitespace-nowrap transition-colors duration-200";
+const railLink = "flex min-h-11 shrink-0 items-center gap-2.5 rounded-2xl px-3 font-sans text-[0.95rem] whitespace-nowrap transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 ---
-<section class:list={["bg-background pb-20 md:pb-28", compact ? "pt-8 md:pt-12" : "pt-28 md:pt-36"]} data-slot="admin-shell">
-  <div class="container-page">
-    <Breadcrumb items={trail} label={space} />
-    <div class="mt-6 grid gap-10 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-14">
-      <div class="min-w-0 lg:sticky lg:top-28 lg:self-start">
-        {!login && <nav aria-label={space} data-slot="admin-rail">
-          <ul class="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-2 lg:mx-0 lg:flex-col lg:px-0 lg:pb-0">
+<section class:list={["bg-muted/40 text-foreground", !compact && "pt-24 lg:pt-28"]} data-slot="admin-shell">
+  <div class="flex min-h-svh flex-col lg:flex-row">
+      <aside class="dark bg-background text-foreground flex min-w-0 flex-col lg:w-64 lg:shrink-0 [padding-top:max(0px,env(safe-area-inset-top))]">
+        <a href={home} class="flex min-h-11 items-center gap-2 px-5 py-5 focus-visible:outline-2 focus-visible:outline-ring">
+          <Icon name="wave" size={22} class="text-primary" />
+          <span class="font-display text-lg font-extrabold tracking-tight">{brand}</span>
+        </a>
+        <p class="text-muted-foreground px-5 pb-4 text-xs font-semibold uppercase tracking-widest">{space}</p>
+        {!login && <nav aria-label={space} data-slot="admin-rail" class="px-3 pb-4">
+          <ul class="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible">
             {navigation.map(item => <li>
               <a href={item.href} aria-current={here === item.href ? "page" : undefined}
-                class={`${railLink} ${here === item.href ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
+                class={`${railLink} ${here === item.href ? "bg-muted font-semibold text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
                 <Icon name={item.icon} size={17} class="shrink-0" />{item.label}
               </a>
             </li>)}
           </ul>
         </nav>}
-        <slot name="rail" />
-        {(logout || back || Astro.slots.has("account")) && <div class="border-border mt-4 border-t px-1 pt-4">
+        <div class="px-5"><slot name="rail" /></div>
+        {(logout || back || Astro.slots.has("account")) && <div class="border-border mt-4 border-t px-5 py-4 lg:mt-auto lg:pb-6">
           <slot name="account" />
           {!login && logout && <>
             <p class="text-muted-foreground text-xs leading-relaxed">{connected}<br /><span data-session-email class="font-medium">&nbsp;</span></p>
@@ -41,16 +44,18 @@ const railLink = "flex min-h-11 shrink-0 items-center gap-2.5 rounded-pill px-4 
           </>}
           {back && <a href={home} class="text-muted-foreground hover:text-foreground mt-2 flex min-h-11 items-center px-4 text-sm font-semibold">{back}</a>}
         </div>}
-      </div>
-      <Content class="min-w-0">
-        <header class="flex flex-col gap-4">
-          <h1 class="font-display text-display-sm sm:text-display-md text-foreground max-w-3xl">
+      </aside>
+      <Content class="min-w-0 flex-1">
+       <div class="mx-auto w-full max-w-6xl px-5 py-8 sm:px-8 md:py-12">
+        <Breadcrumb items={trail} label={space} />
+        <header class="mt-6 flex flex-col gap-3">
+          <h1 class="font-display text-3xl font-extrabold tracking-tight md:text-4xl text-foreground max-w-3xl">
             {word ? <Fragment>{before}<span class="accent-script">{word}</span>{after}</Fragment> : title}
           </h1>
-          {lede && <p class="text-muted-foreground measure-wide text-lg leading-relaxed">{lede}</p>}
+          {lede && <p class="text-muted-foreground measure-wide leading-relaxed">{lede}</p>}
         </header>
-        <div class="mt-10 flex flex-col gap-8 md:mt-12"><slot /></div>
+        <div class="mt-8 flex flex-col gap-8"><slot /></div>
+       </div>
       </Content>
-    </div>
   </div>
 </section>
