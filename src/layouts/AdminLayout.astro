@@ -1,0 +1,44 @@
+---
+// src/layouts/AdminLayout.astro - coquille du back office interne Aloha, adaptee aux langues Reef.
+import BaseLayout from "./BaseLayout.astro";
+import siteData from "@config/siteData.json";
+import { getLocale, localizePath } from "@i18n";
+import { backofficeCopy } from "@i18n/backoffice";
+interface Props { title: string; login?: boolean }
+const { title, login = false } = Astro.props;
+const locale = getLocale(Astro);
+const t = backofficeCopy[locale];
+---
+<BaseLayout {title} noindex>
+  <div class="bg-background text-foreground flex min-h-svh flex-col lg:flex-row">
+    <aside class="bg-scrim flex flex-col text-white/80 lg:min-h-svh lg:w-64 lg:shrink-0">
+      <a href={localizePath("/", locale)} class="font-display px-5 py-5 text-lg font-extrabold text-white">{siteData.name}</a>
+      <p class="px-5 pb-4 text-xs tracking-widest uppercase">{t.space}</p>
+      {!login && <nav aria-label={t.space} class="px-3 pb-4"><a href={localizePath("/secret-spot/", locale)} aria-current="page" class="rounded-pill flex min-h-11 items-center bg-white/15 px-4 font-semibold text-white">{t.articles}</a></nav>}
+      <div class="px-5 py-4 lg:mt-auto">
+        {!login && <><p data-session-email class="text-sm"></p><button data-admin-logout={localizePath("/secret-spot/connexion/", locale)} class="rounded-pill mt-3 min-h-11 border border-white/20 px-4">{t.logout}</button></>}
+        <a href={localizePath("/", locale)} class="mt-2 flex min-h-11 items-center">{t.back}</a>
+      </div>
+    </aside>
+    <main class="min-w-0 flex-1"><div class="mx-auto max-w-6xl px-5 py-8 sm:px-8 md:py-12">
+      <h1 class="font-display mb-8 text-3xl font-extrabold md:text-4xl">{title}</h1><slot />
+    </div></main>
+  </div>
+  <script>
+    const init = () => {
+      const button = document.querySelector<HTMLButtonElement>("[data-admin-logout]");
+      if (!button || button.dataset.ready) return;
+      button.dataset.ready = "1";
+      void fetch("/api/auth/me", { cache: "no-store" }).then(r => r.json()).then((user: { email?: string }) => {
+        const label = document.querySelector("[data-session-email]");
+        if (label) label.textContent = user.email ?? "";
+      }).catch(() => undefined);
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        try { const response = await fetch("/api/auth/logout", { method: "POST" }); if (response.ok) location.href = button.dataset.adminLogout!; }
+        finally { button.disabled = false; }
+      });
+    };
+    init(); document.addEventListener("astro:page-load", init);
+  </script>
+</BaseLayout>

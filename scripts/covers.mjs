@@ -36,64 +36,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 // plutot que le JPEG d'origine, et w/h/fit=crop fixent le cadrage exact, celui
 // que montre la demonstration. Sans eux, chaque compilation recadrerait un peu
 // autrement.
-const PEXELS = "https://images.pexels.com/photos";
-
-const MANIFEST = {
-  // Le premier ecran : la vague qui se creuse. C'est la photo de la maison, et
-  // le logo du theme est une vague.
-  "reef-hero-vague.webp": {
-    url: `${PEXELS}/29275767/pexels-photo-29275767.jpeg?auto=compress&cs=srgb&fm=webp&w=2560&h=1441&fit=crop`,
-    minWidth: 2560,
-  },
-  // Mesurer chez le lecteur : le soleil pose sur l'horizon donne l'echelle que
-  // le large ne donne pas.
-  "covers/reef-mesurer-lecteur.webp": {
-    url: `${PEXELS}/14281585/pexels-photo-14281585.jpeg?auto=compress&cs=srgb&fm=webp&w=1200&h=1500&fit=crop`,
-    minWidth: 1200,
-  },
-  // Un bon brief : un recif a une structure lisible, chaque chose a sa place.
-  "covers/reef-bon-brief.webp": {
-    url: `${PEXELS}/29290970/pexels-photo-29290970.jpeg?auto=compress&cs=srgb&fm=webp&w=1536&h=1920&fit=crop`,
-    minWidth: 1200,
-  },
-  // Mode sombre : la meme matiere, la lumiere inversee.
-  "covers/reef-mode-sombre.webp": {
-    url: `${PEXELS}/35613489/pexels-photo-35613489.jpeg?auto=compress&cs=srgb&fm=webp&w=2500&h=1667&fit=crop`,
-    minWidth: 1200,
-  },
-  // Une collection est un contrat : la tortue tient sa route parce que le
-  // recif dessous a une structure.
-  "covers/reef-collections-contrat.webp": {
-    url: `${PEXELS}/20443161/pexels-photo-20443161.jpeg?auto=compress&cs=srgb&fm=webp&w=1600&h=1067&fit=crop`,
-    minWidth: 1200,
-  },
-  // Le cout d'une police : ce qui parait leger de loin pese de pres.
-  "covers/reef-cout-police.webp": {
-    url: `${PEXELS}/12810721/pexels-photo-12810721.jpeg?auto=compress&cs=srgb&fm=webp&w=1200&h=1500&fit=crop`,
-    minWidth: 1200,
-  },
-  // Un budget de performance : une vague a un budget avant de casser.
-  "covers/reef-budget-performance.webp": {
-    url: `${PEXELS}/29275767/pexels-photo-29275767.jpeg?auto=compress&cs=srgb&fm=webp&w=1200&h=1500&fit=crop`,
-    minWidth: 1200,
-  },
-  // Une echelle typographique : des paliers qui s'etagent, et on voit le
-  // suivant sans compter.
-  "covers/reef-echelle-typo.webp": {
-    url: `${PEXELS}/8985046/pexels-photo-8985046.jpeg?auto=compress&cs=srgb&fm=webp&w=1920&h=1500&fit=crop`,
-    minWidth: 1200,
-  },
-  // Du HTML qui vieillit bien : la falaise est toujours la.
-  "covers/reef-html-qui-vieillit.webp": {
-    url: `${PEXELS}/4321834/pexels-photo-4321834.jpeg?auto=compress&cs=srgb&fm=webp&w=1600&h=1067&fit=crop`,
-    minWidth: 1200,
-  },
-  // Chiffrer une refonte : vue du ciel, on mesure au lieu de deviner.
-  "covers/reef-prix-refonte.webp": {
-    url: `${PEXELS}/8332588/pexels-photo-8332588.jpeg?auto=compress&cs=srgb&fm=webp&w=1200&h=1500&fit=crop`,
-    minWidth: 1200,
-  },
-};
+const MANIFEST = JSON.parse(readFileSync(new URL("./covers.json", import.meta.url), "utf8"));
 
 // Largeur d'un WebP, lue dans l'en-tete. Trois formes existent et il faut les
 // trois : VP8 pour le compresse avec perte, VP8L pour le sans perte, VP8X pour

@@ -1,5 +1,6 @@
-// src/worker.ts - worker de la demo : choisit la langue du visiteur puis sert les fichiers statiques.
-// Ce fichier ne sert QU'A la demo en ligne, il ne fait pas partie du theme.
+// src/worker.ts - langue du visiteur, fichiers statiques et garde du back office optionnel.
+// Le back office exige cette garde serveur avant tout service des fichiers HTML.
+import { backoffice, type BackofficeEnv } from "./backoffice/worker-backoffice.ts";
 
 const LOCALES = ["en", "fr"];
 const ROOT_LOCALE = "en";
@@ -48,7 +49,7 @@ function preferredLocale(header: string | null): string | null {
   return null;
 }
 
-interface Env {
+interface Env extends BackofficeEnv {
   ASSETS: { fetch: (request: Request) => Promise<Response> };
 }
 
@@ -56,6 +57,8 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
+    const admin = await backoffice(request, env);
+    if (admin) return admin;
 
     const isPage =
       (request.method === "GET" || request.method === "HEAD") &&

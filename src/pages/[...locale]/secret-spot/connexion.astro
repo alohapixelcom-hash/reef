@@ -1,0 +1,25 @@
+---
+// src/pages/[...locale]/secret-spot/connexion.astro - porte du service de connexion interne Aloha.
+import AdminLayout from "@layouts/AdminLayout.astro";
+import { getLocale, localePaths, localizePath } from "@i18n";
+import { backofficeCopy } from "@i18n/backoffice";
+export const getStaticPaths = () => process.env.ALOHA_BACKOFFICE === "1" ? localePaths() : [];
+const locale = getLocale(Astro); const t = backofficeCopy[locale];
+const field = "border-border bg-background rounded-card min-h-11 w-full border px-3 py-2";
+---
+<AdminLayout title={t.signIn} login>
+  <section data-admin-login data-locale={locale} data-target={localizePath("/secret-spot/", locale)} class="max-w-lg">
+    <p class="mb-6">{t.loginHelp}</p>
+    <form data-request-code class="space-y-5">
+      <label class="block">{t.email}<input type="email" name="email" autocomplete="email" required class={field} /></label>
+      <div data-challenge></div>
+      <button type="submit" disabled class="rounded-pill bg-primary text-primary-foreground min-h-11 px-5 disabled:opacity-50">{t.sendCode}</button>
+    </form>
+    <form data-verify-code hidden class="mt-6 space-y-5">
+      <label class="block">{t.code}<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required class={field} /></label>
+      <button type="submit" class="rounded-pill bg-primary text-primary-foreground min-h-11 px-5">{t.verify}</button>
+    </form>
+    <p data-login-status role="status" aria-live="polite" class="mt-5"></p>
+  </section>
+  <script>import "@components/Sections/BackOffice/login";</script>
+</AdminLayout>

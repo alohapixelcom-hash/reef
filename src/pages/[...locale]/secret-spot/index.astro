@@ -1,0 +1,35 @@
+---
+// src/pages/[...locale]/secret-spot/index.astro - editeur interne optionnel, garde par le Worker.
+import AdminLayout from "@layouts/AdminLayout.astro";
+import { getLocale, localePaths, localizePath } from "@i18n";
+import { backofficeCopy } from "@i18n/backoffice";
+export const getStaticPaths = () => process.env.ALOHA_BACKOFFICE === "1" ? localePaths() : [];
+const locale = getLocale(Astro);
+const t = backofficeCopy[locale];
+const field = "border-border bg-background rounded-card min-h-11 w-full border px-3 py-2";
+---
+<AdminLayout title={t.articles}>
+  <section data-editor data-locale={locale}>
+    <nav aria-label={t.contentLanguage} class="mb-6 flex gap-4"><a class="inline-flex min-h-11 items-center underline" href={localizePath("/secret-spot/", "en")}>English</a><a class="inline-flex min-h-11 items-center underline" href={localizePath("/secret-spot/", "fr")}>Français</a></nav>
+    <p data-status role="status" aria-live="polite" class="mb-5">{t.loading}</p>
+    <div class="grid gap-8 xl:grid-cols-[16rem_1fr]">
+      <div><button data-new class="rounded-pill bg-primary text-primary-foreground mb-4 min-h-11 px-5">{t.newArticle}</button><ul data-articles class="space-y-2"></ul></div>
+      <form data-article-form hidden class="min-w-0 space-y-4">
+        <label class="block">{t.slug}<input name="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxlength="120" class={field} /></label>
+        <label class="block">{t.title}<input name="title" required class={field} /></label>
+        <label class="block">{t.description}<textarea name="description" required rows="2" class={field}></textarea></label>
+        <label class="block">{t.date}<input name="pubDate" required class={field} /></label>
+        <div class="grid gap-4 sm:grid-cols-2"><label>{t.author}<select name="author" required class={field}></select></label><label>{t.topic}<select name="topic" required class={field}></select></label></div>
+        <label class="block">{t.tags}<input name="tags" class={field} /></label>
+        <label class="block">{t.cover}<select name="cover" class={field}></select></label>
+        <label class="block">{t.coverAlt}<input name="coverAlt" class={field} /></label>
+        <div class="flex flex-wrap gap-5"><label class="flex min-h-11 items-center gap-2"><input type="checkbox" name="draft" />{t.draft}</label><label class="flex min-h-11 items-center gap-2"><input type="checkbox" name="featured" />{t.featured}</label></div>
+        <label class="block">{t.body}<textarea name="body" rows="18" required class={`${field} font-mono text-sm`}></textarea></label>
+        <button type="submit" class="rounded-pill bg-primary text-primary-foreground min-h-11 px-6">{t.save}</button>
+        <button type="button" data-check-publication hidden class="rounded-pill border-border min-h-11 border px-5">{t.checkPublication}</button>
+        <details><summary class="min-h-11 cursor-pointer py-3">{t.preview}</summary><div data-preview class="bg-card rounded-card p-5"></div></details>
+      </form>
+    </div>
+  </section>
+  <script>import "@components/Sections/BackOffice/editor";</script>
+</AdminLayout>

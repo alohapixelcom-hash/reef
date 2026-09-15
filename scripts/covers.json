@@ -1,0 +1,42 @@
+{
+  "reef-hero-vague.webp": {
+    "url": "https://images.pexels.com/photos/29275767/pexels-photo-29275767.jpeg?auto=compress&cs=srgb&fm=webp&w=2560&h=1441&fit=crop",
+    "minWidth": 2560
+  },
+  "covers/reef-mesurer-lecteur.webp": {
+    "url": "https://images.pexels.com/photos/14281585/pexels-photo-14281585.jpeg?auto=compress&cs=srgb&fm=webp&w=1200&h=1500&fit=crop",
+    "minWidth": 1200
+  },
+  "covers/reef-bon-brief.webp": {
+    "url": "https://images.pexels.com/photos/29290970/pexels-photo-29290970.jpeg?auto=compress&cs=srgb&fm=webp&w=1536&h=1920&fit=crop",
+    "minWidth": 1200
+  },
+  "covers/reef-mode-sombre.webp": {
+    "url": "https://images.pexels.com/photos/35613489/pexels-photo-35613489.jpeg?auto=compress&cs=srgb&fm=webp&w=2500&h=1667&fit=crop",
+    "minWidth": 1200
+  },
+  "covers/reef-collections-contrat.webp": {
+    "url": "https://images.pexels.com/photos/20443161/pexels-photo-20443161.jpeg?auto=compress&cs=srgb&fm=webp&w=1600&h=1067&fit=crop",
+    "minWidth": 1200
+  },
+  "covers/reef-cout-police.webp": {
+    "url": "https://images.pexels.com/photos/12810721/pexels-photo-12810721.jpeg?auto=compress&cs=srgb&fm=webp&w=1200&h=1500&fit=crop",
+    "minWidth": 1200
+  },
+  "covers/reef-budget-performance.webp": {
+    "url": "https://images.pexels.com/photos/29275767/pexels-photo-29275767.jpeg?auto=compress&cs=srgb&fm=webp&w=1200&h=1500&fit=crop",
+    "minWidth": 1200
+  },
+  "covers/reef-echelle-typo.webp": {
+    "url": "https://images.pexels.com/photos/8985046/pexels-photo-8985046.jpeg?auto=compress&cs=srgb&fm=webp&w=1920&h=1500&fit=crop",
+    "minWidth": 1200
+  },
+  "covers/reef-html-qui-vieillit.webp": {
+    "url": "https://images.pexels.com/photos/4321834/pexels-photo-4321834.jpeg?auto=compress&cs=srgb&fm=webp&w=1600&h=1067&fit=crop",
+    "minWidth": 1200
+  },
+  "covers/reef-prix-refonte.webp": {
+    "url": "https://images.pexels.com/photos/8332588/pexels-photo-8332588.jpeg?auto=compress&cs=srgb&fm=webp&w=1200&h=1500&fit=crop",
+    "minWidth": 1200
+  }
+}

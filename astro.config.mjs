@@ -58,7 +58,7 @@ export default defineConfig({
     // JavaScript. C'est le principal argument d'un theme de blog.
     mdx(),
     sitemap({
-      filter: (page) => !["/404/", "/examples/"].some((p) => page.includes(p)),
+      filter: (page) => !["/404/", "/examples/", "/secret-spot/"].some((p) => page.includes(p)),
       // Le sitemap porte les memes alternatives que les balises hreflang du
       // head : Google recoupe les deux, et un desaccord fait ignorer les deux.
       i18n: { defaultLocale: "en", locales: { en: "en", fr: "fr" } },

@@ -28,7 +28,7 @@
   },
   "scripts": {
     "app": "astro build && node scripts/app.mjs",
-    "build": "node scripts/covers.mjs && node scripts/favicon.mjs && astro build",
+    "build": "node scripts/covers.mjs && node scripts/favicon.mjs && astro build && node scripts/backoffice-manifest.mjs",
     "check": "astro check",
     "covers": "node scripts/covers.mjs",
     "dev": "astro dev",

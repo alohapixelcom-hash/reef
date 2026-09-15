@@ -3,7 +3,7 @@
 title: Wiki log
 summary: Dated journal of code changes reflected in the wiki, and the list of open threads.
 sources: []
-updated: 2026-09-13
+updated: 2026-09-15
 ---
 
 # Wiki log
@@ -214,3 +214,10 @@ The demo Worker ignores malformed language cookies and refused language preferen
 ## 2026-09-15 - 1.9.1
 
 Numero de famille aligne sur le correctif des variantes de Kona.
+## 2026-09-15 - Optional Aloha back office, development
+
+Added the internal Aloha editorial shell, bilingual article forms, a server guard,
+restricted authentication relay, GitHub conflict checks and a protected build-hash
+manifest. Default builds omit the administrative pages. Local browser tests use
+simulated services; real authentication and deployment remain to be validated.
+See [back-office integration](../docs/backoffice.md). No 2.3 release has been published.
