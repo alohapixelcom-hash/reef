@@ -8,6 +8,10 @@
 # GitHub obtient le meme garde-fou sans rien ecrire.
 name: verifier
 
+concurrency:
+  group: verifier-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: ["**"]
