@@ -8,6 +8,7 @@ import { getLocale, localizePath } from "@i18n";
 import { backofficeCopy } from "@i18n/backoffice";
 interface Props { title: string; login?: boolean }
 const { title, login = false } = Astro.props;
+const demo = process.env.ALOHA_BACKOFFICE !== "1";
 const locale = getLocale(Astro);
 const t = backofficeCopy[locale];
 ---
@@ -15,7 +16,7 @@ const t = backofficeCopy[locale];
   <Navbar />
   <AdminShell brand={siteData.name} home={localizePath("/", locale)} space={t.space} {title} {login} accentWord={title.split(" ")[0]}
     navigation={[{ href: localizePath("/secret-spot/", locale), label: t.articles, icon: "file-text" }, { href: localizePath("/secret-spot/rubriques/", locale), label: t.categories, icon: "folder" }]}
-    logout={t.logout} logoutUrl={localizePath("/secret-spot/connexion/", locale)} back={t.back} connected={t.connected}>
+    logout={demo ? "" : t.logout} logoutUrl={localizePath("/secret-spot/connexion/", locale)} back={t.back} connected={t.connected}>
     <slot />
   </AdminShell>
   <script>

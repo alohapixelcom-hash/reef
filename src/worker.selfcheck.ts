@@ -34,4 +34,13 @@ const post = await worker.fetch(new Request("https://example.com/", {
   method: "POST", headers: { "Accept-Language": "fr" },
 }), env);
 assert.equal(post.status, 200);
-console.log("17 cas de routage passes.");
+let demoAuthCalls = 0;
+const demoEnv = { ...env, ALOHA_DEMO_BACKOFFICE: "1", ALOHA_AUTH: { async fetch() { demoAuthCalls++; return Response.json({ authenticated: true, role: "admin" }); } } };
+for (const path of ["/api/editorial/fr/test", "/api/editorial-categories/fr/test", "/api/auth/verify", "/%61pi/editorial/fr/test", "/api%2Feditorial/fr/test"]) {
+  const response = await worker.fetch(new Request("https://example.com" + path, { method: "POST", body: "{}" }), demoEnv);
+  assert.equal(response.status, 403); assert.equal((await response.json() as { error: string }).error, "demo_read_only");
+}
+assert.equal(demoAuthCalls, 0);
+assert.equal((await worker.fetch(new Request("https://example.com/fr/secret-spot/"), demoEnv)).status, 200);
+assert.equal((await worker.fetch(new Request("https://example.com/secret-spot/build.json"), demoEnv)).status, 404);
+console.log("Routage et demonstration en lecture seule verifies, meme avec un service de connexion present.");

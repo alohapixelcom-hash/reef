@@ -1,8 +1,8 @@
 {
   "name": "reef",
   "type": "module",
-  "version": "1.9.1",
-  "description": "Reef, a free bilingual Astro 7 blog theme by Aloha Pixel. Reading-first typography, MDX collections, art-directed light and dark modes, owned SEO, Capacitor-ready.",
+  "version": "2.3.0",
+  "description": "Reef, a bilingual Astro blog theme with the Aloha editorial back office, article and category management, and a read-only public demo.",
   "license": "MIT",
   "author": "Aloha Pixel (https://alohapixel.app)",
   "homepage": "https://reef.alohapixel.app",
@@ -28,7 +28,7 @@
   },
   "scripts": {
     "app": "astro build && node scripts/app.mjs",
-    "build": "node scripts/covers.mjs && node scripts/favicon.mjs && astro build && node scripts/backoffice-manifest.mjs",
+    "build": "node scripts/covers.mjs && node scripts/favicon.mjs && astro build && node scripts/backoffice-manifest.mjs && node scripts/backoffice-demo.mjs",
     "check": "astro check",
     "covers": "node scripts/covers.mjs",
     "dev": "astro dev",

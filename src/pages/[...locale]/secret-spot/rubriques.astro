@@ -3,13 +3,15 @@
 import AdminLayout from "@layouts/AdminLayout.astro";
 import { getLocale, localePaths } from "@i18n";
 import { backofficeCopy } from "@i18n/backoffice";
-export const getStaticPaths = () => process.env.ALOHA_BACKOFFICE === "1" ? localePaths() : [];
+export const getStaticPaths = localePaths;
+const demo = process.env.ALOHA_BACKOFFICE !== "1";
 const locale = getLocale(Astro);
 const t = backofficeCopy[locale];
 const field = "border-border bg-background rounded-2xl min-h-11 w-full border px-4 py-2 text-sm";
 ---
 <AdminLayout title={t.categories}>
-  <section data-categories data-locale={locale}>
+  <section data-categories data-locale={locale} data-demo={String(demo)}>
+    {demo && <p class="border-border rounded-panel mb-5 border p-4 text-sm">{t.demoHint}</p>}
     <p data-category-status role="status" aria-live="polite" class="mb-5">{t.categoryLoading}</p>
     <button type="button" data-category-new class="bg-primary text-primary-foreground rounded-pill min-h-11 px-5 font-semibold">{t.newCategory}</button>
     <div class="bg-card border-border rounded-panel mt-6 overflow-x-auto border">

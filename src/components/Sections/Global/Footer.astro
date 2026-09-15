@@ -15,6 +15,7 @@ import { LocaleSwitcher } from "@components/ui/locale-switcher";
 import { getFooterData, getSiteRoutes } from "@config/navData.json.ts";
 import siteData from "@config/siteData.json";
 import { fmt, getLocale, localePrefix, useTranslations } from "@i18n";
+import { backofficeCopy } from "@i18n/backoffice";
 
 type Props = {
   /**
@@ -182,6 +183,7 @@ const columnLink =
       <div class="text-muted-foreground flex flex-col gap-1 text-sm">
         <p>&copy; {year} {siteData.name}. {t.footer.rights}</p>
         <p>{t.footer.builtWith}</p>
+        <a class="inline-flex min-h-11 items-center hover:underline" href={`${localePrefix(locale)}/secret-spot/`}>{backofficeCopy[locale].space}</a>
         <p>
           {t.footer.themeBy}{" "}
           <a href={creditHref} class="text-foreground font-semibold hover:underline">

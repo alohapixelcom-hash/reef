@@ -5,18 +5,19 @@ import { Breadcrumb } from "@components/ui/breadcrumb";
 interface Props {
   brand: string; home: string; space: string; title: string; lede?: string; accentWord?: string;
   navigation: { href: string; label: string; icon: IconName }[];
-  logout: string; logoutUrl: string; back: string; connected: string; login?: boolean;
+  logout?: string; logoutUrl?: string; back?: string; connected?: string; login?: boolean;
+  trail?: { label: string; href?: string }[]; contentTag?: "main" | "div"; compact?: boolean;
 }
-const { brand, home, space, title, lede, accentWord = "", navigation, logout, logoutUrl, back, connected, login = false } = Astro.props;
+const { brand, home, space, title, lede, accentWord = "", navigation, logout = "", logoutUrl = "", back = "", connected = "", login = false, contentTag: Content = "main", compact = false } = Astro.props;
 const here = Astro.url.pathname;
-const trail = [{ label: brand, href: home }, { label: space, href: navigation[0]?.href }, { label: title }];
+const trail = Astro.props.trail ?? [{ label: brand, href: home }, { label: space, href: navigation[0]?.href }, { label: title }];
 const at = accentWord ? title.toLowerCase().indexOf(accentWord.toLowerCase()) : -1;
 const before = at >= 0 ? title.slice(0, at) : title;
 const word = at >= 0 ? title.slice(at, at + accentWord.length) : "";
 const after = at >= 0 ? title.slice(at + accentWord.length) : "";
 const railLink = "flex min-h-11 shrink-0 items-center gap-2.5 rounded-pill px-4 py-2.5 font-sans text-[0.9rem] font-semibold whitespace-nowrap transition-colors duration-200";
 ---
-<section class="bg-background pt-28 pb-20 md:pt-36 md:pb-28" data-slot="admin-shell">
+<section class:list={["bg-background pb-20 md:pb-28", compact ? "pt-8 md:pt-12" : "pt-28 md:pt-36"]} data-slot="admin-shell">
   <div class="container-page">
     <Breadcrumb items={trail} label={space} />
     <div class="mt-6 grid gap-10 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-14">
@@ -31,15 +32,17 @@ const railLink = "flex min-h-11 shrink-0 items-center gap-2.5 rounded-pill px-4 
             </li>)}
           </ul>
         </nav>}
-        <div class="border-border mt-4 border-t px-1 pt-4">
-          {!login && <>
+        <slot name="rail" />
+        {(logout || back || Astro.slots.has("account")) && <div class="border-border mt-4 border-t px-1 pt-4">
+          <slot name="account" />
+          {!login && logout && <>
             <p class="text-muted-foreground text-xs leading-relaxed">{connected}<br /><span data-session-email class="font-medium">&nbsp;</span></p>
             <button type="button" data-admin-logout={logoutUrl} class="border-border text-foreground rounded-pill mt-3 min-h-11 border px-4 text-sm font-semibold transition-colors duration-200 hover:bg-muted">{logout}</button>
           </>}
-          <a href={home} class="text-muted-foreground hover:text-foreground mt-2 flex min-h-11 items-center px-4 text-sm font-semibold">{back}</a>
-        </div>
+          {back && <a href={home} class="text-muted-foreground hover:text-foreground mt-2 flex min-h-11 items-center px-4 text-sm font-semibold">{back}</a>}
+        </div>}
       </div>
-      <main class="min-w-0">
+      <Content class="min-w-0">
         <header class="flex flex-col gap-4">
           <h1 class="font-display text-display-sm sm:text-display-md text-foreground max-w-3xl">
             {word ? <Fragment>{before}<span class="accent-script">{word}</span>{after}</Fragment> : title}
@@ -47,7 +50,7 @@ const railLink = "flex min-h-11 shrink-0 items-center gap-2.5 rounded-pill px-4 
           {lede && <p class="text-muted-foreground measure-wide text-lg leading-relaxed">{lede}</p>}
         </header>
         <div class="mt-10 flex flex-col gap-8 md:mt-12"><slot /></div>
-      </main>
+      </Content>
     </div>
   </div>
 </section>

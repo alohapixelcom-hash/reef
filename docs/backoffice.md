@@ -1,9 +1,9 @@
 <!-- docs/backoffice.md - integration du socle editorial interne Aloha, preparation 2.3. -->
 # Aloha editorial back office
 
-## Development status
+## Validation scope
 
-This integration is being prepared for 2.3. Real administrator sign-in and article
+This integration is included in Reef 2.3. Real administrator sign-in and article
 creation, modification and deletion have been verified on the private preview
 branch. Category creation and ordering have also been verified against GitHub.
 The standalone buyer authentication adapter has automated tests with SQLite and
@@ -15,13 +15,13 @@ not provide store orders, payments, customer accounts or a second content databa
 
 ## Build and server configuration
 
-The default static build does not generate the administrative pages. Setting
+The default build generates a read-only demonstration using public sample content. Setting
 `ALOHA_BACKOFFICE=1` during `pnpm build` generates English and French screens and a
 private build manifest. These files must be served through `src/worker.ts`, with
 `run_worker_first = true`. Do not publish this enabled build on a static-only host.
 
 The Worker supports two installations: the existing Aloha service bindings below,
-or the standalone buyer setup in the next section.
+or the standalone buyer setup below.
 
 For an existing Aloha service, the Worker requires:
 
@@ -99,8 +99,9 @@ atomic attempt limits, single-use codes and an HTTP-only signed session.
    succeeds. The protected build manifest confirms which article version is live.
 
 The `.cloudflare/` configuration is Aloha Pixel's private validation deployment;
-it is not the buyer installation template. The public theme demo remains without
-editorial credentials and rejects administrative writes.
+it is not the buyer installation template. The public theme demo uses `ALOHA_DEMO_BACKOFFICE=1`, rejects every API request
+before authentication and only serves the demonstration screens and sample JSON.
+The buyer configuration omits that flag.
 
 ## Image cache and publication time
 

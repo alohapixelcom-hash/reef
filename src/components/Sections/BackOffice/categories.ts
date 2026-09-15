@@ -6,6 +6,7 @@ function init() {
   if (!root || root.dataset.ready) return;
   root.dataset.ready = "1";
   const lang = root.dataset.locale === "fr" ? "fr" : "en", t = backofficeCopy[lang];
+  const demo = root.dataset.demo === "true";
   const status = root.querySelector<HTMLElement>("[data-category-status]")!;
   const form = root.querySelector<HTMLFormElement>("[data-category-form]")!;
   const list = root.querySelector<HTMLTableSectionElement>("[data-category-list]")!;
@@ -19,10 +20,12 @@ function init() {
     current = item; form.reset(); field("slug").value = item?.slug ?? ""; field("slug").readOnly = !!item;
     for (const name of ["name", "description", "order", "accent"]) field(name).value = String(item?.frontmatter[name] ?? (name === "order" ? 0 : name === "accent" ? "coral" : ""));
     remove.hidden = !item; form.hidden = false; dirty = false; field("name").focus();
+    if (demo) for (const control of form.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLSelectElement | HTMLTextAreaElement>("input,button,select,textarea")) control.disabled = true;
   };
   const load = async () => {
-    const response = await fetch(endpoint, { cache: "no-store" }); if (!response.ok) throw new Error("load");
-    const data = await response.json() as { items: Category[] }; list.replaceChildren();
+    const response = await fetch(demo ? "/secret-spot/demo.json" : endpoint, { cache: "no-store" }); if (!response.ok) throw new Error("load");
+    const value = await response.json();
+    const data = (demo ? { items: value[lang].categories } : value) as { items: Category[] }; list.replaceChildren();
     for (const item of data.items.sort((a, b) => Number(a.frontmatter.order) - Number(b.frontmatter.order) || String(a.frontmatter.name).localeCompare(String(b.frontmatter.name), lang))) {
       const row = list.insertRow(); row.className = "border-border border-b";
       for (const value of [item.frontmatter.name, item.frontmatter.order]) { const cell = row.insertCell(); cell.className = "px-4 py-3"; cell.textContent = String(value); }
@@ -33,7 +36,7 @@ function init() {
     return data.items.length;
   };
   const submit = async (deleting: boolean) => {
-    if (busy || (deleting && (!current || !confirm(t.confirmCategoryDelete)))) return;
+    if (demo || busy || (deleting && (!current || !confirm(t.confirmCategoryDelete)))) return;
     busy = true;
     const controls = [...form.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLSelectElement | HTMLTextAreaElement>("input,button,select,textarea")];
     controls.forEach(control => { control.disabled = true; });
@@ -50,6 +53,7 @@ function init() {
   form.addEventListener("submit", event => { event.preventDefault(); void submit(false); });
   remove.addEventListener("click", () => void submit(true));
   root.querySelector("[data-category-new]")!.addEventListener("click", () => open(null));
+  if (demo) (root.querySelector("[data-category-new]") as HTMLButtonElement).disabled = true;
   form.addEventListener("input", () => { dirty = true; });
   window.addEventListener("beforeunload", event => { if (dirty && root.isConnected) event.preventDefault(); });
   document.addEventListener("click", event => { if (root.isConnected && event.target instanceof Element && event.target.closest("a,[data-admin-logout]") && !canLeave()) { event.preventDefault(); event.stopImmediatePropagation(); } }, { capture: true });

@@ -2,11 +2,20 @@
 
 # Reef - changelog
 
-Every theme in the family carries the same version number, so a number that
-moves here moved in all seven. The dated working notes behind each entry, with
-the reasoning and the files, are in `wiki/log.md`.
+Versions describe the features actually shipped in this theme.
 
-Current version: **1.9.1**.
+Current version: **2.3.0**.
+
+## 2.3.0 - 2026-09-15
+
+- Optional editorial back office using the common Aloha shell based on Kai.
+- Article creation, editing, deletion, search and sorting; category creation, editing, ordering and deletion.
+- Atomic Git writes detect concurrent edits and protect categories still used by posts.
+- A public read-only demonstration exposes the interface without allowing writes, even if an authentication service is configured accidentally.
+- Buyers can configure their own Cloudflare, GitHub, Turnstile and Resend services. Existing Aloha authentication service bindings remain supported.
+- Drafts no longer generate public routes. A protected build manifest confirms the saved article version after deployment.
+- Image downloads reuse verified cached files; clean installations still fetch their own images.
+- Real private-preview article create/update/delete, category ordering and automatic build confirmation verified. Standalone authentication is covered by automated SQLite and provider-mock tests.
 
 ## 1.9.1 - 2026-09-15
 

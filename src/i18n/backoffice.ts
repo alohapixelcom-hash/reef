@@ -1,5 +1,7 @@
 // src/i18n/backoffice.ts - copie bilingue du back office Aloha adapte a Reef.
 const en = {
+  demoSelect: "Select an article to explore the editor.",
+  demoHint: "Read-only demo. Explore the editor and categories; no changes can be saved. Enable the back office with your own services after installation.",
   accentCoral: "Coral", accentReef: "Turquoise", accentInk: "Ink", noResults: "No matching articles.",
   categorySlug: "Category address", categoryLoading: "Loading categories…", noCategories: "No categories yet.", categoryDeleted: "Category deleted. Website update pending.",
   categories: "Categories", newCategory: "New category", name: "Name", order: "Display order", accent: "Accent colour", categoryUsed: "This category is used by an article. Move its articles to another category first.", deleteCategory: "Delete category", confirmCategoryDelete: "Delete this unused category?", categorySaved: "Category saved. Website update pending.",
@@ -19,6 +21,8 @@ const en = {
 };
 type Copy = { [K in keyof typeof en]: string };
 const fr: Copy = {
+  demoSelect: "Sélectionnez un article pour découvrir l’éditeur.",
+  demoHint: "Démonstration en lecture seule. Découvrez l’éditeur et les rubriques ; aucune modification ne peut être enregistrée. Activez le back-office avec vos propres services après installation.",
   accentCoral: "Corail", accentReef: "Turquoise", accentInk: "Encre", noResults: "Aucun article ne correspond à la recherche.",
   categorySlug: "Adresse de la rubrique", categoryLoading: "Chargement des rubriques…", noCategories: "Aucune rubrique pour le moment.", categoryDeleted: "Rubrique supprimée. Mise à jour du site en attente.",
   categories: "Rubriques", newCategory: "Nouvelle rubrique", name: "Nom", order: "Ordre d’affichage", accent: "Couleur d’accent", categoryUsed: "Cette rubrique est utilisée par un article. Déplacez ses articles vers une autre rubrique avant de la supprimer.", deleteCategory: "Supprimer la rubrique", confirmCategoryDelete: "Supprimer cette rubrique inutilisée ?", categorySaved: "Rubrique enregistrée. Mise à jour du site en attente.",

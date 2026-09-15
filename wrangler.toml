@@ -4,6 +4,9 @@ name = "reef-demo"
 main = "src/worker.ts"
 compatibility_date = "2026-08-14"
 
+[vars]
+ALOHA_DEMO_BACKOFFICE = "1"
+
 [assets]
 directory = "./dist"
 binding = "ASSETS"

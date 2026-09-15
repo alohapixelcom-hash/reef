@@ -9,6 +9,7 @@ function init() {
   root.dataset.ready = "1";
   const lang = root.dataset.locale === "fr" ? "fr" : "en";
   const t = backofficeCopy[lang];
+  const demo = root.dataset.demo === "true";
   const form = root.querySelector<HTMLFormElement>("[data-article-form]")!;
   const status = root.querySelector<HTMLElement>("[data-status]")!;
   const list = root.querySelector<HTMLTableSectionElement>("[data-articles]")!;
@@ -63,6 +64,7 @@ function init() {
     check("featured").checked = article?.frontmatter.featured === true;
     if (!article) field("pubDate").value = new Date().toISOString().slice(0, 10);
     form.hidden = false; dirty = false; renderPreview(); field("title").focus();
+    if (demo) for (const control of form.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLSelectElement | HTMLTextAreaElement>("input,button,select,textarea")) control.disabled = true;
   };
   const renderList = () => {
     list.replaceChildren();
@@ -88,6 +90,7 @@ function init() {
       button.setAttribute("aria-label", `${t.edit} : ${String(article.frontmatter.title)}`);
       button.addEventListener("click", async () => {
         if (busy || !canLeave()) return;
+        if (demo) { populate(article); status.textContent = t.demoHint; return; }
         busy = true; button.disabled = true;
         try {
           const res = await fetch(`/api/editorial/${lang}/${encodeURIComponent(article.slug)}`, { cache: "no-store" });
@@ -105,7 +108,7 @@ function init() {
     direction = sortKey === button.dataset.sort ? -direction : 1; sortKey = button.dataset.sort!; renderList();
   });
   remove.addEventListener("click", async () => {
-    if (busy || !current || !confirm(t.confirmDelete)) return;
+    if (demo || busy || !current || !confirm(t.confirmDelete)) return;
     busy = true;
     const controls = [...form.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLSelectElement | HTMLTextAreaElement>("input,button,select,textarea")];
     controls.forEach(control => { control.disabled = true; });
@@ -118,9 +121,10 @@ function init() {
     finally { busy = false; controls.forEach(control => { control.disabled = false; }); }
   });
   const load = async () => {
-    const response = await fetch(`/api/editorial/${lang}`, { cache: "no-store" });
+    const response = await fetch(demo ? "/secret-spot/demo.json" : `/api/editorial/${lang}`, { cache: "no-store" });
     if (!response.ok) throw new Error("load");
-    const data = await response.json() as { items: Article[]; references: References };
+    const value = await response.json();
+    const data = (demo ? value[lang] : value) as { items: Article[]; references: References };
     references = data.references;
     for (const [name, values] of [["author", references.auteurs], ["topic", references.sujets], ["cover", references.images]] as const) {
       const select = field(name) as HTMLSelectElement;
@@ -131,6 +135,7 @@ function init() {
     return data.items.length;
   };
   root.querySelector("[data-new]")!.addEventListener("click", () => { if (!busy && references && canLeave()) { populate(null); status.textContent = ""; } });
+  if (demo) (root.querySelector("[data-new]") as HTMLButtonElement).disabled = true;
   form.addEventListener("input", () => { dirty = true; renderPreview(); });
   window.addEventListener("beforeunload", event => { if (dirty && root.isConnected) event.preventDefault(); });
   document.addEventListener("click", event => {
@@ -138,7 +143,7 @@ function init() {
     if (root.isConnected && target && !canLeave()) { event.preventDefault(); event.stopImmediatePropagation(); }
   }, { capture: true });
   form.addEventListener("submit", async event => {
-    event.preventDefault(); if (busy) return;
+    event.preventDefault(); if (demo || busy) return;
     busy = true; status.textContent = t.saving;
     const controls = [...form.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLSelectElement | HTMLTextAreaElement>("input,button,select,textarea")];
     const fm: Record<string, unknown> = {};
@@ -162,6 +167,6 @@ function init() {
     } catch { status.textContent = t.failed; }
     finally { busy = false; controls.forEach(control => { control.disabled = false; }); }
   });
-  void load().then(count => { status.textContent = count ? t.select : t.empty; }).catch(() => { status.textContent = t.failed; });
+  void load().then(count => { status.textContent = count ? demo ? t.demoSelect : t.select : t.empty; }).catch(() => { status.textContent = t.failed; });
 }
 init(); document.addEventListener("astro:page-load", init);

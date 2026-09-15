@@ -38,6 +38,17 @@ paginated blog, topic and author pages, a reading column with a table of
 contents, and a per-language RSS feed. In English and in French, from the same
 source.
 
+Reef 2.3 includes the optional **Aloha editorial back office**, using the common
+Kai-based interface. Create, edit, delete, search and sort articles; manage
+categories and their display order. GitHub keeps the history, and the editor
+confirms the article version after the site build. Drafts have no public route.
+
+[Explore the read-only editor demo](https://reef.alohapixel.app/secret-spot/) or
+[configure your own installation](docs/backoffice.md). The active back office
+requires your Cloudflare Worker, GitHub repository, email service and Turnstile
+configuration. The public demo cannot save changes. It does not use Aloha Pixel's
+private account or credentials for buyer installations.
+
 The demo publication is Reef Notes, a fictional three-person web studio's
 notebook: build logs, type specimens, and the unglamorous half of freelancing.
 Every word lives in a typed dictionary or in a Markdown post, never inside a
