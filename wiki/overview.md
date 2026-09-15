@@ -138,3 +138,8 @@ session primitives and is tested with SQLite, simulated Turnstile and mail.
 See docs/backoffice.md and wrangler.backoffice.example.toml for setup. Drafts no
 longer generate public article routes. The preview has its own build trigger;
 the public demo has no editorial credentials.
+
+
+## Sync 2026-09-15: Aloha SaaS back-office reference
+
+The shared BackOffice/AdminShell now follows the existing alohapixel.app SaaS admin layout: full-height dark navigation rail, horizontally scrolling mobile navigation, compact workspace, visible account and return links. Semantic theme tokens preserve each theme's identity. Business modules, authentication and read-only demo protections are unchanged. This supersedes Kai as the visual reference.
