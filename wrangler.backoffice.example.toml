@@ -1,0 +1,21 @@
+# wrangler.backoffice.example.toml - copie a personnaliser pour le site de l'acheteur.
+name = "my-reef"
+main = "src/worker.ts"
+compatibility_date = "2026-08-14"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+run_worker_first = true
+not_found_handling = "404-page"
+
+[vars]
+ALOHA_ADMIN_EMAILS = "admin@example.com"
+ALOHA_TURNSTILE_SITE_KEY = "REPLACE_WITH_YOUR_PUBLIC_SITE_KEY"
+ALOHA_MAIL_FROM = "Editorial <signin@example.com>"
+ALOHA_EDITORIAL_CONFIG = '{"id":"reef","depot":"YOUR_ACCOUNT/YOUR_REPOSITORY","branche":"main","dossierArticles":"src/data/posts","dossierAuteurs":"src/data/authors","dossierSujets":"src/data/topics","dossierImages":"src/assets/covers","fichierImages":"scripts/covers.json","format":"reef","langues":["fr","en"]}'
+
+[[d1_databases]]
+binding = "ALOHA_AUTH_DB"
+database_name = "my-reef-auth"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"

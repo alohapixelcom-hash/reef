@@ -1,6 +1,10 @@
 // src/i18n/backoffice.ts - copie bilingue du back office Aloha adapte a Reef.
 const en = {
-  space: "Editorial workspace", articles: "Articles", back: "View website", logout: "Sign out", email: "Email",
+  accentCoral: "Coral", accentReef: "Turquoise", accentInk: "Ink", noResults: "No matching articles.",
+  categorySlug: "Category address", categoryLoading: "Loading categories…", noCategories: "No categories yet.", categoryDeleted: "Category deleted. Website update pending.",
+  categories: "Categories", newCategory: "New category", name: "Name", order: "Display order", accent: "Accent colour", categoryUsed: "This category is used by an article. Move its articles to another category first.", deleteCategory: "Delete category", confirmCategoryDelete: "Delete this unused category?", categorySaved: "Category saved. Website update pending.",
+  remove: "Delete article", confirmDelete: "Delete this article? The deletion will be saved in your repository.", deleted: "Article deleted from the repository. Website update pending.", state: "Status", publishedState: "Published", actions: "Actions", edit: "Edit", search: "Search articles",
+  connected: "Signed in as", space: "Editorial workspace", articles: "Articles", back: "View website", logout: "Sign out", email: "Email",
   title: "Title", description: "Description", date: "Publication date", author: "Author", topic: "Topic", tags: "Tags (comma separated)",
   cover: "Cover image", coverAlt: "Image description", body: "Article (Markdown)", draft: "Draft", featured: "Featured article",
   slug: "Article address", newArticle: "New article", save: "Save changes", preview: "Reading preview", loading: "Loading articles…",
@@ -15,7 +19,11 @@ const en = {
 };
 type Copy = { [K in keyof typeof en]: string };
 const fr: Copy = {
-  space: "Espace éditorial", articles: "Articles", back: "Voir le site", logout: "Se déconnecter", email: "Adresse e-mail",
+  accentCoral: "Corail", accentReef: "Turquoise", accentInk: "Encre", noResults: "Aucun article ne correspond à la recherche.",
+  categorySlug: "Adresse de la rubrique", categoryLoading: "Chargement des rubriques…", noCategories: "Aucune rubrique pour le moment.", categoryDeleted: "Rubrique supprimée. Mise à jour du site en attente.",
+  categories: "Rubriques", newCategory: "Nouvelle rubrique", name: "Nom", order: "Ordre d’affichage", accent: "Couleur d’accent", categoryUsed: "Cette rubrique est utilisée par un article. Déplacez ses articles vers une autre rubrique avant de la supprimer.", deleteCategory: "Supprimer la rubrique", confirmCategoryDelete: "Supprimer cette rubrique inutilisée ?", categorySaved: "Rubrique enregistrée. Mise à jour du site en attente.",
+  remove: "Supprimer l’article", confirmDelete: "Supprimer cet article ? La suppression sera enregistrée dans votre dépôt.", deleted: "Article supprimé du dépôt. Mise à jour du site en attente.", state: "État", publishedState: "Publié", actions: "Actions", edit: "Modifier", search: "Rechercher un article",
+  connected: "Connecté en tant que", space: "Espace éditorial", articles: "Articles", back: "Voir le site", logout: "Se déconnecter", email: "Adresse e-mail",
   title: "Titre", description: "Description", date: "Date de publication", author: "Auteur", topic: "Rubrique", tags: "Étiquettes (séparées par des virgules)",
   cover: "Image de couverture", coverAlt: "Description de l’image", body: "Article (Markdown)", draft: "Brouillon", featured: "Article à la une",
   slug: "Adresse de l’article", newArticle: "Nouvel article", save: "Enregistrer", preview: "Aperçu de lecture", loading: "Chargement des articles…",

@@ -47,7 +47,7 @@ const navLink = [
 
 // L'inscription vit dans le pied de page, present sur toutes les pages : une
 // ancre suffit et ne depend d'aucune langue.
-const subscribeHref = "#newsletter";
+const subscribeHref = path.includes("/secret-spot") ? `${routes.home}#newsletter` : "#newsletter";
 ---
 
 {/* Le lien d'evitement est le premier element focalisable du document. Il ne

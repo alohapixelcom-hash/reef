@@ -127,3 +127,14 @@ Default builds remain static. scripts/covers.json is the tracked image source
 manifest used by both the build and editor. The download cache checks URL,
 width and SHA-256 before reusing a local file. Tests cover cache invalidation
 and preservation of a valid photo when the upstream response is invalid.
+
+## Sync 2026-09-15: shared administration shell
+
+The working branch uses the Kai-based Aloha AdminShell shared source, an article
+table with search and accessible sorting, guarded article deletion and category
+management. Real sign-in, article create/update/delete and category ordering
+were verified on the private preview branch. Buyer authentication reuses Aloha
+session primitives and is tested with SQLite, simulated Turnstile and mail.
+See docs/backoffice.md and wrangler.backoffice.example.toml for setup. Drafts no
+longer generate public article routes. The preview has its own build trigger;
+the public demo has no editorial credentials.

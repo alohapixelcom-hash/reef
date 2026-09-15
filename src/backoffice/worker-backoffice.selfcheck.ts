@@ -17,6 +17,7 @@ Object.assign(env, {
 });
 const transport: typeof fetch = async (input, init) => {
   github++;
+  assert.equal(init?.redirect, "manual", "Cloudflare refuse redirect:error ; aucune redirection ne doit etre suivie");
   assert.equal(String(input), "https://api.github.com/graphql");
   const headers = new Headers(init?.headers);
   assert.equal(headers.get("Cookie"), null);

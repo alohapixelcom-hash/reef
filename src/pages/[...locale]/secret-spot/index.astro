@@ -6,15 +6,21 @@ import { backofficeCopy } from "@i18n/backoffice";
 export const getStaticPaths = () => process.env.ALOHA_BACKOFFICE === "1" ? localePaths() : [];
 const locale = getLocale(Astro);
 const t = backofficeCopy[locale];
-const field = "border-border bg-background rounded-card min-h-11 w-full border px-3 py-2";
+const field = "border-border bg-background rounded-2xl min-h-11 w-full border px-4 py-2 text-sm";
 ---
 <AdminLayout title={t.articles}>
   <section data-editor data-locale={locale}>
     <nav aria-label={t.contentLanguage} class="mb-6 flex gap-4"><a class="inline-flex min-h-11 items-center underline" href={localizePath("/secret-spot/", "en")}>English</a><a class="inline-flex min-h-11 items-center underline" href={localizePath("/secret-spot/", "fr")}>Français</a></nav>
     <p data-status role="status" aria-live="polite" class="mb-5">{t.loading}</p>
-    <div class="grid gap-8 xl:grid-cols-[16rem_1fr]">
-      <div><button data-new class="rounded-pill bg-primary text-primary-foreground mb-4 min-h-11 px-5">{t.newArticle}</button><ul data-articles class="space-y-2"></ul></div>
-      <form data-article-form hidden class="min-w-0 space-y-4">
+    <div class="space-y-8">
+      <div><button data-new class="rounded-pill bg-primary text-primary-foreground mb-4 min-h-11 px-5">{t.newArticle}</button><label class="block mb-4">{t.search}<input type="search" data-search class={field} /></label>
+        <div class="bg-card border-border rounded-panel overflow-x-auto border">
+          <table class="w-full text-left text-sm"><thead class="text-muted-foreground border-border border-b text-xs uppercase"><tr>
+            {[['title', t.title], ['pubDate', t.date], ['draft', t.state]].map(([key, label]) => <th class="px-4 py-3" aria-sort="none"><button type="button" data-sort={key} class="min-h-11 font-semibold">{label}<span data-sort-arrow aria-hidden="true"></span></button></th>)}
+            <th class="px-4 py-3">{t.actions}</th>
+          </tr></thead><tbody data-articles></tbody></table>
+        </div></div>
+      <form data-article-form hidden class="bg-card border-border rounded-panel min-w-0 space-y-4 border p-6">
         <label class="block">{t.slug}<input name="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxlength="120" class={field} /></label>
         <label class="block">{t.title}<input name="title" required class={field} /></label>
         <label class="block">{t.description}<textarea name="description" required rows="2" class={field}></textarea></label>
@@ -25,6 +31,7 @@ const field = "border-border bg-background rounded-card min-h-11 w-full border p
         <label class="block">{t.coverAlt}<input name="coverAlt" class={field} /></label>
         <div class="flex flex-wrap gap-5"><label class="flex min-h-11 items-center gap-2"><input type="checkbox" name="draft" />{t.draft}</label><label class="flex min-h-11 items-center gap-2"><input type="checkbox" name="featured" />{t.featured}</label></div>
         <label class="block">{t.body}<textarea name="body" rows="18" required class={`${field} font-mono text-sm`}></textarea></label>
+        <button type="button" data-delete hidden class="text-foreground border-accent rounded-pill min-h-11 border px-5 font-semibold">{t.remove}</button>
         <button type="submit" class="rounded-pill bg-primary text-primary-foreground min-h-11 px-6">{t.save}</button>
         <button type="button" data-check-publication hidden class="rounded-pill border-border min-h-11 border px-5">{t.checkPublication}</button>
         <details><summary class="min-h-11 cursor-pointer py-3">{t.preview}</summary><div data-preview class="bg-card rounded-card p-5"></div></details>

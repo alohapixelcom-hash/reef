@@ -11,8 +11,13 @@ function init() {
   const t = backofficeCopy[lang];
   const form = root.querySelector<HTMLFormElement>("[data-article-form]")!;
   const status = root.querySelector<HTMLElement>("[data-status]")!;
-  const list = root.querySelector<HTMLUListElement>("[data-articles]")!;
+  const list = root.querySelector<HTMLTableSectionElement>("[data-articles]")!;
   const preview = root.querySelector<HTMLElement>("[data-preview]")!;
+  let items: Article[] = [];
+  let sortKey = "pubDate";
+  let direction = -1;
+  const search = root.querySelector<HTMLInputElement>("[data-search]")!;
+  const remove = root.querySelector<HTMLButtonElement>("[data-delete]")!;
   let current: Article | null = null;
   let dirty = false;
   let busy = false;
@@ -47,7 +52,7 @@ function init() {
   const renderPreview = () => { preview.innerHTML = apercu(field("body").value); };
   const populate = (article: Article | null) => {
     watch++; pending = null; publicationButton.hidden = true;
-    current = article;
+    current = article; remove.hidden = !article;
     form.reset();
     for (const name of ["title", "description", "pubDate", "author", "topic", "cover", "coverAlt"]) field(name).value = String(article?.frontmatter[name] ?? "");
     field("slug").value = article?.slug ?? "";
@@ -59,21 +64,28 @@ function init() {
     if (!article) field("pubDate").value = new Date().toISOString().slice(0, 10);
     form.hidden = false; dirty = false; renderPreview(); field("title").focus();
   };
-  const load = async () => {
-    const response = await fetch(`/api/editorial/${lang}`, { cache: "no-store" });
-    if (!response.ok) throw new Error("load");
-    const data = await response.json() as { items: Article[]; references: References };
-    references = data.references;
-    for (const [name, values] of [["author", references.auteurs], ["topic", references.sujets], ["cover", references.images]] as const) {
-      const select = field(name) as HTMLSelectElement;
-      select.replaceChildren(new Option(name === "cover" ? t.noCover : "", ""), ...values.map(value => new Option(references?.libelles?.[value] ?? value.split("/").pop()!.replace(/\.[a-z]+$/i, "").replace(/^reef-/, "").replace(/-/g, " "), value)));
-    }
+  const renderList = () => {
     list.replaceChildren();
-    for (const article of data.items) {
-      const item = document.createElement("li");
-      const button = document.createElement("button");
-      button.type = "button"; button.className = "border-border rounded-card min-h-11 w-full border px-3 py-3 text-left";
-      button.textContent = `${String(article.frontmatter.title)}${article.frontmatter.draft ? ` (${t.draft})` : ""}`;
+    for (const button of root.querySelectorAll<HTMLButtonElement>("[data-sort]")) {
+      const active = button.dataset.sort === sortKey;
+      button.closest("th")?.setAttribute("aria-sort", active ? direction === 1 ? "ascending" : "descending" : "none");
+      button.querySelector("[data-sort-arrow]")!.textContent = active ? direction === 1 ? " ↑" : " ↓" : "";
+    }
+    const query = search.value.trim().toLocaleLowerCase(lang);
+    const sorted = items.filter(item => String(item.frontmatter.title).toLocaleLowerCase(lang).includes(query)).sort((a, b) => {
+      const left = a.frontmatter[sortKey], right = b.frontmatter[sortKey];
+      const comparison = sortKey === "pubDate" ? Date.parse(String(left)) - Date.parse(String(right)) : sortKey === "draft" ? Number(left === true) - Number(right === true) : String(left).localeCompare(String(right), lang);
+      return direction * comparison || a.slug.localeCompare(b.slug);
+    });
+    for (const article of sorted) {
+      const item = document.createElement("tr"); item.className = "border-border border-b";
+      for (const value of [String(article.frontmatter.title), String(article.frontmatter.pubDate), article.frontmatter.draft ? t.draft : t.publishedState]) {
+        const cell = document.createElement("td"); cell.className = "px-4 py-3"; cell.textContent = value; item.append(cell);
+      }
+      const action = document.createElement("td"); action.className = "px-4 py-3";
+      const button = document.createElement("button"); button.type = "button";
+      button.className = "rounded-pill border-border min-h-11 border px-4 font-semibold"; button.textContent = t.edit;
+      button.setAttribute("aria-label", `${t.edit} : ${String(article.frontmatter.title)}`);
       button.addEventListener("click", async () => {
         if (busy || !canLeave()) return;
         busy = true; button.disabled = true;
@@ -84,8 +96,38 @@ function init() {
         } catch { status.textContent = t.failed; }
         finally { busy = false; button.disabled = false; }
       });
-      item.append(button); list.append(item);
+      action.append(button); item.append(action); list.append(item);
     }
+    if (!sorted.length) { const row = list.insertRow(); const cell = row.insertCell(); cell.colSpan = 4; cell.className = "px-4 py-10 text-center text-muted-foreground"; cell.textContent = items.length ? t.noResults : t.empty; }
+  };
+  search.addEventListener("input", renderList);
+  for (const button of root.querySelectorAll<HTMLButtonElement>("[data-sort]")) button.addEventListener("click", () => {
+    direction = sortKey === button.dataset.sort ? -direction : 1; sortKey = button.dataset.sort!; renderList();
+  });
+  remove.addEventListener("click", async () => {
+    if (busy || !current || !confirm(t.confirmDelete)) return;
+    busy = true;
+    const controls = [...form.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLSelectElement | HTMLTextAreaElement>("input,button,select,textarea")];
+    controls.forEach(control => { control.disabled = true; });
+    try {
+      const response = await fetch(`/api/editorial/${lang}/${encodeURIComponent(current.slug)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "delete", sha: current.sha }) });
+      if (!response.ok) { status.textContent = response.status === 409 ? t.conflict : t.failed; return; }
+      items = items.filter(item => item.slug !== current!.slug); current = null; dirty = false; watch++; pending = null;
+      form.hidden = true; renderList(); status.textContent = t.deleted;
+    } catch { status.textContent = t.failed; }
+    finally { busy = false; controls.forEach(control => { control.disabled = false; }); }
+  });
+  const load = async () => {
+    const response = await fetch(`/api/editorial/${lang}`, { cache: "no-store" });
+    if (!response.ok) throw new Error("load");
+    const data = await response.json() as { items: Article[]; references: References };
+    references = data.references;
+    for (const [name, values] of [["author", references.auteurs], ["topic", references.sujets], ["cover", references.images]] as const) {
+      const select = field(name) as HTMLSelectElement;
+      select.replaceChildren(new Option(name === "cover" ? t.noCover : "", ""), ...values.map(value => new Option(references?.libelles?.[value] ?? value.split("/").pop()!.replace(/\.[a-z]+$/i, "").replace(/^reef-/, "").replace(/-/g, " "), value)));
+    }
+    items = data.items;
+    renderList();
     return data.items.length;
   };
   root.querySelector("[data-new]")!.addEventListener("click", () => { if (!busy && references && canLeave()) { populate(null); status.textContent = ""; } });
@@ -112,6 +154,7 @@ function init() {
       const data = await response.json() as { sha?: string; fields?: string[] };
       if (!response.ok) { status.textContent = response.status === 409 ? t.conflict : data.fields ? t.invalid + data.fields.map(key => t[key as keyof typeof t] ?? key).join(", ") : t.failed; return; }
       current = { slug, sha: data.sha!, frontmatter: fm, body }; dirty = false;
+      items = [...items.filter(item => item.slug !== slug), current]; renderList(); remove.hidden = false;
       check("slug").readOnly = true; status.textContent = t.saved;
       pending = { slug, sha: data.sha!, draft: fm.draft === true }; publicationButton.hidden = false;
       void watchPublication(++watch);

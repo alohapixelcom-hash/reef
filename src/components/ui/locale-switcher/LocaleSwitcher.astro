@@ -63,7 +63,7 @@ const { variant = "bar", class: className } = Astro.props;
 
 const locale = getLocale(Astro);
 const t = useTranslations(locale);
-const alternates = getAlternates(Astro.url, Astro.site, locale);
+const alternates = getAlternates(Astro.url, Astro.site, locale).map(alt => ({ ...alt, href: new URL(alt.href, Astro.url).pathname }));
 const compact = locales.length <= 2;
 
 // La position du curseur, et rien d'autre. Le repli sur 0 n'arrive jamais en

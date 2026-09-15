@@ -3,11 +3,13 @@
 
 ## Development status
 
-This integration is being prepared for 2.3. It has not been released. Browser
-tests currently use simulated authentication and GitHub services. Do not describe
-it as production-ready until a real sign-in, edit and deployment have been verified.
+This integration is being prepared for 2.3. Real administrator sign-in and article
+creation, modification and deletion have been verified on the private preview
+branch. Category creation and ordering have also been verified against GitHub.
+The standalone buyer authentication adapter has automated tests with SQLite and
+simulated mail/Turnstile services. Distribution status is recorded in the release.
 
-The interface reuses the internal Aloha back-office shell. Its editorial engine
+The interface reuses the Kai back-office shell selected for the Aloha common base. Its editorial engine
 adapts the existing GitHub workflow to Reef's posts, authors and topics. It does
 not provide store orders, payments, customer accounts or a second content database.
 
@@ -18,7 +20,10 @@ The default static build does not generate the administrative pages. Setting
 private build manifest. These files must be served through `src/worker.ts`, with
 `run_worker_first = true`. Do not publish this enabled build on a static-only host.
 
-The Worker requires:
+The Worker supports two installations: the existing Aloha service bindings below,
+or the standalone buyer setup in the next section.
+
+For an existing Aloha service, the Worker requires:
 
 - `ALOHA_AUTH`: a service binding implementing the internal Aloha authentication API.
 - `ALOHA_AUTH_ORIGIN`: the HTTPS origin expected by that authentication service.
@@ -47,6 +52,11 @@ Service binding reference: [Cloudflare HTTP service bindings](https://developers
 
 ## Editorial behaviour
 
+- Search and sort articles by title, date or draft status; create, edit and delete.
+- Create, rename, describe, order and delete categories. A category referenced by
+  an article cannot be deleted. Git commits preserve history for recovery.
+- Article and category writes use an atomic non-force branch update. A concurrent
+  edit aborts with a conflict instead of overwriting the other person's work.
 - Existing custom frontmatter is preserved. Required references are verified.
 - A new article starts as a draft. Saving an existing article preserves its status
   unless the editor changes it.
@@ -58,15 +68,39 @@ Service binding reference: [Cloudflare HTTP service bindings](https://developers
 - GitHub acknowledgement means saved, not deployed. The interface polls a protected
   manifest built from the exact Git blob hashes of the sources in the current build.
   It announces the website version only when that hash matches the saved article.
-- A draft stays out of article lists. Reef's existing draft routes are build previews;
-  no claim of private draft content is made by this integration.
+- Drafts are excluded from public routes as well as article lists, RSS and search.
+  Use the private editor's Markdown preview before publishing.
 
-## Before distribution
+## Standalone buyer installation
 
 A buyer must use their own services and credentials. Never bind a buyer's installation
-to Aloha Pixel's private store. A distributable standalone setup for the authentication
-service, deployment documentation, live validation and marketing assets remain to be
-completed before releasing this optional feature.
+to Aloha Pixel's private store. The standalone adapter reuses the Aloha session and
+email-code primitives, with an administrator allowlist, mandatory Turnstile,
+atomic attempt limits, single-use codes and an HTTP-only signed session.
+
+1. Copy `wrangler.backoffice.example.toml` to `wrangler.toml`. Choose your Worker
+   name, your administrator email, your own GitHub repository and editorial branch.
+2. Create a D1 database with `npx wrangler d1 create my-reef-auth`. Copy its ID into
+   the configuration, then run `npx wrangler d1 execute my-reef-auth --remote
+   --file scripts/backoffice-schema.sql` (one command).
+3. Create a Turnstile widget for your exact final hostname and copy the public key.
+   Verify your sending domain with Resend and set `ALOHA_MAIL_FROM` accordingly.
+4. Set each secret through the interactive Wrangler prompt, never in source files:
+   `npx wrangler secret put ALOHA_AUTH_SECRET` (at least 32 random characters),
+   `npx wrangler secret put ALOHA_TURNSTILE_SECRET_KEY`,
+   `npx wrangler secret put ALOHA_MAIL_KEY`, and
+   `npx wrangler secret put GITHUB_CONTENT_TOKEN`. Restrict the GitHub token to
+   Contents read/write on your repository and give it an expiry date.
+5. Build with `ALOHA_BACKOFFICE=1 pnpm build`, then `npx wrangler deploy`.
+   Set the same build variable in Cloudflare Workers Builds. Connect exactly the
+   editorial branch and use `npx wrangler deploy --keep-vars` as the deploy command.
+6. Open `/fr/secret-spot/` or `/secret-spot/`, sign in with an allowlisted email,
+   create a draft and confirm the generated commit. Publish only when your build
+   succeeds. The protected build manifest confirms which article version is live.
+
+The `.cloudflare/` configuration is Aloha Pixel's private validation deployment;
+it is not the buyer installation template. The public theme demo remains without
+editorial credentials and rejects administrative writes.
 
 ## Image cache and publication time
 
