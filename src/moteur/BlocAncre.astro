@@ -1,0 +1,11 @@
+---
+// src/moteur/BlocAncre.astro - un bloc de texte riche ; les intertitres portent l'ancre calculee par corpsDuBillet.
+interface Props {
+  node: { style?: string; ancre?: string };
+}
+const { node } = Astro.props;
+const style = node.style ?? "normal";
+const Balise = /^h[1-6]$/.test(style) ? style : style === "blockquote" ? "blockquote" : "p";
+---
+
+<Balise id={node.ancre}><slot /></Balise>

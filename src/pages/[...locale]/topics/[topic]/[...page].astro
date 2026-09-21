@@ -14,6 +14,7 @@ import { entrySlug } from "@i18n/content";
 import { getResolvedPosts, getSortedTopics } from "@js/posts";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { introuvable, propsDeLaPage } from "@moteur/chemins";
 import type { GetStaticPaths, Page } from "astro";
 import type { CollectionEntry } from "astro:content";
 import type { ResolvedPost } from "@js/posts";
@@ -44,7 +45,9 @@ type Props = {
   topics: CollectionEntry<"topics">[];
 };
 
-const { page, topic, topics } = Astro.props;
+const props = await propsDeLaPage<Props>(Astro, getStaticPaths);
+if (!props) return introuvable();
+const { page, topic, topics } = props;
 const locale = getLocale(Astro);
 const t = useTranslations(locale);
 

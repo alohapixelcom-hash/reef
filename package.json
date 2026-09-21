@@ -40,22 +40,38 @@
     "rebrand": "node scripts/rebrand.mjs",
     "test": "node scripts/checks.mjs && node scripts/covers.selfcheck.mjs",
     "verify": "node scripts/verify.mjs",
-    "favicon": "node scripts/favicon.mjs"
+    "favicon": "node scripts/favicon.mjs",
+    "dev:moteur": "ALOHA_MOTEUR=emdash astro dev",
+    "build:moteur": "node scripts/covers.mjs && node scripts/favicon.mjs && ALOHA_MOTEUR=emdash astro build"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^14.3.2",
     "@astrojs/mdx": "^7.0.0",
+    "@astrojs/react": "^6.0.6",
     "@astrojs/sitemap": "^3.7.3",
+    "@emdash-cms/cloudflare": "0.38.0",
     "@fontsource-variable/instrument-sans": "^5.3.0",
     "@fontsource-variable/space-grotesk": "^5.3.0",
     "@tailwindcss/vite": "^4.3.2",
     "astro": "^7.3.1",
+    "emdash": "0.38.0",
+    "github-slugger": "^2.0.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "tailwind-merge": "^3.6.0",
     "tailwind-variants": "^3.2.2",
     "tailwindcss": "^4.3.2"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "sharp": "^0.35.3",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "wrangler": "^4.135.0",
+    "yaml": "^2.9.0"
+  },
+  "emdash": {
+    "seed": "seed/seed.json"
   }
 }

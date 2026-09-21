@@ -1,0 +1,12 @@
+// wrangler.moteur.jsonc - le Worker de Reef quand le moteur de publication est allume.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "reef-moteur",
+  "main": "./src/worker.moteur.ts",
+  "compatibility_date": "2026-08-14",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [{ "binding": "DB", "database_name": "reef-moteur" }],
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "reef-moteur-media" }],
+  // Publication programmee et entretien : une minute de resolution.
+  "triggers": { "crons": ["* * * * *"] }
+}

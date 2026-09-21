@@ -1,0 +1,115 @@
+{
+  "$schema": "https://emdashcms.com/seed.schema.json",
+  "version": "1",
+  "defaultLocale": "en",
+  "meta": {
+    "name": "Reef",
+    "description": "Le journal de Reef, publie depuis le back office.",
+    "author": "Aloha Pixel"
+  },
+  "settings": {
+    "title": "Reef",
+    "tagline": "A quiet place to read about building for the web"
+  },
+  "collections": [
+    {
+      "slug": "posts",
+      "label": "Articles",
+      "labelSingular": "Article",
+      "supports": [
+        "drafts",
+        "revisions",
+        "search",
+        "seo"
+      ],
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Titre",
+          "type": "string",
+          "required": true,
+          "searchable": true
+        },
+        {
+          "slug": "description",
+          "label": "Chapo",
+          "type": "text",
+          "required": true,
+          "searchable": true
+        },
+        {
+          "slug": "cover",
+          "label": "Couverture",
+          "type": "image"
+        },
+        {
+          "slug": "content",
+          "label": "Texte",
+          "type": "portableText",
+          "searchable": true
+        },
+        {
+          "slug": "topic",
+          "label": "Rubrique",
+          "type": "select",
+          "required": true,
+          "translatable": false,
+          "indexed": true,
+          "validation": {
+            "options": [
+              "craft",
+              "design",
+              "performance",
+              "studio",
+              "typography"
+            ]
+          }
+        },
+        {
+          "slug": "author",
+          "label": "Signature",
+          "type": "select",
+          "required": true,
+          "translatable": false,
+          "indexed": true,
+          "validation": {
+            "options": [
+              "mara-lindqvist",
+              "noor-benali",
+              "tomas-abaroa"
+            ]
+          }
+        },
+        {
+          "slug": "tags",
+          "label": "Mots-cles",
+          "type": "json"
+        },
+        {
+          "slug": "featured",
+          "label": "A la une",
+          "type": "boolean",
+          "defaultValue": false
+        },
+        {
+          "slug": "pub_date",
+          "label": "Date affichee",
+          "type": "datetime",
+          "indexed": true
+        },
+        {
+          "slug": "updated_date",
+          "label": "Revu le",
+          "type": "datetime"
+        }
+      ]
+    }
+  ],
+  "taxonomies": [],
+  "bylines": [],
+  "content": {},
+  "menus": [],
+  "redirects": [],
+  "widgetAreas": [],
+  "sections": []
+}

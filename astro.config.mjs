@@ -3,6 +3,7 @@ import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
+import { moteur } from "./moteur.config.mjs";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
@@ -39,8 +40,11 @@ export default defineConfig({
   // canonical + OG s'accordent sur cette forme.
   trailingSlash: "always",
 
-  // Pas d'adapter, volontairement : le theme compile en HTML 100% statique et
-  // n'impose aucun hebergeur a son utilisateur.
+  // Pas d'adapter PAR DEFAUT, volontairement : le theme compile en HTML 100%
+  // statique et n'impose aucun hebergeur a son utilisateur. Le moteur de
+  // publication (ALOHA_MOTEUR=emdash) pose l'adapter Cloudflare et ne rend a
+  // la demande QUE les pages qu'il gere ; tout le reste demeure prerendu.
+  ...moteur.config,
   security: { checkOrigin: true },
 
   // Routage bilingue. L'anglais est servi a la racine (/, /about/), le francais
@@ -53,6 +57,7 @@ export default defineConfig({
   },
 
   integrations: [
+    ...moteur.integrations,
     // Pas de React ici, volontairement : Reef n'a pas un seul ilot. Tout le
     // theme est du .astro, et la page d'article part a zero kilo-octet de
     // JavaScript. C'est le principal argument d'un theme de blog.
@@ -113,6 +118,9 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    // Deux sources de billets, une seule forme : l'alias choisit les fichiers
+    // ou la base, et aucune page ne sait d'ou vient un billet.
+    resolve: { alias: moteur.alias },
     build: {
       // N'inline pas les petits scripts, pour qu'ils survivent aux view transitions.
       assetsInlineLimit: 0,

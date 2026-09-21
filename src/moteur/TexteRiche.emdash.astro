@@ -1,0 +1,17 @@
+---
+// src/moteur/TexteRiche.emdash.astro - rend le corps d'un billet de la base (Portable Text) dans la colonne de lecture du theme.
+//
+// Deux composants du moteur sont remplaces : les blocs, pour que chaque
+// intertitre porte l'ancre du sommaire, et le code, pour garder la
+// coloration a deux themes du reste du journal.
+import { PortableText } from "emdash/ui";
+import BlocAncre from "./BlocAncre.astro";
+import CodeDuJournal from "./CodeDuJournal.astro";
+
+interface Props {
+  blocs: unknown[];
+}
+const { blocs } = Astro.props;
+---
+
+<PortableText value={blocs as never} components={{ block: BlocAncre, type: { code: CodeDuJournal } }} />

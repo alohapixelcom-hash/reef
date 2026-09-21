@@ -36,3 +36,7 @@ src/assets/*.webp
 .DS_Store
 Thumbs.db
 *.log
+
+# Moteur de publication : etat local de D1 et R2, et types generes.
+.emdash/
+emdash-env.d.ts

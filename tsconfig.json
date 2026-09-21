@@ -5,16 +5,49 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "@components/*": ["src/components/*"],
-      "@config/*": ["src/config/*"],
-      "@layouts/*": ["src/layouts/*"],
-      "@styles/*": ["src/styles/*"],
-      "@js/*": ["src/js/*"],
-      "@assets/*": ["src/assets/*"],
-      "@i18n": ["src/i18n/index.ts"],
-      "@i18n/*": ["src/i18n/*"]
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@config/*": [
+        "src/config/*"
+      ],
+      "@layouts/*": [
+        "src/layouts/*"
+      ],
+      "@styles/*": [
+        "src/styles/*"
+      ],
+      "@js/*": [
+        "src/js/*"
+      ],
+      "@assets/*": [
+        "src/assets/*"
+      ],
+      "@i18n": [
+        "src/i18n/index.ts"
+      ],
+      "@i18n/*": [
+        "src/i18n/*"
+      ],
+      "@moteur/source": [
+        "src/moteur/source.fichiers.ts"
+      ],
+      "@moteur/TexteRiche.astro": [
+        "src/moteur/TexteRiche.emdash.astro"
+      ],
+      "@moteur/live": [
+        "src/moteur/live.fichiers.ts"
+      ],
+      "@moteur/*": [
+        "src/moteur/*"
+      ]
     }
   },
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "include": [
+    ".astro/types.d.ts",
+    "**/*"
+  ],
+  "exclude": [
+    "dist"
+  ]
 }
