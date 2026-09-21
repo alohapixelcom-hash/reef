@@ -1,0 +1,62 @@
+/* src/moteur/back-office.css - habille le back office du moteur aux jetons du theme : memes surfaces, memes encres, meme couleur de marque, memes polices.
+ *
+ * Le back office d'EmDash se peint entierement par variables (--color-kumo-*,
+ * --text-color-kumo-*). On ne touche donc ni a son code ni a son paquet : on
+ * donne a ses variables les valeurs des jetons du theme, que habillage.ts pose
+ * dans la page juste avant cette feuille. Un rebrand du theme (tokens.css)
+ * rebrande le back office du meme geste, clair et sombre compris.
+ *
+ * Le selecteur porte data-mode pour passer devant le theme "classic" du
+ * moteur, qui declare les siennes avec deux attributs.
+ */
+html[data-theme][data-mode] {
+  /* Surfaces */
+  --color-kumo-canvas: var(--reef-background);
+  --color-kumo-elevated: var(--reef-background);
+  --color-kumo-base: var(--reef-card);
+  --color-kumo-overlay: var(--reef-card);
+  --color-kumo-control: var(--reef-card);
+  --color-kumo-tint: var(--reef-muted);
+  --color-kumo-recessed: var(--reef-muted);
+  --color-kumo-fill: color-mix(in oklab, var(--reef-foreground) 10%, var(--reef-background));
+  --color-kumo-fill-hover: color-mix(in oklab, var(--reef-foreground) 16%, var(--reef-background));
+  --color-kumo-interact: color-mix(in oklab, var(--reef-foreground) 16%, var(--reef-background));
+  --color-kumo-contrast: var(--reef-foreground);
+
+  /* Filets */
+  --color-kumo-line: var(--reef-border);
+  --color-kumo-hairline: var(--reef-border);
+
+  /* Marque */
+  --color-kumo-brand: var(--reef-primary);
+  --color-kumo-brand-hover: color-mix(in oklab, var(--reef-primary) 88%, var(--reef-foreground));
+  --color-kumo-focus: var(--reef-ring);
+  --text-color-kumo-brand: var(--reef-primary-text);
+  --text-color-kumo-link: var(--reef-primary-text);
+
+  /* Encres */
+  --text-color-kumo-default: var(--reef-foreground);
+  --text-color-kumo-strong: var(--reef-muted-foreground);
+  --text-color-kumo-subtle: var(--reef-muted-foreground);
+  --text-color-kumo-inactive: color-mix(in oklab, var(--reef-muted-foreground) 60%, transparent);
+  --text-color-kumo-placeholder: color-mix(in oklab, var(--reef-muted-foreground) 70%, transparent);
+
+  /* Polices : le texte du theme partout, sa police de titre sur les titres. */
+  --font-emdash: var(--font-sans);
+}
+
+html[data-theme][data-mode] body {
+  font-family: var(--font-sans);
+}
+
+html[data-theme][data-mode] :is(h1, h2, h3) {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* Les boutons du theme sont des pilules. Seuls les boutons a largeur
+ * naturelle (w-max) le deviennent : une zone de depot d'image est aussi un
+ * bouton pour le moteur, et une pilule de trente lignes de haut n'en est plus une. */
+html[data-theme][data-mode] [data-kumo-component="Button"][class*="w-max"] {
+  border-radius: var(--radius-pill);
+}

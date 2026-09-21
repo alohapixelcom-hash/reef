@@ -28,12 +28,14 @@ export const MOTEUR_ACTIF = process.env.ALOHA_MOTEUR === "emdash";
 const IMAGES =
   process.env.ALOHA_IMAGES === "origine" ? "compile" : { build: "compile", runtime: "cloudflare-binding" };
 
-/** Rend a la demande les pages gerees, fige toutes les autres, et ajoute le plan de site du moteur. */
+/** Rend a la demande les pages gerees, fige toutes les autres, ajoute le plan de site et habille le back office. */
 function partageDesPages() {
   return {
     name: "aloha:moteur-pages",
     hooks: {
-      "astro:config:setup": ({ injectRoute }) => {
+      "astro:config:setup": ({ injectRoute, addMiddleware }) => {
+        // Habille le back office aux jetons du theme (voir habillage.ts).
+        addMiddleware({ entrypoint: ici("./src/moteur/habillage.ts"), order: "post" });
         injectRoute({ pattern: "/sitemap-contenu.xml", entrypoint: ici("./src/moteur/plan-du-site.ts"), prerender: false });
       },
       "astro:route:setup": ({ route }) => {
@@ -72,7 +74,12 @@ async function allume() {
     },
     integrations: [
       react(),
-      emdash({ database: d1({ binding: "DB" }), storage: r2({ binding: "MEDIA" }) }),
+      emdash({
+        database: d1({ binding: "DB" }),
+        storage: r2({ binding: "MEDIA" }),
+        // Le back office porte le nom et la marque du site, pas ceux du moteur.
+        admin: { siteName: "Reef", logo: "/favicon.svg", favicon: "/favicon.svg" },
+      }),
       partageDesPages(),
     ],
   };
