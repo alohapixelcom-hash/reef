@@ -143,3 +143,8 @@ the public demo has no editorial credentials.
 ## Sync 2026-09-15: Aloha SaaS back-office reference
 
 The shared BackOffice/AdminShell now follows the existing alohapixel.app SaaS admin layout: full-height dark navigation rail, horizontally scrolling mobile navigation, compact workspace, visible account and return links. Semantic theme tokens preserve each theme's identity. Business modules, authentication and read-only demo protections are unchanged. This supersedes Kai as the visual reference.
+
+
+## Sync 2026-09-21: optional publication engine
+
+`ALOHA_MOTEUR=emdash` builds Reef as a Cloudflare Worker on EmDash (MIT): posts in D1, media in R2, the pages that show a post rendered on demand, everything else prerendered. Publishing in the back office (/_emdash/admin) shows on the post page, the blog index and the RSS feed with no build: 55 to 93 ms on the production build served locally by workerd, three passes. One alias (`@moteur/source`) picks the files or the database, both sources return the same collection entry, and no component was rewritten; `src/moteur/chemins.ts` replays a page's own getStaticPaths on demand. The engine also ships an on-demand sitemap for managed pages, Cloudflare Images at request time, a back office skinned from tokens.css, and a "Tout deployer" extension (cache purge, Deploy Hook, proof by /version.json). With the variable absent the build is unchanged: 63 HTML, XML and TXT files compared one by one. Not yet deployed online. See docs/moteur.md.

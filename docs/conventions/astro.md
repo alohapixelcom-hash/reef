@@ -4,9 +4,18 @@
 
 ## Static output is the product
 
-- No adapter, on purpose (astro.config.mjs:16-17). The theme compiles to
+- No adapter BY DEFAULT, on purpose (astro.config.mjs). The theme compiles to
   plain HTML and imposes no host on its user. Never add an adapter, an
-  endpoint that needs a server, or `export const prerender = false`.
+  endpoint that needs a server, or `export const prerender = false` to the
+  theme itself.
+- One opt-in exception, and it lives outside the default build: the
+  publication engine (docs/moteur.md). With `ALOHA_MOTEUR=emdash`,
+  moteur.config.mjs adds the Cloudflare adapter, EmDash and React, and renders
+  on demand ONLY the pages listed in src/moteur/pages-gerees.mjs; every other
+  page stays prerendered. With the variable absent none of those packages is
+  even imported, and the build must stay identical, file by file, to what it
+  was before the engine existed. A change that alters the static HTML is a
+  regression, whatever it does for the engine.
 - The contact form (contact.astro) ships with no `action` and no `method`: it
   is written but deliberately not wired. Keep it that way; its activation steps
   are documented in its own header.
@@ -24,7 +33,9 @@
   model is src/components/ui/_dialog.ts: one set of document-level listeners,
   a `bound` flag, shared by Dialog and Sheet.
 - There is no React and no island in this theme. Adding a framework here is a
-  design failure, not a feature.
+  design failure, not a feature. The publication engine's back office
+  (/_emdash/admin) is a React application, but it is EmDash's page, served only
+  when the engine is on: it is not an island, and the public site keeps zero.
 
 ## Scripts must survive view transitions
 
