@@ -41,6 +41,17 @@ html[data-theme][data-mode] {
   --text-color-kumo-inactive: color-mix(in oklab, var(--reef-muted-foreground) 60%, transparent);
   --text-color-kumo-placeholder: color-mix(in oklab, var(--reef-muted-foreground) 70%, transparent);
 
+  /* Encres semantiques (bandeaux, notifications). Le moteur ecrit ses messages
+   * dans la couleur meme de leur pictogramme : mesure le 21 septembre 2026 sur
+   * un bandeau d'alerte, 2,06 pour 1 sur son fond pale, quand AA en demande 4,5.
+   * Aucune couleur n'est inventee : la teinte reste celle du moteur, tiree vers
+   * l'encre du theme, et elle suit donc le mode sombre comme elle. Mesure apres :
+   * de 7,18 a 10,22 pour 1 sur les bandeaux et les notifications, clair et sombre. */
+  --text-color-kumo-warning: color-mix(in oklab, var(--color-kumo-warning) 40%, var(--reef-foreground));
+  --text-color-kumo-info: color-mix(in oklab, var(--color-kumo-info) 40%, var(--reef-foreground));
+  --text-color-kumo-success: color-mix(in oklab, var(--color-kumo-success) 40%, var(--reef-foreground));
+  --text-color-kumo-danger: color-mix(in oklab, var(--color-kumo-danger) 40%, var(--reef-foreground));
+
   /* Polices : le texte du theme partout, sa police de titre sur les titres. */
   --font-emdash: var(--font-sans);
 }
