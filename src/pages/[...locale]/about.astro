@@ -15,8 +15,14 @@ import { entrySlug, getLocalizedCollection } from "@i18n/content";
 import { getResolvedPosts } from "@js/posts";
 import { breadcrumbList, organization } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { propsDeLaPage } from "@moteur/chemins";
 
 export const getStaticPaths = localePaths;
+
+// Moteur allume, cette page se rend a la demande et [...locale] accepte
+// n'importe quel segment : une langue inconnue repond 404, comme au build.
+const demande = await propsDeLaPage(Astro, getStaticPaths);
+if (demande instanceof Response) return demande;
 
 const locale = getLocale(Astro);
 const t = useTranslations(locale);

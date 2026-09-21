@@ -17,6 +17,9 @@ export const PAGES_GEREES = [
   "src/pages/[...locale]/authors/index.astro",
   "src/pages/[...locale]/authors/[author].astro",
   "src/pages/[...locale]/search.astro",
+  // A propos compte les billets de chaque auteur : figee, elle mentirait
+  // d'un billet a chaque publication.
+  "src/pages/[...locale]/about.astro",
   "src/pages/[...locale]/rss.xml.ts",
   "src/pages/llms.txt.ts",
 ];
