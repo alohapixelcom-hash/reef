@@ -15,6 +15,7 @@ import { parse } from "yaml";
 
 const RACINE = fileURLToPath(new URL("../", import.meta.url));
 const DOSSIER = path.join(RACINE, "src/data/posts");
+const COLLECTION = "posts";
 const LANGUE_SOURCE = "en";
 
 const args = process.argv.slice(2);
@@ -32,6 +33,72 @@ function lire(source, fichier) {
   if (!m) throw new Error(`Frontmatter introuvable dans ${fichier}`);
   return { meta: parse(m[1]), corps: m[2] };
 }
+
+/**
+ * Recolle les lignes d'un meme paragraphe.
+ *
+ * Les fiches sont ecrites a 80 colonnes, et le convertisseur du client lit le
+ * Markdown LIGNE PAR LIGNE : sans ce passage, chaque ligne devenait un
+ * paragraphe et une description de trois paragraphes en affichait douze. En
+ * Markdown, un saut de ligne simple vaut une espace ; on l'ecrit donc ainsi.
+ * Titres, listes, citations, tableaux et blocs de code gardent leurs lignes.
+ *
+ * Une ligne qui commence par "17. " au milieu d'un paragraphe est une fin de
+ * phrase, pas une liste : comme en Markdown, seule "1. " peut interrompre un
+ * paragraphe. La cire tiede ("cool for 12 to / 17. Above 22 it drags") y a
+ * gagne une liste numerotee le temps d'un essai.
+ */
+function deplier(markdown) {
+  const BLOC = /^(#{1,6} |> |[-*+] |\d+\. |\||```)/;
+  const COUPE_UN_PARAGRAPHE = /^(#{1,6} |> |[-*+] |1\. |\||```)/;
+  const sortie = [];
+  let dansLeCode = false;
+  let dansUnParagraphe = false;
+  for (const ligne of markdown.split(/\r?\n/)) {
+    if (ligne.startsWith("```")) dansLeCode = !dansLeCode;
+    const vide = ligne.trim() === "";
+    const suite = dansUnParagraphe && !dansLeCode && !vide && !COUPE_UN_PARAGRAPHE.test(ligne);
+    if (suite) sortie[sortie.length - 1] = `${sortie.at(-1)} ${ligne.trim()}`;
+    else sortie.push(ligne);
+    dansUnParagraphe = suite || (!dansLeCode && !vide && !BLOC.test(ligne));
+  }
+  return sortie.join("\n");
+}
+
+/** Applique une retouche au texte d'un Markdown, jamais a son code (blocs et code en ligne). */
+function horsDuCode(markdown, retouche) {
+  let dansLeCode = false;
+  return markdown
+    .split(/\r?\n/)
+    .map((ligne) => {
+      const cloture = ligne.startsWith("```");
+      if (cloture) dansLeCode = !dansLeCode;
+      if (dansLeCode || cloture) return ligne;
+      return ligne
+        .split(/(`[^`]*`)/)
+        .map((bout) => (bout.startsWith("`") ? bout : retouche(bout)))
+        .join("");
+    })
+    .join("\n");
+}
+
+/**
+ * Deux ecarts entre un billet lu d'un fichier et le meme billet verse en base,
+ * corriges ici une fois pour toutes.
+ *
+ * L'italique a un seul asterisque (*mot*) n'est pas lu par le convertisseur du
+ * client, qui ne connait que _mot_ : les asterisques sortaient tels quels.
+ *
+ * L'apostrophe typographique, qu'Astro pose tout seul en rendant un fichier
+ * Markdown, n'est posee par personne sur un texte riche : on l'ecrit donc
+ * juste. Seule l'apostrophe entre deux lettres est touchee.
+ */
+const fidele = (markdown) =>
+  horsDuCode(markdown, (texte) =>
+    texte
+      .replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?![*\w])/g, "$1_$2_")
+      .replace(/(\p{L})'(?=\p{L})/gu, "$1\u2019"),
+  );
 
 const sansLangue = (ref) => String(ref).replace(/^[a-z]{2}\//, "");
 
@@ -54,9 +121,48 @@ async function couverture(chemin, alt, fichier) {
   return { id: media.id, alt: alt ?? "", width: media.width, height: media.height };
 }
 
+/**
+ * Rend non traduisibles les champs que le seed declare ainsi.
+ *
+ * POURQUOI ICI : EmDash 0.38 lit `translatable: false` a la creation d'un
+ * champ par l'API, mais l'ignore quand le champ vient du seed, et refuse
+ * ensuite de le changer ("requires a manual content migration"). Tant que la
+ * collection est vide, le champ est donc recree a l'identique, a la meme
+ * place, avec le bon reglage. C'est ce reglage qui fait qu'un prix change sur
+ * la fiche anglaise vaut aussitot pour la fiche francaise.
+ *
+ * Collection deja remplie : on ne touche a rien et on le dit. Le jour ou le
+ * moteur lira ce reglage dans le seed, cette fonction ne trouvera plus rien a
+ * faire.
+ */
+async function alignerLeSchema(langues) {
+  const seed = JSON.parse(await readFile(path.join(RACINE, "seed/seed.json"), "utf8"));
+  const voulus = seed.collections.find((c) => c.slug === COLLECTION)?.fields ?? [];
+  const enBase = new Map((await client.collection(COLLECTION)).fields.map((f) => [f.slug, f]));
+  const aCorriger = voulus
+    .map((champ, rang) => ({ champ, rang }))
+    .filter(({ champ }) => champ.translatable === false && enBase.get(champ.slug)?.translatable !== false);
+  if (aCorriger.length === 0) return;
+
+  let remplie = false;
+  for (const langue of langues) if ((await dejaLa(langue)).size > 0) remplie = true;
+  if (remplie) {
+    const noms = aCorriger.map(({ champ }) => champ.slug).join(", ");
+    console.warn(`Schema : ${noms} restent traduisibles, la collection contient deja des billets.`);
+    return;
+  }
+  for (const { champ, rang } of aCorriger) {
+    if (enBase.has(champ.slug)) await client.deleteField(COLLECTION, champ.slug);
+    await client.createField(COLLECTION, { ...champ, validation: champ.validation ?? null, sortOrder: rang });
+    console.log(`~ champ ${champ.slug} : non traduisible`);
+  }
+}
+
 const langues = (await readdir(DOSSIER, { withFileTypes: true })).filter((d) => d.isDirectory()).map((d) => d.name);
 // La langue source d'abord : une traduction se rattache a un billet qui existe.
 langues.sort((a, b) => (a === LANGUE_SOURCE ? -1 : b === LANGUE_SOURCE ? 1 : a.localeCompare(b)));
+
+await alignerLeSchema(langues);
 
 const sources = new Map();
 let crees = 0;
@@ -85,7 +191,7 @@ for (const langue of langues) {
         title: meta.title,
         description: meta.description,
         // Le client convertit le Markdown en Portable Text a l'ecriture.
-        content: corps,
+        content: fidele(deplier(corps)),
         cover: await couverture(meta.cover, meta.coverAlt, fichier),
         topic: sansLangue(meta.topic),
         author: sansLangue(meta.author),

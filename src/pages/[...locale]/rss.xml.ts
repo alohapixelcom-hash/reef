@@ -7,7 +7,7 @@
 import siteData from "@config/siteData.json";
 import { getLocale, localeMeta, localePaths, localizePath, useTranslations } from "@i18n";
 import { getResolvedPosts } from "@js/posts";
-import { introuvable, propsDeLaPage } from "@moteur/chemins";
+import { propsDeLaPage } from "@moteur/chemins";
 import type { APIRoute } from "astro";
 
 export const getStaticPaths = localePaths;
@@ -24,7 +24,8 @@ function escapeXml(value: string): string {
 
 export const GET: APIRoute = async ({ site, url, currentLocale, params, props }) => {
   // Moteur allume, le flux se rend a la demande : une langue inconnue repond 404.
-  if (!(await propsDeLaPage({ params, props }, getStaticPaths))) return introuvable();
+  const demande = await propsDeLaPage({ params, props }, getStaticPaths);
+  if (demande instanceof Response) return demande;
   const base = site ?? url;
   const absolute = (path: string): string => new URL(path, base).href;
 

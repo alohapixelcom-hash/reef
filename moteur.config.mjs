@@ -6,43 +6,36 @@
 //
 // Le moteur est EmDash (MIT, emdashcms.com) : la base D1 porte le contenu, R2
 // les medias, et les pages gerees se rendent a la demande. Publier dans le
-// back office ecrit en base ET purge le cache de la page : aucun build.
-import cloudflare from "@astrojs/cloudflare";
-import react from "@astrojs/react";
-import { d1, r2 } from "@emdash-cms/cloudflare";
-import emdash from "emdash/astro";
-
+// back office ecrit en base, et la page suivante le montre : aucun build.
 import { fileURLToPath } from "node:url";
+import { PAGES_GEREES } from "./src/moteur/pages-gerees.mjs";
 
 const ici = (chemin) => fileURLToPath(new URL(chemin, import.meta.url));
 
 /** Vrai quand le moteur est allume. Lu au build ET par `astro dev`. */
 export const MOTEUR_ACTIF = process.env.ALOHA_MOTEUR === "emdash";
 
-// LES PAGES QUE LE MOTEUR GERE. Tout ce qui affiche un billet se rend a la
-// demande, pour qu'une publication se voie sans build. Le reste du site
-// (a propos, contact, pages legales) garde son HTML fige.
+// LES IMAGES DES PAGES RENDUES A LA DEMANDE.
 //
-// Une seule liste, ici : une page oubliee resterait figee sur le contenu du
-// dernier build, et c'est exactement le defaut que le moteur vient corriger.
-const PAGES_GEREES = [
-  "src/pages/[...locale]/index.astro",
-  "src/pages/[...locale]/blog/[id].astro",
-  "src/pages/[...locale]/blog/[...page].astro",
-  "src/pages/[...locale]/topics/index.astro",
-  "src/pages/[...locale]/topics/[topic]/[...page].astro",
-  "src/pages/[...locale]/authors/index.astro",
-  "src/pages/[...locale]/authors/[author].astro",
-  "src/pages/[...locale]/search.astro",
-  "src/pages/[...locale]/rss.xml.ts",
-  "src/pages/llms.txt.ts",
-];
+// "compile" seul les laisserait sortir dans leur poids d'origine : sharp ne
+// tourne qu'au build, et une page rendue a la demande n'a pas de build. Mesure
+// sur l'accueil de Kai le 21 septembre 2026 : 552 430 octets par largeur au
+// lieu de 19 960. Le liant Images de Cloudflare fait a la demande ce que sharp
+// fait au build ; il demande Cloudflare Images sur le compte.
+//
+// ALOHA_IMAGES=origine garde "compile" seul, pour qui n'a pas ce service : le
+// site marche, ses images gerees sont simplement plus lourdes.
+const IMAGES =
+  process.env.ALOHA_IMAGES === "origine" ? "compile" : { build: "compile", runtime: "cloudflare-binding" };
 
-/** Rend a la demande les pages gerees, et fige toutes les autres pages du theme. */
+/** Rend a la demande les pages gerees, fige toutes les autres, et ajoute le plan de site du moteur. */
 function partageDesPages() {
   return {
     name: "aloha:moteur-pages",
     hooks: {
+      "astro:config:setup": ({ injectRoute }) => {
+        injectRoute({ pattern: "/sitemap-contenu.xml", entrypoint: ici("./src/moteur/plan-du-site.ts"), prerender: false });
+      },
       "astro:route:setup": ({ route }) => {
         if (!route.component.startsWith("src/pages/")) return;
         route.prerender = !PAGES_GEREES.includes(route.component);
@@ -57,30 +50,46 @@ const alias = (source) => ({
   "@moteur/TexteRiche.astro": ici(`./src/moteur/TexteRiche.${source}.astro`),
 });
 
+// Les paquets du moteur ne se chargent QUE moteur allume : un build statique
+// ne lit ni l'adapter Cloudflare ni EmDash, et n'en paie pas le demarrage.
+async function allume() {
+  const { default: cloudflare } = await import("@astrojs/cloudflare");
+  const { default: react } = await import("@astrojs/react");
+  const { d1, r2 } = await import("@emdash-cms/cloudflare");
+  const { default: emdash } = await import("emdash/astro");
+  return {
+    alias: alias("emdash"),
+    // Declare dans l'index du plan de site (customSitemaps, astro.config.mjs).
+    plans: ["/sitemap-contenu.xml"],
+    config: {
+      // "server" est ce qu'EmDash attend pour ses propres routes ; le
+      // partage ci-dessus refige aussitot toutes les pages non gerees.
+      output: "server",
+      // Les routes du moteur (/_emdash/api/...) s'appellent sans barre
+      // finale, et "always" leur repondrait 404.
+      trailingSlash: "ignore",
+      adapter: cloudflare({ configPath: "./wrangler.moteur.jsonc", imageService: IMAGES }),
+    },
+    integrations: [
+      react(),
+      emdash({ database: d1({ binding: "DB" }), storage: r2({ binding: "MEDIA" }) }),
+      partageDesPages(),
+    ],
+  };
+}
+
+/**
+ * Ce qu'astro.config.mjs etale dans sa propre configuration. Le type est ecrit
+ * ici pour que `trailingSlash` reste le litteral "ignore" et non une chaine
+ * quelconque : astro.config.mjs est controle (@ts-check), et le refuserait.
+ *
+ * @type {{
+ *   alias: Record<string, string>,
+ *   plans: string[],
+ *   config: import("astro").AstroUserConfig,
+ *   integrations: import("astro").AstroIntegration[],
+ * }}
+ */
 export const moteur = MOTEUR_ACTIF
-  ? {
-      alias: alias("emdash"),
-      config: {
-        // "server" est ce qu'EmDash attend pour ses propres routes ; le
-        // partage ci-dessus refige aussitot toutes les pages non gerees.
-        output: "server",
-        // Les routes du moteur (/_emdash/api/...) s'appellent sans barre
-        // finale, et "always" leur repondrait 404.
-        trailingSlash: "ignore",
-        adapter: cloudflare({
-          configPath: "./wrangler.moteur.jsonc",
-          // sharp optimise les images des pages figees au build ; a la
-          // demande, les medias du back office sont servis tels quels.
-          imageService: "compile",
-        }),
-      },
-      integrations: [
-        react(),
-        emdash({
-          database: d1({ binding: "DB" }),
-          storage: r2({ binding: "MEDIA" }),
-        }),
-        partageDesPages(),
-      ],
-    }
-  : { alias: alias("fichiers"), config: {}, integrations: [] };
+  ? await allume()
+  : { alias: alias("fichiers"), plans: [], config: {}, integrations: [] };

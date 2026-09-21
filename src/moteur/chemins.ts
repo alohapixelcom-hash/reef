@@ -21,7 +21,7 @@ const cle = (params: Params): string =>
     .join("&");
 
 /** La pagination d'Astro, refaite pour la demande : memes pages, memes params. */
-const paginer: PaginateFunction = ((donnees: unknown[], options: { pageSize?: number; params?: Params; props?: object } = {}) => {
+export const paginer: PaginateFunction = ((donnees: unknown[], options: { pageSize?: number; params?: Params; props?: object } = {}) => {
   const taille = options.pageSize ?? 10;
   const derniere = Math.max(1, Math.ceil(donnees.length / taille));
   return Array.from({ length: derniere }, (_, i) => {
@@ -48,21 +48,25 @@ const paginer: PaginateFunction = ((donnees: unknown[], options: { pageSize?: nu
 }) as unknown as PaginateFunction;
 
 /**
- * Les props de la page demandee, ou `undefined` si l'adresse n'existe pas.
+ * Les props de la page demandee, ou la reponse 404 si l'adresse n'existe pas.
  *
  *   const props = await propsDeLaPage<Props>(Astro, getStaticPaths);
- *   if (!props) return introuvable();
+ *   if (props instanceof Response) return props;
+ *
+ * POURQUOI RENDRE LA REPONSE plutot qu'undefined : `astro check` ne lit pas
+ * l'expression d'un `return` pose au sommet d'un frontmatter. Une fonction
+ * appelee seulement la (`return introuvable()`) y passe pour jamais lue, et
+ * chaque page geree coutait un indice au controle, qui doit rester a zero. La
+ * page teste donc une valeur, et rend celle qu'elle a recue. Astro habille
+ * cette reponse vide avec la page 404 du theme.
  */
-export async function propsDeLaPage<P extends object>(
+export async function propsDeLaPage<P extends object = object>(
   Astro: Pick<AstroGlobal, "params" | "props">,
   chemins: GetStaticPaths,
-): Promise<P | undefined> {
+): Promise<P | Response> {
   if (!MOTEUR) return Astro.props as P;
   const liste = (await chemins({ paginate: paginer, routePattern: "" })) as { params: Params; props?: object }[];
   const voulu = cle(Astro.params as Params);
   const trouve = liste.flat().find((chemin) => cle(chemin.params) === voulu);
-  return trouve ? ((trouve.props ?? {}) as P) : undefined;
+  return trouve ? ((trouve.props ?? {}) as P) : new Response(null, { status: 404 });
 }
-
-/** La reponse d'une adresse inconnue : Astro y met la page 404 du theme. */
-export const introuvable = (): Response => new Response(null, { status: 404 });

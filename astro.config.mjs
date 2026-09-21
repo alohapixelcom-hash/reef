@@ -3,11 +3,13 @@ import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
-import { moteur } from "./moteur.config.mjs";
+import { moteur, MOTEUR_ACTIF } from "./moteur.config.mjs";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-const DIST = fileURLToPath(new URL("./dist/", import.meta.url));
+// Moteur allume, l'adapter range les pages figees sous dist/client/ ; sans ce
+// detour, le plan de site ne retrouvait plus leur head et perdait ses x-default.
+const DIST = fileURLToPath(new URL(MOTEUR_ACTIF ? "./dist/client/" : "./dist/", import.meta.url));
 
 // Lit les hreflang que la page construite porte deja : le head est la seule
 // source, le plan de site ne peut donc plus le contredire. L'integration
@@ -31,10 +33,14 @@ function hreflangDuHtml(/** @type {string} */ pathname) {
   return links;
 }
 
+// L'adresse publique du site, ecrite une fois : `site` la donne a Astro, et le
+// plan de site du moteur (moteur allume seulement) en tire son adresse absolue.
+const SITE = "https://reef.alohapixel.app";
+
 // https://astro.build/config
 export default defineConfig({
   // Alimente canonical, OG, sitemap, robots.txt et llms.txt. Une seule edition les corrige tous.
-  site: "https://reef.alohapixel.app",
+  site: SITE,
 
   // Une seule forme d'URL canonique : le build en repertoires emet un slash final, et
   // canonical + OG s'accordent sur cette forme.
@@ -63,6 +69,9 @@ export default defineConfig({
     // JavaScript. C'est le principal argument d'un theme de blog.
     mdx(),
     sitemap({
+      // Moteur allume, les pages gerees ont leur propre plan, rendu a la
+      // demande : l'index le declare. Moteur eteint, la liste est vide.
+      customSitemaps: moteur.plans.map((plan) => new URL(plan, SITE).href),
       filter: (page) => !["/404/", "/examples/", "/secret-spot/"].some((p) => page.includes(p)),
       // Le sitemap porte les memes alternatives que les balises hreflang du
       // head : Google recoupe les deux, et un desaccord fait ignorer les deux.

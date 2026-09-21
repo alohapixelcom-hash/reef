@@ -14,7 +14,7 @@ import ArticlePage from "@components/Pages/ArticlePage.astro";
 import { defaultLocale, locales } from "@i18n";
 import { entryLocale, entrySlug } from "@i18n/content";
 import { cheminsArchive, type PropsArchive } from "@js/archive";
-import { introuvable, propsDeLaPage } from "@moteur/chemins";
+import { propsDeLaPage } from "@moteur/chemins";
 import { billetsPublies, MOTEUR } from "@moteur/source";
 import { getEntry, type CollectionEntry } from "astro:content";
 
@@ -52,15 +52,15 @@ type Props = {
   topic: CollectionEntry<"topics">;
 };
 
+// Un numero, moteur allume, designe une page de l'archive ; tout le reste un billet.
 const numero = MOTEUR && /^\d+$/.test(Astro.params.id ?? "");
-const archive = numero
+const demande = numero
   ? await propsDeLaPage<PropsArchive>(
       { params: { locale: Astro.params.locale, page: Astro.params.id }, props: {} },
       cheminsArchive,
     )
-  : undefined;
-const billet = numero ? undefined : await propsDeLaPage<Props>(Astro, getStaticPaths);
-if (!archive && !billet) return introuvable();
+  : await propsDeLaPage<Props>(Astro, getStaticPaths);
+if (demande instanceof Response) return demande;
 ---
 
-{archive ? <ArchivePage {...archive} /> : billet && <ArticlePage {...billet} />}
+{numero ? <ArchivePage {...(demande as PropsArchive)} /> : <ArticlePage {...(demande as Props)} />}

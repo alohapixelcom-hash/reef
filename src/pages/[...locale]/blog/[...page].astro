@@ -7,12 +7,12 @@
 // pages. Les chemins vivent dans @js/archive, le rendu dans ArchivePage.
 import ArchivePage from "@components/Pages/ArchivePage.astro";
 import { cheminsArchive, type PropsArchive } from "@js/archive";
-import { introuvable, propsDeLaPage } from "@moteur/chemins";
+import { propsDeLaPage } from "@moteur/chemins";
 
 export const getStaticPaths = cheminsArchive;
 
 const props = await propsDeLaPage<PropsArchive>(Astro, cheminsArchive);
-if (!props) return introuvable();
+if (props instanceof Response) return props;
 ---
 
 <ArchivePage {...props} />

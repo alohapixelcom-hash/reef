@@ -7,6 +7,8 @@
   "compatibility_flags": ["nodejs_compat"],
   "d1_databases": [{ "binding": "DB", "database_name": "reef-moteur" }],
   "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "reef-moteur-media" }],
+  // Optimise a la demande les images des pages gerees (voir moteur.config.mjs).
+  "images": { "binding": "IMAGES" },
   // Publication programmee et entretien : une minute de resolution.
   "triggers": { "crons": ["* * * * *"] }
 }
