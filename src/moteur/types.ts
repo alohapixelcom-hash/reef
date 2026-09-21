@@ -9,3 +9,6 @@ export interface CorpsDeBillet {
   blocs?: unknown[];
   headings: MarkdownHeading[];
 }
+
+/** Le chargeur des collections a la demande : une fabrique moteur allume, rien moteur eteint. */
+export type Chargeur = (() => import("astro/loaders").LiveLoader) | undefined;
