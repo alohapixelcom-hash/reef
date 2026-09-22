@@ -1,7 +1,7 @@
 // src/moteur/deployer/regles.selfcheck.ts - self-check des regles pures du bouton "Tout deployer".
 // Lancer : node src/moteur/deployer/regles.selfcheck.ts
 import assert from "node:assert/strict";
-import { attente, DELAI_MS, heure, lireLeHook, secondes } from "./regles.ts";
+import { attente, DELAI_MS, FUSEAU_PAR_DEFAUT, heure, lireLeFuseau, lireLeHook, secondes } from "./regles.ts";
 
 let checks = 0;
 function is(actual: unknown, expected: unknown, message: string): void {
@@ -48,5 +48,12 @@ is(lireLeHook("ftp://127.0.0.1/hook", true), { etat: "invalide" }, "autre protoc
 is(heure("2026-09-21T19:45:12.000Z"), "21 sept. 2026, 21:45:12", "heure d'ete : UTC plus deux");
 is(heure("2026-12-01T08:05:00.000Z"), "1 déc. 2026, 09:05:00", "heure d'hiver : UTC plus un");
 is(heure("n'importe quoi"), "n'importe quoi", "une date illisible est rendue telle quelle");
+is(heure("2026-09-21T19:45:12.000Z", "en"), "21 Sept 2026, 21:45:12", "en anglais, la meme heure de Paris");
+is(heure("2026-09-21T19:45:12.000Z", "en", "America/New_York"), "21 Sept 2026, 15:45:12", "le fuseau du site deplace l'heure");
+
+// Le fuseau : ALOHA_BO_FUSEAU, ou Paris.
+is(lireLeFuseau(undefined), FUSEAU_PAR_DEFAUT, "variable absente : Paris");
+is(lireLeFuseau(" America/New_York "), "America/New_York", "un fuseau connu est garde, espaces retires");
+is(lireLeFuseau("Lune/Mer_de_la_Tranquillite"), FUSEAU_PAR_DEFAUT, "un fuseau inconnu retombe sur Paris");
 
 console.log(`regles.selfcheck : ${checks} verifications passees`);

@@ -14,7 +14,7 @@ import { hookConfigure, toutDeployer } from "./action";
 import { IDENTITE } from "./identite.mjs";
 import { dernierDeclenchement, derniers } from "./journal";
 import { ACTION_DEPLOYER, composer, type Reponse } from "./page";
-import { TEXTES } from "./textes";
+import { langueDe, TEXTES_DU_SITE } from "./textes";
 
 const LIGNES_DU_JOURNAL = 5;
 
@@ -30,6 +30,7 @@ async function page(ctx: RouteContext): Promise<Reponse> {
   const clic = actionDemandee(ctx.input) === ACTION_DEPLOYER ? await toutDeployer(ctx) : undefined;
   return composer(
     {
+      langue: langueDe(ctx.request),
       hook: hookConfigure(),
       dernier: await dernierDeclenchement(ctx),
       passages: await derniers(ctx, LIGNES_DU_JOURNAL),
@@ -52,7 +53,8 @@ export function createPlugin(): ResolvedPlugin {
         handler: page,
       },
     },
-    admin: { pages: [{ path: "/", label: TEXTES.titre, icon: "upload" }] },
+    // Le libelle du menu est fige au demarrage : il suit la langue par defaut du site.
+    admin: { pages: [{ path: "/", label: TEXTES_DU_SITE.titre, icon: "upload" }] },
   });
 }
 

@@ -1,100 +1,30 @@
-// src/moteur/deployer/textes.ts - tout ce que la page "Tout deployer" affiche, en francais, au meme endroit.
+// src/moteur/deployer/textes.ts - choisit le dictionnaire de la page "Tout deployer" : francais ou anglais, selon la langue du back office.
 //
 // Le back office n'a pas de dictionnaire du theme (src/i18n sert le site
-// public). Ce fichier en tient lieu : aucune phrase affichee ne vit dans la
-// logique, et une correction de wording ne touche que lui.
-import type { Build } from "./journal";
+// public). textes.fr.ts et textes.en.ts en tiennent lieu : aucune phrase
+// affichee ne vit dans la logique, et une correction de wording ne touche
+// qu'eux. La langue est celle que le moteur a choisie pour la personne (voir
+// ../langue-bo.regles.ts) ; le libelle du menu, lui, est fige au demarrage :
+// il suit la langue par defaut du site.
+import { type LangueDesTextes, langueDesTextes } from "../langue-bo.regles";
+import { EN } from "./textes.en";
+import { FR } from "./textes.fr";
+
+export type Textes = typeof FR;
+export type { LangueDesTextes };
 
 export const COMMANDE_DU_SECRET = "pnpm wrangler secret put ALOHA_DEPLOY_HOOK --config wrangler.moteur.jsonc";
 
-export const TEXTES = {
-  titre: "Tout déployer",
-  intro:
-    "Publier un billet se voit déjà sur le site, sans rien faire : les pages gérées se rendent depuis la base. Ce bouton sert à la fin d'une séance de modifications. Il vide les caches du contenu, puis relance le build des pages figées (contact, pages légales, et tout ce qui ne change qu'au build).",
-  bouton: "Tout déployer",
-  actualiser: "Actualiser",
-  inconnu: "inconnu",
-  jamais: "Jamais",
-  aucune: "Aucune",
+const DICTIONNAIRES: Record<LangueDesTextes, Textes> = { fr: FR, en: EN };
 
-  etat: {
-    version: "Version servie",
-    construit: "Build servi, construit le",
-    dernier: "Dernier déclenchement",
-    reponse: "Réponse du hook",
-    objets: "Cache d'objets",
-    routes: "Cache de routes",
-    configure: (nom: string) => `Configuré (${nom})`,
-    nonConfigure: "Aucun configuré",
-    http: (code: number) => `HTTP ${code}`,
-    sansReponse: "Aucune réponse",
-  },
+/** La langue des textes du theme pour cette requete du back office. */
+export function langueDe(requete: Request): LangueDesTextes {
+  return langueDesTextes(requete, __ALOHA_BO_LANGUE__);
+}
 
-  caches: {
-    aucun: "Aucun cache configuré, rien à vider.",
-    nonTouches: "Non touchés.",
-    objetsVides: (espaces: number) => `Cache d'objets vidé (${espaces} espaces).`,
-    objetsAucun: "Pas de cache d'objets.",
-    routesVides: "Cache de routes vidé.",
-    routesAucun: "Pas de cache de routes.",
-    routesInconnu: (nom: string) => `Cache de routes « ${nom} » : ce bouton ne sait pas le vider en entier.`,
-    routesEchec: (detail: string) => `Cache de routes NON vidé : ${detail}.`,
-  },
+export function textesPour(langue: LangueDesTextes): Textes {
+  return DICTIONNAIRES[langue];
+}
 
-  build: {
-    declenche: "Déclenché",
-    rejete: "Rejeté par le hook",
-    injoignable: "Hook injoignable",
-    refuse: "Refusé (moins d'une minute)",
-    "sans-hook": "Non lancé (variable absente)",
-    "hook-invalide": "Non lancé (variable invalide)",
-  } satisfies Record<Build | "rejete", string>,
-
-  resultat: {
-    declenche: (code: number) => `Build demandé : le hook a répondu HTTP ${code}.`,
-    rejete: (code: number) =>
-      `Le hook a répondu HTTP ${code} : le build n'a PAS été lancé. Vérifiez l'adresse du Deploy Hook dans Cloudflare.`,
-    injoignable:
-      "Le hook n'a pas répondu (adresse injoignable, ou dix secondes dépassées) : le build n'a PAS été lancé. Vous pouvez réessayer tout de suite.",
-    refuse: (depuis: string, reste: string) =>
-      `Déjà déclenché il y a ${depuis}. Un seul déclenchement par minute : réessayez dans ${reste}. Rien n'a été fait.`,
-    // Le pourquoi est dit juste en dessous, par l'avertissement permanent : on ne le repete pas.
-    sansBuild: "Le build des pages figées n'a PAS été relancé : voir ci-dessous.",
-  },
-
-  hook: {
-    absentTitre: "Le build ne peut pas être relancé d'ici",
-    absent:
-      "La variable secrète ALOHA_DEPLOY_HOOK n'est pas posée. Créez un Deploy Hook dans Cloudflare (Workers Builds, réglages du Worker), puis posez son adresse avec la commande ci-dessous. Les caches, eux, sont traités à chaque clic.",
-    invalideTitre: "ALOHA_DEPLOY_HOOK est illisible",
-    invalide: "La valeur posée n'est pas une adresse https. Reposez-la avec la commande ci-dessous.",
-  },
-
-  preuve: {
-    prouveTitre: "Redéploiement prouvé",
-    prouve: (construit: string, demande: string) =>
-      `Le site sert un build du ${construit}, postérieur au déclenchement du ${demande}.`,
-    attenteTitre: "Build demandé, pas encore en ligne",
-    attente: (construit: string, demande: string) =>
-      `Déclenché le ${demande}. Le site sert encore le build du ${construit}. Un build prend d'ordinaire une à trois minutes : cliquez sur Actualiser. S'il n'arrive pas, le journal de Workers Builds, dans Cloudflare, dit pourquoi.`,
-  },
-
-  journal: {
-    titre: "Cinq derniers clics",
-    vide: "Aucun clic pour l'instant.",
-    quand: "Quand",
-    qui: "Qui",
-    caches: "Caches",
-    build: "Build",
-    code: "HTTP",
-    note: (adresse: string) =>
-      `Un déclenchement par minute au plus. Heures de Paris. La preuve publique du build servi : ${adresse}`,
-  },
-
-  toast: {
-    fait: "Build demandé",
-    sansBuild: "Build non relancé",
-    refuse: "Refusé : un déclenchement par minute",
-    echec: "Le build n'a pas été lancé",
-  },
-} as const;
+/** Le dictionnaire de la langue par defaut du site : sert aux libelles figes au demarrage (entree de menu, titre de la carte). */
+export const TEXTES_DU_SITE: Textes = textesPour(__ALOHA_BO_LANGUE__?.toLowerCase().split("-")[0] === "fr" ? "fr" : "en");

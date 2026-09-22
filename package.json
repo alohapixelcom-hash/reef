@@ -1,7 +1,7 @@
 {
   "name": "reef",
   "type": "module",
-  "version": "2.3.0",
+  "version": "3.1.0",
   "description": "Reef, a bilingual Astro blog theme with the Aloha editorial back office, article and category management, and a read-only public demo.",
   "license": "MIT",
   "author": "Aloha Pixel (https://alohapixel.app)",

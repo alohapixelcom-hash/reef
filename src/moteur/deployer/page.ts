@@ -12,8 +12,8 @@
 import { versionServie } from "../version";
 import type { Resultat } from "./action";
 import type { Passage } from "./journal";
-import { DELAI_MS, heure, type Hook, secondes } from "./regles";
-import { COMMANDE_DU_SECRET, TEXTES } from "./textes";
+import { DELAI_MS, heure as heureDuSite, type Hook, secondes } from "./regles";
+import { COMMANDE_DU_SECRET, type LangueDesTextes, type Textes, textesPour } from "./textes";
 
 type Bouton = { type: "button"; action_id: string; label: string; style?: "primary" | "secondary" };
 type Bloc =
@@ -42,6 +42,8 @@ export const ACTION_DEPLOYER = "tout-deployer";
 const ACTION_ACTUALISER = "actualiser";
 
 export interface Etat {
+  /** La langue du back office pour cette personne : elle choisit le dictionnaire et la forme des dates. */
+  langue: LangueDesTextes;
   hook: Hook;
   dernier: Passage | null;
   passages: Passage[];
@@ -51,13 +53,13 @@ export interface Etat {
 
 const reussi = (code: number | null): code is number => code !== null && code >= 200 && code < 300;
 
-function libelleDuBuild(passage: Passage): string {
+function libelleDuBuild(TEXTES: Textes, passage: Passage): string {
   if (passage.build === "declenche" && !reussi(passage.code)) return TEXTES.build.rejete;
   return TEXTES.build[passage.build];
 }
 
 /** Ce que le clic vient de faire, dit sans adoucir : un build non lance s'ecrit "PAS lance". */
-function bandeauDuClic({ passage, attente }: Resultat): { bloc: Bloc; toast: Reponse["toast"] } {
+function bandeauDuClic(TEXTES: Textes, { passage, attente }: Resultat): { bloc: Bloc; toast: Reponse["toast"] } {
   const avec = (phrase: string): string => `${passage.caches} ${phrase}`;
   switch (passage.build) {
     case "declenche":
@@ -98,7 +100,7 @@ function bandeauDuClic({ passage, attente }: Resultat): { bloc: Bloc; toast: Rep
 }
 
 /** La preuve : le build servi est-il posterieur au dernier declenchement reussi ? */
-function preuve(dernier: Passage | null): Bloc[] {
+function preuve(TEXTES: Textes, heure: (iso: string) => string, dernier: Passage | null): Bloc[] {
   if (!dernier || dernier.build !== "declenche" || !reussi(dernier.code)) return [];
   const construit = heure(versionServie.construit);
   const demande = heure(dernier.quand);
@@ -107,7 +109,7 @@ function preuve(dernier: Passage | null): Bloc[] {
     : [{ type: "banner", variant: "alert", title: TEXTES.preuve.attenteTitre, description: TEXTES.preuve.attente(construit, demande) }];
 }
 
-function avertissementDuHook(hook: Hook): Bloc[] {
+function avertissementDuHook(TEXTES: Textes, hook: Hook): Bloc[] {
   if (hook.etat === "pret") return [];
   const absent = hook.etat === "absent";
   return [
@@ -121,19 +123,21 @@ function avertissementDuHook(hook: Hook): Bloc[] {
   ];
 }
 
-function reponseDuHook(dernier: Passage | null): string {
+function reponseDuHook(TEXTES: Textes, dernier: Passage | null): string {
   if (!dernier) return TEXTES.aucune;
   return dernier.code === null ? TEXTES.etat.sansReponse : TEXTES.etat.http(dernier.code);
 }
 
 export function composer(etat: Etat, clic?: Resultat): Reponse {
-  const bandeau = clic ? bandeauDuClic(clic) : undefined;
+  const TEXTES = textesPour(etat.langue);
+  const heure = (iso: string): string => heureDuSite(iso, etat.langue, __ALOHA_BO_FUSEAU__);
+  const bandeau = clic ? bandeauDuClic(TEXTES, clic) : undefined;
   const caches = __ALOHA_CACHES__;
   const blocks: Bloc[] = [
     { type: "header", text: TEXTES.titre },
     { type: "section", text: TEXTES.intro },
     ...(bandeau ? [bandeau.bloc] : []),
-    ...avertissementDuHook(etat.hook),
+    ...avertissementDuHook(TEXTES, etat.hook),
     {
       type: "actions",
       elements: [
@@ -148,14 +152,14 @@ export function composer(etat: Etat, clic?: Resultat): Reponse {
         { label: TEXTES.etat.version, value: versionServie.version },
         { label: TEXTES.etat.construit, value: heure(versionServie.construit) },
         { label: TEXTES.etat.dernier, value: etat.dernier ? heure(etat.dernier.quand) : TEXTES.jamais },
-        { label: TEXTES.etat.reponse, value: reponseDuHook(etat.dernier) },
+        { label: TEXTES.etat.reponse, value: reponseDuHook(TEXTES, etat.dernier) },
         { label: TEXTES.etat.objets, value: caches.objets ? TEXTES.etat.configure(caches.objets) : TEXTES.etat.nonConfigure },
         { label: TEXTES.etat.routes, value: caches.routes ? TEXTES.etat.configure(caches.routes) : TEXTES.etat.nonConfigure },
       ],
     },
-    ...preuve(etat.dernier),
+    ...preuve(TEXTES, heure, etat.dernier),
     { type: "divider" },
-    { type: "section", text: TEXTES.journal.titre },
+    { type: "header", text: TEXTES.journal.titre },
     {
       type: "table",
       page_action_id: "journal",
@@ -171,11 +175,11 @@ export function composer(etat: Etat, clic?: Resultat): Reponse {
         quand: heure(passage.quand),
         qui: passage.qui,
         caches: passage.caches,
-        build: libelleDuBuild(passage),
+        build: libelleDuBuild(TEXTES, passage),
         code: passage.code === null ? "-" : String(passage.code),
       })),
     },
-    { type: "context", text: TEXTES.journal.note(etat.adresseVersion) },
+    { type: "context", text: TEXTES.journal.note(etat.adresseVersion, __ALOHA_BO_FUSEAU__) },
   ];
   return { blocks, ...(bandeau ? { toast: bandeau.toast } : {}) };
 }

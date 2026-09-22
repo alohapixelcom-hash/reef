@@ -9,8 +9,10 @@
 // back office ecrit en base, et la page suivante le montre : aucun build.
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { IDENTITE } from "./src/moteur/deployer/identite.mjs";
+import { IDENTITE as ACCUEIL } from "./src/moteur/accueil/identite.mjs";
+import { IDENTITE as DEPLOYER } from "./src/moteur/deployer/identite.mjs";
 import { PAGES_GEREES } from "./src/moteur/pages-gerees.mjs";
+import { routesDuCache } from "./src/moteur/routes-du-cache.mjs";
 
 const ici = (chemin) => fileURLToPath(new URL(chemin, import.meta.url));
 
@@ -40,14 +42,58 @@ const CACHE_OBJETS = ["kv", "memoire"].includes(process.env.ALOHA_CACHE_OBJETS ?
   ? process.env.ALOHA_CACHE_OBJETS
   : null;
 
+// LE CACHE DE ROUTES. Aucun par defaut, pour la meme raison. Un site a fort
+// trafic peut garder ses pages gerees au bord du reseau :
+//   ALOHA_CACHE_ROUTES=cloudflare  dans Workers Cache (a activer aussi dans wrangler.moteur.jsonc, voir docs/moteur.md)
+//   ALOHA_CACHE_ROUTES=memoire     dans la memoire du processus (essais locaux : prouve la purge a la publication)
+// Chaque page geree declare alors sa duree et porte l'etiquette de ses
+// collections : a chaque publication, EmDash purge ces etiquettes, et la page
+// suivante est rendue a neuf. "Tout deployer" vide le tout.
+const CACHE_ROUTES = ["cloudflare", "memoire"].includes(process.env.ALOHA_CACHE_ROUTES ?? "")
+  ? process.env.ALOHA_CACHE_ROUTES
+  : null;
+
+/** Une page en cache sert au plus une minute de retard si une purge se perd ; au-dela, elle est rendue a neuf en arriere-plan. */
+const DUREE_DU_CACHE = { maxAge: 60, swr: 600 };
+
+// LA LANGUE DU BACK OFFICE. Sans variable, le moteur suit le navigateur de
+// chaque personne (28 langues, dont le francais). ALOHA_BO_LANGUE=fr donne au
+// site une langue par defaut, que chacun peut encore changer dans ses reglages
+// (voir src/moteur/langue-bo.ts). ALOHA_BO_FUSEAU regle le fuseau des heures
+// affichees par les extensions du theme.
+const LANGUE_BO = /^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/.test((process.env.ALOHA_BO_LANGUE ?? "").trim())
+  ? process.env.ALOHA_BO_LANGUE.trim()
+  : null;
+const FUSEAU_BO = (process.env.ALOHA_BO_FUSEAU ?? "").trim() || "Europe/Paris";
+
+/** Les collections du schema (seed/seed.json) : ce sont les etiquettes qu'EmDash purge a chaque publication. */
+function collectionsDuSchema() {
+  const graine = JSON.parse(readFileSync(ici("./seed/seed.json"), "utf8"));
+  return (graine.collections ?? []).map((collection) => collection.slug);
+}
+
 /** Rend a la demande les pages gerees, fige toutes les autres, ajoute le plan de site et /version.json, habille le back office. */
 function partageDesPages() {
   return {
     name: "aloha:moteur-pages",
     hooks: {
       "astro:config:setup": ({ config, injectRoute, addMiddleware, updateConfig }) => {
+        // Le cache de routes ne vaut que pour les pages gerees, un motif par
+        // langue (voir routes-du-cache.mjs) : l'API et l'administration du
+        // moteur n'en recoivent aucun. Le plan de site des pages gerees change
+        // avec elles.
+        if (CACHE_ROUTES) {
+          const regle = { ...DUREE_DU_CACHE, tags: collectionsDuSchema() };
+          const { locales, defaultLocale } = config.i18n ?? { locales: [], defaultLocale: "" };
+          const langues = locales.map((l) => (typeof l === "string" ? l : l.path));
+          updateConfig({
+            routeRules: { ...routesDuCache(PAGES_GEREES, langues, defaultLocale, regle), "/sitemap-contenu.xml": regle },
+          });
+        }
         // Habille le back office aux jetons du theme (voir habillage.ts).
         addMiddleware({ entrypoint: ici("./src/moteur/habillage.ts"), order: "post" });
+        // La langue par defaut du back office, seulement si elle est demandee.
+        if (LANGUE_BO) addMiddleware({ entrypoint: ici("./src/moteur/langue-bo.ts"), order: "post" });
         injectRoute({ pattern: "/sitemap-contenu.xml", entrypoint: ici("./src/moteur/plan-du-site.ts"), prerender: false });
         injectRoute({ pattern: "/version.json", entrypoint: ici("./src/moteur/version.ts"), prerender: false });
         // Figees ICI, une fois par build : l'horodatage est la preuve que
@@ -62,6 +108,8 @@ function partageDesPages() {
               __ALOHA_VERSION__: JSON.stringify(version),
               __ALOHA_CONSTRUIT__: JSON.stringify(new Date().toISOString()),
               __ALOHA_CACHES__: JSON.stringify({ objets: CACHE_OBJETS, routes: config.cache?.provider?.name ?? null }),
+              __ALOHA_BO_LANGUE__: JSON.stringify(LANGUE_BO),
+              __ALOHA_BO_FUSEAU__: JSON.stringify(FUSEAU_BO),
             },
           },
         });
@@ -79,6 +127,18 @@ const alias = (source) => ({
   "@moteur/live": ici(`./src/moteur/live.${source}.ts`),
   "@moteur/TexteRiche.astro": ici(`./src/moteur/TexteRiche.${source}.astro`),
 });
+
+/** Le fournisseur du cache de routes (`cache` d'Astro), quand ALOHA_CACHE_ROUTES est posee ; rien sinon. Les regles se posent dans partageDesPages. */
+async function cacheDeRoutes() {
+  if (!CACHE_ROUTES) return {};
+  // "cloudflare" passe par src/moteur/cache-routes.ts : le fournisseur de
+  // l'adapter, dont une purge impossible ne casse pas une publication.
+  const provider =
+    CACHE_ROUTES === "cloudflare"
+      ? { name: "cloudflare", entrypoint: ici("./src/moteur/cache-routes.ts") }
+      : (await import("astro/config")).memoryCache();
+  return { cache: { provider } };
+}
 
 // Les paquets du moteur ne se chargent QUE moteur allume : un build statique
 // ne lit ni l'adapter Cloudflare ni EmDash, et n'en paie pas le demarrage.
@@ -100,6 +160,7 @@ async function allume() {
       // finale, et "always" leur repondrait 404.
       trailingSlash: "ignore",
       adapter: cloudflare({ configPath: "./wrangler.moteur.jsonc", imageService: IMAGES }),
+      ...(await cacheDeRoutes()),
     },
     integrations: [
       react(),
@@ -111,7 +172,16 @@ async function allume() {
         ...(cacheObjets ? { objectCache: cacheObjets() } : {}),
         // "Tout deployer" : extension native rangee dans le depot. EmDash
         // l'importe par son chemin et l'embarque dans le Worker au build.
-        plugins: [{ ...IDENTITE, entrypoint: ici("./src/moteur/deployer/extension.ts") }],
+        plugins: [
+          { ...DEPLOYER, entrypoint: ici("./src/moteur/deployer/extension.ts") },
+          // La carte du site sur le tableau de bord : une extension React, son
+          // composant est importe par le paquet de l'administration.
+          {
+            ...ACCUEIL,
+            entrypoint: ici("./src/moteur/accueil/extension.ts"),
+            adminEntry: ici("./src/moteur/accueil/carte.ts"),
+          },
+        ],
       }),
       partageDesPages(),
     ],

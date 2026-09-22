@@ -9,7 +9,16 @@
 // Comme propsDeLaPage, il REJOUE le getStaticPaths de chaque page geree : le
 // plan liste exactement les adresses que le build statique aurait produites,
 // avec les memes alternatives de langue que le plan fige.
-import { defaultLocale, locales } from "@i18n";
+//
+// SANS IMPORTER LES PAGES. Une page importee par un module qui n'est pas une
+// page cesse d'etre une frontiere pour le partage des feuilles de style
+// d'Astro : le CSS du theme (127 ko) se retrouvait dans le back office et
+// dans le manifeste de 73 routes d'API (mesure le 21 septembre 2026). Les
+// chemins vivent donc dans des modules partages (@i18n, @js/archive,
+// @js/adresses), que la page et ce plan importent chacun de leur cote.
+import { defaultLocale, localePaths, locales } from "@i18n";
+import { cheminsDeLAuteur, cheminsDuBillet, cheminsDuSujet } from "@js/adresses";
+import { cheminsArchive } from "@js/archive";
 import type { APIRoute, GetStaticPaths } from "astro";
 import { paginer } from "./chemins";
 import { PAGES_GEREES } from "./pages-gerees.mjs";
@@ -20,9 +29,24 @@ export const prerender = false;
 const EXCLUES = ["/404/", "/examples/", "/secret-spot/"];
 
 type Params = Record<string, string | number | undefined>;
-type ModuleDePage = { getStaticPaths?: GetStaticPaths };
 
-const modules = import.meta.glob<ModuleDePage>("/src/pages/**/*.astro");
+// Le getStaticPaths de chaque page geree, tel que la page l'exporte. Une page
+// geree absente d'ici est une erreur, et le plan le dit au lieu de l'oublier.
+// Les flux (rss.xml, llms.txt) n'y sont pas : comme le plan fige, celui-ci
+// n'inventorie que des pages.
+const CHEMINS: Record<string, GetStaticPaths | null> = {
+  "src/pages/[...locale]/index.astro": localePaths,
+  "src/pages/[...locale]/blog/[id].astro": cheminsDuBillet,
+  "src/pages/[...locale]/blog/[...page].astro": cheminsArchive,
+  "src/pages/[...locale]/topics/index.astro": localePaths,
+  "src/pages/[...locale]/topics/[topic]/[...page].astro": cheminsDuSujet,
+  "src/pages/[...locale]/authors/index.astro": localePaths,
+  "src/pages/[...locale]/authors/[author].astro": cheminsDeLAuteur,
+  "src/pages/[...locale]/search.astro": localePaths,
+  "src/pages/[...locale]/about.astro": localePaths,
+  "src/pages/[...locale]/rss.xml.ts": null,
+  "src/pages/llms.txt.ts": null,
+};
 
 /** "src/pages/[...locale]/blog/[id].astro" + params -> "/fr/blog/mon-billet/". */
 function adresse(page: string, params: Params): string {
@@ -47,10 +71,9 @@ export const GET: APIRoute = async ({ site, url }) => {
   const base = site ?? url;
   const chemins = new Set<string>();
   for (const page of PAGES_GEREES) {
-    const charger = modules[`/${page}`];
-    if (!charger) continue;
-    const { getStaticPaths } = await charger();
-    if (!getStaticPaths) continue;
+    const getStaticPaths = CHEMINS[page];
+    if (getStaticPaths === undefined) throw new Error(`Page geree sans chemins dans le plan de site : ${page}`);
+    if (getStaticPaths === null) continue;
     const liste = (await getStaticPaths({ paginate: paginer, routePattern: "" })) as { params: Params }[];
     for (const { params } of liste.flat()) {
       const chemin = adresse(page, params);

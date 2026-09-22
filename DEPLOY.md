@@ -1,4 +1,4 @@
-<!-- DEPLOY.md - how the live demo is published. Does not concern the theme itself. -->
+<!-- DEPLOY.md - how the live demo is published, and how the optional publication engine is deployed for the first time. -->
 
 # Deploying the demo
 
@@ -39,3 +39,87 @@ allows redistribution, so nothing is taken away from anyone. `NOTICE.md`
 section 1 and `PHOTOS.md` say which ones, and where from. Keeping them or
 replacing them with your own comes to the same thing as far as the licence is
 concerned.
+
+## First deployment of the engine
+
+Everything above concerns the static demo. The optional publication engine
+(`ALOHA_MOTEUR=emdash`, see `docs/moteur.md`) is a second, separate Worker,
+described by `wrangler.moteur.jsonc`. It needs a Cloudflare account with
+Workers, D1 and R2 enabled, and Cloudflare Images for the on-demand image
+optimisation (set `ALOHA_IMAGES=origine` at build time to do without it). The
+steps below were written from the configuration files and the EmDash 0.38
+routes; they have not yet been run against a live account.
+
+1. **Sign in and create the storage.** `wrangler deploy` creates a missing D1
+   database and R2 bucket on its own, but creating them first keeps the first
+   deploy readable:
+
+   ```bash
+   npx wrangler login
+   npx wrangler d1 create reef-moteur
+   npx wrangler r2 bucket create reef-moteur-media
+   ```
+
+   The names are the ones in `wrangler.moteur.jsonc` (`database_name`,
+   `bucket_name`). Nothing else to edit: the bindings are found by name.
+
+2. **Build and deploy the Worker.**
+
+   ```bash
+   pnpm install --frozen-lockfile
+   ALOHA_MOTEUR=emdash pnpm build:moteur
+   npx wrangler deploy --config wrangler.moteur.jsonc
+   ```
+
+   Optional variables at build time: `ALOHA_BO_LANGUE=fr` (default language of
+   the back office), `ALOHA_BO_FUSEAU=Europe/Paris` (time zone of the times the
+   house extensions display), `ALOHA_CACHE_OBJETS=kv` (with a `CACHE` KV
+   binding added to the Wrangler file), `ALOHA_CACHE_ROUTES=cloudflare` (with
+   `"cache": { "enabled": true }` added to the Wrangler file). None is needed.
+
+3. **Secrets, if any.** The engine needs no secret to run. The "Deploy
+   everything" button needs the address of a Deploy Hook (Cloudflare, the
+   Worker's settings, Builds) to restart the build of the prerendered pages:
+
+   ```bash
+   npx wrangler secret put ALOHA_DEPLOY_HOOK --config wrangler.moteur.jsonc
+   ```
+
+   Without it the button still empties the caches and says the build was not
+   restarted.
+
+4. **The first administrator.** Open `https://<your-worker>/_emdash/admin`.
+   The setup wizard asks for the site title and tagline, then an email and a
+   name, then registers a passkey on the device in use: that passkey is the
+   administrator account. The wizard runs once; afterwards the same address is
+   the login page (passkey, or a link sent by email once an email provider is
+   configured in the settings).
+
+5. **An API token for the import.** In the back office, Settings, API tokens:
+   create a token with the `admin` scope. The import creates posts
+   (`content:write`), uploads covers (`media:write`) and, on an empty
+   collection, realigns the schema fields the seed cannot express
+   (`schema:write`): `admin` covers the three. Copy it once; it is not shown
+   again.
+
+6. **Import the content.**
+
+   ```bash
+   EMDASH_TOKEN=<the token> node scripts/moteur-import.mjs --url https://<your-worker>
+   ```
+
+   The script creates one post per Markdown file and language, uploads the
+   covers, and publishes what was not a draft. It can be run again: a post
+   already present is skipped.
+
+7. **Check.** `https://<your-worker>/version.json` gives the version and the
+   build time; `/blog/`, a post, `/sitemap-index.xml` and
+   `/sitemap-contenu.xml` must answer 200; an invented address 404. Publish a
+   post in the back office and reload it on the site: no build is involved.
+
+8. **Workers Builds, for the prerendered pages.** Connect the repository in the
+   Worker's settings, with `ALOHA_MOTEUR=emdash pnpm build:moteur` as the build
+   command and `npx wrangler deploy --config wrangler.moteur.jsonc` as the
+   deploy command. Then create the Deploy Hook of step 3. From then on, the
+   "Deploy everything" button restarts that build, and `/version.json` proves
+   when the new build is online.

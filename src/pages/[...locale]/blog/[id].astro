@@ -11,40 +11,15 @@
 // nomme passe avant un parametre de reste) : un numero de page rend l'archive.
 import ArchivePage from "@components/Pages/ArchivePage.astro";
 import ArticlePage from "@components/Pages/ArticlePage.astro";
-import { defaultLocale, locales } from "@i18n";
-import { entryLocale, entrySlug } from "@i18n/content";
+import { cheminsDuBillet } from "@js/adresses";
 import { cheminsArchive, type PropsArchive } from "@js/archive";
 import { propsDeLaPage } from "@moteur/chemins";
-import { billetsPublies, MOTEUR } from "@moteur/source";
-import { getEntry, type CollectionEntry } from "astro:content";
+import { MOTEUR } from "@moteur/source";
+import type { CollectionEntry } from "astro:content";
 
-export async function getStaticPaths() {
-  // Les brouillons se previsualisent dans l'editeur prive, jamais a une URL publique.
-  // Fichiers ou base : la source ne rend que les billets publies.
-  const posts = (await Promise.all(locales.map((locale) => billetsPublies(locale)))).flat();
-
-  return Promise.all(
-    posts.map(async (post) => {
-      // Une reference cassee arrete le build avec le nom du fichier fautif,
-      // plutot que de rendre une page a moitie vide en production.
-      const author = await getEntry(post.data.author);
-      if (!author) throw new Error(`Auteur inconnu "${post.data.author.id}" dans "${post.id}"`);
-      const topic = await getEntry(post.data.topic);
-      if (!topic) throw new Error(`Sujet inconnu "${post.data.topic.id}" dans "${post.id}"`);
-
-      const locale = entryLocale(post.id);
-      return {
-        params: {
-          // undefined genere la route sans prefixe : l'anglais est servi a la
-          // racine, les autres langues sous leur code.
-          locale: locale === defaultLocale ? undefined : locale,
-          id: entrySlug(post.id),
-        },
-        props: { post, author, topic },
-      };
-    }),
-  );
-}
+// Les chemins vivent dans @js/adresses : le plan de site du moteur les rejoue
+// sans importer cette page (voir l'en-tete de ce module).
+export const getStaticPaths = cheminsDuBillet;
 
 type Props = {
   post: CollectionEntry<"posts">;

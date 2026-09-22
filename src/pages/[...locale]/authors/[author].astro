@@ -11,32 +11,16 @@ import { Icon } from "@components/svg/icons";
 import { Avatar } from "@components/ui/avatar";
 import { Breadcrumb } from "@components/ui/breadcrumb";
 import { Button } from "@components/ui/button";
-import { defaultLocale, fmt, getLocale, localizePath, locales, useTranslations } from "@i18n";
-import { entrySlug, getLocalizedCollection } from "@i18n/content";
-import { getResolvedPosts, type ResolvedPost } from "@js/posts";
+import { fmt, getLocale, localizePath, useTranslations } from "@i18n";
+import { entrySlug } from "@i18n/content";
+import { cheminsDeLAuteur } from "@js/adresses";
+import type { ResolvedPost } from "@js/posts";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { propsDeLaPage } from "@moteur/chemins";
-import type { GetStaticPaths } from "astro";
 import type { CollectionEntry } from "astro:content";
 
-export const getStaticPaths = (async () => {
-  const groups = await Promise.all(
-    locales.map(async (locale) => {
-      const authors = await getLocalizedCollection("authors", locale);
-      const posts = await getResolvedPosts(locale);
-
-      return authors.map((author) => {
-        const slug = entrySlug(author.id);
-        return {
-          params: { locale: locale === defaultLocale ? undefined : locale, author: slug },
-          props: { author, posts: posts.filter((entry) => entry.authorSlug === slug) },
-        };
-      });
-    }),
-  );
-  return groups.flat();
-}) satisfies GetStaticPaths;
+export const getStaticPaths = cheminsDeLAuteur;
 
 type Props = {
   author: CollectionEntry<"authors">;

@@ -4,7 +4,58 @@
 
 Versions describe the features actually shipped in this theme.
 
-Current version: **2.3.0**.
+Current version: **3.1.0**.
+
+## 3.1.0 - 2026-09-22
+
+The optional publication engine. Everything in this entry is off by default:
+without `ALOHA_MOTEUR=emdash` the theme builds exactly as before, to static
+HTML, and the 63 HTML, XML and TXT files of that build were compared one by
+one with the previous release. See `docs/moteur.md`.
+
+- **Publishing without a build.** With the variable set, the same source
+  builds as a Cloudflare Worker on EmDash 0.38 (MIT): posts in D1, media in
+  R2, and the pages that show a post rendered on demand from the database.
+  Publishing in the back office is visible on the site with no build, measured
+  at 31 to 112 ms locally on the production build (publish, correct,
+  unpublish, three passes). One alias (`@moteur/source`) picks the files or
+  the database, both return the same collection entry, and no component was
+  rewritten.
+- **The back office, in the theme's clothes.** EmDash's React administration
+  at `/_emdash/admin` is skinned from `tokens.css` itself: the theme's fonts,
+  surfaces, inks, brand colour and pill buttons, light and dark, and
+  `pnpm rebrand` restyles it in the same move. Every visible text was measured
+  against WCAG AA in seven views and two modes. The theme's own stylesheet no
+  longer leaks into the admin page: a page imported by the on-demand sitemap
+  had stopped being a style boundary for Astro, which inlined 127 KB of theme
+  CSS into the back office and into the manifest of 73 API routes; the
+  sitemap now replays the path functions of the pages without importing them.
+- **The back office in French, or in 27 other languages.** EmDash chooses the
+  admin language per person (cookie, then browser). `ALOHA_BO_LANGUE=fr` gives
+  a site a default language; unset, a buyer keeps English. The texts the theme
+  adds follow the same rule, in French and in English.
+- **A dashboard card of the site.** Last published content with a link to its
+  editor, version and build time served, "View the site" and "Deploy
+  everything", as a house extension of the dashboard.
+- **"Deploy everything".** A native EmDash extension with its own page: it
+  empties the content caches, calls a Cloudflare Deploy Hook to rebuild the
+  prerendered pages (secret `ALOHA_DEPLOY_HOOK`), keeps a log of the clicks,
+  and proves a redeployment through `/version.json`. One trigger per minute.
+- **Two optional caches, emptied at every publication.** `ALOHA_CACHE_OBJETS`
+  (KV or memory) keeps the database reads; `ALOHA_CACHE_ROUTES` (Workers
+  Cache or memory) keeps whole managed pages, tagged by collection and purged
+  by EmDash at each publication. Proven locally with the memory providers;
+  the Workers Cache purge is documented as not yet proven online.
+- **A sitemap of the managed pages, rendered on demand** (`/sitemap-contenu.xml`,
+  declared in the sitemap index), with the same language alternates as the
+  static plan; **images optimised on demand** through the Cloudflare Images
+  binding; **the visitor's language redirect** shared by the static Worker
+  and the engine's Worker, which leaves the admin and API paths alone.
+- **The back office rail.** Active entry, focus ring and phone layout were
+  reviewed at 1440 and 390 px in both modes; the rail no longer hides its
+  last entries at 1440 px, a side effect of the leaked stylesheet above.
+- `DEPLOY.md` gains "First deployment of the engine": storage, build, deploy,
+  secrets, first administrator, API token, import, verification.
 
 ## 2.3.0 - 2026-09-15
 

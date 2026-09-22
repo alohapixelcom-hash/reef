@@ -17,7 +17,7 @@ import { versionServie } from "../version";
 import { type BilanCaches, viderLesCaches } from "./caches";
 import { inscrire, type Passage, prendreLaGarde, rendreLaGarde } from "./journal";
 import { type Hook, lireLeHook, secondes } from "./regles";
-import { TEXTES } from "./textes";
+import { langueDe, type Textes, textesPour } from "./textes";
 
 /** Un build ne demarre pas plus vite parce qu'on attend : dix secondes suffisent a savoir si le hook repond. */
 const DELAI_DU_HOOK_MS = 10_000;
@@ -26,7 +26,7 @@ export function hookConfigure(): Hook {
   return lireLeHook(getSecret("ALOHA_DEPLOY_HOOK"), import.meta.env.DEV);
 }
 
-function resumer(bilan: BilanCaches): string {
+function resumer(TEXTES: Textes, bilan: BilanCaches): string {
   const { objets, routes } = bilan;
   if (objets.etat === "aucun" && routes.etat === "aucun") return TEXTES.caches.aucun;
   const morceaux = [
@@ -62,6 +62,8 @@ export interface Resultat {
 }
 
 export async function toutDeployer(ctx: RouteContext): Promise<Resultat> {
+  // Le journal garde la phrase telle qu'elle a ete dite a qui a clique, dans sa langue.
+  const TEXTES = textesPour(langueDe(ctx.request));
   const maintenant = Date.now();
   const base = {
     quand: new Date(maintenant).toISOString(),
@@ -82,7 +84,7 @@ export async function toutDeployer(ctx: RouteContext): Promise<Resultat> {
   }
 
   // 2. Les caches du contenu, que le hook existe ou non.
-  const caches = resumer(await viderLesCaches());
+  const caches = resumer(TEXTES, await viderLesCaches());
 
   // 3. Le build des pages figees.
   let passage: Passage;

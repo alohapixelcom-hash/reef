@@ -1,4 +1,4 @@
-// src/moteur/deployer/regles.ts - les regles pures du bouton "Tout deployer" : la garde d'une minute, l'adresse du hook, l'heure lisible.
+// src/moteur/deployer/regles.ts - les regles pures du bouton "Tout deployer" : la garde d'une minute, l'adresse du hook, l'heure lisible dans le fuseau du site.
 //
 // POURQUOI UN FICHIER A PART : ces trois regles ne touchent ni la base ni le
 // reseau. Sorties ici, elles se verifient par `pnpm test` (regles.selfcheck.ts)
@@ -37,16 +37,41 @@ export function lireLeHook(brut: string | undefined, dev: boolean): Hook {
   return { etat: "invalide" };
 }
 
-// L'agence et ses clients lisent l'heure de Paris. Un Worker tourne en UTC :
-// sans fuseau explicite, le journal afficherait deux heures de moins en ete.
-const FUSEAU = "Europe/Paris";
+// Un Worker tourne en UTC : sans fuseau explicite, le journal afficherait deux
+// heures de moins que la montre de qui a clique. Le fuseau est celui du site
+// (ALOHA_BO_FUSEAU, Europe/Paris par defaut), la forme de la date celle de la
+// langue du lecteur.
+export const FUSEAU_PAR_DEFAUT = "Europe/Paris";
 
-const FORMAT = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "medium", timeZone: FUSEAU });
+/** Lit ALOHA_BO_FUSEAU : un fuseau que la plateforme connait, sinon celui par defaut. */
+export function lireLeFuseau(brut: string | undefined): string {
+  const valeur = (brut ?? "").trim();
+  if (valeur === "") return FUSEAU_PAR_DEFAUT;
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: valeur });
+    return valeur;
+  } catch {
+    return FUSEAU_PAR_DEFAUT;
+  }
+}
 
-/** "2026-09-21T19:45:12.000Z" -> "21 sept. 2026, 21:45:12". Une date illisible est rendue telle quelle. */
-export function heure(iso: string): string {
+const FORMATS = new Map<string, Intl.DateTimeFormat>();
+
+function format(langue: "fr" | "en", fuseau: string): Intl.DateTimeFormat {
+  const cle = `${langue}|${fuseau}`;
+  let existant = FORMATS.get(cle);
+  if (!existant) {
+    const locale = langue === "fr" ? "fr-FR" : "en-GB";
+    existant = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "medium", timeZone: fuseau });
+    FORMATS.set(cle, existant);
+  }
+  return existant;
+}
+
+/** "2026-09-21T19:45:12.000Z" -> "21 sept. 2026, 21:45:12" a Paris, en francais. Une date illisible est rendue telle quelle. */
+export function heure(iso: string, langue: "fr" | "en" = "fr", fuseau: string = FUSEAU_PAR_DEFAUT): string {
   const date = new Date(iso);
-  return Number.isNaN(date.getTime()) ? iso : FORMAT.format(date);
+  return Number.isNaN(date.getTime()) ? iso : format(langue, fuseau).format(date);
 }
 
 /**
