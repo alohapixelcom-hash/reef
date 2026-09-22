@@ -16,6 +16,7 @@
       "slug": "posts",
       "label": "Articles",
       "labelSingular": "Article",
+      "urlPattern": "/blog/{slug}",
       "supports": [
         "drafts",
         "revisions",
