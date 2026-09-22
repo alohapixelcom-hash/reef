@@ -64,8 +64,10 @@ The administration is EmDash's own React application. Reef does not copy it: it 
 
 ```bash
 pnpm build:moteur
-npx wrangler deploy --config wrangler.moteur.jsonc
+npx wrangler deploy --domain blog.example.com   # never --config: see DEPLOY.md
 ```
+
+With the engine on, `/secret-spot/` and `/fr/secret-spot/` answer a 302 to `/_emdash/admin` (`src/worker.moteur.ts`; `assets.run_worker_first` in `wrangler.moteur.jsonc` makes the Worker see those paths before the prerendered files): one back office per site, at the same address as every other back office of the house.
 
 ## Deploy everything
 

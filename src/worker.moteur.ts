@@ -11,13 +11,26 @@ export { PluginBridge };
 
 type Fetch = (request: Request, env: unknown, ctx: unknown) => Response | Promise<Response>;
 
+// L'entree du back office, la meme adresse que sur tous les sites de la
+// maison : /secret-spot/ (et /fr/secret-spot/) ouvre l'administration
+// d'EmDash. Moteur allume, l'ancien back office fige du theme ne publie rien :
+// le laisser servir ces pages ferait deux back offices dont un inerte.
+const ENTREE_DU_BACK_OFFICE = /^\/(?:fr\/)?secret-spot(?:\/.*)?$/;
+
 export default {
   ...handler,
   // La meme redirection de langue que le Worker du site fige, sauf sur les
   // adresses internes (/_emdash, /_image, /_astro) : envoyer le back office
   // sous /fr/ le rendrait introuvable.
   fetch(request: Request, env: unknown, ctx: unknown) {
-    const interne = new URL(request.url).pathname.startsWith("/_");
+    const chemin = new URL(request.url).pathname;
+    if (ENTREE_DU_BACK_OFFICE.test(chemin)) {
+      return new Response(null, {
+        status: 302,
+        headers: { Location: "/_emdash/admin", "Cache-Control": "no-store" },
+      });
+    }
+    const interne = chemin.startsWith("/_");
     const langue = interne ? null : redirectionDeLangue(request);
     return langue ?? (handler.fetch as Fetch)(request, env, ctx);
   },

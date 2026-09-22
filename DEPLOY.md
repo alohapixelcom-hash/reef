@@ -67,9 +67,21 @@ routes; they have not yet been run against a live account.
 
    ```bash
    pnpm install --frozen-lockfile
-   ALOHA_MOTEUR=emdash pnpm build:moteur
-   npx wrangler deploy --config wrangler.moteur.jsonc
+   pnpm build:moteur
+   npx wrangler deploy --domain blog.example.com
    ```
+
+   Run `wrangler deploy` WITHOUT `--config`: the build writes the real Worker
+   configuration to `dist/server/wrangler.json` and points
+   `.wrangler/deploy/config.json` at it, and Wrangler follows that pointer
+   only when no configuration file is named. With `--config
+   wrangler.moteur.jsonc` it bundles the raw source instead and fails on
+   `@emdash-cms/cloudflare/worker` (measured on 22 September 2026). The first
+   deploy creates the D1 database, the R2 bucket and the sessions KV namespace
+   on its own. `--domain` attaches the Worker to a hostname of a zone of the
+   same Cloudflare account, DNS record and certificate included; without it
+   the Worker answers on its `workers.dev` address, which browsers may flag
+   while it is brand new.
 
    Optional variables at build time: `ALOHA_BO_LANGUE=fr` (default language of
    the back office), `ALOHA_BO_FUSEAU=Europe/Paris` (time zone of the times the
@@ -88,7 +100,11 @@ routes; they have not yet been run against a live account.
    Without it the button still empties the caches and says the build was not
    restarted.
 
-4. **The first administrator.** Open `https://<your-worker>/_emdash/admin`.
+4. **The first administrator.** Open `https://<your-domain>/secret-spot/`
+   (with the engine on, that address, and its French twin, open
+   `/_emdash/admin`; the static back office of the theme is not served).
+   Do it on the final domain: the passkey is bound to the hostname it was
+   created on.
    The setup wizard asks for the site title and tagline, then an email and a
    name, then registers a passkey on the device in use: that passkey is the
    administrator account. The wizard runs once; afterwards the same address is
@@ -105,21 +121,21 @@ routes; they have not yet been run against a live account.
 6. **Import the content.**
 
    ```bash
-   EMDASH_TOKEN=<the token> node scripts/moteur-import.mjs --url https://<your-worker>
+   EMDASH_TOKEN=<the token> node scripts/moteur-import.mjs --url https://<your-domain>
    ```
 
    The script creates one post per Markdown file and language, uploads the
    covers, and publishes what was not a draft. It can be run again: a post
    already present is skipped.
 
-7. **Check.** `https://<your-worker>/version.json` gives the version and the
+7. **Check.** `https://<your-domain>/version.json` gives the version and the
    build time; `/blog/`, a post, `/sitemap-index.xml` and
    `/sitemap-contenu.xml` must answer 200; an invented address 404. Publish a
    post in the back office and reload it on the site: no build is involved.
 
 8. **Workers Builds, for the prerendered pages.** Connect the repository in the
    Worker's settings, with `ALOHA_MOTEUR=emdash pnpm build:moteur` as the build
-   command and `npx wrangler deploy --config wrangler.moteur.jsonc` as the
+   command and `npx wrangler deploy` as the
    deploy command. Then create the Deploy Hook of step 3. From then on, the
    "Deploy everything" button restarts that build, and `/version.json` proves
    when the new build is online.
