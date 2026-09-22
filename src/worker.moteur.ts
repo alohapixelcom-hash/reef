@@ -15,7 +15,9 @@ type Fetch = (request: Request, env: unknown, ctx: unknown) => Response | Promis
 // maison : /secret-spot/ (et /fr/secret-spot/) ouvre l'administration
 // d'EmDash. Moteur allume, l'ancien back office fige du theme ne publie rien :
 // le laisser servir ces pages ferait deux back offices dont un inerte.
-const ENTREE_DU_BACK_OFFICE = /^\/(?:fr\/)?secret-spot(?:\/.*)?$/;
+// /_emdash/secret-spot/ est l'alias demande par l'editeur pour l'adresse
+// native d'EmDash, /_emdash/admin, que le paquet ne permet pas de renommer.
+const ENTREE_DU_BACK_OFFICE = /^\/(?:(?:fr\/)?secret-spot|_emdash\/secret-spot)(?:\/.*)?$/;
 
 export default {
   ...handler,
