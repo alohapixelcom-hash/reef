@@ -1,4 +1,6 @@
-// src/moteur/catalogue-bo.fr.ts - le dictionnaire francais du theme pour le back office : ce qu'EmDash 0.38 n'a pas encore traduit.
+// src/moteur/catalogue-bo.fr.ts - le dictionnaire francais de la maison pour le back office : ce qu'EmDash 0.38 n'a pas encore traduit.
+//
+// PIECE DU SOCLE (voir en tete de catalogue-bo.ts).
 //
 // COMMENT LE LIRE. A gauche, le texte anglais tel qu'il sort du catalogue
 // source du moteur, au caractere pres : c'est la cle, et elle doit rester
@@ -1302,7 +1304,7 @@ function parLaFormeAnglaise(paires: [unknown, unknown][]): Record<string, unknow
   return Object.fromEntries(paires.map(([anglais, francais]) => [JSON.stringify(anglais), francais]));
 }
 
-/** Le dictionnaire francais du theme, tel que catalogue-bo.ts le pose sur le catalogue du moteur. */
+/** Le dictionnaire francais de la maison, tel que catalogue-bo.ts le pose sur le catalogue du moteur. */
 export const DICTIONNAIRE: Dictionnaire = {
   simples: SIMPLES,
   composes: parLaFormeAnglaise(COMPOSES_SOURCE),

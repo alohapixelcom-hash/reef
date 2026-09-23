@@ -1,5 +1,6 @@
 // src/moteur/catalogue-bo.selfcheck.ts - la preuve que le back office ne parle plus anglais, et que le dictionnaire ne traine rien d'inutile.
 //
+// PIECE DU SOCLE (voir en tete de catalogue-bo.ts).
 // Lancer : node --experimental-strip-types src/moteur/catalogue-bo.selfcheck.ts
 //
 // Il lit les VRAIS catalogues du moteur (ceux du paquet installe), pas une
@@ -11,19 +12,15 @@
 //   3. effet : le catalogue complete rend bien du francais sur les libelles
 //      que la maison surveille.
 import assert from "node:assert/strict";
-import { readdirSync } from "node:fs";
+import { dirname } from "node:path";
+import { pathToFileURL } from "node:url";
+import { cheminDuCatalogueDuMoteur } from "./catalogue-bo.config.mjs";
 import { catalogueComplete, entreesMortes, messagesEnAnglais, texteSimple, type Catalogue } from "./catalogue-bo.regles.ts";
 import { DICTIONNAIRE } from "./catalogue-bo.fr.ts";
 
-/** Le dossier des catalogues du paquet d'administration, trouve comme le fait moteur.config.mjs. */
-function dossierDesCatalogues(): string {
-  const racine = new URL("../../node_modules/.pnpm/", import.meta.url);
-  const paquet = readdirSync(racine).find((nom) => nom.startsWith("@emdash-cms+admin@"));
-  assert.ok(paquet, "le paquet @emdash-cms/admin est introuvable dans node_modules");
-  return new URL(`${paquet}/node_modules/@emdash-cms/admin/dist/locales/`, racine).href;
-}
-
-const dossier = dossierDesCatalogues();
+// Le dossier des catalogues du paquet d'administration, trouve exactement
+// comme la configuration du site le trouve : depuis emdash.
+const dossier = `${pathToFileURL(dirname(cheminDuCatalogueDuMoteur(import.meta.url))).href}/`;
 const anglais = ((await import(`${dossier}en/messages.mjs`)) as { messages: Catalogue }).messages;
 const francais = ((await import(`${dossier}fr/messages.mjs`)) as { messages: Catalogue }).messages;
 
@@ -66,7 +63,7 @@ assert.equal(Object.keys(complete).length, total, "le catalogue complete a perdu
 
 console.log(
   `catalogue-bo.selfcheck: ${total} messages, ${restesDuMoteur} laisses en anglais par EmDash 0.38, ` +
-    `${Object.keys(DICTIONNAIRE.simples).length + Object.keys(DICTIONNAIRE.composes).length} traduits par le theme, ` +
+    `${Object.keys(DICTIONNAIRE.simples).length + Object.keys(DICTIONNAIRE.composes).length} traduits par la maison, ` +
     `${DICTIONNAIRE.identiques.length} identiques en francais, ` +
     `${Object.keys(DICTIONNAIRE.maison.simples).length + Object.keys(DICTIONNAIRE.maison.composes).length} mots de la maison. Aucun reste anglais.`,
 );

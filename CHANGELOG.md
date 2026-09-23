@@ -21,11 +21,15 @@ one with the previous release. See `docs/moteur.md`.
   unpublish, three passes). One alias (`@moteur/source`) picks the files or
   the database, both return the same collection entry, and no component was
   rewritten.
-- **The back office, in the theme's clothes.** EmDash's React administration
-  at `/_emdash/admin` is skinned from `tokens.css` itself: the theme's fonts,
-  surfaces, inks, brand colour and pill buttons, light and dark, and
-  `pnpm rebrand` restyles it in the same move. Every visible text was measured
-  against WCAG AA in seven views and two modes. The theme's own stylesheet no
+- **The back office: native backgrounds, the theme's accent.** House rule of
+  23 September 2026: every back office keeps EmDash's own two backgrounds,
+  white in light mode and black in dark mode. The skin (`habillage.ts`,
+  `back-office.css`) now carries only the accent colour (buttons, links,
+  active states, focus ring), the fonts, the pill shape of controls, the logo
+  and the site name; canvas, rail, cards, fields, hairlines and base ink are
+  the engine's. Measured on the rendered page at 1440 px: `#ffffff` light,
+  `#0f0f0f` dark, chroma zero; the accent passes AA on both (4.64 and 8.99 to
+  1 on the primary button, 6.58 and 8.97 on links). The theme's own stylesheet no
   longer leaks into the admin page: a page imported by the on-demand sitemap
   had stopped being a style boundary for Astro, which inlined 127 KB of theme
   CSS into the back office and into the manifest of 73 API routes; the
@@ -38,7 +42,9 @@ one with the previous release. See `docs/moteur.md`.
   dictionary (`src/moteur/catalogue-bo.fr.ts`) completes them through an alias
   on the module the admin page reads its catalogue from, without forking the
   package, without touching the rendered page, and without ever contradicting
-  a message EmDash has translated. A self-check reads the real catalogues and
+  a message EmDash has translated. The catalogue is a piece of the house
+  base, portable as is (the recipe is at the top of `catalogue-bo.ts`, the
+  Astro wiring in `catalogue-bo.config.mjs`). A self-check reads the real catalogues and
   fails on a single uncovered message or a dead entry. Measured on the
   production build: of the 2327 simple messages the admin page carries, the 98
   that remain identical to English are spellings French shares (GitHub, CSS,

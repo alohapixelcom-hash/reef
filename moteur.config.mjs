@@ -7,10 +7,10 @@
 // Le moteur est EmDash (MIT, emdashcms.com) : la base D1 porte le contenu, R2
 // les medias, et les pages gerees se rendent a la demande. Publier dans le
 // back office ecrit en base, et la page suivante le montre : aucun build.
-import { readFileSync, realpathSync } from "node:fs";
-import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { IDENTITE as ACCUEIL } from "./src/moteur/accueil/identite.mjs";
+import { catalogueDuBackOffice } from "./src/moteur/catalogue-bo.config.mjs";
 import { IDENTITE as DEPLOYER } from "./src/moteur/deployer/identite.mjs";
 import { PAGES_GEREES } from "./src/moteur/pages-gerees.mjs";
 import { routesDuCache } from "./src/moteur/routes-du-cache.mjs";
@@ -115,7 +115,7 @@ function partageDesPages() {
         const { version } = JSON.parse(readFileSync(ici("./package.json"), "utf8"));
         updateConfig({
           vite: {
-            plugins: [catalogueFrancaisDuBackOffice()],
+            plugins: CATALOGUE_BO ? [CATALOGUE_BO.greffon] : [],
             define: {
               __ALOHA_VERSION__: JSON.stringify(version),
               __ALOHA_CONSTRUIT__: JSON.stringify(new Date().toISOString()),
@@ -134,58 +134,18 @@ function partageDesPages() {
   };
 }
 
-/**
- * Le chemin reel du catalogue de messages de l'administration. Il se resout
- * DEPUIS emdash : @emdash-cms/admin est sa dependance, pas celle du theme, et
- * l'arborescence stricte de pnpm ne le met pas a portee de src/.
- */
-function catalogueDuMoteur() {
-  const depuisIci = createRequire(import.meta.url);
-  const depuisEmdash = createRequire(realpathSync(depuisIci.resolve("emdash")));
-  return depuisEmdash.resolve("@emdash-cms/admin/locales/index.js");
-}
+// Le catalogue francais du back office (piece du socle, voir en tete de
+// src/moteur/catalogue-bo.ts) : son alias entre dans `alias`, son greffon dans
+// `vite.plugins`, moteur allume seulement.
+const CATALOGUE_BO = MOTEUR_ACTIF ? catalogueDuBackOffice(import.meta.url) : null;
 
-/**
- * Les alias de Vite, en tableau : il en faut un dont la cle est une expression
- * reguliere ancree. En forme d'objet, "@emdash-cms/admin/locales" capturerait
- * aussi "@emdash-cms/admin/locales/index.js" - donc l'import par lequel notre
- * propre fichier atteint le vrai catalogue - et se rappellerait lui-meme.
- */
+/** Les alias de Vite, en tableau : c'est la forme que le greffon du catalogue attend. */
 const alias = (source) => [
   { find: "@moteur/source", replacement: ici(`./src/moteur/source.${source}.ts`) },
   { find: "@moteur/live", replacement: ici(`./src/moteur/live.${source}.ts`) },
   { find: "@moteur/TexteRiche.astro", replacement: ici(`./src/moteur/TexteRiche.${source}.astro`) },
-  // src/moteur/catalogue-bo.ts atteint le vrai catalogue du moteur par ce nom.
-  ...(source === "emdash" ? [{ find: "@moteur/catalogue-emdash", replacement: catalogueDuMoteur() }] : []),
+  ...(CATALOGUE_BO?.alias ?? []),
 ];
-
-/**
- * Le greffon Vite qui met le catalogue francais du theme SUR LE CHEMIN de la
- * page d'administration.
- *
- * POURQUOI UN GREFFON ET PAS UNE LIGNE D'ALIAS. L'integration d'EmDash pose
- * elle-meme un alias de prefixe "@emdash-cms/admin" vers son dossier dist, et
- * Astro range les alias des integrations AVANT ceux du projet. Or le premier
- * alias qui correspond gagne : le notre, ajoute a la fin, ne serait jamais lu.
- * Le crochet `config` d'un greffon est le seul endroit ou l'on peut se placer
- * en tete, et Vite le prevoit explicitement (on modifie la configuration en
- * place avant qu'elle soit resolue).
- *
- * Ce que ca change pour la page d'administration : rien, sauf que son
- * `loadMessages` rend le catalogue du moteur complete en francais. Notre
- * propre fichier, lui, importe "@moteur/catalogue-emdash" : un autre nom,
- * donc aucune boucle.
- */
-function catalogueFrancaisDuBackOffice() {
-  return {
-    name: "aloha:catalogue-bo",
-    config(configuration) {
-      const alias = configuration.resolve?.alias;
-      if (!Array.isArray(alias)) throw new Error("aloha:catalogue-bo : les alias de Vite ne sont plus un tableau");
-      alias.unshift({ find: "@emdash-cms/admin/locales", replacement: ici("./src/moteur/catalogue-bo.ts") });
-    },
-  };
-}
 
 /** Le fournisseur du cache de routes (`cache` d'Astro), quand ALOHA_CACHE_ROUTES est posee ; rien sinon. Les regles se posent dans partageDesPages. */
 async function cacheDeRoutes() {

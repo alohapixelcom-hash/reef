@@ -1,5 +1,7 @@
 // src/moteur/catalogue-bo.regles.ts - les regles pures du catalogue francais du back office : completer, jamais contredire.
 //
+// PIECE DU SOCLE (voir en tete de catalogue-bo.ts).
+//
 // CE QUE FAIT LE MOTEUR TOUT SEUL. EmDash 0.38 livre son administration en 28
 // langues, compilees par Lingui. Le catalogue francais compte 2428 messages,
 // mais 678 y sont encore mot pour mot l'anglais : ce sont les ecrans les plus
@@ -7,7 +9,7 @@
 // programmee). "Widgets" et "Publish now" en font partie, et un editeur
 // francais les lit en anglais.
 //
-// CE QU'AJOUTE LE THEME. Un dictionnaire maison (catalogue-bo.fr.ts), pose
+// CE QU'AJOUTE LA MAISON. Un dictionnaire a elle (catalogue-bo.fr.ts), pose
 // PAR-DESSUS le catalogue du moteur, et seulement la ou le moteur n'a pas
 // traduit. La regle est stricte et se verifie : un message dont la forme
 // francaise differe deja de la forme anglaise n'est JAMAIS touche. On complete
@@ -64,7 +66,7 @@ function nonTraduit(francais: MessageCompile, anglais: MessageCompile): boolean 
 }
 
 /**
- * Le catalogue francais complete par le dictionnaire du theme. Les messages
+ * Le catalogue francais complete par le dictionnaire de la maison. Les messages
  * que le moteur traduit deja sortent intacts ; les autres prennent notre
  * traduction quand nous en avons une.
  */
@@ -95,7 +97,7 @@ export function catalogueComplete(francais: Catalogue, anglais: Catalogue, dicti
 }
 
 /**
- * Ce que le theme n'a pas encore traduit : les messages que le moteur laisse
+ * Ce que la maison n'a pas encore traduit : les messages que le moteur laisse
  * en anglais et que le dictionnaire ne couvre pas, ni par une traduction ni
  * par la liste des textes identiques. Le self-check exige une liste vide.
  */
