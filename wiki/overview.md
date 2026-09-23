@@ -113,8 +113,9 @@ the current URL, and on a 404 that URL exists in no language.
 
 From package.json: `pnpm dev`, `pnpm build`, `pnpm preview`, `pnpm check`
 (astro check, must return 0/0/0), `pnpm rebrand <hex>` (repaints tokens.css
-from one brand color, scripts/rebrand.mjs), `pnpm og` (regenerates the
-public/og/*.png cards, scripts/og.mjs), `pnpm app` (build tuned for a
+from one brand color, scripts/rebrand.mjs), `pnpm og` (crops the
+public/og/*.jpg share cards from the theme photos, scripts/og.mjs, also run by
+every build), `pnpm app` (build tuned for a
 Capacitor shell, scripts/app.mjs). Selfchecks run directly with Node:
 `node src/js/schema.selfcheck.ts` and `node src/js/pagination.selfcheck.ts`.
 Node >= 22.18 required. Path aliases live in tsconfig.json.
@@ -152,3 +153,7 @@ The shared BackOffice/AdminShell now follows the existing alohapixel.app SaaS ad
 ## Sync 2026-09-22: version 3.1.0, the engine finished
 
 Three structural changes on top of the 21 September sync. **The on-demand sitemap no longer imports pages**: the path functions of the dynamic pages moved to `src/js/adresses.ts` (next to `cheminsArchive` in `src/js/archive.ts`), each page exports them as its `getStaticPaths`, and `src/moteur/plan-du-site.ts` replays them from an explicit table. A page imported by a non-page module stops being a style boundary for Astro's build, which was inlining the theme's 127 KB stylesheet into the admin page and into the manifest of 73 API routes (the server entry chunk went from 12.2 MB to 2.3 MB). **The back office speaks the person's language**: EmDash picks it per request (cookie, then browser), `ALOHA_BO_LANGUE` sets a site default through `src/moteur/langue-bo.ts`, and the theme's own admin texts have two dictionaries (`deployer/textes.fr.ts`, `deployer/textes.en.ts`, `accueil/textes.ts`). **A second house extension** (`src/moteur/accueil/`) adds the site card to the dashboard, the only React component the theme gives the admin. Also: `back-office.css` now writes the pill buttons and fields, the focus ring, the flat primary button with the theme's ink, and the Block Kit heading hierarchy; `ALOHA_CACHE_ROUTES` (Workers Cache or memory) joins `ALOHA_CACHE_OBJETS`, with route rules tagged by collection so that EmDash purges them at each publication (proven locally with the memory providers, 21 September 2026); `DEPLOY.md` documents the first deployment of the engine. Still not deployed online. See docs/moteur.md.
+
+## Sync 2026-09-23: version 3.1.1, the share card is a photograph
+
+House rule of 23 September 2026: an Open Graph or Twitter image is one photograph and nothing else. `scripts/og.mjs` no longer renders an SVG template from the tokens; it crops a photograph already fetched by `scripts/covers.mjs` into `public/og/<slug>.jpg` (sharp, 1200x630, fit cover, position "attention", JPEG 86 mozjpeg 4:4:4) and checks the size. `build`, `build:moteur`, `app` and `predev` run it right after covers.mjs, `public/og/` is ignored by git, and the script deletes any file there it did not make. Only `default` is referenced (siteData.defaultImage), cropped from `src/assets/reef-hero-vague.webp`; the blog, topics, about and contact cards had no reader and are gone. The script no longer reads tokens.css. See wiki/subsystems/seo.md.

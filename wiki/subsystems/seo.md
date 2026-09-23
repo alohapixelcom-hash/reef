@@ -13,7 +13,7 @@ sources:
   - scripts/favicon.mjs
   - astro.config.mjs
   - src/i18n/index.ts
-updated: 2026-09-13
+updated: 2026-09-23
 ---
 
 # SEO layer
@@ -85,8 +85,16 @@ page without them keeps the integration's own pairing.
 
 ## OG images
 
-scripts/og.mjs renders the public/og/*.png cards (1200x630) from an SVG
-template whose colors come from tokens.css (og.mjs:29-31), rasterized by
-sharp. `pnpm og` regenerates them; run it after `pnpm rebrand`. Pages choose
+A share card is one photograph and nothing else (house rule of 23 September
+2026): no gradient, title, wave or domain drawn on it, since the platform
+writes og:title under the preview. scripts/og.mjs crops a theme photograph
+already fetched by scripts/covers.mjs into public/og/<slug>.jpg with sharp
+(1200x630, fit cover, position "attention", JPEG 86 mozjpeg 4:4:4), checks
+the size, and deletes any file in public/og/ it did not make. Its CARTES table
+lists only the cards a page cites: today `default` (siteData.defaultImage),
+cropped from src/assets/reef-hero-vague.webp. `pnpm build`, `build:moteur`,
+`app` and `predev` run it right after covers.mjs, and public/og/ is ignored by
+git, so a missing photo fails the build with a message naming covers.mjs. A
+post with a cover shares the cover instead (ArticlePage.astro). Pages choose
 their card through the `image` prop of BaseLayout, whose shape requires alt
 text (src/layouts/BaseHead.astro:27).

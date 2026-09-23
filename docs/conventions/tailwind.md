@@ -44,7 +44,7 @@ instead of being declared unreadable.
 
 Hard rule: palette names never appear in markup. No `bg-ink-900`, no
 `text-coral-400`, no raw hex. Those names exist only inside tokens.css and
-its known readers: scripts/rebrand.mjs, scripts/og.mjs and BaseHead's favicon
+its known readers: scripts/rebrand.mjs and BaseHead's favicon
 extraction. `pnpm rebrand` repaints the theme by editing floor 1 only; one
 leaked palette class in markup breaks that promise. Check yourself:
 

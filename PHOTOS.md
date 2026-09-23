@@ -69,5 +69,19 @@ at your own URL, or delete the entry, and the build stops fetching ours.
 
 No other raster image and no other video ship with this theme. Every icon and
 every decorative shape is original SVG or CSS drawn for this house, covered by
-the theme LICENSE. The Open Graph cards in `public/og/` are generated locally by
-`scripts/og.mjs` from an original SVG template.
+the theme LICENSE.
+
+## The share cards
+
+The Open Graph and Twitter cards in `public/og/` are not new images: they are
+crops of the photographs above, under the same Pexels licence. A card is a
+photograph and nothing else, with no text or shape drawn on it; the platform
+writes the title under the preview itself. `scripts/og.mjs` makes them at every
+build, right after `scripts/covers.mjs`, at 1200x630 in JPEG, and the
+repository does not version them.
+
+| Card | Cropped from |
+|---|---|
+| `public/og/default.jpg` | `src/assets/reef-hero-vague.webp` (Pexels #29275767) |
+
+Replace the hero photograph and the card follows at the next build.

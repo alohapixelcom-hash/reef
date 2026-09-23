@@ -168,7 +168,7 @@ pnpm preview      # serve the build locally
 pnpm check        # astro check (types and templates)
 pnpm rebrand "#7a59ff"   # repaint the theme from one brand color
 pnpm rebrand --restore   # back to the Reef palette
-pnpm og           # regenerate the Open Graph cards in public/og/
+pnpm og           # crop the share cards into public/og/ (the build does it too)
 pnpm app          # build tuned for a native Capacitor shell
 pnpm dev:moteur   # the same site with the publication engine on (docs/moteur.md)
 pnpm build:moteur # the Worker build: managed pages on demand, the rest prerendered
@@ -210,7 +210,8 @@ docs/           the five convention files, one per subsystem
    the only file you must edit to change the publication identity.
 2. **astro.config.mjs**: set `site` to your production URL. It feeds canonical
    URLs, OG tags, the sitemap, robots.txt, llms.txt and the RSS feed at once.
-3. `pnpm rebrand "#yourbrandcolor"`, then `pnpm og` to repaint the share cards.
+3. `pnpm rebrand "#yourbrandcolor"`. The share cards need no step: they are
+   photographs, cropped by the build from the theme photos (scripts/og.mjs).
 4. **src/data/**: replace the demo posts, authors and topics. One Markdown post
    per language under the same slug.
 5. **src/i18n/ui/en/** and **src/i18n/ui/fr/**: all the interface copy. Nothing
@@ -226,8 +227,10 @@ docs/           the five convention files, one per subsystem
       line saying "this site is a demo of the Reef theme" does not render on
       your site. The demo keeps it; you clear the field, and there is no
       component to open.
-- [ ] `pnpm og` ran after your rebrand, so the cards in public/og/ carry your
-      colors and not Reef Notes'.
+- [ ] The share card is YOUR photograph: the build crops public/og/default.jpg
+      from the home page hero photo (scripts/og.mjs, run by `pnpm build`), so
+      replace that photo, or point the `default` line of scripts/og.mjs at
+      yours, and Reef's wave leaves your link previews.
 - [ ] Legal copy in src/config/legalData.json.ts reviewed by a human who may
       legally have an opinion, and the bracketed fields of the legal notice
       (src/i18n/ui/en/pages.ts and src/i18n/ui/fr/pages.ts) filled in. It all

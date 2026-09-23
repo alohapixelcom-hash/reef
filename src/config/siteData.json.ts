@@ -28,7 +28,7 @@ const siteData: SiteDataProps = {
   },
 
   defaultImage: {
-    src: "/og/default.png",
+    src: "/og/default.jpg",
     alt: "Reef, the Astro theme for people who write",
   },
 };

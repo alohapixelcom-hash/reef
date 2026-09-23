@@ -74,9 +74,13 @@ source, so the sitemap cannot contradict it.
 
 ## Images and indexing
 
-- OG images are generated, branded, static files: `pnpm og` renders
-  public/og/*.png (1200x630) from the theme tokens (scripts/og.mjs:29-31,
-  SVG template at :76-106). Re-run it after `pnpm rebrand`. Pages pass their
-  card via the `image` prop; alt text is mandatory in that prop's shape.
+- A share card is ONE PHOTOGRAPH AND NOTHING ELSE (house rule of
+  23 September 2026): no gradient, grid, eyebrow, title, wave, domain, panel
+  or screenshot on it; the platform writes og:title under the preview.
+  scripts/og.mjs crops a theme photo from src/assets into
+  public/og/<slug>.jpg (1200x630, sharp "attention", JPEG 86) at every build,
+  right after covers.mjs; public/og/ is not versioned. A new card is a line in
+  its CARTES table, and pages pass it via the `image` prop; alt text is
+  mandatory in that prop's shape.
 - `noindex` is a prop, not a habit (BaseHead.astro:84): draft posts and
   utility pages use it; everything else stays indexable.

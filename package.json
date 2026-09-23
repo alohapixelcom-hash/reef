@@ -1,7 +1,7 @@
 {
   "name": "reef",
   "type": "module",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Reef, a bilingual Astro blog theme with the Aloha editorial back office, article and category management, and a read-only public demo.",
   "license": "MIT",
   "author": "Aloha Pixel (https://alohapixel.app)",
@@ -27,12 +27,12 @@
     "node": ">=22.18.0"
   },
   "scripts": {
-    "app": "astro build && node scripts/app.mjs",
-    "build": "node scripts/covers.mjs && node scripts/favicon.mjs && astro build && node scripts/backoffice-manifest.mjs && node scripts/backoffice-demo.mjs",
+    "app": "node scripts/covers.mjs && node scripts/og.mjs && astro build && node scripts/app.mjs",
+    "build": "node scripts/covers.mjs && node scripts/og.mjs && node scripts/favicon.mjs && astro build && node scripts/backoffice-manifest.mjs && node scripts/backoffice-demo.mjs",
     "check": "astro check",
     "covers": "node scripts/covers.mjs",
     "dev": "astro dev",
-    "predev": "node scripts/covers.mjs",
+    "predev": "node scripts/covers.mjs && node scripts/og.mjs",
     "lint:house": "node scripts/house.mjs",
     "og": "node scripts/og.mjs",
     "poster": "node scripts/poster.mjs",
@@ -42,7 +42,7 @@
     "verify": "node scripts/verify.mjs",
     "favicon": "node scripts/favicon.mjs",
     "dev:moteur": "ALOHA_MOTEUR=emdash astro dev",
-    "build:moteur": "node scripts/covers.mjs && node scripts/favicon.mjs && ALOHA_MOTEUR=emdash astro build"
+    "build:moteur": "node scripts/covers.mjs && node scripts/og.mjs && node scripts/favicon.mjs && ALOHA_MOTEUR=emdash astro build"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.3.2",
