@@ -94,7 +94,7 @@ src/
   moteur/       the optional publication engine: two post sources behind one
                 alias, managed pages, on-demand sitemap, back office skin, and
                 the "Tout deployer" extension
-scripts/        og.mjs (OG cards), rebrand.mjs (repaint), app.mjs (Capacitor),
+scripts/        og.mjs (share cards), rebrand.mjs (repaint), app.mjs (Capacitor),
                 moteur-import.mjs (pours src/data/posts into the engine, once)
 seed/           seed.json, the engine's schema (collection and fields)
 wiki/           the maintained knowledge base
@@ -113,7 +113,7 @@ pnpm dev:moteur   # the same site with the publication engine on (docs/moteur.md
 pnpm build:moteur # the Worker build: managed pages on demand, the rest prerendered
 pnpm check      # astro check; must be 0/0/0 before you finish
 pnpm rebrand "#7a59ff"   # repaint tokens.css from one brand color
-pnpm og         # regenerate public/og/*.png from the tokens
+pnpm og         # crop the share cards (public/og/*.jpg) from the theme photos
 pnpm poster     # re-shoot the phone mockup of the home page into public/
 
 pnpm test       # every *.selfcheck.ts and *.test.ts under src/, found by name
@@ -218,6 +218,12 @@ work is done".
   Wiring it to an endpoint is the user's documented decision, not a fix.
 - Draft posts build (for preview) but must stay out of lists, RSS and
   llms.txt: filter with data.draft !== true, like the existing readers.
+- A share card (og:image, twitter:image) is ONE PHOTOGRAPH AND NOTHING ELSE,
+  house rule of 23 September 2026: no gradient, grid, eyebrow, title, wave,
+  domain, panel or screenshot drawn on it, because the platform already writes
+  the title under the preview. scripts/og.mjs crops the theme photos into
+  public/og/*.jpg at every build, right after covers.mjs; public/og/ is not
+  versioned, so never commit a card and never draw on one.
 
 ## Definition of done
 

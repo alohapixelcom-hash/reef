@@ -21,9 +21,10 @@ dist/
 .dev.vars
 .dev.vars.*
 
-# Les cartes Open Graph de public/og/ sont VERSIONNEES : `pnpm og` ne tourne pas
-# au build, un clone doit donc les trouver deja la. Les regenerer apres un
-# rebrand, puis les commiter.
+# Cartes de partage Open Graph : une photo seule, recadree depuis src/assets par
+# scripts/og.mjs, que `pnpm build` lance juste apres covers.mjs. Refabriquees a
+# chaque build, donc jamais versionnees.
+public/og/
 
 # Photographies de la demo : rapatriees par `pnpm covers`, refabriquees au build.
 src/assets/covers/

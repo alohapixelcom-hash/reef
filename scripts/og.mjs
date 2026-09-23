@@ -1,119 +1,89 @@
 #!/usr/bin/env node
 /**
- * scripts/og.mjs - genere les images Open Graph brandees du site, au build.
+ * scripts/og.mjs - fabrique les cartes de partage Open Graph du site, au build, a partir des photos du theme.
  *
  * Usage :
- *   pnpm og            genere public/og/*.png (1200x630) depuis le manifest ci-dessous
+ *   pnpm og            ecrit public/og/<slug>.jpg (1200x630) depuis la table CARTES ci-dessous
  *
- * Pourquoi un script et pas un service : zero dependance externe, zero runtime.
- * Le rendu part d'un gabarit SVG (degrade d'encre, grille, titre Space Grotesk,
- * vague aigue-marine) rasterise par sharp, deja present dans les
- * devDependencies.
+ * LA REGLE (23 septembre 2026, a vie) : une carte de partage est UNE PHOTO ET
+ * RIEN D'AUTRE. Ni degrade, ni grille, ni surtitre, ni titre, ni vague, ni
+ * cercles, ni domaine, ni panneau, ni capture d'ecran. La plateforme qui
+ * affiche l'apercu (Facebook, LinkedIn, X, iMessage, Slack) ecrit deja le
+ * titre et le domaine sous l'image, a partir de og:title et de og:url : les
+ * redessiner dans l'image, c'est les lire deux fois, en plus petit, et rogner
+ * par la plateforme selon son propre cadrage. Une photo pleine se lit a
+ * n'importe quelle taille de vignette.
  *
- * Les PNG ne sont PAS versionnes : `pnpm build` appelle ce script avant
- * `astro build`, donc un depot propre, une CI ou un `pnpm rebrand` refabriquent
- * les cartes aux couleurs du moment. C'est ce qui manquait : /og/default.png
- * repondait 404 en production.
+ * POURQUOI AU BUILD ET PAS VERSIONNEES : chaque carte est un recadrage d'une
+ * photo deja rapatriee par scripts/covers.mjs dans src/assets. `pnpm build`
+ * lance covers.mjs, puis ce script, puis `astro build` : un depot propre, une
+ * CI ou un acheteur qui remplace ses photos obtient des cartes a jour sans
+ * rien commiter. Des fichiers versionnes vieillissaient en silence : la carte
+ * montrait encore la demo apres un changement de photo. public/og/ est donc
+ * ignore par git, et ce script en est le seul proprietaire : il y efface tout
+ * fichier qu'il n'a pas fabrique (les anciennes cartes .png des versions
+ * precedentes, par exemple).
  *
- * Personnalisation : edite PAGES ou appelle `makeOg(titre, sortie, accent)`.
+ * Le recadrage est celui du site de l'agence : sharp, 1200x630, fit "cover",
+ * position "attention" (la zone la plus contrastee et la plus saturee reste
+ * dans le cadre), JPEG qualite 86, mozjpeg, sans sous-echantillonnage des
+ * couleurs (4:4:4), pour que l'ecume et le ciel ne bavent pas.
+ *
+ * Personnalisation : une page qui veut sa propre carte ajoute une ligne a
+ * CARTES et passe image={{ src: "/og/<slug>.jpg", alt }} a sa mise en page.
+ * Une carte que plus aucune page ne cite se retire de CARTES.
  */
 
-import { mkdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import sharp from "sharp";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+const ASSETS = join(ROOT, "src/assets");
 const OUT = join(ROOT, "public/og");
+const LARGEUR = 1200;
+const HAUTEUR = 630;
 
-// Les tokens sont lus depuis la source de verite : un rebrand repeint aussi les OG.
-const tokens = readFileSync(join(ROOT, "src/styles/tokens.css"), "utf8");
-const token = (name, fallback) => tokens.match(new RegExp(`--color-${name}:\\s*(#[0-9a-fA-F]{6})`))?.[1] ?? fallback;
-
-// Les quatre couleurs de la carte viennent de la palette DE CE THEME, pas de
-// celle d'un autre : un rebrand repeint donc aussi les cartes de partage.
-const DEEP = token("ink-950", "#080d10");
-const DEEP_MID = token("ink-900", "#101a20");
-const DEEP_SOFT = token("ink-300", "#8fa6b2");
-// L'accent dominant est l'aigue-marine de la maison. Le corail passe en second
-// : c'est la couleur des actions, pas celle de l'identite.
-const ACCENT = token("reef-400", "#3fc0e0");
-const ACCENT_2 = token("coral-400", "#ff7a59");
-
-// title : ce qui s'affiche en enorme. eyebrow : la petite ligne au-dessus.
-const PAGES = [
-  { slug: "default", eyebrow: "Reef Notes", title: "The notebook, not the portfolio." },
-  { slug: "blog", eyebrow: "Reef Notes · Posts", title: "What we learn while building sites." },
-  { slug: "topics", eyebrow: "Reef Notes · Topics", title: "Every note, sorted by subject." },
-  { slug: "about", eyebrow: "Reef Notes · About", title: "A two-person studio that writes it down." },
-  { slug: "contact", eyebrow: "Reef Notes · Contact", title: "Tell us what you are building." },
+// Une ligne par carte REELLEMENT citee par une page. Aujourd'hui une seule :
+// siteData.defaultImage, que toutes les pages utilisent, sauf un billet qui a
+// une couverture (ArticlePage prend alors la couverture elle-meme). La photo
+// est celle du premier ecran de l'accueil, la vague de Hawaii.
+const CARTES = [
+  { slug: "default", photo: "reef-hero-vague.webp" },
 ];
 
-const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-// Coupe le titre en 1 ou 2 lignes equilibrees, sans dependre d'une mesure de police.
-function twoLines(title) {
-  if (title.length <= 26) return [title];
-  const words = title.split(" ");
-  let best = [title, ""], bestDiff = Infinity;
-  for (let i = 1; i < words.length; i++) {
-    const a = words.slice(0, i).join(" ");
-    const b = words.slice(i).join(" ");
-    const diff = Math.abs(a.length - b.length);
-    if (diff < bestDiff && a.length <= 30 && b.length <= 30) { best = [a, b]; bestDiff = diff; }
+/** Recadre une photo du theme en carte 1200x630 et verifie le resultat. */
+export async function fabriquerCarte({ slug, photo }, sortie = OUT) {
+  const source = join(ASSETS, photo);
+  if (!existsSync(source)) {
+    throw new Error(
+      `og: la photo src/assets/${photo} manque pour la carte "${slug}". ` +
+        "Lancez d'abord `node scripts/covers.mjs` (ou `pnpm covers`), qui rapatrie les photos du theme.",
+    );
   }
-  return best[1] ? best : [title];
+  mkdirSync(sortie, { recursive: true });
+  const fichier = join(sortie, `${slug}.jpg`);
+  await sharp(source)
+    .resize(LARGEUR, HAUTEUR, { fit: "cover", position: "attention" })
+    .jpeg({ quality: 86, mozjpeg: true, chromaSubsampling: "4:4:4" })
+    .toFile(fichier);
+  const { width, height, format } = await sharp(fichier).metadata();
+  if (width !== LARGEUR || height !== HAUTEUR || format !== "jpeg") {
+    throw new Error(`og: ${fichier} fait ${width}x${height} (${format}), il faut ${LARGEUR}x${HAUTEUR} en JPEG`);
+  }
+  return fichier;
 }
 
-function svgTemplate({ eyebrow, title }) {
-  const lines = twoLines(title);
-  const titleSize = lines.length === 2 ? 76 : 84;
-  const firstY = lines.length === 2 ? 330 : 370;
-  const text = lines
-    .map((l, i) => `<text x="90" y="${firstY + i * (titleSize + 12)}" font-family="Space Grotesk, Inter Tight, Arial, sans-serif" font-weight="800" font-size="${titleSize}" letter-spacing="-2.5" fill="#ffffff">${esc(l)}</text>`)
-    .join("\n  ");
+const fabriquees = [];
+for (const carte of CARTES) fabriquees.push(await fabriquerCarte(carte));
 
-  return `<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="${DEEP_MID}"/>
-      <stop offset="0.55" stop-color="${DEEP}"/>
-      <stop offset="1" stop-color="${DEEP}"/>
-    </linearGradient>
-    <radialGradient id="glowA" cx="0.85" cy="0.1" r="0.7">
-      <stop offset="0" stop-color="${ACCENT}" stop-opacity="0.5"/>
-      <stop offset="1" stop-color="${ACCENT}" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="glowB" cx="0.1" cy="0.95" r="0.6">
-      <stop offset="0" stop-color="${ACCENT_2}" stop-opacity="0.35"/>
-      <stop offset="1" stop-color="${ACCENT_2}" stop-opacity="0"/>
-    </radialGradient>
-    <pattern id="grid" width="72" height="72" patternUnits="userSpaceOnUse">
-      <path d="M 72 0 L 0 0 0 72" fill="none" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
-    </pattern>
-  </defs>
+// Le dossier appartient a ce script : ce qu'il n'a pas fabrique ce tour-ci
+// n'est cite par aucune page et partirait en ligne pour rien.
+const attendus = new Set(CARTES.map((c) => `${c.slug}.jpg`));
+const retires = readdirSync(OUT).filter((nom) => !attendus.has(nom));
+for (const nom of retires) rmSync(join(OUT, nom), { recursive: true, force: true });
 
-  <rect width="1200" height="630" fill="url(#bg)"/>
-  <rect width="1200" height="630" fill="url(#glowA)"/>
-  <rect width="1200" height="630" fill="url(#glowB)"/>
-  <rect width="1200" height="630" fill="url(#grid)"/>
-
-  <text x="90" y="180" font-family="Space Grotesk, Inter Tight, Arial, sans-serif" font-weight="700" font-size="30" letter-spacing="6" fill="${ACCENT}">${esc(eyebrow.toUpperCase())}</text>
-  ${text}
-
-  <path d="M 90 520 q 30 -26 60 0 t 60 0 t 60 0 t 60 0" fill="none" stroke="${ACCENT}" stroke-width="7" stroke-linecap="round"/>
-  <text x="1110" y="560" text-anchor="end" font-family="Space Grotesk, Inter Tight, Arial, sans-serif" font-weight="700" font-size="26" fill="${DEEP_SOFT}">reef.alohapixel.app</text>
-</svg>`;
-}
-
-export async function makeOg(page, outDir = OUT) {
-  mkdirSync(outDir, { recursive: true });
-  const file = join(outDir, `${page.slug}.png`);
-  await sharp(Buffer.from(svgTemplate(page))).png({ compressionLevel: 9 }).toFile(file);
-  return file;
-}
-
-const results = [];
-for (const page of PAGES) results.push(await makeOg(page));
-console.log(`${results.length} images OG generees dans public/og/ :`);
-for (const f of results) console.log("  " + f.replace(ROOT + "/", ""));
+console.log(`${fabriquees.length} carte(s) de partage fabriquee(s) dans public/og/ :`);
+CARTES.forEach((c, i) => console.log(`  ${fabriquees[i].replace(ROOT + "/", "")} <- src/assets/${c.photo}`));
+if (retires.length) console.log(`  retire(s), plus cite(s) par aucune page : ${retires.join(", ")}`);

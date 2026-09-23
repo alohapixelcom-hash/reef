@@ -65,9 +65,13 @@ To make the theme yours: change the URLs in scripts/covers.mjs, or drop the
 `cover` field from a post and the layout falls back to a typographic card.
 Nothing in the code depends on a specific image.
 
-Everything else raster in the repository is generated, not sourced: the Open
-Graph cards in public/og/ are produced locally by scripts/og.mjs from an
-original SVG template that reads the theme's own color tokens, and the favicon
+The Open Graph share cards in public/og/ are not a separate source either:
+scripts/og.mjs crops them, at build time, from the Pexels photographs that
+PHOTOS.md lists (the default card is the home page hero, Pexels #29275767), so
+they are under the same Pexels licence. They are a photograph and nothing else,
+and they are not versioned in the repository.
+
+Everything else raster in the repository is generated, not sourced: the favicon
 is an original inline SVG data URI built in src/layouts/BaseHead.astro.
 
 ## Demo copy
@@ -105,7 +109,7 @@ Never shipped to the browser.
 |---|---|---|
 | typescript | Apache-2.0 | Type checking |
 | @astrojs/check | MIT | astro check |
-| sharp | Apache-2.0 | Rasterizes the OG SVG template in scripts/og.mjs |
+| sharp | Apache-2.0 | Crops the theme photos into the share cards in scripts/og.mjs |
 
 ## What is deliberately absent
 

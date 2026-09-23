@@ -4,7 +4,29 @@
 
 Versions describe the features actually shipped in this theme.
 
-Current version: **3.1.0**.
+Current version: **3.1.1**.
+
+## 3.1.1 - 2026-09-23
+
+The share cards become a photograph and nothing else, made at build time.
+
+- **One card, one photograph.** The Open Graph and Twitter image is now a
+  plain crop of the home page hero photograph (`src/assets/reef-hero-vague.webp`,
+  Pexels, already listed in `PHOTOS.md`): no gradient, grid, eyebrow, title,
+  wave or domain drawn on it. The platform already writes the title and the
+  domain under the preview, from `og:title` and `og:url`.
+- **Made by the build, no longer versioned.** `pnpm build`, `pnpm build:moteur`,
+  `pnpm app` and `pnpm dev` run `scripts/og.mjs` right after `scripts/covers.mjs`:
+  sharp, 1200x630, "attention" crop, JPEG quality 86. `public/og/` is ignored
+  by git, and replacing the hero photograph replaces the card at the next
+  build, with no rebrand step and nothing to commit.
+- **What changes for you.** The default card is now `/og/default.jpg`
+  (`siteData.defaultImage`); the five PNG cards are gone, and the four that no
+  page referenced (blog, topics, about, contact) are not rebuilt. If you
+  pointed a page at one of them, add a line to `CARTES` in `scripts/og.mjs`
+  (a slug and one of your photographs) and point the page at that `.jpg`. A
+  post with a cover still shares its cover.
+- Family release number 3.1.1, the same on the seven themes.
 
 ## 3.1.0 - 2026-09-22
 

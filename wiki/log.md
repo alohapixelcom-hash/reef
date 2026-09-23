@@ -3,7 +3,7 @@
 title: Wiki log
 summary: Dated journal of code changes reflected in the wiki, and the list of open threads.
 sources: []
-updated: 2026-09-15
+updated: 2026-09-23
 ---
 
 # Wiki log
@@ -12,6 +12,19 @@ Newest entry first. Every `wiki sync` appends an entry here, even when
 nothing needed updating. Open threads are questions or known gaps waiting on
 a decision; close them by editing this list and noting the resolution in a
 dated entry.
+
+## 2026-09-23 - 3.1.1, the share card is a photograph
+
+- House rule of 23 September 2026: an Open Graph or Twitter image is one
+  photograph and nothing else. scripts/og.mjs now crops a theme photograph
+  (src/assets, fetched by covers.mjs) into public/og/<slug>.jpg, 1200x630,
+  sharp "attention", JPEG 86, instead of rendering an SVG template from the
+  tokens. `build`, `build:moteur`, `app` and `predev` run it right after
+  covers.mjs; public/og/ left git. Only `default` is cited by a page
+  (siteData.defaultImage, now /og/default.jpg, from reef-hero-vague.webp); the
+  four orphan cards are gone.
+- Pages updated: overview (commands, sync entry), subsystems/seo (OG images),
+  subsystems/tokens (og.mjs no longer reads the palette).
 
 ## 2026-09-13 - 1.8.0, the favicon tells the truth and the sitemap reads the head
 

@@ -6,9 +6,8 @@ sources:
   - src/styles/tokens.css
   - src/styles/global.css
   - scripts/rebrand.mjs
-  - scripts/og.mjs
   - src/layouts/BaseHead.astro
-updated: 2026-08-15
+updated: 2026-09-23
 ---
 
 # Design tokens
@@ -106,8 +105,6 @@ contract:
 - scripts/rebrand.mjs rewrites the ink, coral and reef ramps from one brand
   colour (`pnpm rebrand "#hex"`), backing up the original palette and restoring
   it with `--restore`. It touches floor 1 only; markup never moves.
-- scripts/og.mjs reads the ramps to render the Open Graph cards, so `pnpm og`
-  after a rebrand repaints them too.
 - src/layouts/BaseHead.astro imports the file raw to build the inline SVG
   favicon and the theme-color metas from the palette.
 
