@@ -49,17 +49,6 @@ requires your Cloudflare Worker, GitHub repository, email service and Turnstile
 configuration. The public demo cannot save changes. It does not use Aloha Pixel's
 private account or credentials for buyer installations.
 
-Reef 3.1 also ships an optional **publication engine**, off by default. With
-`ALOHA_MOTEUR=emdash` the same source builds as a Cloudflare Worker on
-[EmDash](https://github.com/emdash-cms/emdash) (MIT): posts live in a database,
-the pages that show them are rendered on demand, and publishing in the back
-office at `/_emdash/admin` is visible on the site with no build. That back
-office is dressed in the theme's own tokens, speaks French or English, and
-carries a "Deploy everything" button that empties the caches and rebuilds the
-prerendered pages. Without the variable, nothing of it is bundled and the
-static build is unchanged. See [docs/moteur.md](docs/moteur.md) and, to put it
-online, the "First deployment of the engine" section of [DEPLOY.md](DEPLOY.md).
-
 The demo publication is Reef Notes, a fictional three-person web studio's
 notebook: build logs, type specimens, and the unglamorous half of freelancing.
 Every word lives in a typed dictionary or in a Markdown post, never inside a
@@ -67,6 +56,43 @@ component.
 
 Reef is built to be read. You get clean, commented, strictly typed source
 with a maintained wiki and agent tooling, not a black box.
+
+## Back office (EmDash)
+
+Reef 3.1 ships an optional publication engine on
+[EmDash](https://github.com/emdash-cms/emdash) 0.38 (MIT), the CMS for Astro
+that runs on Cloudflare Workers, D1 and R2. It is off by default: without
+`ALOHA_MOTEUR=emdash` nothing of it is bundled and the static build is
+unchanged.
+
+With the variable set, the same source builds as a Cloudflare Worker:
+
+- **A complete back office at `/_emdash/admin`** (and `/secret-spot/` redirects
+  there). Posts live in D1, media in R2, and the pages that show a post are
+  rendered on demand, so publishing is visible on the site with no rebuild.
+- **French by default, entirely.** EmDash 0.38 still leaves 678 of its 2428
+  French messages in English; the theme's dictionary
+  (`src/moteur/catalogue-bo.fr.ts`) translates the 585 missing ones without
+  forking the package. `ALOHA_BO_LANGUE` changes the default (`en`, or
+  `navigateur` to follow the browser), and each person can override it in
+  their settings.
+- **EmDash's native backgrounds**, white in light mode and black in dark mode.
+  The theme only brings its accent colour, fonts, logo and site name.
+- **A dashboard card** (last published content, version served) and a
+  **"Deploy everything"** button that empties the caches and rebuilds the
+  prerendered pages through a Cloudflare Deploy Hook.
+
+```bash
+pnpm dev:moteur                                              # back office at http://localhost:4321/_emdash/admin
+node scripts/moteur-import.mjs --url http://localhost:4321   # pours the Markdown posts into the database, once
+pnpm build:moteur                                            # the Worker build
+```
+
+How it is wired: [docs/moteur.md](docs/moteur.md). Putting it online, step by
+step: "First deployment of the engine" in [DEPLOY.md](DEPLOY.md).
+
+The six paid themes carry the same EmDash back office in 3.1.0:
+https://alohapixel.app/themes/
 
 ## What is in the box, counted from this repo
 
