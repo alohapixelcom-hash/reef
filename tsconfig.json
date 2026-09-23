@@ -38,6 +38,9 @@
       "@moteur/live": [
         "src/moteur/live.fichiers.ts"
       ],
+      "@moteur/catalogue-emdash": [
+        "src/moteur/catalogue-emdash.d.ts"
+      ],
       "@moteur/*": [
         "src/moteur/*"
       ]

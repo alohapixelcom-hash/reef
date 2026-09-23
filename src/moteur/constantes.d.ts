@@ -13,7 +13,7 @@ declare const __ALOHA_CONSTRUIT__: string;
 /** Les caches reellement configures : le bouton "Tout deployer" ne vide que ceux-la, et dit lesquels. */
 declare const __ALOHA_CACHES__: { objets: "kv" | "memoire" | null; routes: string | null };
 
-/** ALOHA_BO_LANGUE : la langue par defaut du back office ("fr"), ou null quand le navigateur decide seul. */
+/** ALOHA_BO_LANGUE : la langue par defaut du back office ("fr" sans variable), ou null avec ALOHA_BO_LANGUE=navigateur, quand chaque navigateur decide seul. */
 declare const __ALOHA_BO_LANGUE__: string | null;
 
 /** ALOHA_BO_FUSEAU : le fuseau des heures affichees dans le back office (Europe/Paris par defaut). */

@@ -7,7 +7,8 @@
 // Le moteur est EmDash (MIT, emdashcms.com) : la base D1 porte le contenu, R2
 // les medias, et les pages gerees se rendent a la demande. Publier dans le
 // back office ecrit en base, et la page suivante le montre : aucun build.
-import { readFileSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { IDENTITE as ACCUEIL } from "./src/moteur/accueil/identite.mjs";
 import { IDENTITE as DEPLOYER } from "./src/moteur/deployer/identite.mjs";
@@ -56,14 +57,24 @@ const CACHE_ROUTES = ["cloudflare", "memoire"].includes(process.env.ALOHA_CACHE_
 /** Une page en cache sert au plus une minute de retard si une purge se perd ; au-dela, elle est rendue a neuf en arriere-plan. */
 const DUREE_DU_CACHE = { maxAge: 60, swr: 600 };
 
-// LA LANGUE DU BACK OFFICE. Sans variable, le moteur suit le navigateur de
-// chaque personne (28 langues, dont le francais). ALOHA_BO_LANGUE=fr donne au
-// site une langue par defaut, que chacun peut encore changer dans ses reglages
-// (voir src/moteur/langue-bo.ts). ALOHA_BO_FUSEAU regle le fuseau des heures
-// affichees par les extensions du theme.
-const LANGUE_BO = /^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/.test((process.env.ALOHA_BO_LANGUE ?? "").trim())
-  ? process.env.ALOHA_BO_LANGUE.trim()
-  : null;
+// LA LANGUE DU BACK OFFICE. Le francais par defaut : Reef s'edite en
+// francais, et un libelle anglais dans le rail est un defaut. ALOHA_BO_LANGUE
+// reste le levier - ALOHA_BO_LANGUE=en rend le back office a l'anglais,
+// ALOHA_BO_LANGUE=navigateur le laisse suivre chaque navigateur, comme le
+// moteur le fait seul (28 langues). Dans tous les cas, chaque personne garde
+// le dernier mot dans ses reglages : ce qui est pose ici n'est qu'un defaut
+// (voir src/moteur/langue-bo.ts).
+//
+// Le catalogue francais d'EmDash 0.38 laisse 678 messages en anglais ; le
+// dictionnaire du theme les complete (voir src/moteur/catalogue-bo.ts).
+// ALOHA_BO_FUSEAU regle le fuseau des heures affichees par les extensions.
+const LANGUE_DEMANDEE = (process.env.ALOHA_BO_LANGUE ?? "").trim();
+const LANGUE_BO =
+  LANGUE_DEMANDEE === "navigateur"
+    ? null
+    : /^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/.test(LANGUE_DEMANDEE)
+      ? LANGUE_DEMANDEE
+      : "fr";
 const FUSEAU_BO = (process.env.ALOHA_BO_FUSEAU ?? "").trim() || "Europe/Paris";
 
 /** Les collections du schema (seed/seed.json) : ce sont les etiquettes qu'EmDash purge a chaque publication. */
@@ -104,6 +115,7 @@ function partageDesPages() {
         const { version } = JSON.parse(readFileSync(ici("./package.json"), "utf8"));
         updateConfig({
           vite: {
+            plugins: [catalogueFrancaisDuBackOffice()],
             define: {
               __ALOHA_VERSION__: JSON.stringify(version),
               __ALOHA_CONSTRUIT__: JSON.stringify(new Date().toISOString()),
@@ -122,11 +134,58 @@ function partageDesPages() {
   };
 }
 
-const alias = (source) => ({
-  "@moteur/source": ici(`./src/moteur/source.${source}.ts`),
-  "@moteur/live": ici(`./src/moteur/live.${source}.ts`),
-  "@moteur/TexteRiche.astro": ici(`./src/moteur/TexteRiche.${source}.astro`),
-});
+/**
+ * Le chemin reel du catalogue de messages de l'administration. Il se resout
+ * DEPUIS emdash : @emdash-cms/admin est sa dependance, pas celle du theme, et
+ * l'arborescence stricte de pnpm ne le met pas a portee de src/.
+ */
+function catalogueDuMoteur() {
+  const depuisIci = createRequire(import.meta.url);
+  const depuisEmdash = createRequire(realpathSync(depuisIci.resolve("emdash")));
+  return depuisEmdash.resolve("@emdash-cms/admin/locales/index.js");
+}
+
+/**
+ * Les alias de Vite, en tableau : il en faut un dont la cle est une expression
+ * reguliere ancree. En forme d'objet, "@emdash-cms/admin/locales" capturerait
+ * aussi "@emdash-cms/admin/locales/index.js" - donc l'import par lequel notre
+ * propre fichier atteint le vrai catalogue - et se rappellerait lui-meme.
+ */
+const alias = (source) => [
+  { find: "@moteur/source", replacement: ici(`./src/moteur/source.${source}.ts`) },
+  { find: "@moteur/live", replacement: ici(`./src/moteur/live.${source}.ts`) },
+  { find: "@moteur/TexteRiche.astro", replacement: ici(`./src/moteur/TexteRiche.${source}.astro`) },
+  // src/moteur/catalogue-bo.ts atteint le vrai catalogue du moteur par ce nom.
+  ...(source === "emdash" ? [{ find: "@moteur/catalogue-emdash", replacement: catalogueDuMoteur() }] : []),
+];
+
+/**
+ * Le greffon Vite qui met le catalogue francais du theme SUR LE CHEMIN de la
+ * page d'administration.
+ *
+ * POURQUOI UN GREFFON ET PAS UNE LIGNE D'ALIAS. L'integration d'EmDash pose
+ * elle-meme un alias de prefixe "@emdash-cms/admin" vers son dossier dist, et
+ * Astro range les alias des integrations AVANT ceux du projet. Or le premier
+ * alias qui correspond gagne : le notre, ajoute a la fin, ne serait jamais lu.
+ * Le crochet `config` d'un greffon est le seul endroit ou l'on peut se placer
+ * en tete, et Vite le prevoit explicitement (on modifie la configuration en
+ * place avant qu'elle soit resolue).
+ *
+ * Ce que ca change pour la page d'administration : rien, sauf que son
+ * `loadMessages` rend le catalogue du moteur complete en francais. Notre
+ * propre fichier, lui, importe "@moteur/catalogue-emdash" : un autre nom,
+ * donc aucune boucle.
+ */
+function catalogueFrancaisDuBackOffice() {
+  return {
+    name: "aloha:catalogue-bo",
+    config(configuration) {
+      const alias = configuration.resolve?.alias;
+      if (!Array.isArray(alias)) throw new Error("aloha:catalogue-bo : les alias de Vite ne sont plus un tableau");
+      alias.unshift({ find: "@emdash-cms/admin/locales", replacement: ici("./src/moteur/catalogue-bo.ts") });
+    },
+  };
+}
 
 /** Le fournisseur du cache de routes (`cache` d'Astro), quand ALOHA_CACHE_ROUTES est posee ; rien sinon. Les regles se posent dans partageDesPages. */
 async function cacheDeRoutes() {
@@ -194,7 +253,7 @@ async function allume() {
  * quelconque : astro.config.mjs est controle (@ts-check), et le refuserait.
  *
  * @type {{
- *   alias: Record<string, string>,
+ *   alias: { find: string | RegExp, replacement: string }[],
  *   plans: string[],
  *   config: import("astro").AstroUserConfig,
  *   integrations: import("astro").AstroIntegration[],

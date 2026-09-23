@@ -4,14 +4,15 @@
 // langues, dont le francais) et choisit sa langue a chaque requete : le cookie
 // `emdash-locale` (le choix de la personne, pose par le selecteur de langue de
 // ses reglages), sinon l'entete Accept-Language du navigateur, sinon
-// l'anglais. Un navigateur en francais a donc deja un back office en francais,
-// sans rien regler.
+// l'anglais.
 //
-// CE QU'AJOUTE LE THEME. ALOHA_BO_LANGUE donne une langue PAR DEFAUT au site
-// (voir langue-bo.ts) : elle passe devant le navigateur, jamais devant le
-// choix de la personne. Et les textes que le theme ajoute au back office (la
-// page "Tout deployer", la carte du tableau de bord) suivent la meme langue,
-// avec deux dictionnaires : francais, et anglais pour tout le reste.
+// CE QU'AJOUTE LE THEME. Une langue PAR DEFAUT pour le site, le francais sauf
+// si ALOHA_BO_LANGUE dit autre chose (voir moteur.config.mjs et langue-bo.ts) :
+// elle passe devant le navigateur, jamais devant le choix de la personne. Les
+// textes que le theme ajoute au back office (la page "Tout deployer", la carte
+// du tableau de bord) suivent la meme langue, avec deux dictionnaires :
+// francais, et anglais pour tout le reste. Ce que le moteur laisse en anglais
+// dans son propre catalogue est complete ailleurs, par catalogue-bo.ts.
 
 /** Le cookie que pose et que lit l'administration d'EmDash. */
 export const COOKIE_DE_LANGUE = "emdash-locale";

@@ -83,8 +83,10 @@ routes; they have not yet been run against a live account.
    the Worker answers on its `workers.dev` address, which browsers may flag
    while it is brand new.
 
-   Optional variables at build time: `ALOHA_BO_LANGUE=fr` (default language of
-   the back office), `ALOHA_BO_FUSEAU=Europe/Paris` (time zone of the times the
+   Optional variables at build time: `ALOHA_BO_LANGUE` (default language of
+   the back office, French without it; a language code changes it,
+   `navigateur` lets each browser decide), `ALOHA_BO_FUSEAU=Europe/Paris`
+   (time zone of the times the
    house extensions display), `ALOHA_CACHE_OBJETS=kv` (with a `CACHE` KV
    binding added to the Wrangler file), `ALOHA_CACHE_ROUTES=cloudflare` (with
    `"cache": { "enabled": true }` added to the Wrangler file). None is needed.

@@ -30,10 +30,26 @@ one with the previous release. See `docs/moteur.md`.
   had stopped being a style boundary for Astro, which inlined 127 KB of theme
   CSS into the back office and into the manifest of 73 API routes; the
   sitemap now replays the path functions of the pages without importing them.
-- **The back office in French, or in 27 other languages.** EmDash chooses the
-  admin language per person (cookie, then browser). `ALOHA_BO_LANGUE=fr` gives
-  a site a default language; unset, a buyer keeps English. The texts the theme
-  adds follow the same rule, in French and in English.
+- **The back office in French, entirely.** French is the default: the engine
+  still chooses per person (cookie, then site default, then browser), and
+  `ALOHA_BO_LANGUE` changes that default or hands it back to the browser
+  (`navigateur`). EmDash's own French catalogue leaves 678 of its 2428
+  messages in English, "Widgets" and "Publish now" among them; the theme's
+  dictionary (`src/moteur/catalogue-bo.fr.ts`) completes them through an alias
+  on the module the admin page reads its catalogue from, without forking the
+  package, without touching the rendered page, and without ever contradicting
+  a message EmDash has translated. A self-check reads the real catalogues and
+  fails on a single uncovered message or a dead entry. Measured on the
+  production build: of the 2327 simple messages the admin page carries, the 98
+  that remain identical to English are spellings French shares (GitHub, CSS,
+  Image, Sections). The texts the theme adds follow the same rule, in French
+  and in English.
+- **The two native taxonomies, in one rail entry.** EmDash's migration always
+  writes `Categories` and `Tags` in English, as data. The seed now declares
+  their French translations in the same translation group (`translationOf`),
+  so the rail shows one entry per taxonomy, labelled in the language of the
+  content, and no second "Categories" can appear beside the first. The English
+  rows are left untouched.
 - **A dashboard card of the site.** Last published content with a link to its
   editor, version and build time served, "View the site" and "Deploy
   everything", as a house extension of the dashboard.
