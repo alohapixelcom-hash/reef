@@ -1,0 +1,163 @@
+{
+  "$schema": "https://emdashcms.com/seed.schema.json",
+  "version": "1",
+  "defaultLocale": "en",
+  "meta": {
+    "name": "Reef",
+    "description": "Le journal de Reef, publié depuis le back office.",
+    "author": "Aloha Pixel"
+  },
+  "settings": {
+    "title": "Reef",
+    "tagline": "A quiet place to read about building for the web"
+  },
+  "collections": [
+    {
+      "slug": "posts",
+      "label": "Articles",
+      "labelSingular": "Article",
+      "urlPattern": "/blog/{slug}",
+      "supports": [
+        "drafts",
+        "revisions",
+        "search",
+        "seo"
+      ],
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Titre",
+          "type": "string",
+          "required": true,
+          "searchable": true
+        },
+        {
+          "slug": "description",
+          "label": "Chapo",
+          "type": "text",
+          "required": true,
+          "searchable": true
+        },
+        {
+          "slug": "cover",
+          "label": "Couverture",
+          "type": "image"
+        },
+        {
+          "slug": "content",
+          "label": "Texte",
+          "type": "portableText",
+          "searchable": true
+        },
+        {
+          "slug": "topic",
+          "label": "Rubrique",
+          "type": "select",
+          "required": true,
+          "translatable": false,
+          "indexed": true,
+          "validation": {
+            "options": [
+              "craft",
+              "design",
+              "performance",
+              "studio",
+              "typography"
+            ]
+          }
+        },
+        {
+          "slug": "author",
+          "label": "Signature",
+          "type": "select",
+          "required": true,
+          "translatable": false,
+          "indexed": true,
+          "validation": {
+            "options": [
+              "mara-lindqvist",
+              "noor-benali",
+              "tomas-abaroa"
+            ]
+          }
+        },
+        {
+          "slug": "tags",
+          "label": "Mots-clés",
+          "type": "json"
+        },
+        {
+          "slug": "featured",
+          "label": "À la une",
+          "type": "boolean",
+          "defaultValue": false
+        },
+        {
+          "slug": "pub_date",
+          "label": "Date affichée",
+          "type": "datetime",
+          "indexed": true
+        },
+        {
+          "slug": "updated_date",
+          "label": "Revu le",
+          "type": "datetime"
+        }
+      ]
+    }
+  ],
+  "taxonomies": [
+    {
+      "id": "taxonomie:category:en",
+      "name": "category",
+      "label": "Categories",
+      "labelSingular": "Category",
+      "hierarchical": true,
+      "collections": [
+        "posts"
+      ],
+      "locale": "en"
+    },
+    {
+      "id": "taxonomie:category:fr",
+      "name": "category",
+      "label": "Catégories",
+      "labelSingular": "Catégorie",
+      "hierarchical": true,
+      "collections": [
+        "posts"
+      ],
+      "locale": "fr",
+      "translationOf": "taxonomie:category:en"
+    },
+    {
+      "id": "taxonomie:tag:en",
+      "name": "tag",
+      "label": "Tags",
+      "labelSingular": "Tag",
+      "hierarchical": false,
+      "collections": [
+        "posts"
+      ],
+      "locale": "en"
+    },
+    {
+      "id": "taxonomie:tag:fr",
+      "name": "tag",
+      "label": "Étiquettes",
+      "labelSingular": "Étiquette",
+      "hierarchical": false,
+      "collections": [
+        "posts"
+      ],
+      "locale": "fr",
+      "translationOf": "taxonomie:tag:en"
+    }
+  ],
+  "bylines": [],
+  "content": {},
+  "menus": [],
+  "redirects": [],
+  "widgetAreas": [],
+  "sections": []
+}

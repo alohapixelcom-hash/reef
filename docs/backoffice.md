@@ -1,9 +1,9 @@
-<!-- docs/backoffice.md - integration du socle editorial interne Aloha, preparation 2.3. -->
+<!-- docs/backoffice.md - the Aloha editorial back office (Git-based, since 2.3); the EmDash publication engine is documented in docs/moteur.md. -->
 # Aloha editorial back office
 
 ## Validation scope
 
-This integration is included in Reef 2.3. Real administrator sign-in and article
+This integration is included since Reef 2.3 (current version: 3.1). It writes to the Git repository; the database-backed publication engine of 3.1 is a separate, optional path, documented in docs/moteur.md. Real administrator sign-in and article
 creation, modification and deletion have been verified on the private preview
 branch. Category creation and ordering have also been verified against GitHub.
 The standalone buyer authentication adapter has automated tests with SQLite and

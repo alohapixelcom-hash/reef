@@ -127,3 +127,23 @@ find public src -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.webp" -
 # license declared by each font package
 node -e "console.log(require('@fontsource-variable/space-grotesk/package.json').license)"
 ```
+
+## Optional publication engine (off by default)
+
+These packages are installed with the theme but enter a build ONLY when
+`ALOHA_MOTEUR=emdash` is set (see docs/moteur.md). With the variable absent,
+the theme compiles exactly as before, to static HTML, and none of them is
+bundled: the 63 HTML, XML and TXT files of the static build were compared one
+by one on 2026-09-21. Licenses read from node_modules metadata on that date.
+
+| Package | License | Why it is here |
+|---|---|---|
+| emdash | MIT | The CMS: schema, content API, back office at /_emdash/admin |
+| @emdash-cms/cloudflare | MIT | D1 (content) and R2 (media) bindings, Worker entry |
+| @astrojs/cloudflare | MIT | Adapter, used only by the engine build |
+| @astrojs/react + react + react-dom | MIT | The back office interface; no page of the blog receives a byte of it |
+| github-slugger | ISC | Same heading anchors for a post from the database as for a Markdown file |
+| @emdash-cms/admin, @emdash-cms/blocks, @cloudflare/kumo (through emdash) | MIT | The React administration, its Block Kit renderer and its component library; skinned by src/moteur/back-office.css, never copied |
+| wrangler | MIT OR Apache-2.0 | Local D1 and R2 for the engine, and its deploy (dev dependency) |
+| yaml | ISC | Reads post frontmatter in scripts/moteur-import.mjs (dev dependency) |
+| @types/react + @types/react-dom | MIT | Types for the back office integration (dev dependency) |

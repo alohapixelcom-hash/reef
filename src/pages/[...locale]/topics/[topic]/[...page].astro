@@ -9,34 +9,17 @@ import TopicNav from "@components/Sections/Archive/TopicNav.astro";
 import Footer from "@components/Sections/Global/Footer.astro";
 import Navbar from "@components/Sections/Global/Navbar.astro";
 import PageHero from "@components/Sections/Global/PageHero.astro";
-import { defaultLocale, fmt, getLocale, localizePath, locales, useTranslations } from "@i18n";
+import { fmt, getLocale, localizePath, useTranslations } from "@i18n";
 import { entrySlug } from "@i18n/content";
-import { getResolvedPosts, getSortedTopics } from "@js/posts";
+import { cheminsDuSujet } from "@js/adresses";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import type { GetStaticPaths, Page } from "astro";
+import { propsDeLaPage } from "@moteur/chemins";
+import type { Page } from "astro";
 import type { CollectionEntry } from "astro:content";
 import type { ResolvedPost } from "@js/posts";
 
-export const getStaticPaths = (async ({ paginate }) => {
-  const groups = await Promise.all(
-    locales.map(async (locale) => {
-      const posts = await getResolvedPosts(locale);
-      const topics = await getSortedTopics(locale);
-
-      return topics.flatMap((topic) => {
-        const slug = entrySlug(topic.id);
-        const inTopic = posts.filter((entry) => entry.topicSlug === slug);
-        return paginate(inTopic, {
-          pageSize: 9,
-          params: { locale: locale === defaultLocale ? undefined : locale, topic: slug },
-          props: { topic, topics },
-        });
-      });
-    }),
-  );
-  return groups.flat();
-}) satisfies GetStaticPaths;
+export const getStaticPaths = cheminsDuSujet;
 
 type Props = {
   page: Page<ResolvedPost>;
@@ -44,7 +27,9 @@ type Props = {
   topics: CollectionEntry<"topics">[];
 };
 
-const { page, topic, topics } = Astro.props;
+const props = await propsDeLaPage<Props>(Astro, getStaticPaths);
+if (props instanceof Response) return props;
+const { page, topic, topics } = props;
 const locale = getLocale(Astro);
 const t = useTranslations(locale);
 

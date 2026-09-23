@@ -1,57 +1,25 @@
 ---
-// src/pages/[...locale]/blog/[id].astro - la page d'article : en-tete, colonne de lecture avec sommaire, pied d'article, lectures suivantes, JSON-LD Article + BreadcrumbList.
+// src/pages/[...locale]/blog/[id].astro - la route d'un billet : une par billet ET par langue.
 //
-// Une route par billet ET par langue. Les id de collection sont prefixes
-// ("fr/mon-billet") parce que le contenu est range par langue ; l'URL, elle, ne
-// porte que le slug, le prefixe etant deja dans le param locale. C'est ce qui
-// permet au selecteur de langue d'emmener le lecteur sur LA traduction du
-// billet qu'il lit, et pas sur l'accueil.
+// Les id de collection sont prefixes ("fr/mon-billet") parce que le contenu est
+// range par langue ; l'URL, elle, ne porte que le slug, le prefixe etant deja
+// dans le param locale. C'est ce qui permet au selecteur de langue d'emmener le
+// lecteur sur LA traduction du billet qu'il lit, et pas sur l'accueil.
 //
-// Un brouillon se construit toujours, pour etre relu en local sur sa vraie
-// page, mais part en noindex : il est deja hors des listes, du flux et de la
-// recherche (src/js/posts.ts), il ne manquait que la consigne aux robots.
-import Footer from "@components/Sections/Global/Footer.astro";
-import Navbar from "@components/Sections/Global/Navbar.astro";
-import PostBody from "@components/Sections/Post/PostBody.astro";
-import PostFooter from "@components/Sections/Post/PostFooter.astro";
-import PostHero from "@components/Sections/Post/PostHero.astro";
-import ReadingProgress from "@components/Sections/Post/ReadingProgress.astro";
-import RelatedPosts from "@components/Sections/Post/RelatedPosts.astro";
-import TableOfContents from "@components/Sections/Post/TableOfContents.astro";
-import { getSiteRoutes } from "@config/navData.json.ts";
-import siteData from "@config/siteData.json";
-import { defaultLocale, getLocale, localizePath, useTranslations } from "@i18n";
-import { entryLocale, entrySlug } from "@i18n/content";
-import { article, breadcrumbList } from "@js/schema";
-import BaseLayout from "@layouts/BaseLayout.astro";
-import { getCollection, getEntry, render, type CollectionEntry } from "astro:content";
+// Le rendu vit dans ArticlePage. Cette route ne fait qu'aiguiller, parce que,
+// moteur allume, /blog/2/ arrive ICI avant la route d'archive (un parametre
+// nomme passe avant un parametre de reste) : un numero de page rend l'archive.
+import ArchivePage from "@components/Pages/ArchivePage.astro";
+import ArticlePage from "@components/Pages/ArticlePage.astro";
+import { cheminsDuBillet } from "@js/adresses";
+import { cheminsArchive, type PropsArchive } from "@js/archive";
+import { propsDeLaPage } from "@moteur/chemins";
+import { MOTEUR } from "@moteur/source";
+import type { CollectionEntry } from "astro:content";
 
-export async function getStaticPaths() {
-  // Les brouillons se previsualisent dans l'editeur prive, jamais a une URL publique.
-  const posts = await getCollection("posts", ({ data }) => data.draft !== true);
-
-  return Promise.all(
-    posts.map(async (post) => {
-      // Une reference cassee arrete le build avec le nom du fichier fautif,
-      // plutot que de rendre une page a moitie vide en production.
-      const author = await getEntry(post.data.author);
-      if (!author) throw new Error(`Auteur inconnu "${post.data.author.id}" dans "${post.id}"`);
-      const topic = await getEntry(post.data.topic);
-      if (!topic) throw new Error(`Sujet inconnu "${post.data.topic.id}" dans "${post.id}"`);
-
-      const locale = entryLocale(post.id);
-      return {
-        params: {
-          // undefined genere la route sans prefixe : l'anglais est servi a la
-          // racine, les autres langues sous leur code.
-          locale: locale === defaultLocale ? undefined : locale,
-          id: entrySlug(post.id),
-        },
-        props: { post, author, topic },
-      };
-    }),
-  );
-}
+// Les chemins vivent dans @js/adresses : le plan de site du moteur les rejoue
+// sans importer cette page (voir l'en-tete de ce module).
+export const getStaticPaths = cheminsDuBillet;
 
 type Props = {
   post: CollectionEntry<"posts">;
@@ -59,78 +27,15 @@ type Props = {
   topic: CollectionEntry<"topics">;
 };
 
-const { post, author, topic } = Astro.props;
-const { Content, headings } = await render(post);
-
-const locale = getLocale(Astro);
-const t = useTranslations(locale);
-const routes = getSiteRoutes(locale);
-
-// Toutes les URLs passent par la table des routes, donc par localizePath : un
-// blog servi sous /journal/ ne demande pas de rouvrir cette page.
-const base = Astro.site ?? Astro.url;
-const url = new URL(`${routes.posts}${entrySlug(post.id)}/`, base).href;
-
-// La couverture sert de carte de partage quand elle existe ; sinon l'image par
-// defaut du site. Les deux sont absolues, ce qu'exigent OG et schema.org.
-const cover = post.data.cover;
-const share = cover
-  ? { src: cover.src, alt: post.data.coverAlt ?? post.data.title }
-  : siteData.defaultImage;
-
-const articleSchema = article({
-  title: post.data.title,
-  description: post.data.description,
-  url,
-  datePublished: post.data.pubDate,
-  dateModified: post.data.updatedDate,
-  image: new URL(share.src, base).href,
-  authorName: author.data.name,
-  authorUrl: new URL(`${routes.authors}${entrySlug(author.id)}/`, base).href,
-  publisherName: siteData.name,
-});
-
-const crumbSchema = breadcrumbList([
-  { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
-  { name: t.archive.metaTitle, url: new URL(routes.posts, base).href },
-  { name: post.data.title, url },
-]);
+// Un numero, moteur allume, designe une page de l'archive ; tout le reste un billet.
+const numero = MOTEUR && /^\d+$/.test(Astro.params.id ?? "");
+const demande = numero
+  ? await propsDeLaPage<PropsArchive>(
+      { params: { locale: Astro.params.locale, page: Astro.params.id }, props: {} },
+      cheminsArchive,
+    )
+  : await propsDeLaPage<Props>(Astro, getStaticPaths);
+if (demande instanceof Response) return demande;
 ---
 
-<BaseLayout
-  title={post.data.title}
-  description={post.data.description}
-  type="article"
-  noindex={post.data.draft}
-  image={share}
->
-  <Fragment slot="head">
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(crumbSchema)} />
-  </Fragment>
-
-  <ReadingProgress />
-  <Navbar />
-
-  {/* tabindex="-1" : sans lui, le lien d'evitement deplace le defilement mais
-      pas le focus sur certains navigateurs, et le clavier repart de la barre. */}
-  <main id="content" tabindex="-1">
-    {/* L'element article couvre l'en-tete, le corps ET le pied : c'est le
-        billet entier, son titre compris. Les lectures suivantes restent
-        dehors, elles appartiennent au site et pas au texte. */}
-    <article>
-      <PostHero {post} {author} {topic} />
-
-      <PostBody>
-        <TableOfContents slot="toc" {headings} />
-        <Content />
-      </PostBody>
-
-      <PostFooter {post} {author} {url} />
-    </article>
-
-    <RelatedPosts {post} />
-  </main>
-
-  <Footer />
-</BaseLayout>
+{numero ? <ArchivePage {...(demande as PropsArchive)} /> : <ArticlePage {...(demande as Props)} />}

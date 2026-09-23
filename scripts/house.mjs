@@ -56,6 +56,11 @@ const EXEMPTIONS = [
     why: "JSON n'a pas de commentaires",
   },
   {
+    rule: "length",
+    match: /src\/moteur\/catalogue-bo\.fr\.ts$/,
+    why: "dictionnaire de traduction : 678 messages qu'EmDash laisse en anglais, une paire par ligne ; le decouper n'enleverait pas une ligne et cacherait le total",
+  },
+  {
     rule: "palette",
     match: /src\/components\/ui\/button\/Button\.astro$/,
     why: "cite un nom de palette dans un COMMENTAIRE qui explique le jeton --color-scrim",

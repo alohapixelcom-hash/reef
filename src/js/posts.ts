@@ -11,6 +11,7 @@
 
 import type { Locale } from "@i18n";
 import { entrySlug, getLocalizedCollection } from "@i18n/content";
+import { billetsPublies } from "@moteur/source";
 import { readingTime } from "@js/textUtils";
 import { getEntry, type CollectionEntry } from "astro:content";
 
@@ -39,9 +40,11 @@ export interface ResolvedPost {
  * vide en production : dans un site statique, l'erreur bruyante est le cadeau.
  */
 export async function getResolvedPosts(locale: Locale): Promise<ResolvedPost[]> {
-  const posts = (
-    await getLocalizedCollection("posts", locale, ({ data }) => data.draft !== true)
-  ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  // Fichiers ou base : la source est choisie par l'alias "@moteur/source", et
+  // tout ce qui suit (tri, references, temps de lecture) vaut pour les deux.
+  const posts = (await billetsPublies(locale)).sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+  );
 
   return Promise.all(
     posts.map(async (post) => {

@@ -1,0 +1,265 @@
+/* src/moteur/back-office.css - habille le back office du moteur : la couleur d'accent du theme, ses polices, ses pilules. Rien d'autre.
+ *
+ * LA REGLE DE L'EDITEUR (23 septembre 2026) : tous les back offices gardent
+ * les deux fonds natifs d'EmDash, blanc en clair, noir en sombre. Cette
+ * feuille ne touche donc plus jamais --color-kumo-canvas, ni les fonds du
+ * rail, des cartes, des champs, ni les filets, ni la couleur du texte de
+ * base : ce sont ceux du moteur, tels quels, dans les deux modes. Elle garde
+ * seulement ce qui fait reconnaitre le site : la couleur d'accent (boutons,
+ * liens, etats actifs, anneau de focus), les polices et la forme en pilule des
+ * controles. Le logo et le nom du site, eux, passent par `admin` dans
+ * moteur.config.mjs.
+ *
+ * Le back office d'EmDash se peint par variables (--color-kumo-*,
+ * --text-color-kumo-*). On ne touche donc ni a son code ni a son paquet : on
+ * ne donne a ses variables de MARQUE que les jetons d'accent du theme, que
+ * habillage.ts pose dans la page juste avant cette feuille. Un rebrand du
+ * theme (tokens.css) rebrande l'accent du back office du meme geste.
+ *
+ * Ce que les variables ne savent pas dire (la forme d'un bouton, l'anneau de
+ * focus, la carte du tableau de bord) est ecrit plus bas, sur des crochets
+ * stables : data-kumo-component, la classe kumo-input-placeholder, les classes
+ * de hauteur des controles. Si le moteur les renomme un jour, la regle ne
+ * s'applique plus et le back office retrouve sa forme d'origine : rien ne casse.
+ *
+ * Le selecteur porte data-mode pour passer devant le theme "classic" du
+ * moteur, qui declare les siennes avec deux attributs.
+ */
+html[data-theme][data-mode] {
+  /* Marque : la seule couleur que le theme apporte. Le survol tire l'accent
+   * vers l'encre native du moteur, sombre en clair, claire en sombre. */
+  --color-kumo-brand: var(--reef-primary);
+  --color-kumo-brand-hover: color-mix(in oklab, var(--reef-primary) 88%, var(--text-color-kumo-default));
+  --color-kumo-focus: var(--reef-ring);
+  --text-color-kumo-brand: var(--reef-primary-text);
+  --text-color-kumo-link: var(--reef-primary-text);
+
+  /* Polices : le texte du theme partout, sa police de titre sur les titres. */
+  --font-emdash: var(--font-sans);
+}
+
+html[data-theme][data-mode] body {
+  font-family: var(--font-sans);
+}
+
+html[data-theme][data-mode] :is(h1, h2, h3) {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* LES BOUTONS SONT DES PILULES, comme sur le site. Un controle du moteur a une
+ * hauteur fixe (h-5 a h-10) : c'est ce qui le distingue d'une zone de depot
+ * d'image, bouton elle aussi, qu'une pilule de trente lignes defigurerait.
+ * Les liens habilles en bouton portent les memes classes, sans l'attribut. */
+html[data-theme][data-mode] :is(a, button)[class~="select-none"]:is([class~="h-5"], [class~="h-6.5"], [class~="h-9"], [class~="h-10"]) {
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+html[data-theme][data-mode] :is(a, button)[class~="select-none"]:is([class~="h-9"], [class~="h-10"]):not([class~="p-0"]) {
+  padding-inline: calc(var(--spacing) * 4.5);
+}
+
+html[data-theme][data-mode] :is(a, button)[class~="select-none"][class~="p-0"] {
+  border-radius: var(--radius-pill);
+}
+
+/* Le bouton principal : a plat, dans le primaire du theme, avec SON encre.
+ * Le moteur le peint en degrade et l'ecrit en blanc quel que soit le fond ;
+ * mesure en sombre, blanc sur le turquoise clair du theme : 1,66 pour 1. Les
+ * variables du degrade sont posees en ligne sur le bouton, d'ou !important.
+ * Le blanc, lui, est pose sur le bouton par une classe importante dans une
+ * couche : l'encre se pose sur ses enfants, qui ne l'heritent alors plus. */
+html[data-theme][data-mode] [style*="--kumo-button-emphasis-bg"] {
+  --kumo-button-emphasis-bg: var(--reef-primary) !important;
+  --kumo-button-emphasis-gradient-start: var(--reef-primary) !important;
+  --kumo-button-emphasis-gradient-end: var(--reef-primary) !important;
+  --kumo-button-emphasis-ring: var(--reef-primary) !important;
+}
+
+html[data-theme][data-mode] [style*="--kumo-button-emphasis-bg"] > span:not([aria-hidden="true"]) {
+  color: var(--reef-primary-foreground);
+}
+
+html[data-theme][data-mode] [style*="--kumo-button-emphasis-bg"]:not(:disabled):hover {
+  --kumo-button-emphasis-bg: var(--color-kumo-brand-hover) !important;
+  --kumo-button-emphasis-gradient-start: var(--color-kumo-brand-hover) !important;
+  --kumo-button-emphasis-gradient-end: var(--color-kumo-brand-hover) !important;
+  --kumo-button-emphasis-ring: var(--color-kumo-brand-hover) !important;
+}
+
+html[data-theme][data-mode] [style*="--kumo-button-emphasis-bg"] > span[aria-hidden="true"] {
+  transform: none;
+}
+
+/* LES CHAMPS D'UNE LIGNE SONT DES PILULES, une zone de texte garde sa forme.
+ * kumo-input-placeholder est la classe que le moteur pose sur chacun de ses
+ * champs. Leur fond et leur filet restent ceux du moteur. */
+html[data-theme][data-mode] :is(input, select)[class~="kumo-input-placeholder"],
+html[data-theme][data-mode] select {
+  border-radius: var(--radius-pill);
+}
+
+html[data-theme][data-mode] input[class~="kumo-input-placeholder"]:is([class~="h-9"], [class~="h-10"]) {
+  padding-inline: calc(var(--spacing) * 4.5);
+}
+
+/* LE FOCUS SE VOIT, PARTOUT. Le rail ne le signalait que par un fond a peine
+ * plus sombre, et les champs par un anneau a demi transparent. Un seul anneau,
+ * celui de l'accent, detache du controle pour rester lisible sur toute surface. */
+html[data-theme][data-mode] :is(a, button, input, select, textarea, summary, [role="tab"], [role="menuitem"], [role="option"], [role="switch"], [role="checkbox"], [tabindex="0"]):focus-visible {
+  outline: 2px solid var(--reef-ring);
+  outline-offset: 2px;
+}
+
+/* LE RAIL : l'entree active porte l'accent, pas un gris de plus. Son fond
+ * reste celui du moteur. */
+html[data-theme][data-mode] [data-kumo-component="Sidebar"][class~="active"],
+html[data-theme][data-mode] [data-kumo-component="Sidebar"][data-active] {
+  color: var(--reef-primary-text);
+}
+
+/* LES PAGES DES EXTENSIONS (Block Kit) : un paragraphe se lit sur une mesure
+ * de lecture, pas sur toute la largeur d'un ecran de bureau ; le premier
+ * en-tete est le titre de la page, les suivants des intertitres. */
+html[data-theme][data-mode] main [class="flex-1 text-kumo-default"],
+html[data-theme][data-mode] main p[class="text-sm text-kumo-subtle"] {
+  max-width: 72ch;
+  font-size: var(--text-base);
+  line-height: 1.6;
+}
+
+html[data-theme][data-mode] main [class="flex flex-col gap-4"] > :first-child > h2 {
+  font-size: 1.5rem;
+  margin-bottom: calc(var(--spacing) * 2);
+}
+
+html[data-theme][data-mode] main [class="flex flex-col gap-4"] > :not(:first-child) > h2 {
+  font-size: 1.05rem;
+  margin-top: calc(var(--spacing) * 2);
+}
+
+/* Le bloc de faits (deux colonnes, valeurs tronquees) passe sur une colonne
+ * au telephone : a 390 px, une date y perdait ses secondes. */
+@media (max-width: 40rem) {
+  html[data-theme][data-mode] main [class="grid grid-cols-2 gap-x-6 gap-y-3"] {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* LA CARTE DU SITE (src/moteur/accueil/carte.ts), seule sur sa ligne. Ses
+ * surfaces et ses encres sont celles du moteur (variables kumo) ; seul
+ * l'accent vient du theme. */
+html[data-theme][data-mode] [class~="grid"]:has(> * .aloha-carte, > * .aloha-carte-attente) > :only-child {
+  grid-column: 1 / -1;
+}
+
+.aloha-carte {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: calc(var(--spacing) * 6);
+}
+
+.aloha-carte-faits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
+  gap: calc(var(--spacing) * 6) calc(var(--spacing) * 10);
+  flex: 1 1 28rem;
+  margin: 0;
+}
+
+.aloha-carte-fait dt {
+  font-size: var(--text-sm);
+  color: var(--text-color-kumo-subtle);
+}
+
+.aloha-carte-fait dd {
+  display: grid;
+  gap: calc(var(--spacing) * 0.5);
+  margin: calc(var(--spacing) * 1) 0 0;
+}
+
+.aloha-carte-valeur {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-color-kumo-strong);
+}
+
+.aloha-carte-valeur a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--color-kumo-line);
+  text-underline-offset: 0.2em;
+}
+
+.aloha-carte-valeur a:hover {
+  color: var(--reef-primary-text);
+  text-decoration-color: currentColor;
+}
+
+.aloha-carte-detail,
+.aloha-carte-attente {
+  font-size: var(--text-sm);
+  color: var(--text-color-kumo-subtle);
+}
+
+.aloha-carte-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--spacing) * 2);
+}
+
+.aloha-bouton {
+  display: inline-flex;
+  align-items: center;
+  min-height: calc(var(--spacing) * 9);
+  padding-inline: calc(var(--spacing) * 4.5);
+  border: 1px solid var(--color-kumo-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-kumo-base);
+  color: var(--text-color-kumo-default);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s, transform 0.09s;
+}
+
+.aloha-bouton:hover {
+  background: var(--color-kumo-fill-hover);
+}
+
+.aloha-bouton:active {
+  transform: scale(0.97);
+}
+
+.aloha-bouton-plein {
+  border-color: transparent;
+  background: var(--reef-primary);
+  color: var(--reef-primary-foreground);
+}
+
+.aloha-bouton-plein:hover {
+  background: var(--color-kumo-brand-hover);
+}
+
+.aloha-hors-ecran {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aloha-bouton {
+    transition: none;
+  }
+}

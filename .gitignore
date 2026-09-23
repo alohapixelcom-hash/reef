@@ -16,6 +16,11 @@ dist/
 # construire ni pour se deployer ; ce fichier reste ignore par principe.
 .env
 
+# Secrets du Worker en local (moteur allume) : ALOHA_DEPLOY_HOOK s'y pose pour
+# `astro dev`. En ligne, il se pose par `wrangler secret put`. Jamais versionne.
+.dev.vars
+.dev.vars.*
+
 # Les cartes Open Graph de public/og/ sont VERSIONNEES : `pnpm og` ne tourne pas
 # au build, un clone doit donc les trouver deja la. Les regenerer apres un
 # rebrand, puis les commiter.
@@ -36,3 +41,7 @@ src/assets/*.webp
 .DS_Store
 Thumbs.db
 *.log
+
+# Moteur de publication : etat local de D1 et R2, et types generes.
+.emdash/
+emdash-env.d.ts

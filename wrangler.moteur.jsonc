@@ -1,0 +1,21 @@
+// wrangler.moteur.jsonc - le Worker de Reef quand le moteur de publication est allume.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "reef-moteur",
+  "main": "./src/worker.moteur.ts",
+  "compatibility_date": "2026-08-14",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [{ "binding": "DB", "database_name": "reef-moteur" }],
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "reef-moteur-media" }],
+  // Les pages figees de l'ancien back office sont servies par les assets sans
+  // reveiller le Worker : sans cette liste, /secret-spot/ afficherait l'ecran
+  // inerte au lieu d'ouvrir EmDash (voir src/worker.moteur.ts).
+  "assets": {
+    "binding": "ASSETS",
+    "run_worker_first": ["/secret-spot", "/secret-spot/*", "/fr/secret-spot", "/fr/secret-spot/*"]
+  },
+  // Optimise a la demande les images des pages gerees (voir moteur.config.mjs).
+  "images": { "binding": "IMAGES" },
+  // Publication programmee et entretien : une minute de resolution.
+  "triggers": { "crons": ["* * * * *"] }
+}

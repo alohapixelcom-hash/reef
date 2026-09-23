@@ -1,0 +1,26 @@
+---
+// src/moteur/BlocAncre.astro - un bloc de texte riche, rendu avec la balise nue qu'Astro produit depuis un fichier Markdown ; les intertitres portent l'ancre calculee par corpsDuBillet.
+//
+// Le bloc d'origine du moteur ajoute a chaque paragraphe des classes
+// d'alignement. La colonne de lecture du theme n'en veut pas : un billet saisi
+// dans le back office sort au meme balisage que le meme billet ecrit en Markdown.
+interface Props {
+  node: { style?: string; ancre?: string };
+}
+const { node } = Astro.props;
+const style = node.style ?? "normal";
+const Titre = (/^h[1-6]$/.test(style) ? style : undefined) as "h2" | undefined;
+---
+
+{
+  // Une citation Markdown sort en <blockquote><p> : la colonne de lecture
+  // habille ce <p>. Sans lui, la citation d'un billet de la base retombait en
+  // texte courant.
+  Titre ? (
+    <Titre id={node.ancre}><slot /></Titre>
+  ) : style === "blockquote" ? (
+    <blockquote><p><slot /></p></blockquote>
+  ) : (
+    <p><slot /></p>
+  )
+}

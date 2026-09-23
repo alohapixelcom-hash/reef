@@ -1,0 +1,12 @@
+---
+// src/moteur/CodeDuJournal.astro - un bloc de code de la base, colore par Shiki avec les deux themes du journal.
+import { Code } from "astro:components";
+
+interface Props {
+  node: { code?: string; language?: string };
+}
+const { node } = Astro.props;
+const langue = (node.language ?? "plaintext") as never;
+---
+
+{node.code && <Code code={node.code} lang={langue} themes={{ light: "github-light-high-contrast", dark: "github-dark-default" }} wrap />}

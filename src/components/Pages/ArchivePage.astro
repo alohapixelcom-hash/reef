@@ -1,0 +1,78 @@
+---
+// src/components/Pages/ArchivePage.astro - le rendu de l'archive paginee : en-tete, pastilles de sujets et grille.
+//
+// Deux routes le montent. [...page].astro, qui est l'archive ; et, moteur
+// allume, [id].astro : a la demande, /blog/2/ rencontre d'abord la route
+// d'article (un parametre nomme passe avant un parametre de reste), qui
+// reconnait un numero de page et rend l'archive au lieu d'un 404.
+import PostGrid from "@components/Sections/Archive/PostGrid.astro";
+import TopicNav from "@components/Sections/Archive/TopicNav.astro";
+import Footer from "@components/Sections/Global/Footer.astro";
+import Navbar from "@components/Sections/Global/Navbar.astro";
+import PageHero from "@components/Sections/Global/PageHero.astro";
+import { fmt, getLocale, localizePath, useTranslations } from "@i18n";
+import type { ResolvedPost } from "@js/posts";
+import { breadcrumbList } from "@js/schema";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import type { Page } from "astro";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  page: Page<ResolvedPost>;
+  topics: CollectionEntry<"topics">[];
+}
+
+const { page, topics } = Astro.props;
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+
+const title =
+  page.currentPage > 1
+    ? `${t.archive.metaTitle}, ${fmt(t.archive.pageSuffix, { n: page.currentPage })}`
+    : t.archive.metaTitle;
+const description = t.archive.metaDescription;
+
+const base = Astro.site ?? Astro.url;
+const crumbs = breadcrumbList([
+  { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
+  { name: t.archive.metaTitle, url: new URL(localizePath("/blog/", locale), base).href },
+]);
+
+// Les pages 2 et suivantes ne meritent pas d'etre indexees : elles n'ont pas de
+// contenu propre, et Google preferera toujours la page 1 ou le billet lui-meme.
+const noindex = page.currentPage > 1;
+---
+
+<BaseLayout {title} {description} {noindex}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
+  </Fragment>
+
+  <Navbar />
+
+  <main id="content">
+    <PageHero
+      eyebrow={t.archive.eyebrow}
+      title={t.archive.title}
+      accentWord={t.archive.accent}
+      lede={t.archive.lede}
+      crumbs={[{ label: t.archive.metaTitle }]}
+    >
+      <TopicNav {topics} {locale} class="mt-2" />
+    </PageHero>
+
+    <PostGrid
+      posts={page.data}
+      {locale}
+      basePath={localizePath("/blog", locale)}
+      currentPage={page.currentPage}
+      totalPages={page.lastPage}
+      total={page.total}
+      headingLevel="h2"
+      emptyCtaLabel={t.topics.allTopics}
+      emptyCtaHref={localizePath("/topics/", locale)}
+    />
+  </main>
+
+  <Footer />
+</BaseLayout>

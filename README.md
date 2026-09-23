@@ -38,7 +38,7 @@ paginated blog, topic and author pages, a reading column with a table of
 contents, and a per-language RSS feed. In English and in French, from the same
 source.
 
-Reef 2.3 includes the optional **Aloha editorial back office**, using the common
+Reef 3.1 includes the optional **Aloha editorial back office**, using the common
 Kai-based interface. Create, edit, delete, search and sort articles; manage
 categories and their display order. GitHub keeps the history, and the editor
 confirms the article version after the site build. Drafts have no public route.
@@ -48,6 +48,17 @@ confirms the article version after the site build. Drafts have no public route.
 requires your Cloudflare Worker, GitHub repository, email service and Turnstile
 configuration. The public demo cannot save changes. It does not use Aloha Pixel's
 private account or credentials for buyer installations.
+
+Reef 3.1 also ships an optional **publication engine**, off by default. With
+`ALOHA_MOTEUR=emdash` the same source builds as a Cloudflare Worker on
+[EmDash](https://github.com/emdash-cms/emdash) (MIT): posts live in a database,
+the pages that show them are rendered on demand, and publishing in the back
+office at `/_emdash/admin` is visible on the site with no build. That back
+office is dressed in the theme's own tokens, speaks French or English, and
+carries a "Deploy everything" button that empties the caches and rebuilds the
+prerendered pages. Without the variable, nothing of it is bundled and the
+static build is unchanged. See [docs/moteur.md](docs/moteur.md) and, to put it
+online, the "First deployment of the engine" section of [DEPLOY.md](DEPLOY.md).
 
 The demo publication is Reef Notes, a fictional three-person web studio's
 notebook: build logs, type specimens, and the unglamorous half of freelancing.
@@ -108,7 +119,9 @@ file), tailwind-variants, @astrojs/mdx (Markdown and MDX posts) and
 @astrojs/sitemap, self-hosted fonts via Fontsource (Space Grotesk, Instrument
 Sans, both OFL); the accent word of a heading keeps the heading font under a
 turquoise wave underline, so no third font loads. Node >= 22.18 and pnpm. No
-React, no animation library, no WebGL.
+React, no animation library, no WebGL on the public site. The optional
+publication engine adds the Cloudflare adapter, EmDash and React to ITS build
+only; React carries EmDash's back office and no public page gains an island.
 
 ## Quick start
 
@@ -131,6 +144,10 @@ pnpm rebrand "#7a59ff"   # repaint the theme from one brand color
 pnpm rebrand --restore   # back to the Reef palette
 pnpm og           # regenerate the Open Graph cards in public/og/
 pnpm app          # build tuned for a native Capacitor shell
+pnpm dev:moteur   # the same site with the publication engine on (docs/moteur.md)
+pnpm build:moteur # the Worker build: managed pages on demand, the rest prerendered
+pnpm test         # the selfchecks, plain Node, no framework
+pnpm lint:house   # the mechanical house rules
 
 # selfchecks, plain Node, no framework:
 node src/js/schema.selfcheck.ts
@@ -153,7 +170,10 @@ src/
   layouts/      BaseLayout + BaseHead (the entire <head>, hand-written)
   pages/        [...locale]/ (index, blog, topics, authors, about, contact, legal), 404, robots, llms, rss
   styles/       tokens.css, global.css, prose.css, the motion catalog
-scripts/        rebrand.mjs, og.mjs, app.mjs
+  moteur/       the optional publication engine: two post sources behind one alias, managed pages,
+                on-demand sitemap, back office skin and language, the two house extensions
+scripts/        rebrand.mjs, og.mjs, app.mjs, moteur-import.mjs
+seed/           seed.json, the engine's schema
 wiki/           how the theme works, anchored to the code
 docs/           the five convention files, one per subsystem
 ```
@@ -193,7 +213,9 @@ docs/           the five convention files, one per subsystem
 - [ ] `pnpm check` and `pnpm build` are green, and the selfchecks pass.
 
 Deploy dist/ to any static host: Cloudflare Pages, Netlify, Vercel, an nginx
-box. No adapter, no server, no environment variable required.
+box. No adapter, no server, no environment variable required. The publication
+engine is the one exception, and it is opt-in: its deployment is a Cloudflare
+Worker, described step by step in DEPLOY.md.
 
 ## Ship it as a native app (Capacitor)
 

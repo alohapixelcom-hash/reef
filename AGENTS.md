@@ -51,7 +51,7 @@ is named **Reef**. A user replaces Reef Notes and keeps Reef.
 
 ## Stack
 
-Astro 7 (static output, no adapter), Tailwind CSS 4 (CSS-first config, no
+Astro 7 (static output and no adapter BY DEFAULT), Tailwind CSS 4 (CSS-first config, no
 tailwind.config.js), tailwind-variants, @astrojs/mdx (Markdown and MDX posts)
 and @astrojs/sitemap, Fontsource for Space Grotesk and Instrument Sans (the
 only two fonts: the accent word keeps the heading font under a turquoise wave
@@ -61,6 +61,18 @@ publication named Reef Notes.
 **No React, no WebGL, no animation library.** Reef has zero islands and nine
 runtime dependencies. Every effect on the page is CSS. Adding a framework to
 this repo is a design failure, not a feature.
+
+**One opt-in exception: the publication engine.** With `ALOHA_MOTEUR=emdash`
+the same source builds as a Cloudflare Worker: posts live in a database
+(EmDash, D1 and R2) and the pages that show them are rendered on demand, so
+publishing in the back office shows on the site with no build. The Cloudflare
+adapter, EmDash and React enter the build ONLY then, through
+moteur.config.mjs; React carries the back office at /_emdash/admin, which is
+EmDash's own page, and no public page gains an island. Everything on this page
+describes the default, static build, which must stay identical, file by file,
+to what it was: read docs/moteur.md before touching src/moteur/,
+src/js/posts.ts or a managed page. Posts are listed through `@js/posts`, never
+through `getCollection("posts")`.
 
 ## Structure
 
@@ -79,12 +91,17 @@ src/
   pages/        [...locale]/{index,blog,topics,authors,about,contact,legal},
                 404, robots, llms, rss
   styles/       tokens.css (design system), global.css, prose.css, motion/
-scripts/        og.mjs (OG cards), rebrand.mjs (repaint), app.mjs (Capacitor)
+  moteur/       the optional publication engine: two post sources behind one
+                alias, managed pages, on-demand sitemap, back office skin, and
+                the "Tout deployer" extension
+scripts/        og.mjs (OG cards), rebrand.mjs (repaint), app.mjs (Capacitor),
+                moteur-import.mjs (pours src/data/posts into the engine, once)
+seed/           seed.json, the engine's schema (collection and fields)
 wiki/           the maintained knowledge base
 ```
 
 Import through aliases (tsconfig.json): @components/*, @config/*,
-@layouts/*, @styles/*, @js/*, @i18n.
+@layouts/*, @styles/*, @js/*, @i18n, @moteur/*.
 
 ## Commands
 
@@ -92,6 +109,8 @@ Import through aliases (tsconfig.json): @components/*, @config/*,
 pnpm dev        # dev server
 pnpm build      # static build into dist/ (55 pages when green)
 pnpm preview    # serve dist/
+pnpm dev:moteur   # the same site with the publication engine on (docs/moteur.md)
+pnpm build:moteur # the Worker build: managed pages on demand, the rest prerendered
 pnpm check      # astro check; must be 0/0/0 before you finish
 pnpm rebrand "#7a59ff"   # repaint tokens.css from one brand color
 pnpm og         # regenerate public/og/*.png from the tokens
