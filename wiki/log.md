@@ -13,6 +13,20 @@ nothing needed updating. Open threads are questions or known gaps waiting on
 a decision; close them by editing this list and noting the resolution in a
 dated entry.
 
+## 2026-09-24 - 3.1.3, the EmDash edit bar finds what it edits
+
+- Engine on, edit mode: `enBillet` (source.emdash.ts) keeps EmDash's `edit`
+  proxy on the post as `edition`, in edit mode only, and `annotation(post,
+  field?)` of `@moteur/source` returns the `data-emdash-ref` attribute to
+  spread (`src/moteur/annotations.ts`, pure, checked against the package's
+  real proxies by `annotations.selfcheck.ts`). The files source returns `{}`.
+- Annotated: PostHero (entry on the header, `title`, `description`,
+  `cover`), PostCard and FeaturedPostCard (entry, `title`), the search
+  results and the previous and next links of PostFooter (entry, `title`).
+  The body is left to EmDash's inline editor, which `<PortableText>` mounts.
+- Pages updated: overview (sync entry). Mechanism, limits and measures in
+  docs/moteur.md.
+
 ## 2026-09-24 - 3.1.2, engine images at build quality, post cards, sitemap
 
 - Engine on, `src/moteur/service-image.ts` replaces the adapter's image

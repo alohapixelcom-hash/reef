@@ -24,7 +24,7 @@ node scripts/moteur-import.mjs --url http://localhost:4321   # pours the Markdow
 
 On first start EmDash creates its tables and applies `seed/seed.json`, which describes the SCHEMA of Reef (the `posts` collection and its fields). The content goes through the API: the import puts every post through the same validation as a post typed by hand. It can be replayed: a post already present (same slug, same language) is skipped.
 
-Locally, `/_emdash/api/setup/dev-bypass?redirect=/_emdash/admin` opens an administrator session without a passkey. That door exists in development only.
+Locally, `/_emdash/api/setup/dev-bypass?redirect=/_emdash/admin` opens an administrator session without a passkey. That door exists in development only; the session it opens also holds for `astro preview` of the production build, which reads the same local state (`.wrangler/state`): that is how the edit mode is measured on the build that ships.
 
 ## How it is wired
 
@@ -54,6 +54,34 @@ A forgotten page would stay frozen on the content of the last build: that is exa
 
 - **An image without a quality weighs ten times more.** At build time sharp encodes with its defaults (80 for WebP and JPEG, 50 for AVIF); on demand, the adapter's `/_image` address carried no `q`, and the Cloudflare Images binding then encodes almost losslessly (the demo's lead image: 569 KB at 390 px and 1.5 MB at 1440 px online on 24 September 2026, against 100 to 200 KB in the static build). `src/moteur/service-image.ts`, aliased onto the adapter's service (`@astrojs/cloudflare/image-service-workerd`, engine on only, see `moteur.config.mjs`), writes the build's quality into every address; `qualite-image.selfcheck.ts` compares it with the installed sharp. The alias keeps the service's name, so the prerendered files of the engine build keep the same images, and the static build never reads the file. The local emulation of the Images binding ignores `q`: the gain only shows online.
 - **A post's share card is a 1200x630 JPEG, made by the theme.** With the engine on, a cover lives in the media library (`/_emdash/api/media/file/<key>`, a WebP of any size and shape). EmDash's own `/_image` endpoint cannot crop it: for a media file it passes the width and height to the Images binding but not `fit`, so `w=1200&h=630&fit=cover` gave a portrait cover back at 504x630 (measured locally on 24 September 2026). The route `/og/billet/<key>.jpg` (`src/moteur/carte-du-billet.ts`, injected by `moteur.config.mjs`) reads the cover from storage the way EmDash does and crops it with the binding (`fit: "cover"`, JPEG quality 80); the post page gives that address as `og:image` and `twitter:image`. A post without a cover, a cover outside the media library, or a card that cannot be made (file deleted, binding missing, as with `ALOHA_IMAGES=origine` on an account without Cloudflare Images) falls back to `/og/default.jpg`.
+
+## The edit bar, on the site
+
+For a signed-in editor, EmDash adds its "EmDash | Edit" bar to every page rendered on demand (option `toolbar`, "server" by default; code in `emdash/dist/astro/middleware/request-context.mjs`). What it does, read in the code of 0.38:
+
+- **Switching "Edit" on** sets the cookie `emdash-edit-mode=true` and reloads. Edit mode needs the cookie AND a session of role 30 (Editor) or above: a visitor who forges the cookie gets nothing. In that mode `getEmDashCollection` and `getEmDashEntry` read the database without cache and put an `edit` proxy on every entry (`createEditable`); outside it, a silent proxy (`createNoop`) that writes no attribute.
+- **The bar only reads the HTML**: the tags marked `data-emdash-ref`. The FIRST one on the page gives the status ("Published", "Unpublished changes"), the "Publish" button and the link to the back office. On a click it walks up to the first annotated parent that names a field and acts on the kind the manifest (`/_emdash/api/manifest`) gives that field: `title` (string) is edited in the page; `cover` (image) opens EmDash's picker (replace, upload, remove); `description` (text, which the manifest lists as richText) opens the back office at that field, in another tab.
+- **Saving is not publishing.** Each change goes out as `PUT /_emdash/api/content/posts/<id>`; the collection keeps revisions, so the engine stores a draft and the public site does not move. "Publish" (`POST .../publish`) puts it online and reloads the page.
+
+The theme turns every entry into an entry of the `posts` collection (`src/moteur/source.emdash.ts`), and that conversion dropped the proxy: no tag carried the attribute and "Edit" did nothing (measured on 24 September 2026: 44 pages in edit mode, zero attribute). The proxy now travels with the post, in edit mode only, and `annotation(post, field?)` from `@moteur/source` returns the attribute to spread on the tag (`src/moteur/annotations.ts`, checked against the package's real proxies by `annotations.selfcheck.ts`):
+
+| Where | The entry | The fields |
+|---|---|---|
+| Post page | the header (`data-slot="post-hero"`), first annotated tag | `title` (h1), `description` (standfirst), `cover` (lead image) |
+| Post cards (home, blog, topics, authors, keep reading) and the featured post | the card (`<article>`) | `title` |
+| Search results | the result link | `title` |
+| Previous and next post, under a post | the link | `title` |
+
+Engine off, `annotation()` returns an empty object and the static build does not change by a byte. Engine on, an anonymous visitor gets the HTML from before, byte for byte.
+
+**What the bar does not do, and why.**
+
+- **The body is not annotated, and does not need to be.** The bar leaves Portable Text to `InlinePortableTextEditor`, EmDash's React (TipTap) island, which EmDash's own `<PortableText>` mounts in edit mode. Reef renders the body with that component (`src/moteur/TexteRiche.emdash.astro`), so in edit mode the island is already there (seen in Chromium) and saves its own draft on blur; an annotation on the body would only draw a second frame.
+- **A draft does not show in the lists.** EmDash's lists render the published version, even in edit mode: after a save, the cards keep the old title, with "Unpublished changes" and "Publish". The post page itself shows the draft. Publishing shows it everywhere.
+- **On the home page and the lists**, the first annotated tag is the first card: the status and the link of the bar are those of that post. The about, authors and topics indexes show no post and carry no annotation.
+- **The standfirst and the cover of a card are not annotated**: the title's link covers the card with a pseudo-element, so a click there reaches the title, which the bar edits.
+- **An annotation goes on a tag that already has a class.** Astro gives its scope class (`class="astro-..."`) to a classless tag that receives a spread in a component with a `<style>`, even when the spread object is empty, and that for every visitor.
+- **The bar speaks English**: its words are written in its script, outside the catalogue the theme completes.
 
 ## The back office
 
@@ -148,4 +176,11 @@ Production build served by workerd locally, three passes, 21 September 2026, on 
 | Correct a title and republish | 36 to 49 ms |
 | Unpublish | 31 to 112 ms (the page answers 404 and leaves the list) |
 
-A draft answers 404 as long as it is not published. These figures are local: online, the network and Cloudflare's edge are added, to be measured after the first deployment.
+A draft answers 404 as long as it is not published.
+
+The edit bar, 24 September 2026, same setup (production build served by workerd locally, database filled by `scripts/moteur-import.mjs`, editor session opened by dev-bypass):
+
+- **Before**: in edit mode, 44 pages (every managed HTML page), the bar in `data-edit-mode="true"` everywhere, zero annotated tag.
+- **After, anonymous visitor**: the 48 managed addresses (pages, feeds, `llms.txt`, content sitemap) identical byte for byte, zero `data-emdash-ref`; engine off, the static build identical file by file (171 files, same sha256).
+- **After, edit mode**: 38 pages annotated, the first annotated tag of each one carries the entry and its status; 372 attributes (170 entries, 170 titles, 16 standfirsts, 16 covers). With the attributes removed, the HTML is the one from before, in edit mode as well.
+- **In Chromium, through the bar itself**: "Edit" switches on; the title is edited in the page, Enter saves it (`PUT` 200, "Saved", "Unpublished changes") without touching the public site; "Publish" (`POST` 200) puts it online, on the post and on the blog list; back to the original title the same way. The standfirst opens the back office at `?field=description`, the cover opens the picker, the body carries EmDash's inline editor; on a list, a click on a card title edits it instead of following the link. These figures are local: online, the network and Cloudflare's edge are added, to be measured after the first deployment.

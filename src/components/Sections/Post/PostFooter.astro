@@ -13,6 +13,7 @@ import { getSiteRoutes } from "@config/navData.json.ts";
 import { fmt, getLocale, useTranslations } from "@i18n";
 import { entrySlug } from "@i18n/content";
 import { getResolvedPosts } from "@js/posts";
+import { annotation } from "@moteur/source";
 import type { CollectionEntry } from "astro:content";
 
 type Props = {
@@ -40,6 +41,9 @@ const published = await getResolvedPosts(locale);
 const index = published.findIndex((entry) => entry.post.id === post.id);
 const newer = index > 0 ? published[index - 1] : undefined;
 const older = index >= 0 ? published[index + 1] : undefined;
+// Moteur allume, en mode edition seulement : chaque lien porte son billet et
+// son titre le champ "title", que la barre d'EmDash edite en place. L'en-tete
+// du billet lu reste la premiere balise annotee de la page (PostHero).
 
 // --- Partage ---------------------------------------------------------------
 const title = post.data.title;
@@ -173,6 +177,7 @@ const chip =
               <a
                 href={`${routes.posts}${older.slug}/`}
                 rel="prev"
+                {...annotation(older.post)}
                 class="group border-border bg-card rounded-card hover:border-foreground/20 hover:shadow-float flex flex-col gap-1.5 border p-5 transition-[border-color,box-shadow] duration-200"
               >
                 <span class={`${eyebrow} flex items-center gap-1.5`}>
@@ -183,7 +188,7 @@ const chip =
                   />
                   {t.post.previousPost}
                 </span>
-                <span class="font-display text-foreground leading-snug font-semibold text-balance">
+                <span class="font-display text-foreground leading-snug font-semibold text-balance" {...annotation(older.post, "title")}>
                   {older.post.data.title}
                 </span>
               </a>
@@ -193,6 +198,7 @@ const chip =
               <a
                 href={`${routes.posts}${newer.slug}/`}
                 rel="next"
+                {...annotation(newer.post)}
                 class:list={[
                   "group border-border bg-card rounded-card hover:border-foreground/20 hover:shadow-float flex flex-col gap-1.5 border p-5 transition-[border-color,box-shadow] duration-200",
                   "sm:items-end sm:text-right",
@@ -207,7 +213,7 @@ const chip =
                     class="transition-transform duration-200 group-hover:translate-x-0.5"
                   />
                 </span>
-                <span class="font-display text-foreground leading-snug font-semibold text-balance">
+                <span class="font-display text-foreground leading-snug font-semibold text-balance" {...annotation(newer.post, "title")}>
                   {newer.post.data.title}
                 </span>
               </a>

@@ -22,6 +22,7 @@ import { EmptyState } from "@components/ui/empty-state";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { fmt, getLocale, useTranslations } from "@i18n";
 import type { ResolvedPost } from "@js/posts";
+import { annotation } from "@moteur/source";
 
 type Props = {
   posts: ResolvedPost[];
@@ -48,6 +49,9 @@ const index = posts.map(({ post, topic, slug }) => ({
 const indexJson = JSON.stringify(index).replaceAll("<", "\\u003c");
 
 const promptLabel = fmt(t.search.prompt, { count: posts.length });
+// Moteur allume, en mode edition seulement : chaque resultat porte son billet
+// et son titre le champ "title", que la barre d'EmDash edite en place. Rien
+// pour un visiteur, ni moteur eteint (src/moteur/annotations.ts).
 ---
 
 <section class="container-page py-12 md:py-16" data-slot="search" data-search>
@@ -109,6 +113,7 @@ const promptLabel = fmt(t.search.prompt, { count: posts.length });
             lang={locale}
             class="hover:bg-surface group flex flex-col gap-1.5 px-2 py-5 transition-colors duration-150"
             data-search-link
+            {...annotation(post)}
           >
             {/* Le sujet est du texte et non un lien : une ancre dans une ancre
                 est invalide, et un resultat de recherche n'a qu'une seule
@@ -116,7 +121,10 @@ const promptLabel = fmt(t.search.prompt, { count: posts.length });
             <span class="text-muted-foreground font-sans text-xs">
               {fmt(t.search.inTopic, { topic: topic.data.name })}
             </span>
-            <span class="font-display text-foreground group-hover:text-primary text-lg font-semibold transition-colors duration-150">
+            <span
+              class="font-display text-foreground group-hover:text-primary text-lg font-semibold transition-colors duration-150"
+              {...annotation(post, "title")}
+            >
               {post.data.title}
             </span>
             <span class="text-muted-foreground line-clamp-2 text-[0.95rem] leading-relaxed">

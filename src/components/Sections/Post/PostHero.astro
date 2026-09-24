@@ -17,6 +17,7 @@ import { getSiteRoutes } from "@config/navData.json.ts";
 import { readingTime } from "@js/textUtils";
 import { fmt, formatDate, getLocale, useTranslations } from "@i18n";
 import { entrySlug } from "@i18n/content";
+import { annotation } from "@moteur/source";
 import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 
@@ -56,9 +57,18 @@ const authorHref = `${routes.authors}${entrySlug(author.id)}/`;
 // datetime porte la date complete pour les machines ; le texte visible passe
 // par Intl et suit les usages de la langue affichee.
 const iso = (date: Date): string => date.toISOString();
+
+// LA BARRE D'EDITION D'EMDASH (moteur allume, editeur connecte, "Edit"
+// bascule) : chaque balise qui affiche un champ du billet en recoit
+// l'attribut data-emdash-ref, et l'en-tete porte celui de l'entree. L'en-tete
+// est la PREMIERE balise annotee de la page, et c'est voulu : la barre lit le
+// statut, le bouton Publish et le lien vers le back office sur la premiere
+// qu'elle trouve. Le corps n'en porte pas : voir src/moteur/annotations.ts et
+// docs/moteur.md. Hors edition et moteur eteint, annotation() rend un objet
+// vide, et la page ne change pas d'un octet.
 ---
 
-<header class:list={["pt-28 pb-10 md:pt-36 md:pb-12", className]} data-slot="post-hero">
+<header class:list={["pt-28 pb-10 md:pt-36 md:pb-12", className]} data-slot="post-hero" {...annotation(post)}>
   <div class="container-page">
     <div class="measure-prose mx-auto flex flex-col">
       {/* Surtitre de rubrique : le filet turquoise de la maison, puis le nom du
@@ -84,6 +94,7 @@ const iso = (date: Date): string => date.toISOString();
       <h1
         class="font-display text-display-sm md:text-display-md text-foreground"
         transition:name={`post-title-${entrySlug(post.id)}`}
+        {...annotation(post, "title")}
       >
         {title}
       </h1>
@@ -94,6 +105,7 @@ const iso = (date: Date): string => date.toISOString();
           qui separe les deux blocs, pas un changement de famille. */}
       <p
         class="text-muted-foreground mt-5 text-xl leading-[1.55] font-normal md:text-2xl md:leading-[1.5]"
+        {...annotation(post, "description")}
       >
         {description}
       </p>
@@ -164,6 +176,7 @@ const iso = (date: Date): string => date.toISOString();
           class="rounded-card shadow-float measure-wide mx-auto w-full object-cover"
           loading="eager"
           decoding="async"
+          {...annotation(post, "cover")}
         />
       </figure>
     )
