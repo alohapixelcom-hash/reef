@@ -88,6 +88,9 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
         donc personne n'y perd. fallbackFormat EST OBLIGATOIRE : sans lui
         Astro fabrique un PNG de secours par palier, soit pres de vingt
         megaoctets de fichiers que personne ne telechargera jamais. */}
+    {/* QUALITE 75, EN AVIF COMME EN WEBP : l'image de tete est la premiere chose
+       qu'on voit, en grand. A 50 (le defaut de sharp en AVIF) la texture de la
+       photo s'empate ; a 75 elle reste nette, pour environ 50 % de poids en plus. */}
     <Picture
       src={heroVague}
       formats={["avif"]}
@@ -97,6 +100,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
       sizes="100vw"
       loading="eager"
       fetchpriority="high"
+      quality={75}
       class="pointer-events-none absolute inset-0 size-full object-cover object-[center_62%]"
       aria-hidden="true"
     />

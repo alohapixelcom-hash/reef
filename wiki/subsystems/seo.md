@@ -13,7 +13,9 @@ sources:
   - scripts/favicon.mjs
   - astro.config.mjs
   - src/i18n/index.ts
-updated: 2026-09-23
+  - src/moteur/carte-du-billet.ts
+  - src/moteur/plan-du-site.ts
+updated: 2026-09-24
 ---
 
 # SEO layer
@@ -76,12 +78,14 @@ website only (index.astro), a post carries article + breadcrumbList
   hand with minimal XML escaping, drafts excluded, deterministic lastBuildDate
   taken from the newest post.
 
-The sitemap integration filters /404/ and /examples/ out
-(astro.config.mjs:61). A page hidden from robots should be hidden from the
-sitemap too; keep them in step. Its `serialize` hook (astro.config.mjs:68)
-re-reads the `<link rel="alternate" hreflang>` tags of the built page in
-dist/ and writes those, x-default included, as the sitemap alternates; a
-page without them keeps the integration's own pairing.
+The sitemap integration filters /404/, /examples/, /secret-spot/ and
+/search/ out (astro.config.mjs), and the engine's on-demand sitemap
+(src/moteur/plan-du-site.ts) excludes the same paths. A page hidden from
+robots should be hidden from the sitemap too; keep them in step. Its
+`serialize` hook (astro.config.mjs) re-reads the `<link rel="alternate"
+hreflang>` tags of the built page in dist/ and writes those, x-default
+included, as the sitemap alternates; a page without them keeps the
+integration's own pairing.
 
 ## OG images
 
@@ -95,6 +99,11 @@ lists only the cards a page cites: today `default` (siteData.defaultImage),
 cropped from src/assets/reef-hero-vague.webp. `pnpm build`, `build:moteur`,
 `app` and `predev` run it right after covers.mjs, and public/og/ is ignored by
 git, so a missing photo fails the build with a message naming covers.mjs. A
-post with a cover shares the cover instead (ArticlePage.astro). Pages choose
+post with a cover shares that cover cropped to a 1200x630 JPEG instead
+(ArticlePage.astro, through `carteDuBillet` of `@moteur/source`): sharp crops
+it at build time (position "attention", quality 80); with the engine on, the
+route `/og/billet/<key>.jpg` (src/moteur/carte-du-billet.ts) reads it from
+the media library and crops it with the Images binding, because EmDash's
+`/_image` endpoint drops `fit` for media files. Pages choose
 their card through the `image` prop of BaseLayout, whose shape requires alt
 text (src/layouts/BaseHead.astro:27).

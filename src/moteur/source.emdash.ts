@@ -9,6 +9,7 @@ import type { MarkdownHeading } from "astro";
 import type { CollectionEntry } from "astro:content";
 import { getEmDashCollection, getEmDashEntry } from "emdash";
 import GithubSlugger from "github-slugger";
+import { adresseDeLaCarte, cleDeLaCouverture } from "./carte-du-billet.regles";
 import type { CorpsDeBillet } from "./types";
 
 export const MOTEUR = true;
@@ -115,4 +116,17 @@ export async function corpsDuBillet(billet: CollectionEntry<"posts">): Promise<C
     headings.push({ depth: Number(m[1]), slug, text });
   }
   return { blocs, headings };
+}
+
+/**
+ * L'adresse de la carte de partage d'un billet : sa couverture de la
+ * mediatheque, recadree a la demande en JPEG 1200x630 par la route
+ * /og/billet/<cle>.jpg (carte-du-billet.ts). Sans couverture, ou pour une
+ * couverture hors de la mediatheque, undefined : la page prend la carte par
+ * defaut du site.
+ */
+export async function carteDuBillet(billet: CollectionEntry<"posts">): Promise<string | undefined> {
+  const src = billet.data.cover?.src;
+  const cle = src ? cleDeLaCouverture(src) : undefined;
+  return cle ? adresseDeLaCarte(cle) : undefined;
 }

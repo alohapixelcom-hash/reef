@@ -5,7 +5,9 @@
 // choisit l'un ou l'autre, et aucune page ne sait d'ou vient un billet.
 import type { Locale } from "@i18n";
 import { entryIdIn, getLocalizedCollection } from "@i18n/content";
+import { getImage } from "astro:assets";
 import { getEntry, render, type CollectionEntry } from "astro:content";
+import { CARTE } from "./carte-du-billet.regles";
 import type { CorpsDeBillet } from "./types";
 
 /** Vrai quand les billets viennent de la base : les pages gerees se rendent alors a la demande. */
@@ -26,4 +28,25 @@ export async function billetParSlug(locale: Locale, slug: string): Promise<Colle
 export async function corpsDuBillet(billet: CollectionEntry<"posts">): Promise<CorpsDeBillet> {
   const { Content, headings } = await render(billet);
   return { Content, headings };
+}
+
+/**
+ * L'adresse de la carte de partage d'un billet : sa couverture recadree par
+ * sharp au build en JPEG 1200x630, position "attention" comme les cartes de
+ * scripts/og.mjs. Sans couverture, undefined : la page prend la carte par
+ * defaut du site.
+ */
+export async function carteDuBillet(billet: CollectionEntry<"posts">): Promise<string | undefined> {
+  const couverture = billet.data.cover;
+  if (!couverture) return undefined;
+  const carte = await getImage({
+    src: couverture,
+    width: CARTE.largeur,
+    height: CARTE.hauteur,
+    fit: "cover",
+    position: "attention",
+    format: "jpeg",
+    quality: CARTE.qualite,
+  });
+  return carte.src;
 }

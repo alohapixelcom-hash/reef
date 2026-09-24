@@ -4,7 +4,44 @@
 
 Versions describe the features actually shipped in this theme.
 
-Current version: **3.1.1**.
+Current version: **3.1.2**.
+
+## 3.1.2 - 2026-09-24
+
+Engine images at build quality, a real share card for every post, and a
+sitemap that no longer lists the search page.
+
+- **The first-screen image is encoded at quality 75**, in AVIF as in WebP, in
+  both modes: at sharp's AVIF default of 50 the photo's texture smeared.
+- **On-demand images at the build's quality.** With the engine on, the pages
+  rendered on demand sent their images through `/_image` with no `q`
+  parameter, and the Cloudflare Images binding then encodes almost
+  losslessly: the demo's lead image weighed 569 KB at 390 px and 1.5 MB at
+  1440 px online, where the static build ships the same image at 100 to
+  200 KB. `src/moteur/service-image.ts`, aliased onto the adapter's image
+  service (engine on only), now writes the quality sharp applies at build
+  time into every address: 80 for WebP and JPEG, 50 for AVIF. A declared
+  quality stays its own. `qualite-image.selfcheck.ts` compares the table
+  with the defaults of the installed sharp. The static build does not read
+  this file, and the prerendered files of the engine build are unchanged.
+- **Every post shares a JPEG card, 1200x630.** A post with a cover used to
+  give the cover itself as `og:image`: a WebP at its original size, up to
+  556 KB and sometimes portrait (1200x1500). The card is now the cover
+  cropped to 1200x630 JPEG, in both modes: at build time by sharp (position
+  "attention", like `scripts/og.mjs`), and with the engine on by a new route,
+  `/og/billet/<key>.jpg` (`src/moteur/carte-du-billet.ts`), which reads the
+  cover from the media library and crops it with the Images binding. EmDash's
+  own `/_image` endpoint could not do it: for a media file it passes the
+  width and height but not `fit`, so a portrait cover came out 504x630. A
+  post without a cover, or a card that cannot be made, shares
+  `/og/default.jpg`. The schema.org `image` of the article keeps the whole
+  cover.
+- **The search page leaves the sitemap.** `/search/` and `/fr/search/` are
+  `noindex, nofollow` and disallowed in `robots.txt`, but both sitemaps
+  listed them. They are now excluded from the static sitemap
+  (`astro.config.mjs`) and from the engine's `/sitemap-contenu.xml`
+  (`src/moteur/plan-du-site.ts`); their `noindex` is unchanged.
+- Family release number 3.1.2, the same on the seven themes.
 
 ## 3.1.1 - 2026-09-23
 

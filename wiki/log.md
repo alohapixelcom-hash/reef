@@ -3,7 +3,7 @@
 title: Wiki log
 summary: Dated journal of code changes reflected in the wiki, and the list of open threads.
 sources: []
-updated: 2026-09-23
+updated: 2026-09-24
 ---
 
 # Wiki log
@@ -12,6 +12,25 @@ Newest entry first. Every `wiki sync` appends an entry here, even when
 nothing needed updating. Open threads are questions or known gaps waiting on
 a decision; close them by editing this list and noting the resolution in a
 dated entry.
+
+## 2026-09-24 - 3.1.2, engine images at build quality, post cards, sitemap
+
+- Engine on, `src/moteur/service-image.ts` replaces the adapter's image
+  service by alias (`@astrojs/cloudflare/image-service-workerd`, in
+  moteur.config.mjs) and writes sharp's default quality into every `/_image`
+  address (80 WebP and JPEG, 50 AVIF, `src/moteur/qualite-image.ts`, checked
+  against installed sharp by `qualite-image.selfcheck.ts`). Without `q`, the
+  Images binding encoded almost losslessly (1.5 MB at 1440 px online).
+- A post's share card is its cover cropped to a 1200x630 JPEG:
+  `carteDuBillet` in both sources of `@moteur/source`. Files: sharp at build
+  time. Engine: the injected route `/og/billet/[cle].jpg`
+  (`src/moteur/carte-du-billet.ts`, rules and selfcheck beside it), because
+  EmDash's `/_image` endpoint ignores `fit` for media files (a portrait
+  cover came out 504x630, measured locally).
+- `/search/` and `/fr/search/` left both sitemaps (static filter and
+  `EXCLUES` of plan-du-site.ts); their `noindex` is unchanged.
+- Pages updated: subsystems/seo (sitemap exclusions, OG images), overview
+  (sync entry).
 
 ## 2026-09-23 - 3.1.1, the share card is a photograph
 
