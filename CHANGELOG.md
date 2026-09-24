@@ -4,7 +4,28 @@
 
 Versions describe the features actually shipped in this theme.
 
-Current version: **3.1.2**.
+Current version: **3.1.3**.
+
+## 3.1.3 - 2026-09-24
+
+The EmDash edit bar now finds what it edits.
+
+- **Edit mode had nothing to edit.** With the engine on, a signed-in editor
+  saw the "EmDash | Edit" bar, but switching "Edit" on did nothing: turning a
+  database entry into a `posts` entry dropped EmDash's `edit` proxy, so no tag
+  carried `data-emdash-ref`. The proxy now travels with the post, in edit
+  mode only, and `annotation()` from `@moteur/source`
+  (`src/moteur/annotations.ts`, with its selfcheck) marks what each template
+  shows.
+- **Edited in the page**: the title, on the post page, the cards, the
+  featured post, the search results and the previous and next links; the
+  cover opens EmDash's image picker. **Opened in the back office**: the
+  standfirst, at its field. The body keeps EmDash's own inline editor. A save
+  stores a draft; "Publish" puts it online.
+- **Nothing changes for a visitor**: engine off, the static build is
+  identical file by file; engine on, the anonymous HTML is identical byte
+  for byte. See docs/moteur.md, "The edit bar, on the site".
+- Family release number 3.1.3, the same on the seven themes.
 
 ## 3.1.2 - 2026-09-24
 

@@ -15,6 +15,7 @@ import { Avatar } from "@components/ui/avatar";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { fmt, formatDate, useTranslations, type Locale } from "@i18n";
 import type { ResolvedPost } from "@js/posts";
+import { annotation } from "@moteur/source";
 import { Image } from "astro:assets";
 import { topicTone } from "./topicTone";
 
@@ -35,6 +36,12 @@ const href = `${routes.posts}${slug}/`;
 const topicHref = `${routes.topics}${topicSlug}/`;
 const tone = topicTone[topic.data.accent];
 const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: minutes });
+// La barre d'edition d'EmDash (moteur allume, mode edition) : la carte porte
+// l'entree, le titre son champ. Le titre, pas le lien qu'il contient : le
+// lien couvre la carte par un pseudo-element, c'est lui qui recoit le clic
+// pose sur la carte, et la barre remonte de la au premier parent annote. Le
+// chapeau et la couverture sont sous ce meme voile : les annoter n'ouvrirait
+// rien. Hors edition, annotation() rend un objet vide (src/moteur/annotations.ts).
 ---
 
 <article
@@ -45,6 +52,7 @@ const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: m
     className,
   ]}
   data-slot="post-card"
+  {...annotation(post)}
 >
   {
     post.data.cover && (
@@ -80,7 +88,7 @@ const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: m
       </span>
     </p>
 
-    <Tag class="font-display text-foreground text-xl leading-snug font-semibold text-balance">
+    <Tag class="font-display text-foreground text-xl leading-snug font-semibold text-balance" {...annotation(post, "title")}>
       <a href={href} class="after:absolute after:inset-0 after:content-['']">
         {post.data.title}
       </a>

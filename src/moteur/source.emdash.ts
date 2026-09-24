@@ -9,6 +9,7 @@ import type { MarkdownHeading } from "astro";
 import type { CollectionEntry } from "astro:content";
 import { getEmDashCollection, getEmDashEntry } from "emdash";
 import GithubSlugger from "github-slugger";
+import { annotationDe, estEditable, type Annotation } from "./annotations";
 import { adresseDeLaCarte, cleDeLaCouverture } from "./carte-du-billet.regles";
 import type { CorpsDeBillet } from "./types";
 
@@ -52,8 +53,15 @@ function couverture(cover: DonneesBillet["cover"]) {
   return { src, width: cover.width, height: cover.height, format: "webp" as const };
 }
 
+/** Une entree telle qu'EmDash la rend : ses donnees, et son proxy d'edition. */
+interface Entree {
+  id: string;
+  data: unknown;
+  edit?: unknown;
+}
+
 /** Une entree de la base, sous la forme qu'attend tout le theme. */
-function enBillet(entree: { id: string; data: unknown }, locale: Locale): CollectionEntry<"posts"> {
+function enBillet(entree: Entree, locale: Locale): CollectionEntry<"posts"> {
   const d = entree.data as DonneesBillet;
   const date = d.pub_date ?? d.publishedAt ?? new Date();
   return {
@@ -76,6 +84,11 @@ function enBillet(entree: { id: string; data: unknown }, locale: Locale): Collec
     },
     // Garde pour corpsDuBillet : les blocs voyagent avec l'entree, hors du schema.
     blocs: d.content ?? [],
+    // LE PROXY D'EDITION D'EMDASH, en mode edition seulement (voir
+    // annotations.ts) : c'est lui qui donne aux gabarits l'attribut que la
+    // barre d'EmDash cherche. Hors edition la cle n'existe pas, et le billet
+    // a exactement la forme qu'il avait avant.
+    ...(estEditable(entree.edit) ? { edition: entree.edit } : {}),
   } as unknown as CollectionEntry<"posts">;
 }
 
@@ -117,6 +130,14 @@ export async function corpsDuBillet(billet: CollectionEntry<"posts">): Promise<C
   }
   return { blocs, headings };
 }
+
+/**
+ * L'attribut data-emdash-ref d'un billet (champ absent) ou d'un de ses champs
+ * ("title", "description", "cover"), a etaler sur la balise qui l'affiche.
+ * Un objet vide pour un visiteur anonyme : voir annotations.ts.
+ */
+export const annotation = (billet: CollectionEntry<"posts">, champ?: string): Annotation =>
+  annotationDe((billet as unknown as { edition?: unknown }).edition, champ);
 
 /**
  * L'adresse de la carte de partage d'un billet : sa couverture de la

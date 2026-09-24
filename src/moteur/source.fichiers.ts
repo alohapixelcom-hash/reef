@@ -7,6 +7,7 @@ import type { Locale } from "@i18n";
 import { entryIdIn, getLocalizedCollection } from "@i18n/content";
 import { getImage } from "astro:assets";
 import { getEntry, render, type CollectionEntry } from "astro:content";
+import type { Annotation } from "./annotations";
 import { CARTE } from "./carte-du-billet.regles";
 import type { CorpsDeBillet } from "./types";
 
@@ -50,3 +51,10 @@ export async function carteDuBillet(billet: CollectionEntry<"posts">): Promise<s
   });
   return carte.src;
 }
+
+/**
+ * Moteur eteint, un billet est un fichier : il ne s'edite pas depuis la page,
+ * et aucune balise ne recoit d'attribut. L'objet vide etale n'ecrit rien, le
+ * build statique reste identique au fichier pres.
+ */
+export const annotation = (_billet: CollectionEntry<"posts">, _champ?: string): Annotation => ({});
