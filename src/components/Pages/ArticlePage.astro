@@ -18,7 +18,7 @@ import { getLocale, localizePath, useTranslations } from "@i18n";
 import { entrySlug } from "@i18n/content";
 import { article, breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { corpsDuBillet } from "@moteur/source";
+import { carteDuBillet, corpsDuBillet } from "@moteur/source";
 import TexteRiche from "@moteur/TexteRiche.astro";
 import type { CollectionEntry } from "astro:content";
 
@@ -42,12 +42,20 @@ const routes = getSiteRoutes(locale);
 const base = Astro.site ?? Astro.url;
 const url = new URL(`${routes.posts}${entrySlug(post.id)}/`, base).href;
 
-// La couverture sert de carte de partage quand elle existe ; sinon l'image par
-// defaut du site. Les deux sont absolues, ce qu'exigent OG et schema.org.
+// La couverture illustre l'article dans schema.org, entiere ; sans elle,
+// l'image par defaut du site. Les adresses sont rendues absolues, ce
+// qu'exigent OG et schema.org.
 const cover = post.data.cover;
 const share = cover
   ? { src: cover.src, alt: post.data.coverAlt ?? post.data.title }
   : siteData.defaultImage;
+
+// La carte de partage (og:image, twitter:image) est une photo en JPEG
+// 1200x630, regle de la maison : la couverture recadree, au build (sharp) ou
+// a la demande (moteur allume, voir src/moteur/carte-du-billet.ts). Un
+// billet sans couverture partage la carte par defaut du site.
+const carte = await carteDuBillet(post);
+const carteDePartage = carte ? { src: carte, alt: share.alt } : siteData.defaultImage;
 
 const articleSchema = article({
   title: post.data.title,
@@ -73,7 +81,7 @@ const crumbSchema = breadcrumbList([
   description={post.data.description}
   type="article"
   noindex={post.data.draft}
-  image={share}
+  image={carteDePartage}
 >
   <Fragment slot="head">
     <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />

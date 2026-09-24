@@ -25,8 +25,11 @@ import { PAGES_GEREES } from "./pages-gerees.mjs";
 
 export const prerender = false;
 
-// Les memes exclusions que le plan fige (astro.config.mjs).
-const EXCLUES = ["/404/", "/examples/", "/secret-spot/"];
+// Les memes exclusions que le plan fige (astro.config.mjs). La recherche est
+// une page geree, donc rendue a la demande et inventoriee ici : elle part en
+// noindex, et un plan de site ne propose pas une page qu'on demande de ne pas
+// indexer.
+const EXCLUES = ["/404/", "/examples/", "/secret-spot/", "/search/"];
 
 type Params = Record<string, string | number | undefined>;
 

@@ -64,12 +64,13 @@ Three hand-written endpoints, all deriving URLs from `site`:
 - src/pages/[...locale]/rss.xml.ts: a per-language RSS 2.0 feed built by hand,
   drafts excluded, deterministic lastBuildDate (the newest post).
 
-The sitemap integration filters out /404/ and /examples/
-(astro.config.mjs:61). A page hidden from robots should be hidden from the
-sitemap too; keep them in step. Its `serialize` hook (astro.config.mjs:68)
-re-reads the `<link rel="alternate" hreflang>` tags of the built page in
-dist/ and writes those, x-default included, as the sitemap alternates; a
-page without them keeps the integration's own pairing. The head is the only
+The sitemap integration filters out /404/, /examples/, /secret-spot/ and
+/search/ (astro.config.mjs), and the engine's on-demand sitemap
+(src/moteur/plan-du-site.ts) keeps the same list. A page hidden from robots
+should be hidden from the sitemap too; keep them in step. Its `serialize`
+hook (astro.config.mjs) re-reads the `<link rel="alternate" hreflang>` tags
+of the built page in dist/ and writes those, x-default included, as the
+sitemap alternates; a page without them keeps the integration's own pairing. The head is the only
 source, so the sitemap cannot contradict it.
 
 ## Images and indexing
@@ -82,5 +83,10 @@ source, so the sitemap cannot contradict it.
   right after covers.mjs; public/og/ is not versioned. A new card is a line in
   its CARTES table, and pages pass it via the `image` prop; alt text is
   mandatory in that prop's shape.
+- A post with a cover shares that cover cropped to a 1200x630 JPEG
+  (`carteDuBillet` in `@moteur/source`): sharp at build time, or, engine on,
+  the `/og/billet/<key>.jpg` route (docs/moteur.md). Never the cover file
+  itself, which is a WebP of any size and shape. Without a cover, the post
+  shares `/og/default.jpg`.
 - `noindex` is a prop, not a habit (BaseHead.astro:84): draft posts and
   utility pages use it; everything else stays indexable.

@@ -72,7 +72,11 @@ export default defineConfig({
       // Moteur allume, les pages gerees ont leur propre plan, rendu a la
       // demande : l'index le declare. Moteur eteint, la liste est vide.
       customSitemaps: moteur.plans.map((plan) => new URL(plan, SITE).href),
-      filter: (page) => !["/404/", "/examples/", "/secret-spot/"].some((p) => page.includes(p)),
+      // La recherche (/search/, /fr/search/) part en noindex et robots.txt
+      // l'interdit : un plan de site ne propose pas une page qu'on demande de
+      // ne pas indexer. Le plan du moteur (src/moteur/plan-du-site.ts) garde
+      // les memes exclusions.
+      filter: (page) => !["/404/", "/examples/", "/secret-spot/", "/search/"].some((p) => page.includes(p)),
       // Le sitemap porte les memes alternatives que les balises hreflang du
       // head : Google recoupe les deux, et un desaccord fait ignorer les deux.
       i18n: { defaultLocale: "en", locales: { en: "en", fr: "fr" } },

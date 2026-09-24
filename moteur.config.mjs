@@ -107,6 +107,9 @@ function partageDesPages() {
         if (LANGUE_BO) addMiddleware({ entrypoint: ici("./src/moteur/langue-bo.ts"), order: "post" });
         injectRoute({ pattern: "/sitemap-contenu.xml", entrypoint: ici("./src/moteur/plan-du-site.ts"), prerender: false });
         injectRoute({ pattern: "/version.json", entrypoint: ici("./src/moteur/version.ts"), prerender: false });
+        // La carte de partage d'un billet : sa couverture de la mediatheque,
+        // recadree en JPEG 1200x630 (voir src/moteur/carte-du-billet.regles.ts).
+        injectRoute({ pattern: "/og/billet/[cle].jpg", entrypoint: ici("./src/moteur/carte-du-billet.ts"), prerender: false });
         // Figees ICI, une fois par build : l'horodatage est la preuve que
         // montre "Tout deployer" (il ne change que si un nouveau build est en
         // ligne), et les caches declares sont ceux que le bouton a le droit
@@ -144,6 +147,16 @@ const alias = (source) => [
   { find: "@moteur/source", replacement: ici(`./src/moteur/source.${source}.ts`) },
   { find: "@moteur/live", replacement: ici(`./src/moteur/live.${source}.ts`) },
   { find: "@moteur/TexteRiche.astro", replacement: ici(`./src/moteur/TexteRiche.${source}.astro`) },
+  // LA QUALITE DES IMAGES RENDUES A LA DEMANDE. Le service d'image que
+  // l'adapter pose pour IMAGES ci-dessus ecrit des adresses /_image sans
+  // qualite, et le liant Cloudflare Images encode alors presque sans perte
+  // (image de tete de la demo : 569 Ko a 390 px, 1,5 Mo a 1440 px en ligne le
+  // 24 septembre 2026, contre 100 a 200 Ko au build statique). Le meme
+  // service, avec la qualite du build dans chaque adresse : voir
+  // src/moteur/service-image.ts.
+  ...(source === "emdash"
+    ? [{ find: /^@astrojs\/cloudflare\/image-service-workerd$/, replacement: ici("./src/moteur/service-image.ts") }]
+    : []),
   ...(CATALOGUE_BO?.alias ?? []),
 ];
 
