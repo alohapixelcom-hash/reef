@@ -14,9 +14,11 @@ export interface Props {
   image?: { src: string; alt: string };
   type?: "website" | "article";
   noindex?: boolean;
+  /** Page introuvable : ni canonical ni hreflang (voir BaseHead). */
+  introuvable?: boolean;
 }
 
-const { title, description, image, type, noindex } = Astro.props;
+const { title, description, image, type, noindex, introuvable } = Astro.props;
 
 // lang et dir viennent de la langue de l'URL, jamais d'une constante. C'est ce
 // qui fait qu'un lecteur d'ecran change de voix entre /pricing/ et /fr/pricing/,
@@ -28,7 +30,7 @@ const meta = localeMeta[locale];
 <!doctype html>
 <html lang={meta.htmlLang} dir={meta.dir}>
   <head>
-    <BaseHead {title} {description} {image} {type} {noindex}>
+    <BaseHead {title} {description} {image} {type} {noindex} {introuvable}>
       <slot name="head" />
     </BaseHead>
     <ThemeInit />

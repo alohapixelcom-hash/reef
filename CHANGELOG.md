@@ -4,7 +4,27 @@
 
 Versions describe the features actually shipped in this theme.
 
-Current version: **3.1.3**.
+Current version: **3.3.0**.
+
+## 3.3.0 - 2026-09-24
+
+Page texts editable from the EmDash bar; the demo finished after its audit.
+
+- The written copy of the pages (home, list headers, footer line, about,
+  contact, legal notice, privacy, terms) is a `sections` collection, 26 entries
+  per language seeded with the file texts, laid over the dictionary engine on
+  (`src/moteur/contenu.ts`). In edit mode titles, accents, eyebrows and
+  buttons are edited in the page; the other fields open the back office.
+- One back office: the Git-based editor of 2.3 and its footer link are gone.
+- Legal notice, privacy and terms describe a blog on a Worker with a database.
+- French 404 under `/fr/`; no canonical or hreflang on the 404; `/404`
+  answers 404. `/sitemap.xml` 301 to the index, unknown sitemaps 404,
+  `robots.txt` disallows `/_emdash/`, no `Server-Timing` for visitors.
+- Share-card alt text and RSS title per language; no placeholder author
+  links; no "theme by" credit next to the demo line; back office named from
+  `siteData.name`, its French catalogue without em or en dashes.
+- The docs say the live demo runs with the engine (Worker `reef-moteur`). A
+  database deployed before 3.3.0 is updated by `seed/import-3.3.0-reef.sql`.
 
 ## 3.1.3 - 2026-09-24
 
@@ -264,30 +284,18 @@ up in front of them, and everything it found the hour it learned to.
   `text-accent-text` has done for the coral since 1.6.3. The column labels go
   back to full ink: an attenuated recessive role is how a theme quietly loses
   AA.
-- The bench stopped changing its mind. It measured 400 ms after its scroll
-  pass and hoped that was enough; on a loaded machine it reported "no h1 on
-  the page" for pages whose title measured 208 by 54 pixels, on different
-  routes at every run. It now waits for a condition instead of a delay: fonts
-  arrived, document height and first title box unchanged from one frame to the
-  next, and a title that exists in the document has a box. A page that really
-  has no h1 answers immediately and is still reported. It also measures five
-  widths instead of three: 1024 is the `lg` breakpoint, where a grid goes to
-  two columns with the least room to do it, and 1280 is the commonest laptop.
-  Neither is coming back out.
+- The bench stopped changing its mind: it waits for a condition (fonts in,
+  layout stable, a title box) instead of a 400 ms delay that reported phantom
+  missing h1s under load, and measures five widths (1024 and 1280 added).
 - The stylesheet travels inside the HTML (`build.inlineStylesheets: "always"`).
   Lighthouse measured 730 ms of render blocking before the first pixel on the
   demo, from stylesheet requests alone. The trade is written out in
   `astro.config.mjs`, and one word puts it back.
-- The demo posters are served by the site. They were fetched from the video
-  host, which delivered them and set two third-party cookies on the way: the
-  demo's best practices score was capped at 77 for that alone, and the largest
-  image on the page depended on a domain the theme does not control. The
-  source now lives in `src/assets` and both crops are built. The video stays
-  remote, and still loads only on scroll.
-- Measured on the demo, mobile, served compressed, before and after:
-  best practices 77 to 100, since nothing third-party is fetched any
-  more; accessibility to 100; three render-blocking stylesheet requests down
-  to zero; first paint and largest paint both earlier on every theme.
+- The demo posters are served by the site (`src/assets`, both crops built)
+  instead of the video host, which set two third-party cookies; the video
+  stays remote and loads only on scroll.
+- Measured on the demo, mobile: best practices 77 to 100, accessibility to
+  100, render-blocking stylesheet requests from three to zero.
 
 ## 1.7.1 - 2026-09-05
 
@@ -307,12 +315,8 @@ mode, and Aloha's title mask stops clipping letters.
   that does not follow the theme. The probe reads an SVG's class with
   `getAttribute` (its `className` is an `SVGAnimatedString`) and honours
   `dark:` display variants.
-- In Aloha, `SplitReveal` reveals a title word by word behind a mask, and that
-  mask kept cutting descenders, accents and the last glyph of every word once
-  the word had landed. It is now lifted the moment the motion ends. The same
-  release keeps the second hero button of Aloha inside its glass between 1024
-  and 1280 px. Neither fix reaches THIS theme: it does not carry `SplitReveal`,
-  and its demo was measured the same way and has no such overflow.
+- Aloha's title mask (`SplitReveal`) and hero button were fixed the same day;
+  neither reaches this theme, which carries no `SplitReveal`.
 - Code comments in the blog posts were at 3.88 to 1 in dark mode: the dark
   Shiki theme becomes `github-dark-default` (`astro.config.mjs`,
   `src/styles/prose.css`).

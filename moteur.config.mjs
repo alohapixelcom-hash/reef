@@ -17,6 +17,13 @@ import { routesDuCache } from "./src/moteur/routes-du-cache.mjs";
 
 const ici = (chemin) => fileURLToPath(new URL(chemin, import.meta.url));
 
+// Le nom affiche par le back office : celui de la marque de demonstration,
+// relu dans siteData.json.ts sans l'importer. Ce fichier est du TypeScript
+// avec des alias d'Astro, et la configuration tourne dans Node. L'acheteur qui
+// remplace le nom dans siteData remplace aussi celui-ci.
+const NOM_DU_SITE =
+  /name:\s*"([^"]+)"/.exec(readFileSync(ici("./src/config/siteData.json.ts"), "utf8"))?.[1] ?? "Reef";
+
 /** Vrai quand le moteur est allume. Lu au build ET par `astro dev`. */
 export const MOTEUR_ACTIF = process.env.ALOHA_MOTEUR === "emdash";
 
@@ -106,6 +113,10 @@ function partageDesPages() {
         // La langue par defaut du back office, seulement si elle est demandee.
         if (LANGUE_BO) addMiddleware({ entrypoint: ici("./src/moteur/langue-bo.ts"), order: "post" });
         injectRoute({ pattern: "/sitemap-contenu.xml", entrypoint: ici("./src/moteur/plan-du-site.ts"), prerender: false });
+        // Toutes les pages indexables se rendent a la demande depuis la 3.3.0 :
+        // l'integration sitemap n'a plus de page figee a inventorier et n'ecrit
+        // plus l'index. Il est servi ici (voir plan-du-site.index.ts).
+        injectRoute({ pattern: "/sitemap-index.xml", entrypoint: ici("./src/moteur/plan-du-site.index.ts"), prerender: false });
         injectRoute({ pattern: "/version.json", entrypoint: ici("./src/moteur/version.ts"), prerender: false });
         // La carte de partage d'un billet : sa couverture de la mediatheque,
         // recadree en JPEG 1200x630 (voir src/moteur/carte-du-billet.regles.ts).
@@ -199,8 +210,9 @@ async function allume() {
       emdash({
         database: d1({ binding: "DB" }),
         storage: r2({ binding: "MEDIA" }),
-        // Le back office porte le nom et la marque du site, pas ceux du moteur.
-        admin: { siteName: "Reef", logo: "/favicon.svg", favicon: "/favicon.svg" },
+        // Le back office porte le nom du site (NOM_DU_SITE) et la marque du
+        // theme, pas ceux du moteur.
+        admin: { siteName: NOM_DU_SITE, logo: "/favicon.svg", favicon: "/favicon.svg" },
         ...(cacheObjets ? { objectCache: cacheObjets() } : {}),
         // "Tout deployer" : extension native rangee dans le depot. EmDash
         // l'importe par son chemin et l'embarque dans le Worker au build.

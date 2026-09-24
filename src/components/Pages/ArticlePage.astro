@@ -34,7 +34,8 @@ const { post, author, topic } = Astro.props;
 const { Content, blocs, headings } = await corpsDuBillet(post);
 
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+// Les textes rediges de la page, poses sur la requete par la page (src/pages/[...locale]/blog/[id].astro).
+const t = useTranslations(Astro);
 const routes = getSiteRoutes(locale);
 
 // Toutes les URLs passent par la table des routes, donc par localizePath : un
@@ -46,16 +47,15 @@ const url = new URL(`${routes.posts}${entrySlug(post.id)}/`, base).href;
 // l'image par defaut du site. Les adresses sont rendues absolues, ce
 // qu'exigent OG et schema.org.
 const cover = post.data.cover;
-const share = cover
-  ? { src: cover.src, alt: post.data.coverAlt ?? post.data.title }
-  : siteData.defaultImage;
+const imageParDefaut = { src: siteData.defaultImage.src, alt: siteData.defaultImage.alt[locale] };
+const share = cover ? { src: cover.src, alt: post.data.coverAlt ?? post.data.title } : imageParDefaut;
 
 // La carte de partage (og:image, twitter:image) est une photo en JPEG
 // 1200x630, regle de la maison : la couverture recadree, au build (sharp) ou
 // a la demande (moteur allume, voir src/moteur/carte-du-billet.ts). Un
 // billet sans couverture partage la carte par defaut du site.
 const carte = await carteDuBillet(post);
-const carteDePartage = carte ? { src: carte, alt: share.alt } : siteData.defaultImage;
+const carteDePartage = carte ? { src: carte, alt: share.alt } : imageParDefaut;
 
 const articleSchema = article({
   title: post.data.title,

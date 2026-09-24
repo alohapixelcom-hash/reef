@@ -12,6 +12,7 @@
 import { Icon } from "@components/svg/icons";
 import { formatDate, fmt, type Locale } from "@i18n";
 import { slugify } from "@js/textUtils";
+import type { Annotation } from "@moteur/annotations";
 
 type Section = { title: string; body: string };
 
@@ -25,6 +26,10 @@ type Props = {
   backToTopLabel: string;
   locale: Locale;
   class?: string;
+  /** Moteur allume, en mode edition : l'attribut du champ de la date de revision, quand la base la porte. */
+  annotationDeLaDate?: Annotation;
+  /** Moteur allume, en mode edition : l'attribut du champ repete des clauses, qui s'ouvre dans le back office. */
+  annotationDesClauses?: Annotation;
 };
 
 const {
@@ -35,6 +40,8 @@ const {
   backToTopLabel,
   locale,
   class: className,
+  annotationDeLaDate = {},
+  annotationDesClauses = {},
 } = Astro.props;
 
 // Les ancres viennent du titre de la section, donc de la langue : les URLs
@@ -44,7 +51,7 @@ const anchored = sections.map((section) => ({ ...section, id: slugify(section.ti
 ---
 
 <div class:list={["container-page py-14 md:py-20", className]} data-slot="legal-article">
-  <p class="text-muted-foreground font-sans text-sm">
+  <p class="text-muted-foreground font-sans text-sm" {...annotationDeLaDate}>
     <time datetime={updated}>{fmt(updatedTemplate, { date: formatDate(new Date(updated), locale) })}</time>
   </p>
 
@@ -68,7 +75,7 @@ const anchored = sections.map((section) => ({ ...section, id: slugify(section.ti
     </ol>
   </nav>
 
-  <div class="prose mt-12">
+  <div class="prose mt-12" {...annotationDesClauses}>
     {
       anchored.map((section) => (
         <section aria-labelledby={section.id}>

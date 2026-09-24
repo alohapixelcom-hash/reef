@@ -9,6 +9,7 @@
 // d'une page interieure.
 import { Breadcrumb } from "@components/ui/breadcrumb";
 import { getLocale, localizePath, useTranslations } from "@i18n";
+import { annotationsDe, type AnnotationsDeLEntree } from "@moteur/annotations";
 import { tv, type VariantProps } from "tailwind-variants";
 
 export const pageHero = tv({
@@ -56,9 +57,14 @@ type Props = VariantProps<typeof pageHero> & {
   /** Maillons apres l'accueil ; le dernier, sans href, devient la page courante. */
   crumbs?: Crumb[];
   class?: string;
+  /** Moteur allume, en mode edition : la section de la base qui porte ces textes (annotationsDe). L'entree va sur la section, chaque texte recoit l'attribut de son champ. */
+  edition?: AnnotationsDeLEntree;
+  /** Raccourci d'edition : le slug de la section de la base, quand elle porte tous les textes du hero. */
+  section?: string;
 };
 
-const { eyebrow, title, accentWord, lede, crumbs = [], align, class: className } = Astro.props;
+const { eyebrow, title, accentWord, lede, crumbs = [], align, class: className, section = "" } = Astro.props;
+const edition = Astro.props.edition ?? annotationsDe(Astro, section);
 const {
   root,
   inner,
@@ -83,7 +89,7 @@ const word = at >= 0 ? title.slice(at, at + accent.length) : "";
 const after = at >= 0 ? title.slice(at + accent.length) : "";
 ---
 
-<section class={root({ class: className })} data-slot="page-hero">
+<section class={root({ class: className })} data-slot="page-hero" {...edition.entree}>
   {/* PAS DE HALO. Un disque flou derivait ici, dans l'aigue-marine de la
       maison, pour rattacher une page interieure a l'accueil. C'est la
       signature des pages fabriquees a la chaine, et la maison l'interdit. Le
@@ -101,18 +107,18 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     }
     {
       eyebrow && (
-        <p class={eyebrowClass()}>
+        <p class={eyebrowClass()} {...edition.champ("eyebrow")}>
           <span class={rule()} aria-hidden="true" />
           {eyebrow}
         </p>
       )
     }
-    <h1 class={heading()}>
+    <h1 class={heading()} {...edition.champ("title")}>
       {
         word ? (
           <Fragment>
             {before}
-            <span class="accent-script">{word}</span>
+            <span class="accent-script" {...edition.champ("accent")}>{word}</span>
             {after}
           </Fragment>
         ) : (
@@ -120,7 +126,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
         )
       }
     </h1>
-    {lede && <p class={ledeClass()}>{lede}</p>}
+    {lede && <p class={ledeClass()} {...edition.champ("lede")}>{lede}</p>}
     <slot />
   </div>
 </section>

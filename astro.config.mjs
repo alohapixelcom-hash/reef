@@ -4,7 +4,7 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import { moteur, MOTEUR_ACTIF } from "./moteur.config.mjs";
-import { readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, renameSync, rmdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 // Moteur allume, l'adapter range les pages figees sous dist/client/ ; sans ce
@@ -37,6 +37,29 @@ function hreflangDuHtml(/** @type {string} */ pathname) {
 // plan de site du moteur (moteur allume seulement) en tire son adresse absolue.
 const SITE = "https://reef.alohapixel.app";
 
+// LA PAGE INTROUVABLE DE CHAQUE LANGUE. src/pages/[locale]/404.astro sort en
+// fr/404/index.html, comme toute page ; un hebergeur statique (et Cloudflare,
+// dans wrangler.toml comme derriere le Worker du moteur) cherche le 404.html
+// le plus proche de l'adresse demandee. On la range donc en fr/404.html, au
+// build, dans les deux modes : `dir` est le dossier des fichiers servis.
+/** @returns {import("astro").AstroIntegration} */
+function pagesIntrouvables() {
+  return {
+    name: "reef:pages-introuvables",
+    hooks: {
+      "astro:build:done": ({ dir }) => {
+        for (const entree of readdirSync(dir, { withFileTypes: true })) {
+          if (!entree.isDirectory()) continue;
+          const page = new URL(`${entree.name}/404/index.html`, dir);
+          if (!existsSync(page)) continue;
+          renameSync(page, new URL(`${entree.name}/404.html`, dir));
+          rmdirSync(new URL(`${entree.name}/404/`, dir));
+        }
+      },
+    },
+  };
+}
+
 // https://astro.build/config
 export default defineConfig({
   // Alimente canonical, OG, sitemap, robots.txt et llms.txt. Une seule edition les corrige tous.
@@ -63,6 +86,7 @@ export default defineConfig({
   },
 
   integrations: [
+    pagesIntrouvables(),
     ...moteur.integrations,
     // Pas de React ici, volontairement : Reef n'a pas un seul ilot. Tout le
     // theme est du .astro, et la page d'article part a zero kilo-octet de
@@ -76,7 +100,7 @@ export default defineConfig({
       // l'interdit : un plan de site ne propose pas une page qu'on demande de
       // ne pas indexer. Le plan du moteur (src/moteur/plan-du-site.ts) garde
       // les memes exclusions.
-      filter: (page) => !["/404/", "/examples/", "/secret-spot/", "/search/"].some((p) => page.includes(p)),
+      filter: (page) => !["/404/", "/examples/", "/search/"].some((p) => page.includes(p)),
       // Le sitemap porte les memes alternatives que les balises hreflang du
       // head : Google recoupe les deux, et un desaccord fait ignorer les deux.
       i18n: { defaultLocale: "en", locales: { en: "en", fr: "fr" } },

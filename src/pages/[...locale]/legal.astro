@@ -9,20 +9,30 @@ import LegalArticle from "@components/Sections/Legal/LegalArticle.astro";
 import Footer from "@components/Sections/Global/Footer.astro";
 import Navbar from "@components/Sections/Global/Navbar.astro";
 import PageHero from "@components/Sections/Global/PageHero.astro";
-import { getLocale, localePaths, localizePath, useTranslations } from "@i18n";
+import { getLocale, localePaths, localizePath } from "@i18n";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { annotationsDe } from "@moteur/annotations";
+import { propsDeLaPage } from "@moteur/chemins";
+import { textesDeLaPage } from "@moteur/textes";
 
 export const getStaticPaths = localePaths;
+
+// Moteur allume, cette page se rend a la demande (ses textes viennent de la
+// base) : une langue inconnue repond 404, comme au build.
+const demande = await propsDeLaPage(Astro, getStaticPaths);
+if (demande instanceof Response) return demande;
 
 // La date de revision des mentions legales vit ici : contrairement a la
 // confidentialite et aux conditions, ce document n'a pas d'entree dans
 // src/config/legalData.json.ts. C'est la ligne a changer le jour ou le texte
 // change, et la seule.
-const LEGAL_UPDATED = "2026-01-15";
+const LEGAL_UPDATED = "2026-09-24";
 
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+// Les textes rediges de la page : ceux de la base moteur allume (docs/moteur.md),
+// poses sur la requete pour ses composants.
+const t = await textesDeLaPage(Astro);
 
 const title = t.legal.title;
 const description = t.legal.description;
@@ -43,6 +53,7 @@ const crumbs = breadcrumbList([
 
   <main id="content">
     <PageHero
+      edition={annotationsDe(Astro, "mentions-legales")}
       eyebrow={t.legal.eyebrow}
       title={t.legal.title}
       lede={t.legal.description}
@@ -55,6 +66,7 @@ const crumbs = breadcrumbList([
       updatedTemplate={t.legal.lastUpdated}
       tocLabel={t.legal.toc}
       backToTopLabel={t.legal.backToTop}
+      annotationDesClauses={annotationsDe(Astro, "mentions-legales").champ("arguments")}
       {locale}
     />
   </main>

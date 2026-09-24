@@ -202,7 +202,7 @@ export const enPages = {
     title: "Nothing at this address",
     accent: "Nothing",
     lede:
-      "The link is wrong, or the post moved and we failed to leave a redirect. Neither is your problem. Two ways back, below.",
+      "The link is wrong, or the post moved and we failed to leave a redirect. Neither is your problem. Three ways back, below.",
     homeCta: "Back to the home page",
     postsCta: "Browse all posts",
     searchCta: "Search the blog",
@@ -228,7 +228,7 @@ export const enPages = {
       },
       {
         title: "Hosting",
-        body: "The site is a set of static files served by [host name], [host address], reachable at [host contact]. There is no database, no server-side session and no account: nothing is stored on our side when you read a page.",
+        body: "The site is served by [host name], [host address], reachable at [host contact]. Reading a page creates no account and no session: nothing about you is stored on our side.",
       },
       {
         title: "Content and reuse",

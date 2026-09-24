@@ -32,22 +32,13 @@
 
 ---
 
+Astro 7.3, static output, English + French, built-in EmDash back office, Capacitor setup for a native app project, and an AGENTS.md with five convention files so your AI agent can extend the theme without breaking it.
+
 A blog theme for Astro 7, by Aloha Pixel. One repository gives you the whole
 front of a writing publication: a home that leads with the latest piece, a
 paginated blog, topic and author pages, a reading column with a table of
 contents, and a per-language RSS feed. In English and in French, from the same
 source.
-
-Reef 3.1 includes the optional **Aloha editorial back office**, using the common
-Kai-based interface. Create, edit, delete, search and sort articles; manage
-categories and their display order. GitHub keeps the history, and the editor
-confirms the article version after the site build. Drafts have no public route.
-
-[Explore the read-only editor demo](https://reef.alohapixel.app/secret-spot/) or
-[configure your own installation](docs/backoffice.md). The active back office
-requires your Cloudflare Worker, GitHub repository, email service and Turnstile
-configuration. The public demo cannot save changes. It does not use Aloha Pixel's
-private account or credentials for buyer installations.
 
 The demo publication is Reef Notes, a fictional three-person web studio's
 notebook: build logs, type specimens, and the unglamorous half of freelancing.
@@ -65,7 +56,11 @@ that runs on Cloudflare Workers, D1 and R2. It is off by default: without
 `ALOHA_MOTEUR=emdash` nothing of it is bundled and the static build is
 unchanged.
 
-With the variable set, the same source builds as a Cloudflare Worker:
+With the variable set, the same source builds as a Cloudflare Worker. The live
+demo runs that way: since 22 September 2026, `reef.alohapixel.app` is served by
+the **reef-moteur** Worker (EmDash engine, D1 `reef-moteur`, R2
+`reef-moteur-media`), built with `pnpm build:moteur` and deployed from the Mac
+with `npx wrangler deploy` (see [DEPLOY.md](DEPLOY.md)).
 
 - **A complete back office at `/_emdash/admin`** (and `/secret-spot/` redirects
   there). Posts live in D1, media in R2, and the pages that show a post are
@@ -91,7 +86,7 @@ pnpm build:moteur                                            # the Worker build
 How it is wired: [docs/moteur.md](docs/moteur.md). Putting it online, step by
 step: "First deployment of the engine" in [DEPLOY.md](DEPLOY.md).
 
-The six paid themes carry the same EmDash back office in 3.1.0:
+The six paid themes carry the same EmDash back office since 3.1:
 https://alohapixel.app/themes/
 
 ## What is in the box, counted from this repo
@@ -296,7 +291,7 @@ deliberate: it is how you try the house without paying, and for a blog it is
 complete.
 
 The six paid themes add the business built on top of that foundation: a shop
-with products and a cart, an eight-screen back office, a headless storefront
+with products and a cart, a headless storefront
 read from WooCommerce or Shopify, a SaaS site with its pricing page and its
 eight-screen dashboard, a launch page with its pricing section. Not one of
 those files is in Reef.

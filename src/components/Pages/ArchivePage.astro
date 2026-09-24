@@ -5,10 +5,17 @@
 // allume, [id].astro : a la demande, /blog/2/ rencontre d'abord la route
 // d'article (un parametre nomme passe avant un parametre de reste), qui
 // reconnait un numero de page et rend l'archive au lieu d'un 404.
-import PostGrid from "@components/Sections/Archive/PostGrid.astro";
-import TopicNav from "@components/Sections/Archive/TopicNav.astro";
+//
+// L'ORDRE DES IMPORTS FIXE CELUI DES FEUILLES DE STYLE. [id].astro importe
+// ce gabarit ET celui de l'article, et Astro range le CSS d'une page selon
+// le rang de chaque module dans les imports de son parent. Navbar et Footer
+// passent donc en tete : leur feuille (les superpositions) precede celle du
+// corps d'article sur la page d'un billet, comme avant la 3.3.0 (mesure le
+// 24 septembre 2026 : sinon les deux s'inversent et le build statique change).
 import Footer from "@components/Sections/Global/Footer.astro";
 import Navbar from "@components/Sections/Global/Navbar.astro";
+import PostGrid from "@components/Sections/Archive/PostGrid.astro";
+import TopicNav from "@components/Sections/Archive/TopicNav.astro";
 import PageHero from "@components/Sections/Global/PageHero.astro";
 import { fmt, getLocale, localizePath, useTranslations } from "@i18n";
 import type { ResolvedPost } from "@js/posts";
@@ -24,7 +31,8 @@ interface Props {
 
 const { page, topics } = Astro.props;
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+// Les textes rediges de la page, poses sur la requete par la page qui rend l'archive.
+const t = useTranslations(Astro);
 
 const title =
   page.currentPage > 1
@@ -52,6 +60,7 @@ const noindex = page.currentPage > 1;
 
   <main id="content">
     <PageHero
+      section="archives"
       eyebrow={t.archive.eyebrow}
       title={t.archive.title}
       accentWord={t.archive.accent}

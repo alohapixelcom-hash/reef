@@ -9,12 +9,14 @@ import TopicNav from "@components/Sections/Archive/TopicNav.astro";
 import Footer from "@components/Sections/Global/Footer.astro";
 import Navbar from "@components/Sections/Global/Navbar.astro";
 import PageHero from "@components/Sections/Global/PageHero.astro";
-import { fmt, getLocale, localizePath, useTranslations } from "@i18n";
+import { fmt, getLocale, localizePath } from "@i18n";
 import { entrySlug } from "@i18n/content";
 import { cheminsDuSujet } from "@js/adresses";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { annotationsDe } from "@moteur/annotations";
 import { propsDeLaPage } from "@moteur/chemins";
+import { textesDeLaPage } from "@moteur/textes";
 import type { Page } from "astro";
 import type { CollectionEntry } from "astro:content";
 import type { ResolvedPost } from "@js/posts";
@@ -31,7 +33,13 @@ const props = await propsDeLaPage<Props>(Astro, getStaticPaths);
 if (props instanceof Response) return props;
 const { page, topic, topics } = props;
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+// Les textes rediges de la page : ceux de la base moteur allume (docs/moteur.md),
+// poses sur la requete pour ses composants.
+const t = await textesDeLaPage(Astro);
+// Le titre est le nom du sujet (sa fiche dans src/data/topics) : seul le
+// surtitre vient de la section "rubriques", et seul lui s'edite ici.
+const rubriques = annotationsDe(Astro, "rubriques");
+const surtitre = { entree: rubriques.entree, champ: (nom: string) => (nom === "eyebrow" ? rubriques.champ(nom) : {}) };
 
 const slug = entrySlug(topic.id);
 const heading = fmt(t.archive.topicTitle, { topic: topic.data.name });
@@ -60,6 +68,7 @@ const noindex = page.currentPage > 1;
 
   <main id="content">
     <PageHero
+      edition={surtitre}
       eyebrow={t.topics.eyebrow}
       title={heading}
       accentWord={topic.data.name}

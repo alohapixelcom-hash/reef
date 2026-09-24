@@ -2,8 +2,8 @@
 //
 // Une seule ecriture pour les deux Workers : moteur allume, la racine doit
 // emmener un lecteur francophone sur /fr/ exactement comme sur le site fige.
-const LOCALES = ["en", "fr"];
-const ROOT_LOCALE = "en";
+export const LOCALES = ["en", "fr"];
+export const ROOT_LOCALE = "en";
 // Repli quand ni le cookie ni Accept-Language ne designent une langue servie :
 // l'anglais, qui tient la racine et porte le x-default.
 //

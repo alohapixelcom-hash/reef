@@ -8,11 +8,16 @@
 import ArchivePage from "@components/Pages/ArchivePage.astro";
 import { cheminsArchive, type PropsArchive } from "@js/archive";
 import { propsDeLaPage } from "@moteur/chemins";
+import { textesDeLaPage } from "@moteur/textes";
 
 export const getStaticPaths = cheminsArchive;
 
 const props = await propsDeLaPage<PropsArchive>(Astro, cheminsArchive);
 if (props instanceof Response) return props;
+
+// Les textes rediges de la page : ceux de la base moteur allume (docs/moteur.md),
+// poses sur la requete pour ArchivePage.
+await textesDeLaPage(Astro);
 ---
 
 <ArchivePage {...props} />

@@ -11,6 +11,7 @@ import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, useTranslations } from "@i18n";
+import { annotationsDe } from "@moteur/annotations";
 import { entrySlug } from "@i18n/content";
 import type { CollectionEntry } from "astro:content";
 
@@ -22,7 +23,8 @@ type Props = {
 
 const { topics, counts } = Astro.props;
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+const t = useTranslations(Astro);
+const ed = annotationsDe(Astro, "sujets");
 const routes = getSiteRoutes(locale);
 
 const filled = topics.filter((topic) => (counts[entrySlug(topic.id)] ?? 0) > 0);
@@ -42,20 +44,32 @@ const tail = rest === 0 ? 0 : rest === 2 ? 2 : Math.min(filled.length, 4);
 const firstWide = filled.length - tail;
 ---
 
-<section class="container-page py-16 md:py-24" aria-labelledby="topics-title" data-slot="topic-strip">
+<section
+  class="container-page py-16 md:py-24"
+  aria-labelledby="topics-title"
+  data-slot="topic-strip"
+  {...ed.entree}
+>
   {/* Titre a gauche, sortie vers l'index a droite, sur la meme ligne de base.
       Le bouton n'est pas sous la grille : la derniere rangee de sujets est
       pleine, et un bouton pose sous une rangee pleine flotte sans appui. */}
   <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between sm:gap-10">
     <SectionHeader
       as="h2"
+      edition={ed}
       headingId="topics-title"
       title={t.home.topicsTitle}
       accentWord={t.home.topicsAccent}
       lede={t.home.topicsLede}
       class="sm:flex-1"
     />
-    <Button href={routes.topics} variant="ghost" size="md" class="shrink-0 self-start sm:self-auto">
+    <Button
+      href={routes.topics}
+      variant="ghost"
+      size="md"
+      class="shrink-0 self-start sm:self-auto"
+      {...ed.champ("cta")}
+    >
       {t.home.topicsCta}
       <Icon name="arrow-right" size={17} />
     </Button>

@@ -14,6 +14,7 @@ import { Avatar } from "@components/ui/avatar";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { fmt, getLocale, useTranslations } from "@i18n";
+import { annotationsDe } from "@moteur/annotations";
 import { entrySlug } from "@i18n/content";
 import type { CollectionEntry } from "astro:content";
 
@@ -25,7 +26,8 @@ type Props = {
 
 const { authors, counts } = Astro.props;
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+const t = useTranslations(Astro);
+const ed = annotationsDe(Astro, "signatures");
 const routes = getSiteRoutes(locale);
 
 // Une signature sans billet publie n'a rien a faire sur l'accueil : la page
@@ -37,10 +39,12 @@ const active = authors.filter((author) => (counts[entrySlug(author.id)] ?? 0) > 
   class="bg-surface border-border border-t"
   aria-labelledby="writers-title"
   data-slot="writers-strip"
+  {...ed.entree}
 >
   <div class="container-page py-16 md:py-24">
     <SectionHeader
       as="h2"
+      edition={ed}
       headingId="writers-title"
       title={t.home.authorsTitle}
       accentWord={t.home.authorsAccent}
@@ -103,7 +107,7 @@ const active = authors.filter((author) => (counts[entrySlug(author.id)] ?? 0) > 
     {/* Fer a gauche : apres la liste, l'oeil revient a la marge, et c'est la
         qu'on lui tend la suite. Rien sur cette page ne se range au centre. */}
     <div class="mt-10 flex justify-start">
-      <Button href={routes.authors} variant="ghost" size="md">
+      <Button href={routes.authors} variant="ghost" size="md" {...ed.champ("cta")}>
         {t.home.authorsCta}
         <Icon name="arrow-right" size={17} />
       </Button>

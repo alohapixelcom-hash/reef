@@ -11,13 +11,14 @@ import { Icon } from "@components/svg/icons";
 import { Avatar } from "@components/ui/avatar";
 import { Breadcrumb } from "@components/ui/breadcrumb";
 import { Button } from "@components/ui/button";
-import { fmt, getLocale, localizePath, useTranslations } from "@i18n";
+import { fmt, getLocale, localizePath } from "@i18n";
 import { entrySlug } from "@i18n/content";
 import { cheminsDeLAuteur } from "@js/adresses";
 import type { ResolvedPost } from "@js/posts";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { propsDeLaPage } from "@moteur/chemins";
+import { textesDeLaPage } from "@moteur/textes";
 import type { CollectionEntry } from "astro:content";
 
 export const getStaticPaths = cheminsDeLAuteur;
@@ -31,7 +32,9 @@ const props = await propsDeLaPage<Props>(Astro, getStaticPaths);
 if (props instanceof Response) return props;
 const { author, posts } = props;
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+// Les textes rediges de la page : ceux de la base moteur allume (docs/moteur.md),
+// poses sur la requete pour ses composants.
+const t = await textesDeLaPage(Astro);
 
 const slug = entrySlug(author.id);
 const title = fmt(t.authors.postsBy, { name: author.data.name });

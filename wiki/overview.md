@@ -83,16 +83,17 @@ carries an Article node plus breadcrumbList.
 
 ## What the build emits
 
-`pnpm build` (verified 2026-08-15): 55 pages. In two languages: the home, the
+`pnpm build` (verified 2026-09-24): 54 pages. In two languages: the home, the
 paginated blog, a page per post, the topic index and topic pages, the author
 index and author pages, a search page, and the about, contact and legal
-annexes, plus a single 404.html shared by the whole domain. Text endpoints are
+annexes, plus one 404 page per language (404.html, fr/404.html). Text endpoints are
 robots.txt, llms.txt and a per-language rss.xml, with sitemap-index.xml from
 the sitemap integration.
 
-The 404 is rendered in the default language and carries no navbar and no
-footer, because the language switcher of the navbar computes its links from
-the current URL, and on a 404 that URL exists in no language.
+The 404 is rendered in the language of the address and carries no navbar and
+no footer, because the language switcher of the navbar computes its links from
+the current URL, and on a 404 that URL exists in no language. For the same
+reason its head declares neither canonical nor hreflang.
 
 ## Invariants that shape everything
 
@@ -120,31 +121,9 @@ Capacitor shell, scripts/app.mjs). Selfchecks run directly with Node:
 `node src/js/schema.selfcheck.ts` and `node src/js/pagination.selfcheck.ts`.
 Node >= 22.18 required. Path aliases live in tsconfig.json.
 
-## Sync 2026-09-15: optional editorial integration
+## Sync 2026-09-15: the Git-based editorial back office (removed in 3.3.0)
 
-The optional Aloha back office is under development; see docs/backoffice.md for
-its server guard, site-specific permissions and current validation limits.
-Default builds remain static. scripts/covers.json is the tracked image source
-manifest used by both the build and editor. The download cache checks URL,
-width and SHA-256 before reusing a local file. Tests cover cache invalidation
-and preservation of a valid photo when the upstream response is invalid.
-
-## Sync 2026-09-15: shared administration shell
-
-The working branch uses the Kai-based Aloha AdminShell shared source, an article
-table with search and accessible sorting, guarded article deletion and category
-management. Real sign-in, article create/update/delete and category ordering
-were verified on the private preview branch. Buyer authentication reuses Aloha
-session primitives and is tested with SQLite, simulated Turnstile and mail.
-See docs/backoffice.md and wrangler.backoffice.example.toml for setup. Drafts no
-longer generate public article routes. The preview has its own build trigger;
-the public demo has no editorial credentials.
-
-
-## Sync 2026-09-15: Aloha SaaS back-office reference
-
-The shared BackOffice/AdminShell now follows the existing alohapixel.app SaaS admin layout: full-height dark navigation rail, horizontally scrolling mobile navigation, compact workspace, visible account and return links. Semantic theme tokens preserve each theme's identity. Business modules, authentication and read-only demo protections are unchanged. This supersedes Kai as the visual reference.
-
+Reef 2.3 carried an optional editor that wrote posts to GitHub (`/secret-spot/`, with a read-only public demo). House rule of 22 September 2026: one back office per site, EmDash's. The editor, its pages, scripts, preview Worker and documentation were removed in 3.3.0; `/secret-spot/` now opens EmDash with the engine on.
 
 ## Sync 2026-09-21: optional publication engine
 
@@ -165,3 +144,11 @@ Engine on, the pages rendered on demand sent their images through `/_image` with
 ## Sync 2026-09-24: version 3.1.3, the EmDash edit bar finds what it edits
 
 Engine on, a signed-in editor saw EmDash's "Edit" bar, but no tag carried `data-emdash-ref`, the only thing its script reads: the conversion of a database entry into a `posts` entry dropped EmDash's `edit` proxy. The proxy now travels with the post in edit mode only (`edition`, set by `enBillet` in `src/moteur/source.emdash.ts`), and templates spread `annotation(post, field?)` from `@moteur/source` (`src/moteur/annotations.ts`; the files source returns `{}`). The post header carries the entry (first annotated tag, where the bar reads status and Publish) and its `title`, `description` and `cover`; cards, the featured post, search results and the previous and next links carry the entry and `title`. The body stays with EmDash's inline editor. Static build and anonymous HTML unchanged. See docs/moteur.md.
+
+## Sync 2026-09-24: version 3.3.0, the page texts are managed by the engine
+
+Engine on, the copy a reader sees first (hero, section headers, buttons, newsletter block, footer line, the headers of the lists, about, contact, legal notice, privacy, terms) came from the dictionary and could not be edited from the bar. It is now the `sections` collection, 26 entries per language seeded with the exact file texts: `src/moteur/contenu.sections.ts` maps each entry to its dictionary paths, `lireLaPage` of `@moteur/source` lays the published entries on the dictionary, pages call `textesDeLaPage(Astro)`, and components read `useTranslations(Astro)` and `annotationsDe(Astro, slug)`. Contact, legal, privacy and terms became managed pages. Engine off, nothing changes. See docs/moteur.md, "The page texts".
+
+## Sync 2026-09-24: version 3.3.0, finishing after the audit of the live demo
+
+The live demo has run with the engine since 22 September 2026 (Worker `reef-moteur`, deployed from the Mac with `npx wrangler deploy` after `pnpm build:moteur`); DEPLOY.md, docs/moteur.md and the README say so. One back office: the Git-based editor and its footer link are gone. The Workers settle their own addresses (`src/worker-adresses.ts`): `/sitemap.xml` 301 to the index, unknown sitemaps 404, missing pages the 404 of the address's language (`fr/404.html`, built from `src/pages/[locale]/404.astro`), `/404` answering 404, no `Server-Timing`; `robots.txt` disallows `/_emdash/`. Legal notice, privacy and terms describe a blog served by a Worker with a database (no account, no subscription); the corrections reach the online database through `seed/import-3.3.0-reef.sql`. The share card's alternative text and the RSS title have one value per language, author placeholder links are gone, the footer credit gives way to the demo line, and the back office is named from `siteData.name` with a French catalogue free of em and en dashes. See docs/moteur.md, "What was measured".

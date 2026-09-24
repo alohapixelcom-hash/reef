@@ -4,13 +4,15 @@
 // Lancer : node --experimental-strip-types src/moteur/catalogue-bo.selfcheck.ts
 //
 // Il lit les VRAIS catalogues du moteur (ceux du paquet installe), pas une
-// copie. Trois exigences, dans cet ordre :
+// copie. Quatre exigences, dans cet ordre :
 //   1. couverture : aucun message laisse en anglais par EmDash n'echappe au
 //      dictionnaire, ni par une traduction, ni par la liste des identiques ;
 //   2. proprete : aucune entree morte, c'est-a-dire aucune cle qui ne
 //      corresponde plus a un message du catalogue anglais ;
 //   3. effet : le catalogue complete rend bien du francais sur les libelles
-//      que la maison surveille.
+//      que la maison surveille ;
+//   4. tirets : aucun tiret cadratin ni demi-cadratin dans le catalogue
+//      complete.
 import assert from "node:assert/strict";
 import { dirname } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -58,6 +60,17 @@ for (const anglaisSurveille of surveilles) {
   }
 }
 
+// 4. Les tirets : ni cadratin ni demi-cadratin dans le catalogue complete,
+// c'est-a-dire dans tout ce que lit un editeur francais (page de connexion
+// comprise). Les treize que pose le moteur sont reecrits dans les mots de la
+// maison (catalogue-bo.fr.ts).
+const avecTiret = Object.entries(complete).filter(([, message]) => /[\u2013\u2014]/.test(JSON.stringify(message)));
+assert.deepEqual(
+  avecTiret.map(([identifiant]) => identifiant),
+  [],
+  `${avecTiret.length} messages du catalogue francais portent un tiret cadratin ou demi-cadratin`,
+);
+
 // Aucun message du catalogue complete ne doit avoir disparu ni changer de forme.
 assert.equal(Object.keys(complete).length, total, "le catalogue complete a perdu ou gagne des messages");
 
@@ -65,5 +78,5 @@ console.log(
   `catalogue-bo.selfcheck: ${total} messages, ${restesDuMoteur} laisses en anglais par EmDash 0.38, ` +
     `${Object.keys(DICTIONNAIRE.simples).length + Object.keys(DICTIONNAIRE.composes).length} traduits par la maison, ` +
     `${DICTIONNAIRE.identiques.length} identiques en francais, ` +
-    `${Object.keys(DICTIONNAIRE.maison.simples).length + Object.keys(DICTIONNAIRE.maison.composes).length} mots de la maison. Aucun reste anglais.`,
+    `${Object.keys(DICTIONNAIRE.maison.simples).length + Object.keys(DICTIONNAIRE.maison.composes).length} mots de la maison. Aucun reste anglais, aucun tiret.`,
 );

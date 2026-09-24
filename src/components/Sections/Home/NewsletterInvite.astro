@@ -24,11 +24,15 @@ import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, useTranslations } from "@i18n";
+import { annotationsDe } from "@moteur/annotations";
 import { Image } from "astro:assets";
 import heroVague from "../../../assets/reef-hero-vague.webp";
 
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+const t = useTranslations(Astro);
+// Moteur allume, en mode edition : les sections "lettre" et "lettre-flux" de la base.
+const ed = annotationsDe(Astro, "lettre");
+const flux = annotationsDe(Astro, "lettre-flux");
 const routes = getSiteRoutes(locale);
 
 const title = t.newsletter.title;
@@ -52,6 +56,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     class="deep-scene rounded-panel relative isolate overflow-hidden"
     id="newsletter"
     aria-labelledby="invite-title"
+    {...ed.entree}
   >
     {/* La photographie, tout au fond. Ce bloc portait deux halos flous, un
         corail en haut a gauche et un turquoise en bas a droite, qui derivaient
@@ -88,12 +93,12 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     <div class="container-page relative z-10 grid gap-12 py-16 md:py-24 lg:grid-cols-12 lg:gap-16">
       <div class="flex flex-col gap-5 lg:col-span-7">
         <span class="bg-primary h-0.5 w-12 rounded-pill" aria-hidden="true"></span>
-        <h2 id="invite-title" class="font-display text-display-sm md:text-display-md">
+        <h2 id="invite-title" class="font-display text-display-sm md:text-display-md" {...ed.champ("title")}>
           {
             word ? (
               <Fragment>
                 {before}
-                <span class="accent-script">{word}</span>
+                <span class="accent-script" {...ed.champ("accent")}>{word}</span>
                 {after}
               </Fragment>
             ) : (
@@ -101,7 +106,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
             )
           }
         </h2>
-        <p class="text-muted-foreground measure-wide text-lg leading-relaxed">{t.newsletter.lede}</p>
+        <p class="text-muted-foreground measure-wide text-lg leading-relaxed" {...ed.champ("lede")}>{t.newsletter.lede}</p>
 
         <form class="mt-2 flex flex-col gap-3 sm:max-w-xl sm:flex-row" name="newsletter-home">
           <label class="sr-only" for="home-newsletter-email">{t.newsletter.emailLabel}</label>
@@ -117,11 +122,11 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
             aria-describedby="home-newsletter-note"
             required
           />
-          <Button type="submit" variant="primary" size="lg" class="sm:shrink-0">
+          <Button type="submit" variant="primary" size="lg" class="sm:shrink-0" {...ed.champ("cta")}>
             {t.newsletter.submit}
           </Button>
         </form>
-        <p id="home-newsletter-note" class="text-muted-foreground text-sm">{t.newsletter.note}</p>
+        <p id="home-newsletter-note" class="text-muted-foreground text-sm" {...ed.champ("note")}>{t.newsletter.note}</p>
       </div>
 
       {/* Le flux vit dans un panneau de verre et non dans une carte opaque : sur
@@ -129,11 +134,11 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
           halo et reste une couche au-dessus. Son bouton est en contour et non
           plein, parce qu'un ecran n'a qu'un seul point d'action et que c'est le
           champ d'inscription. */}
-      <aside class="glass rounded-card flex flex-col gap-3 p-7 lg:col-span-5">
+      <aside class="glass rounded-card flex flex-col gap-3 p-7 lg:col-span-5" {...flux.entree}>
         <span class="text-accent-text" aria-hidden="true"><Icon name="rss" size={22} /></span>
-        <h3 class="font-display text-xl font-bold tracking-tight">{t.newsletter.rssTitle}</h3>
-        <p class="text-muted-foreground text-[0.95rem] leading-relaxed">{t.newsletter.rssLede}</p>
-        <Button href={routes.rss} variant="outline" size="md" class="mt-auto self-start">
+        <h3 class="font-display text-xl font-bold tracking-tight" {...flux.champ("title")}>{t.newsletter.rssTitle}</h3>
+        <p class="text-muted-foreground text-[0.95rem] leading-relaxed" {...flux.champ("lede")}>{t.newsletter.rssLede}</p>
+        <Button href={routes.rss} variant="outline" size="md" class="mt-auto self-start" {...flux.champ("cta")}>
           {t.newsletter.rssCta}
           <Icon name="arrow-up-right" size={17} />
         </Button>

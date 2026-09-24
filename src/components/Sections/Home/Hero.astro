@@ -27,6 +27,7 @@ import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, useTranslations } from "@i18n";
+import { annotationsDe } from "@moteur/annotations";
 import { Picture } from "astro:assets";
 
 interface Props {
@@ -37,7 +38,9 @@ interface Props {
 const { ledger = [] } = Astro.props;
 
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+const t = useTranslations(Astro);
+// Moteur allume, en mode edition : la section "hero" de la base (docs/moteur.md).
+const ed = annotationsDe(Astro, "hero");
 const routes = getSiteRoutes(locale);
 
 // Decoupe du titre autour du mot accentue, insensible a la casse.
@@ -52,7 +55,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
 {/* Le fond de page sur lequel la scene est posee. C'est lui qui fait exister le
     cadre : sans marge autour, le coin arrondi n'aurait rien contre quoi se
     detacher, et la scene redeviendrait un bandeau pleine largeur. */}
-<div class="bg-background p-2 sm:p-3 md:p-4" data-slot="home-hero">
+<div class="bg-background p-2 sm:p-3 md:p-4" data-slot="home-hero" {...ed.entree}>
   <section
     class="deep-scene rounded-panel relative isolate overflow-hidden"
     aria-labelledby="hero-title"
@@ -172,17 +175,18 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
         <div class="flex min-w-0 flex-col items-start">
           <p
             class="text-muted-foreground flex items-center gap-3 text-xs font-medium tracking-[0.18em] uppercase"
+            {...ed.champ("eyebrow")}
           >
             <span class="bg-primary inline-block h-px w-8 shrink-0" aria-hidden="true"></span>
             {t.home.eyebrow}
           </p>
 
-          <h1 id="hero-title" class="font-display text-display-lg lg:text-display-xl mt-6">
+          <h1 id="hero-title" class="font-display text-display-lg lg:text-display-xl mt-6" {...ed.champ("title")}>
             {
               word ? (
                 <Fragment>
                   {before}
-                  <span class="accent-script">{word}</span>
+                  <span class="accent-script" {...ed.champ("accent")}>{word}</span>
                   {after}
                 </Fragment>
               ) : (
@@ -200,16 +204,16 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
             texte secondaire a ete calcule pour un aplat sombre, pas pour une
             photographie qui bouge sous lui. */}
         <div class="flex min-w-0 flex-col items-start lg:justify-end lg:pb-2">
-          <p class="measure-wide leading-relaxed text-white/85 md:text-lg lg:text-xl">
+          <p class="measure-wide leading-relaxed text-white/85 md:text-lg lg:text-xl" {...ed.champ("lede")}>
             {t.home.heroLede}
           </p>
 
           <div class="mt-8 flex flex-wrap items-center gap-3">
-            <Button href={routes.posts} variant="primary" size="lg">
+            <Button href={routes.posts} variant="primary" size="lg" {...ed.champ("cta")}>
               {t.home.heroPrimary}
               <Icon name="arrow-right" size={18} />
             </Button>
-            <Button href={routes.about} variant="outline" size="lg">{t.home.heroSecondary}</Button>
+            <Button href={routes.about} variant="outline" size="lg" {...ed.champ("cta_secondary")}>{t.home.heroSecondary}</Button>
           </div>
         </div>
       </div>
@@ -220,7 +224,10 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
           ils deviendraient un argument de plus au lieu du socle du cadre. */}
       {
         ledger.length > 0 && (
-          <dl class="mt-12 flex w-full flex-wrap gap-x-10 gap-y-4 border-t border-white/25 pt-6 md:mt-16">
+          <dl
+            class="mt-12 flex w-full flex-wrap gap-x-10 gap-y-4 border-t border-white/25 pt-6 md:mt-16"
+            {...ed.champ("arguments")}
+          >
             {t.home.heroLedger.map((label, i) => (
               <div class="flex flex-col gap-0.5">
                 <dd class="font-display text-3xl leading-none font-bold tabular-nums md:text-4xl">

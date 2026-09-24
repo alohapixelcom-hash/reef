@@ -19,12 +19,13 @@ import TopicMarquee from "@components/Sections/Home/TopicMarquee.astro";
 import TopicStrip from "@components/Sections/Home/TopicStrip.astro";
 import WritersStrip from "@components/Sections/Home/WritersStrip.astro";
 import siteData from "@config/siteData.json";
-import { getLocale, localePaths, locales, localizePath, useTranslations } from "@i18n";
+import { getLocale, localePaths, locales, localizePath } from "@i18n";
 import { getLocalizedCollection } from "@i18n/content";
 import { getResolvedPosts, getSortedTopics } from "@js/posts";
 import { organization, website } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { propsDeLaPage } from "@moteur/chemins";
+import { textesDeLaPage } from "@moteur/textes";
 
 // Une seule page source, une sortie par langue : / et /fr/.
 export const getStaticPaths = localePaths;
@@ -35,7 +36,9 @@ const demande = await propsDeLaPage(Astro, getStaticPaths);
 if (demande instanceof Response) return demande;
 
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+// Les textes rediges de la page : ceux de la base moteur allume (docs/moteur.md),
+// poses sur la requete pour ses composants.
+const t = await textesDeLaPage(Astro);
 
 const posts = await getResolvedPosts(locale);
 

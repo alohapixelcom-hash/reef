@@ -9,16 +9,29 @@ import LegalArticle from "@components/Sections/Legal/LegalArticle.astro";
 import Footer from "@components/Sections/Global/Footer.astro";
 import Navbar from "@components/Sections/Global/Navbar.astro";
 import PageHero from "@components/Sections/Global/PageHero.astro";
-import { getLegalData } from "@config/legalData.json.ts";
-import { getLocale, localePaths, localizePath, useTranslations } from "@i18n";
+import { getLocale, localePaths, localizePath } from "@i18n";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { annotationsDe } from "@moteur/annotations";
+import { propsDeLaPage } from "@moteur/chemins";
+import { textesDeLaPage } from "@moteur/textes";
 
 export const getStaticPaths = localePaths;
 
+// Moteur allume, cette page se rend a la demande (ses textes viennent de la
+// base) : une langue inconnue repond 404, comme au build.
+const demande = await propsDeLaPage(Astro, getStaticPaths);
+if (demande instanceof Response) return demande;
+
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
-const doc = getLegalData(locale).terms;
+// Les textes rediges de la page : ceux de la base moteur allume (docs/moteur.md),
+// poses sur la requete pour ses composants.
+const t = await textesDeLaPage(Astro);
+const doc = t.legalData.terms;
+const ed = annotationsDe(Astro, "conditions");
+// Le surtitre est celui des mentions legales : il s'edite sur leur entree.
+const mentions = annotationsDe(Astro, "mentions-legales");
+const tete = { entree: ed.entree, champ: (nom: string) => (nom === "eyebrow" ? mentions.champ(nom) : ed.champ(nom)) };
 
 const base = Astro.site ?? Astro.url;
 const crumbs = breadcrumbList([
@@ -36,6 +49,7 @@ const crumbs = breadcrumbList([
 
   <main id="content">
     <PageHero
+      edition={tete}
       eyebrow={t.legal.eyebrow}
       title={doc.title}
       lede={doc.description}
@@ -48,6 +62,8 @@ const crumbs = breadcrumbList([
       updatedTemplate={t.legal.lastUpdated}
       tocLabel={t.legal.toc}
       backToTopLabel={t.legal.backToTop}
+      annotationDeLaDate={ed.champ("revised")}
+      annotationDesClauses={ed.champ("arguments")}
       {locale}
     />
   </main>

@@ -14,6 +14,7 @@ import SectionHeader from "@components/Sections/Global/SectionHeader.astro";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, useTranslations } from "@i18n";
+import { annotationsDe } from "@moteur/annotations";
 import { getResolvedPosts } from "@js/posts";
 import type { CollectionEntry } from "astro:content";
 
@@ -26,7 +27,8 @@ type Props = {
 const { post, class: className } = Astro.props;
 
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+const t = useTranslations(Astro);
+const ed = annotationsDe(Astro, "a-lire-ensuite");
 const routes = getSiteRoutes(locale);
 
 // getResolvedPosts rend deja les billets PUBLIES de la langue courante, du plus
@@ -45,18 +47,20 @@ const related = [...sameTopic, ...others].slice(0, 3);
       class:list={["bg-surface border-border border-t py-20 md:py-24", className]}
       aria-labelledby="related-posts-title"
       data-slot="related-posts"
+      {...ed.entree}
     >
       <div class="container-page flex flex-col gap-10 md:gap-12">
         <div class="flex flex-wrap items-end justify-between gap-6">
           <SectionHeader
             as="h2"
+            edition={ed}
             headingId="related-posts-title"
             title={t.post.keepReading}
             accentWord={t.post.keepReadingAccent}
             lede={t.post.keepReadingLede}
             class="max-w-2xl"
           />
-          <Button href={routes.posts} variant="outline" size="md">
+          <Button href={routes.posts} variant="outline" size="md" {...ed.champ("cta")}>
             {t.post.keepReadingCta}
           </Button>
         </div>

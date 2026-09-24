@@ -20,14 +20,27 @@ import { Input } from "@components/ui/input";
 import { Label } from "@components/ui/label";
 import { Textarea } from "@components/ui/textarea";
 import siteData from "@config/siteData.json";
-import { getLocale, localePaths, localizePath, useTranslations } from "@i18n";
+import { getLocale, localePaths, localizePath } from "@i18n";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { annotationsDe } from "@moteur/annotations";
+import { propsDeLaPage } from "@moteur/chemins";
+import { textesDeLaPage } from "@moteur/textes";
 
 export const getStaticPaths = localePaths;
 
+// Moteur allume, cette page se rend a la demande (ses textes viennent de la
+// base) : une langue inconnue repond 404, comme au build.
+const demande = await propsDeLaPage(Astro, getStaticPaths);
+if (demande instanceof Response) return demande;
+
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+// Les textes rediges de la page : ceux de la base moteur allume (docs/moteur.md),
+// poses sur la requete pour ses composants.
+const t = await textesDeLaPage(Astro);
+const formulaire = annotationsDe(Astro, "contact-formulaire");
+const direct = annotationsDe(Astro, "contact-direct");
+const suite = annotationsDe(Astro, "contact-suite");
 
 const title = t.contact.metaTitle;
 const description = t.contact.metaDescription;
@@ -48,6 +61,7 @@ const crumbs = breadcrumbList([
 
   <main id="content">
     <PageHero
+      edition={annotationsDe(Astro, "contact")}
       eyebrow={t.contact.eyebrow}
       title={t.contact.title}
       accentWord={t.contact.accent}
@@ -56,9 +70,13 @@ const crumbs = breadcrumbList([
     />
 
     <div class="container-page grid gap-10 py-14 md:py-20 lg:grid-cols-12 lg:gap-14">
-      <section class="lg:col-span-7" aria-labelledby="form-title">
+      <section class="lg:col-span-7" aria-labelledby="form-title" {...formulaire.entree}>
         <div class="border-border bg-card rounded-panel border p-7 sm:p-9">
-          <h2 id="form-title" class="font-display text-foreground text-2xl font-semibold tracking-tight">
+          <h2
+            id="form-title"
+            class="font-display text-foreground text-2xl font-semibold tracking-tight"
+            {...formulaire.champ("title")}
+          >
             {t.contact.formTitle}
           </h2>
 
@@ -110,12 +128,12 @@ const crumbs = breadcrumbList([
               />
             </p>
 
-            <p id="contact-note" class="text-muted-foreground text-sm leading-relaxed">
+            <p id="contact-note" class="text-muted-foreground text-sm leading-relaxed" {...formulaire.champ("note")}>
               {t.contact.formNote}
             </p>
 
             <div>
-              <Button type="submit" variant="primary" size="lg">
+              <Button type="submit" variant="primary" size="lg" {...formulaire.champ("cta")}>
                 {t.contact.submit}
                 <Icon name="send" size={17} />
               </Button>
@@ -128,17 +146,23 @@ const crumbs = breadcrumbList([
         <section
           class="border-border bg-surface rounded-card flex flex-col gap-3 border p-7"
           aria-labelledby="direct-title"
+          {...direct.entree}
         >
           <span class="text-primary" aria-hidden="true"><Icon name="mail" size={22} /></span>
-          <h2 id="direct-title" class="font-display text-foreground text-xl font-semibold tracking-tight">
+          <h2
+            id="direct-title"
+            class="font-display text-foreground text-xl font-semibold tracking-tight"
+            {...direct.champ("title")}
+          >
             {t.contact.directTitle}
           </h2>
-          <p class="text-muted-foreground text-[0.95rem] leading-relaxed">{t.contact.directLede}</p>
+          <p class="text-muted-foreground text-[0.95rem] leading-relaxed" {...direct.champ("lede")}>{t.contact.directLede}</p>
           <Button
             href={`mailto:${siteData.author.email}`}
             variant="outline"
             size="md"
             class="mt-2 self-start"
+            {...direct.champ("cta")}
           >
             {t.contact.directCta}
           </Button>
@@ -147,11 +171,16 @@ const crumbs = breadcrumbList([
         <section
           class="border-border rounded-card flex flex-col gap-4 border p-7"
           aria-labelledby="next-title"
+          {...suite.entree}
         >
-          <h2 id="next-title" class="font-display text-foreground text-xl font-semibold tracking-tight">
+          <h2
+            id="next-title"
+            class="font-display text-foreground text-xl font-semibold tracking-tight"
+            {...suite.champ("title")}
+          >
             {t.contact.nextTitle}
           </h2>
-          <ol class="flex flex-col gap-4">
+          <ol class="flex flex-col gap-4" {...suite.champ("arguments")}>
             {
               t.contact.nextSteps.map((step, index) => (
                 <li class="flex items-start gap-3">

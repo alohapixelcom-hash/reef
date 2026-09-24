@@ -7,12 +7,13 @@
   "compatibility_flags": ["nodejs_compat"],
   "d1_databases": [{ "binding": "DB", "database_name": "reef-moteur" }],
   "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "reef-moteur-media" }],
-  // Les pages figees de l'ancien back office sont servies par les assets sans
-  // reveiller le Worker : sans cette liste, /secret-spot/ afficherait l'ecran
-  // inerte au lieu d'ouvrir EmDash (voir src/worker.moteur.ts).
+  // Les pages introuvables figees (404.html, fr/404.html) sont des fichiers :
+  // demandees par leur propre adresse, les assets les serviraient en 200 sans
+  // reveiller le Worker. Cette liste les lui confie, et il repond 404 (voir
+  // src/worker-adresses.ts).
   "assets": {
     "binding": "ASSETS",
-    "run_worker_first": ["/secret-spot", "/secret-spot/*", "/fr/secret-spot", "/fr/secret-spot/*"]
+    "run_worker_first": ["/404", "/404/", "/404.html", "/fr/404", "/fr/404/", "/fr/404.html"]
   },
   // Optimise a la demande les images des pages gerees (voir moteur.config.mjs).
   "images": { "binding": "IMAGES" },

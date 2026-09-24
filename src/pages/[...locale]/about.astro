@@ -10,12 +10,14 @@ import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import siteData from "@config/siteData.json";
-import { getLocale, localePaths, localizePath, useTranslations } from "@i18n";
+import { getLocale, localePaths, localizePath } from "@i18n";
 import { entrySlug, getLocalizedCollection } from "@i18n/content";
 import { getResolvedPosts } from "@js/posts";
 import { breadcrumbList, organization } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { annotationsDe } from "@moteur/annotations";
 import { propsDeLaPage } from "@moteur/chemins";
+import { textesDeLaPage } from "@moteur/textes";
 
 export const getStaticPaths = localePaths;
 
@@ -25,7 +27,13 @@ const demande = await propsDeLaPage(Astro, getStaticPaths);
 if (demande instanceof Response) return demande;
 
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+// Les textes rediges de la page : ceux de la base moteur allume (docs/moteur.md),
+// poses sur la requete pour ses composants.
+const t = await textesDeLaPage(Astro);
+const histoire = annotationsDe(Astro, "a-propos-histoire");
+const regles = annotationsDe(Astro, "a-propos-regles");
+const signatures = annotationsDe(Astro, "a-propos-signatures");
+const appel = annotationsDe(Astro, "a-propos-appel");
 const routes = getSiteRoutes(locale);
 
 const authors = (await getLocalizedCollection("authors", locale)).sort((a, b) =>
@@ -66,6 +74,7 @@ const schemas = [
 
   <main id="content">
     <PageHero
+      edition={annotationsDe(Astro, "a-propos")}
       eyebrow={t.about.eyebrow}
       title={t.about.title}
       accentWord={t.about.accent}
@@ -75,23 +84,25 @@ const schemas = [
 
     {/* L'histoire est du texte long : elle passe donc par .prose, la colonne de
         lecture du theme, et pas par une grille de cartes. */}
-    <section class="container-page py-14 md:py-20" aria-labelledby="story-title">
+    <section class="container-page py-14 md:py-20" aria-labelledby="story-title" {...histoire.entree}>
       <SectionHeader
         as="h2"
         headingId="story-title"
+        edition={histoire}
         title={t.about.storyTitle}
         accentWord={t.about.storyAccent}
       />
-      <div class="prose prose-dropcap mt-8">
+      <div class="prose prose-dropcap mt-8" {...histoire.champ("arguments")}>
         {t.about.storyParagraphs.map((paragraph) => <p>{paragraph}</p>)}
       </div>
     </section>
 
-    <section class="bg-surface border-border border-y" aria-labelledby="values-title">
+    <section class="bg-surface border-border border-y" aria-labelledby="values-title" {...regles.entree}>
       <div class="container-page py-16 md:py-24">
         <SectionHeader
           as="h2"
           headingId="values-title"
+          edition={regles}
           title={t.about.valuesTitle}
           accentWord={t.about.valuesAccent}
           lede={t.about.valuesLede}
@@ -106,7 +117,7 @@ const schemas = [
             le dessin de telephone n'est pas montre a quelqu'un qui tient deja
             un telephone, et son image n'est jamais telechargee. */}
         <div class="mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-16">
-          <ol class="divide-border border-border flex flex-col divide-y border-t">
+          <ol class="divide-border border-border flex flex-col divide-y border-t" {...regles.champ("arguments")}>
             {
               t.about.values.map((value, index) => (
                 <li class="grid gap-x-8 gap-y-2 py-7 md:grid-cols-[4rem_minmax(0,1fr)] md:py-9">
@@ -140,10 +151,11 @@ const schemas = [
       </div>
     </section>
 
-    <section class="container-page py-16 md:py-24" aria-labelledby="writers-title">
+    <section class="container-page py-16 md:py-24" aria-labelledby="writers-title" {...signatures.entree}>
       <SectionHeader
         as="h2"
         headingId="writers-title"
+        edition={signatures}
         title={t.about.writersTitle}
         accentWord={t.about.writersAccent}
         lede={t.about.writersLede}
@@ -182,22 +194,22 @@ const schemas = [
         }
       </ul>
       <div class="mt-10 flex justify-start">
-        <Button href={routes.authors} variant="ghost" size="md">
+        <Button href={routes.authors} variant="ghost" size="md" {...signatures.champ("cta")}>
           {t.about.writersCta}
           <Icon name="arrow-right" size={17} />
         </Button>
       </div>
     </section>
 
-    <section class="bg-surface border-border border-t" aria-labelledby="work-title">
+    <section class="bg-surface border-border border-t" aria-labelledby="work-title" {...appel.entree}>
       <div class="container-page flex flex-col items-start gap-5 py-16 md:py-24">
-        <h2 id="work-title" class="font-display text-display-sm md:text-display-md text-foreground">
+        <h2 id="work-title" class="font-display text-display-sm md:text-display-md text-foreground" {...appel.champ("title")}>
           {t.about.contactTitle}
         </h2>
-        <p class="text-muted-foreground measure-wide text-lg leading-relaxed">
+        <p class="text-muted-foreground measure-wide text-lg leading-relaxed" {...appel.champ("lede")}>
           {t.about.contactLede}
         </p>
-        <Button href={routes.contact} variant="primary" size="lg" class="mt-2">
+        <Button href={routes.contact} variant="primary" size="lg" class="mt-2" {...appel.champ("cta")}>
           {t.about.contactCta}
           <Icon name="arrow-right" size={18} />
         </Button>

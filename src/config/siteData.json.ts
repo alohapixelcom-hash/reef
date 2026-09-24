@@ -5,7 +5,11 @@ import type { SiteDataProps } from "./types/configDataTypes";
 // l'utilisateur edite, et le seul a editer pour changer de marque.
 const siteData: SiteDataProps = {
   name: "Reef",
-  title: "Reef - the Astro theme for people who write",
+  // Une valeur par langue : le flux RSS francais porte le titre francais.
+  title: {
+    en: "Reef - the Astro theme for people who write",
+    fr: "Reef, le thème Astro pour celles et ceux qui écrivent",
+  },
   description:
     "A free Astro 7 blog theme built for reading: an editorial home, a post page tuned for eight minutes of attention, topic archives, author pages, client-side search, and a bilingual layer that costs one line per language.",
   useViewTransitions: true,
@@ -27,9 +31,15 @@ const siteData: SiteDataProps = {
     twitter: "",
   },
 
+  // La carte de partage est une photo seule (depuis 3.1.1) : son alternative
+  // decrit la photo, la vague en tube de l'accueil, et non la marque. Une
+  // valeur par langue, comme tout texte lu par un lecteur d'ecran.
   defaultImage: {
     src: "/og/default.jpg",
-    alt: "Reef, the Astro theme for people who write",
+    alt: {
+      en: "Looking through the barrel of a turquoise wave at a sandy shore",
+      fr: "Vue à travers le tube d'une vague turquoise, vers une plage de sable",
+    },
   },
 };
 

@@ -1,30 +1,41 @@
-// src/worker.moteur.ts - point d'entree du Worker quand le moteur est allume : langue du visiteur, Astro a la demande, et le cron des publications programmees.
+// src/worker.moteur.ts - point d'entree du Worker quand le moteur est allume : adresses reglees d'avance, langue du visiteur, Astro a la demande, et le cron des publications programmees.
 //
 // Pas de `satisfies ExportedHandler` ici : ce type vient de
 // worker-configuration.d.ts, que `wrangler types` genere sur la machine de qui
 // deploie. Le theme ne l'embarque pas, et `pnpm check` doit rester a zero
 // moteur eteint. Wrangler verifie la forme de l'export au deploiement.
 import handler, { createScheduledHandler, PluginBridge } from "@emdash-cms/cloudflare/worker";
+import { barreFinale, estLaPageIntrouvable, pageIntrouvable, planDuSite, reponseAuVisiteur } from "./worker-adresses.ts";
 import { redirectionDeLangue } from "./worker-langue.ts";
 
 export { PluginBridge };
 
 type Fetch = (request: Request, env: unknown, ctx: unknown) => Response | Promise<Response>;
 
+interface Env {
+  ASSETS: { fetch: (request: Request) => Promise<Response> };
+}
+
 // L'entree du back office, la meme adresse que sur tous les sites de la
 // maison : /secret-spot/ (et /fr/secret-spot/) ouvre l'administration
-// d'EmDash. Moteur allume, l'ancien back office fige du theme ne publie rien :
-// le laisser servir ces pages ferait deux back offices dont un inerte.
-// /_emdash/secret-spot/ est l'alias demande par l'editeur pour l'adresse
-// native d'EmDash, /_emdash/admin, que le paquet ne permet pas de renommer.
+// d'EmDash, le seul back office du site. /_emdash/secret-spot/ est l'alias
+// demande par l'editeur pour l'adresse native d'EmDash, /_emdash/admin, que le
+// paquet ne permet pas de renommer.
 const ENTREE_DU_BACK_OFFICE = /^\/(?:(?:fr\/)?secret-spot|_emdash\/secret-spot)(?:\/.*)?$/;
+
+// Les plans que le moteur sert lui-meme (src/moteur/plan-du-site*.ts) ; ceux
+// d'EmDash, en doublon, ne sont jamais atteints (voir worker-adresses.ts).
+const PLANS = ["/sitemap-index.xml", "/sitemap-contenu.xml"];
 
 export default {
   ...handler,
-  // La meme redirection de langue que le Worker du site fige, sauf sur les
-  // adresses internes (/_emdash, /_image, /_astro) : envoyer le back office
-  // sous /fr/ le rendrait introuvable.
-  fetch(request: Request, env: unknown, ctx: unknown) {
+  // Dans l'ordre : le back office, les plans du site, la page introuvable
+  // demandee par son adresse, la barre finale, puis la meme redirection de
+  // langue que le Worker du site fige, sauf sur les adresses internes (/_emdash,
+  // /_image, /_astro) : envoyer le back office sous /fr/ le rendrait
+  // introuvable. La reponse passe enfin par reponseAuVisiteur : page
+  // introuvable dans la langue de l'adresse, sans Server-Timing.
+  async fetch(request: Request, env: Env, ctx: unknown) {
     const chemin = new URL(request.url).pathname;
     if (ENTREE_DU_BACK_OFFICE.test(chemin)) {
       return new Response(null, {
@@ -32,9 +43,14 @@ export default {
         headers: { Location: "/_emdash/admin", "Cache-Control": "no-store" },
       });
     }
+    const plan = planDuSite(request, PLANS);
+    if (plan) return plan;
+    if (estLaPageIntrouvable(request)) return pageIntrouvable(request, env.ASSETS);
     const interne = chemin.startsWith("/_");
-    const langue = interne ? null : redirectionDeLangue(request);
-    return langue ?? (handler.fetch as Fetch)(request, env, ctx);
+    const reglee = barreFinale(request) ?? (interne ? null : redirectionDeLangue(request));
+    if (reglee) return reglee;
+    const reponse = await (handler.fetch as Fetch)(request, env, ctx);
+    return reponseAuVisiteur(request, reponse, env.ASSETS);
   },
   scheduled: createScheduledHandler(),
 };

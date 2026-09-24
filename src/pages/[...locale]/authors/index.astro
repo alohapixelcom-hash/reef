@@ -5,12 +5,14 @@ import Footer from "@components/Sections/Global/Footer.astro";
 import Navbar from "@components/Sections/Global/Navbar.astro";
 import PageHero from "@components/Sections/Global/PageHero.astro";
 import { getSiteRoutes } from "@config/navData.json.ts";
-import { getLocale, localePaths, localizePath, useTranslations } from "@i18n";
+import { getLocale, localePaths, localizePath } from "@i18n";
 import { entrySlug, getLocalizedCollection } from "@i18n/content";
 import { getResolvedPosts } from "@js/posts";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { annotationsDe } from "@moteur/annotations";
 import { propsDeLaPage } from "@moteur/chemins";
+import { textesDeLaPage } from "@moteur/textes";
 
 export const getStaticPaths = localePaths;
 
@@ -20,7 +22,9 @@ const demande = await propsDeLaPage(Astro, getStaticPaths);
 if (demande instanceof Response) return demande;
 
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+// Les textes rediges de la page : ceux de la base moteur allume (docs/moteur.md),
+// poses sur la requete pour ses composants.
+const t = await textesDeLaPage(Astro);
 const routes = getSiteRoutes(locale);
 
 const authors = (await getLocalizedCollection("authors", locale)).sort((a, b) =>
@@ -50,6 +54,7 @@ const crumbs = breadcrumbList([
 
   <main id="content">
     <PageHero
+      edition={annotationsDe(Astro, "auteurs")}
       eyebrow={t.authors.eyebrow}
       title={t.authors.title}
       accentWord={t.authors.accent}

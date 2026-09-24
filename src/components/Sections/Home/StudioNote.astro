@@ -11,7 +11,7 @@ import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, useTranslations } from "@i18n";
 
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+const t = useTranslations(Astro);
 const routes = getSiteRoutes(locale);
 ---
 

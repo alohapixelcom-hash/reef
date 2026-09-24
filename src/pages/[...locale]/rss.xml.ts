@@ -5,9 +5,10 @@
 // garde /rss.xml, le francais obtient /fr/rss.xml, et chaque page declare le
 // sien dans son <head> (voir BaseHead).
 import siteData from "@config/siteData.json";
-import { getLocale, localeMeta, localePaths, localizePath, useTranslations } from "@i18n";
+import { getLocale, localeMeta, localePaths, localizePath } from "@i18n";
 import { getResolvedPosts } from "@js/posts";
 import { propsDeLaPage } from "@moteur/chemins";
+import { lireLaPage } from "@moteur/source";
 import type { APIRoute } from "astro";
 
 export const getStaticPaths = localePaths;
@@ -30,7 +31,8 @@ export const GET: APIRoute = async ({ site, url, currentLocale, params, props })
   const absolute = (path: string): string => new URL(path, base).href;
 
   const locale = getLocale({ currentLocale });
-  const t = useTranslations(locale);
+  // La description du flux est celle de l'archive : moteur allume, celle que la base publie.
+  const { textes: t } = await lireLaPage(locale);
 
   // getResolvedPosts ecarte deja les brouillons et trie du plus recent au plus
   // ancien : le flux ne peut donc pas diverger des listes du site.
@@ -67,7 +69,7 @@ export const GET: APIRoute = async ({ site, url, currentLocale, params, props })
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
-    <title>${escapeXml(siteData.title)}</title>
+    <title>${escapeXml(siteData.title[locale])}</title>
     <link>${absolute(localizePath("/", locale))}</link>
     <description>${escapeXml(t.archive.metaDescription)}</description>
     <language>${localeMeta[locale].intl.toLowerCase()}</language>

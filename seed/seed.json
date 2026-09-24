@@ -2,160 +2,116 @@
   "$schema": "https://emdashcms.com/seed.schema.json",
   "version": "1",
   "defaultLocale": "en",
-  "meta": {
-    "name": "Reef",
-    "description": "Le journal de Reef, publié depuis le back office.",
-    "author": "Aloha Pixel"
-  },
-  "settings": {
-    "title": "Reef",
-    "tagline": "A quiet place to read about building for the web"
-  },
+  "meta": {"name":"Reef","description":"Le journal de Reef, publié depuis le back office.","author":"Aloha Pixel"},
+  "settings": {"title":"Reef","tagline":"A quiet place to read about building for the web"},
   "collections": [
     {
       "slug": "posts",
       "label": "Articles",
       "labelSingular": "Article",
       "urlPattern": "/blog/{slug}",
-      "supports": [
-        "drafts",
-        "revisions",
-        "search",
-        "seo"
-      ],
+      "supports": ["drafts","revisions","search","seo"],
       "fields": [
-        {
-          "slug": "title",
-          "label": "Titre",
-          "type": "string",
-          "required": true,
-          "searchable": true
-        },
-        {
-          "slug": "description",
-          "label": "Chapo",
-          "type": "text",
-          "required": true,
-          "searchable": true
-        },
-        {
-          "slug": "cover",
-          "label": "Couverture",
-          "type": "image"
-        },
-        {
-          "slug": "content",
-          "label": "Texte",
-          "type": "portableText",
-          "searchable": true
-        },
-        {
-          "slug": "topic",
-          "label": "Rubrique",
-          "type": "select",
-          "required": true,
-          "translatable": false,
-          "indexed": true,
-          "validation": {
-            "options": [
-              "craft",
-              "design",
-              "performance",
-              "studio",
-              "typography"
-            ]
-          }
-        },
-        {
-          "slug": "author",
-          "label": "Signature",
-          "type": "select",
-          "required": true,
-          "translatable": false,
-          "indexed": true,
-          "validation": {
-            "options": [
-              "mara-lindqvist",
-              "noor-benali",
-              "tomas-abaroa"
-            ]
-          }
-        },
-        {
-          "slug": "tags",
-          "label": "Mots-clés",
-          "type": "json"
-        },
-        {
-          "slug": "featured",
-          "label": "À la une",
-          "type": "boolean",
-          "defaultValue": false
-        },
-        {
-          "slug": "pub_date",
-          "label": "Date affichée",
-          "type": "datetime",
-          "indexed": true
-        },
-        {
-          "slug": "updated_date",
-          "label": "Revu le",
-          "type": "datetime"
-        }
+        {"slug":"title","label":"Titre","type":"string","required":true,"searchable":true},
+        {"slug":"description","label":"Chapo","type":"text","required":true,"searchable":true},
+        {"slug":"cover","label":"Couverture","type":"image"},
+        {"slug":"content","label":"Texte","type":"portableText","searchable":true},
+        {"slug":"topic","label":"Rubrique","type":"select","required":true,"translatable":false,"indexed":true,"validation":{"options":["craft","design","performance","studio","typography"]}},
+        {"slug":"author","label":"Signature","type":"select","required":true,"translatable":false,"indexed":true,"validation":{"options":["mara-lindqvist","noor-benali","tomas-abaroa"]}},
+        {"slug":"tags","label":"Mots-clés","type":"json"},
+        {"slug":"featured","label":"À la une","type":"boolean","defaultValue":false},
+        {"slug":"pub_date","label":"Date affichée","type":"datetime","indexed":true},
+        {"slug":"updated_date","label":"Revu le","type":"datetime"}
+      ]
+    },
+    {
+      "slug": "sections",
+      "label": "Textes des pages",
+      "labelSingular": "Section",
+      "description": "Les textes rédigés de l'accueil et des pages fixes : chaque entrée porte une section, sous le même identifiant dans les deux langues. Un champ laissé vide garde le texte livré avec le thème.",
+      "sortOrder": 2,
+      "titleField": "title",
+      "supports": ["drafts","revisions"],
+      "admin": {"listColumns":["page"]},
+      "fields": [
+        {"slug":"title","label":"Titre","type":"string"},
+        {"slug":"page","label":"Page","type":"select","required":true,"indexed":true,"validation":{"options":["accueil","billet","blog","rubriques","auteurs","recherche","a-propos","contact","mentions-legales","confidentialite","conditions","toutes"]}},
+        {"slug":"eyebrow","label":"Surtitre","type":"string"},
+        {"slug":"accent","label":"Mot en couleur (un mot du titre)","type":"string"},
+        {"slug":"lede","label":"Chapô","type":"text"},
+        {"slug":"arguments","label":"Blocs de la liste, dans l'ordre de la page","type":"repeater","validation":{"subFields":[{"slug":"title","label":"Titre","type":"string"},{"slug":"body","label":"Texte","type":"text"}]}},
+        {"slug":"cta","label":"Bouton principal","type":"string"},
+        {"slug":"cta_secondary","label":"Bouton secondaire","type":"string"},
+        {"slug":"note","label":"Note","type":"text"},
+        {"slug":"meta_title","label":"Titre pour les moteurs de recherche","type":"string"},
+        {"slug":"meta_description","label":"Description pour les moteurs de recherche","type":"text"},
+        {"slug":"revised","label":"Date de révision (documents légaux)","type":"datetime"}
       ]
     }
   ],
   "taxonomies": [
-    {
-      "id": "taxonomie:category:en",
-      "name": "category",
-      "label": "Categories",
-      "labelSingular": "Category",
-      "hierarchical": true,
-      "collections": [
-        "posts"
-      ],
-      "locale": "en"
-    },
-    {
-      "id": "taxonomie:category:fr",
-      "name": "category",
-      "label": "Catégories",
-      "labelSingular": "Catégorie",
-      "hierarchical": true,
-      "collections": [
-        "posts"
-      ],
-      "locale": "fr",
-      "translationOf": "taxonomie:category:en"
-    },
-    {
-      "id": "taxonomie:tag:en",
-      "name": "tag",
-      "label": "Tags",
-      "labelSingular": "Tag",
-      "hierarchical": false,
-      "collections": [
-        "posts"
-      ],
-      "locale": "en"
-    },
-    {
-      "id": "taxonomie:tag:fr",
-      "name": "tag",
-      "label": "Étiquettes",
-      "labelSingular": "Étiquette",
-      "hierarchical": false,
-      "collections": [
-        "posts"
-      ],
-      "locale": "fr",
-      "translationOf": "taxonomie:tag:en"
-    }
+    {"id":"taxonomie:category:en","name":"category","label":"Categories","labelSingular":"Category","hierarchical":true,"collections":["posts"],"locale":"en"},
+    {"id":"taxonomie:category:fr","name":"category","label":"Catégories","labelSingular":"Catégorie","hierarchical":true,"collections":["posts"],"locale":"fr","translationOf":"taxonomie:category:en"},
+    {"id":"taxonomie:tag:en","name":"tag","label":"Tags","labelSingular":"Tag","hierarchical":false,"collections":["posts"],"locale":"en"},
+    {"id":"taxonomie:tag:fr","name":"tag","label":"Étiquettes","labelSingular":"Étiquette","hierarchical":false,"collections":["posts"],"locale":"fr","translationOf":"taxonomie:tag:en"}
   ],
   "bylines": [],
-  "content": {},
+  "content": {
+    "sections": [
+      {"id":"sections-hero-en","slug":"hero","locale":"en","status":"published","data":{"page":"accueil","eyebrow":"Reef Notes","title":"Notes from a small web studio","accent":"small","lede":"What we learn building sites, written down as we go. The notebook, not the portfolio.","cta":"Start reading","cta_secondary":"About the studio","meta_title":"Reef Notes, a working notebook from an independent web studio","meta_description":"Build logs, load times, typography and the business of running a small web studio. Written in English and French, a few notes a month, by the three people doing the work.","arguments":[{"title":"notes published"},{"title":"threads"},{"title":"languages"}]}},
+      {"id":"sections-hero-fr","slug":"hero","locale":"fr","translationOf":"sections-hero-en","status":"published","data":{"page":"accueil","eyebrow":"Reef Notes","title":"Notes d'un petit studio web","accent":"petit","lede":"Ce qu'on apprend en construisant des sites, noté au fur et à mesure. Le carnet, pas le portfolio.","cta":"Commencer à lire","cta_secondary":"À propos du studio","meta_title":"Reef Notes, le carnet de bord d'un studio web indépendant","meta_description":"Journaux de chantier, temps de chargement, typographie et gestion d'un petit studio web. En français et en anglais, quelques notes par mois, écrites par les trois personnes qui font le travail.","arguments":[{"title":"notes publiées"},{"title":"fils"},{"title":"langues"}]}},
+      {"id":"sections-a-la-une-en","slug":"a-la-une","locale":"en","status":"published","data":{"page":"accueil","eyebrow":"Pick of the month"}},
+      {"id":"sections-a-la-une-fr","slug":"a-la-une","locale":"fr","translationOf":"sections-a-la-une-en","status":"published","data":{"page":"accueil","eyebrow":"La note du mois"}},
+      {"id":"sections-studio-en","slug":"studio","locale":"en","status":"published","data":{"page":"accueil","title":"The studio behind the notes","accent":"studio","lede":"One builds, one measures, one designs, and all three write. Three or four projects a year, and everything we learn on them ends up here.","cta":"How we work"}},
+      {"id":"sections-studio-fr","slug":"studio","locale":"fr","translationOf":"sections-studio-en","status":"published","data":{"page":"accueil","title":"Le studio derrière les notes","accent":"studio","lede":"L'un construit, l'une mesure, l'autre dessine, et tous les trois écrivent. Trois ou quatre projets par an, et tout ce qu'ils nous apprennent finit ici.","cta":"Notre façon de travailler"}},
+      {"id":"sections-dernieres-notes-en","slug":"dernieres-notes","locale":"en","status":"published","data":{"page":"accueil","title":"Latest notes","accent":"Latest","lede":"The most recent entries, newest first. Everything older waits in the archive.","cta":"Browse all posts"}},
+      {"id":"sections-dernieres-notes-fr","slug":"dernieres-notes","locale":"fr","translationOf":"sections-dernieres-notes-en","status":"published","data":{"page":"accueil","title":"Dernières notes","accent":"Dernières","lede":"Les entrées les plus récentes, de la plus fraîche à la plus ancienne. Le reste attend dans les archives.","cta":"Voir tous les articles"}},
+      {"id":"sections-sujets-en","slug":"sujets","locale":"en","status":"published","data":{"page":"accueil","title":"Five threads we keep pulling","accent":"threads","lede":"Every post belongs to exactly one topic, so a thread can be read end to end without wading through the rest.","cta":"See all topics"}},
+      {"id":"sections-sujets-fr","slug":"sujets","locale":"fr","translationOf":"sections-sujets-en","status":"published","data":{"page":"accueil","title":"Cinq fils que nous tirons sans cesse","accent":"fils","lede":"Chaque article appartient à un seul sujet : un fil se lit donc d'un bout à l'autre, sans traverser tout le reste.","cta":"Voir tous les sujets"}},
+      {"id":"sections-signatures-en","slug":"signatures","locale":"en","status":"published","data":{"page":"accueil","title":"Who writes here","accent":"writes","lede":"Everyone here still ships client work. Each byline leads to everything that person has published, oldest note included.","cta":"Meet the writers"}},
+      {"id":"sections-signatures-fr","slug":"signatures","locale":"fr","translationOf":"sections-signatures-en","status":"published","data":{"page":"accueil","title":"Qui écrit ici","accent":"écrit","lede":"Ici, tout le monde livre encore des projets clients. Chaque signature mène à tout ce que son auteur a publié, première note comprise.","cta":"Voir les auteurs"}},
+      {"id":"sections-lettre-en","slug":"lettre","locale":"en","status":"published","data":{"page":"toutes","title":"One email, once a month","accent":"once","lede":"A short digest of what we published and what we got wrong. No tracking pixel, no drip sequence, one click to leave for good.","cta":"Subscribe","note":"One email a month. Unsubscribe from any of them."}},
+      {"id":"sections-lettre-fr","slug":"lettre","locale":"fr","translationOf":"sections-lettre-en","status":"published","data":{"page":"toutes","title":"Un email, une fois par mois","accent":"mois","lede":"Un court résumé de ce que nous avons publié et de ce que nous avons raté. Pas de pixel espion, pas de séquence automatique, un clic pour partir définitivement.","cta":"S'abonner","note":"Un email par mois. Désinscription depuis n'importe lequel."}},
+      {"id":"sections-lettre-flux-en","slug":"lettre-flux","locale":"en","status":"published","data":{"page":"accueil","title":"Prefer a feed?","lede":"The whole blog is in the RSS feed, full text, no signup.","cta":"RSS feed"}},
+      {"id":"sections-lettre-flux-fr","slug":"lettre-flux","locale":"fr","translationOf":"sections-lettre-flux-en","status":"published","data":{"page":"accueil","title":"Vous préférez un flux ?","lede":"Tout le blog tient dans le flux RSS, en texte intégral, sans inscription.","cta":"Flux RSS"}},
+      {"id":"sections-pied-de-page-en","slug":"pied-de-page","locale":"en","status":"published","data":{"page":"toutes","lede":"Reef Notes is the working notebook of a three-person web studio. Build logs, load times, type specimens, and the parts of freelancing nobody puts on a landing page."}},
+      {"id":"sections-pied-de-page-fr","slug":"pied-de-page","locale":"fr","translationOf":"sections-pied-de-page-en","status":"published","data":{"page":"toutes","lede":"Reef Notes est le carnet de bord d'un studio web à trois. Journaux de chantier, temps de chargement, spécimens typographiques, et les côtés du métier d'indépendant dont personne ne fait une page d'accueil."}},
+      {"id":"sections-a-lire-ensuite-en","slug":"a-lire-ensuite","locale":"en","status":"published","data":{"page":"billet","title":"Keep reading","accent":"reading","lede":"Three more notes from the same notebook, picked by topic and not by an algorithm.","cta":"All posts"}},
+      {"id":"sections-a-lire-ensuite-fr","slug":"a-lire-ensuite","locale":"fr","translationOf":"sections-a-lire-ensuite-en","status":"published","data":{"page":"billet","title":"Lecture suivante","accent":"suivante","lede":"Trois autres notes du même carnet, choisies par sujet et non par un algorithme.","cta":"Tous les articles"}},
+      {"id":"sections-archives-en","slug":"archives","locale":"en","status":"published","data":{"page":"blog","eyebrow":"Archive","title":"Everything we have written","accent":"Everything","lede":"The full archive, newest first. Thirty seconds of scrolling beats a search box when you do not yet know what you are looking for.","meta_title":"All posts","meta_description":"Every post published on Reef Notes, newest first: build logs, performance work, typography, and the business of a small studio."}},
+      {"id":"sections-archives-fr","slug":"archives","locale":"fr","translationOf":"sections-archives-en","status":"published","data":{"page":"blog","eyebrow":"Archives","title":"Tout ce que nous avons écrit","accent":"Tout","lede":"Les archives complètes, du plus récent au plus ancien. Trente secondes de défilement valent mieux qu'un champ de recherche quand on ne sait pas encore ce que l'on cherche.","meta_title":"Tous les articles","meta_description":"Tous les articles publiés sur Reef Notes, du plus récent au plus ancien : journaux de chantier, performance, typographie et gestion d'un petit studio."}},
+      {"id":"sections-rubriques-en","slug":"rubriques","locale":"en","status":"published","data":{"page":"rubriques","eyebrow":"Topics","title":"Five threads we keep pulling","accent":"threads","lede":"Every post belongs to exactly one topic. Pick a thread and read it end to end, oldest first if you want the argument in order.","meta_title":"Topics","meta_description":"Every subject covered on Reef Notes: front-end craft, performance work, typography, and the business of running a small studio."}},
+      {"id":"sections-rubriques-fr","slug":"rubriques","locale":"fr","translationOf":"sections-rubriques-en","status":"published","data":{"page":"rubriques","eyebrow":"Sujets","title":"Cinq fils que nous tirons sans cesse","accent":"fils","lede":"Chaque article appartient à un seul sujet. Choisissez un fil et lisez-le d'un bout à l'autre, du plus ancien au plus récent si vous voulez l'argument dans l'ordre.","meta_title":"Sujets","meta_description":"Tous les sujets couverts par Reef Notes : artisanat du front-end, performance, typographie et gestion d'un petit studio."}},
+      {"id":"sections-auteurs-en","slug":"auteurs","locale":"en","status":"published","data":{"page":"auteurs","eyebrow":"Authors","title":"Who writes here","accent":"writes","lede":"Three people share this notebook. Every post carries a byline, and every byline leads to everything that person has written.","meta_title":"Authors","meta_description":"The people who write Reef Notes: what they work on day to day, where to find them elsewhere, and everything they have published here."}},
+      {"id":"sections-auteurs-fr","slug":"auteurs","locale":"fr","translationOf":"sections-auteurs-en","status":"published","data":{"page":"auteurs","eyebrow":"Auteurs","title":"Qui écrit ici","accent":"écrit","lede":"Trois personnes partagent ce carnet. Chaque article porte une signature, et chaque signature mène à tout ce que son auteur a écrit.","meta_title":"Auteurs","meta_description":"Les personnes qui écrivent Reef Notes : ce qu'elles font au quotidien, où les retrouver ailleurs, et tout ce qu'elles ont publié ici."}},
+      {"id":"sections-recherche-en","slug":"recherche","locale":"en","status":"published","data":{"page":"recherche","eyebrow":"Search","title":"Find it again","accent":"again","lede":"Search covers titles, summaries, topics and tags. It runs in your browser, so nothing leaves the page and it keeps working offline once loaded.","meta_title":"Search","meta_description":"Search every post on Reef Notes by title, summary, topic or tag. It runs in your browser: nothing is sent to a server and nothing is logged."}},
+      {"id":"sections-recherche-fr","slug":"recherche","locale":"fr","translationOf":"sections-recherche-en","status":"published","data":{"page":"recherche","eyebrow":"Recherche","title":"Retrouver un article","accent":"Retrouver","lede":"La recherche couvre les titres, les résumés, les sujets et les étiquettes. Elle tourne dans votre navigateur : rien ne quitte la page, et elle fonctionne encore hors ligne une fois chargée.","meta_title":"Recherche","meta_description":"Cherchez dans tous les articles de Reef Notes par titre, résumé, sujet ou étiquette. La recherche tourne dans votre navigateur : rien n'est envoyé à un serveur, rien n'est enregistré."}},
+      {"id":"sections-a-propos-en","slug":"a-propos","locale":"en","status":"published","data":{"page":"a-propos","eyebrow":"About","title":"A three-person studio that writes things down","accent":"writes","lede":"We design and build websites for small teams. Reef Notes is where the working notes end up, because the useful part of a project is almost never the screenshot.","meta_title":"About the studio","meta_description":"Who runs Reef Notes, how the studio works, what we take on and what we turn down, and why the working notes are published instead of filed away."}},
+      {"id":"sections-a-propos-fr","slug":"a-propos","locale":"fr","translationOf":"sections-a-propos-en","status":"published","data":{"page":"a-propos","eyebrow":"À propos","title":"Un studio à trois qui note tout","accent":"note","lede":"Nous dessinons et construisons des sites pour de petites équipes. Reef Notes est l'endroit où atterrissent les notes de travail, parce que la partie utile d'un projet n'est presque jamais la capture d'écran.","meta_title":"À propos du studio","meta_description":"Qui tient Reef Notes, comment le studio travaille, ce que nous acceptons et ce que nous refusons, et pourquoi les notes de chantier sont publiées plutôt que classées."}},
+      {"id":"sections-a-propos-histoire-en","slug":"a-propos-histoire","locale":"en","status":"published","data":{"page":"a-propos","title":"How the notebook started","accent":"notebook","arguments":[{"body":"The studio opened in 2019 with one laptop and a spreadsheet of leads. The first year taught us that a website is rarely a design problem: it is a decision problem with a design attached. Which font loads first, which section gets cut, what happens on a four-year-old Android phone on hotel wifi."},{"body":"For three years the answers lived in a private repository. Every time a client asked why a page felt slow, or why we refused to add a fifth typeface, the reasoning was already written down somewhere. Publishing those notes cost us nothing and saved the same explanation twice a month."},{"body":"Reef Notes is that repository, cleaned up. Some entries are build logs with numbers in them, some are arguments about type, some cover the unglamorous half of freelancing: scoping, quoting, being paid on time. All of them come out of work we actually did."}]}},
+      {"id":"sections-a-propos-histoire-fr","slug":"a-propos-histoire","locale":"fr","translationOf":"sections-a-propos-histoire-en","status":"published","data":{"page":"a-propos","title":"Comment le carnet a commencé","accent":"carnet","arguments":[{"body":"Le studio a ouvert en 2019 avec un portable et un tableur de prospects. La première année nous a appris qu'un site est rarement un problème de design : c'est un problème de décisions, avec un design posé par-dessus. Quelle police charge en premier, quelle section saute, ce qui se passe sur un Android de quatre ans connecté au wifi d'un hôtel."},{"body":"Pendant trois ans, les réponses sont restées dans un dépôt privé. Chaque fois qu'un client demandait pourquoi une page semblait lente, ou pourquoi nous refusions une cinquième police, le raisonnement était déjà écrit quelque part. Publier ces notes ne nous a rien coûté et nous a évité la même explication deux fois par mois."},{"body":"Reef Notes, c'est ce dépôt remis au propre. Certaines entrées sont des journaux de chantier avec des chiffres dedans, d'autres des prises de position sur la typographie, d'autres encore la moitié ingrate du métier : cadrer, chiffrer, être payé à l'heure. Toutes sortent de travaux réels."}]}},
+      {"id":"sections-a-propos-regles-en","slug":"a-propos-regles","locale":"en","status":"published","data":{"page":"a-propos","title":"How we work","accent":"work","lede":"Three rules we have not yet found a good reason to break.","arguments":[{"title":"Measure before arguing","body":"Taste settles nothing about performance. We publish the before and after numbers, including the times a change made things worse."},{"title":"Ship the boring version","body":"The boring version launches on time, survives a redesign and still works with JavaScript off. Cleverness is what we add once the boring version is live."},{"title":"Write it down once","body":"If an answer takes more than five minutes to explain, it becomes a post. Clients get the link, we get our afternoon back."}]}},
+      {"id":"sections-a-propos-regles-fr","slug":"a-propos-regles","locale":"fr","translationOf":"sections-a-propos-regles-en","status":"published","data":{"page":"a-propos","title":"Notre façon de travailler","accent":"façon","lede":"Trois règles auxquelles nous n'avons pas encore trouvé de bonne raison de déroger.","arguments":[{"title":"Mesurer avant de discuter","body":"Le goût ne tranche rien en matière de performance. Nous publions les chiffres avant et après, y compris les fois où le changement a tout empiré."},{"title":"Livrer la version ennuyeuse","body":"La version ennuyeuse sort dans les temps, survit à une refonte et fonctionne encore sans JavaScript. L'astuce vient ensuite, une fois la version ennuyeuse en ligne."},{"title":"L'écrire une seule fois","body":"Si une réponse demande plus de cinq minutes d'explication, elle devient un article. Le client reçoit le lien, nous récupérons notre après-midi."}]}},
+      {"id":"sections-a-propos-signatures-en","slug":"a-propos-signatures","locale":"en","status":"published","data":{"page":"a-propos","title":"The three of us","accent":"three","lede":"Short bios, honest job titles, and every post each of us has signed.","cta":"All authors"}},
+      {"id":"sections-a-propos-signatures-fr","slug":"a-propos-signatures","locale":"fr","translationOf":"sections-a-propos-signatures-en","status":"published","data":{"page":"a-propos","title":"Nous trois","accent":"trois","lede":"Trois biographies courtes, des intitulés honnêtes, et tous les articles que chacun a signés.","cta":"Tous les auteurs"}},
+      {"id":"sections-a-propos-appel-en","slug":"a-propos-appel","locale":"en","status":"published","data":{"page":"a-propos","title":"Working together","lede":"We take on three or four projects a year, mostly redesigns for teams of under twenty people. If the timing lines up, tell us what is in the way.","cta":"Get in touch"}},
+      {"id":"sections-a-propos-appel-fr","slug":"a-propos-appel","locale":"fr","translationOf":"sections-a-propos-appel-en","status":"published","data":{"page":"a-propos","title":"Travailler ensemble","lede":"Nous prenons trois ou quatre projets par an, surtout des refontes pour des équipes de moins de vingt personnes. Si le calendrier s'y prête, dites-nous ce qui vous bloque.","cta":"Nous écrire"}},
+      {"id":"sections-contact-en","slug":"contact","locale":"en","status":"published","data":{"page":"contact","eyebrow":"Contact","title":"Write to us, we read all of it","accent":"all","lede":"A project, a correction, a question about a build: it lands in the same inbox and a person answers it. No ticket number, no autoresponder.","meta_title":"Contact","meta_description":"Project enquiries, a correction on a post, or a question about something we published. One inbox, read by a person, answered within two working days."}},
+      {"id":"sections-contact-fr","slug":"contact","locale":"fr","translationOf":"sections-contact-en","status":"published","data":{"page":"contact","eyebrow":"Contact","title":"Écrivez-nous, nous lisons tout","accent":"tout","lede":"Un projet, une correction, une question sur un chantier : tout arrive dans la même boîte et une personne y répond. Pas de numéro de ticket, pas de réponse automatique.","meta_title":"Contact","meta_description":"Une demande de projet, une correction sur un article, une question sur ce que nous avons publié. Une seule boîte, lue par une personne, réponse sous deux jours ouvrés."}},
+      {"id":"sections-contact-formulaire-en","slug":"contact-formulaire","locale":"en","status":"published","data":{"page":"contact","title":"Send a message","note":"No newsletter signup hidden in this form. Your address is used to reply, and for nothing else.","cta":"Send message"}},
+      {"id":"sections-contact-formulaire-fr","slug":"contact-formulaire","locale":"fr","translationOf":"sections-contact-formulaire-en","status":"published","data":{"page":"contact","title":"Envoyer un message","note":"Aucune inscription à la newsletter cachée dans ce formulaire. Votre adresse sert à vous répondre, et à rien d'autre.","cta":"Envoyer le message"}},
+      {"id":"sections-contact-direct-en","slug":"contact-direct","locale":"en","status":"published","data":{"page":"contact","title":"Or skip the form","lede":"Plain email works just as well, and a thread is easier to keep than a form.","cta":"Email the studio"}},
+      {"id":"sections-contact-direct-fr","slug":"contact-direct","locale":"fr","translationOf":"sections-contact-direct-en","status":"published","data":{"page":"contact","title":"Ou passez-vous du formulaire","lede":"Un simple email fait aussi bien l'affaire, et un fil de discussion se conserve mieux qu'un formulaire.","cta":"Écrire au studio"}},
+      {"id":"sections-contact-suite-en","slug":"contact-suite","locale":"en","status":"published","data":{"page":"contact","title":"What happens next","arguments":[{"body":"A short reply within two working days, written by one of us."},{"body":"If it is a project, three questions come back before any number does."},{"body":"If it is a correction, the post is fixed and credited the same week."}]}},
+      {"id":"sections-contact-suite-fr","slug":"contact-suite","locale":"fr","translationOf":"sections-contact-suite-en","status":"published","data":{"page":"contact","title":"Ce qui se passe ensuite","arguments":[{"body":"Une réponse courte sous deux jours ouvrés, écrite par l'un de nous trois."},{"body":"S'il s'agit d'un projet, vous recevez trois questions avant le moindre chiffre."},{"body":"S'il s'agit d'une correction, l'article est repris et crédité dans la semaine."}]}},
+      {"id":"sections-mentions-legales-en","slug":"mentions-legales","locale":"en","status":"published","data":{"page":"mentions-legales","eyebrow":"Legal","title":"Legal notice","lede":"Who publishes this site, who hosts it, and how to reach the publisher.","arguments":[{"title":"Publisher","body":"This site is published by [studio name], [legal form] registered at [full address], under number [registration number]. Publication director: [name]. Any question about the content published here can be sent through the contact page."},{"title":"Hosting","body":"The site is served by [host name], [host address], reachable at [host contact]. Reading a page creates no account and no session: nothing about you is stored on our side."},{"title":"Content and reuse","body":"The posts, illustrations and code samples published here belong to their authors. Quoting a passage with a link back is welcome and needs no permission. Republishing a whole post, translated or not, does."},{"title":"Reporting a problem","body":"A factual error, a broken link, a copyright concern: write to the address on the contact page. Corrections are made within two working days and the post carries the date of its revision."}]}},
+      {"id":"sections-mentions-legales-fr","slug":"mentions-legales","locale":"fr","translationOf":"sections-mentions-legales-en","status":"published","data":{"page":"mentions-legales","eyebrow":"Légal","title":"Mentions légales","lede":"Qui publie ce site, qui l'héberge, et comment joindre l'éditeur.","arguments":[{"title":"Éditeur","body":"Ce site est édité par [nom du studio], [forme juridique] immatriculée à [adresse complète] sous le numéro [numéro d'immatriculation]. Directeur de la publication : [nom]. Toute question sur les contenus publiés ici peut nous être adressée depuis la page de contact."},{"title":"Hébergement","body":"Le site est servi par [nom de l'hébergeur], [adresse de l'hébergeur], joignable au [contact de l'hébergeur]. Lire une page ne crée ni compte ni session : rien ne vous concernant n'est conservé de notre côté."},{"title":"Contenus et réutilisation","body":"Les articles, les illustrations et les extraits de code publiés ici appartiennent à leurs auteurs. Citer un passage avec un lien de retour est bienvenu et ne demande aucune autorisation. Republier un article entier, traduit ou non, en demande une."},{"title":"Signaler un problème","body":"Une erreur factuelle, un lien mort, une question de droits : écrivez à l'adresse indiquée sur la page de contact. Les corrections sont faites sous deux jours ouvrés, et l'article porte alors la date de sa révision."}]}},
+      {"id":"sections-confidentialite-en","slug":"confidentialite","locale":"en","status":"published","data":{"page":"confidentialite","title":"Privacy policy","lede":"What we collect, why we collect it, and the choices you have over your data.","revised":"2026-09-24T00:00:00.000Z","arguments":[{"title":"Who we are","body":"This policy describes what this site collects when you read it, subscribe to its newsletter or write to us. If you have any question about it, you can reach us at any time through the contact page."},{"title":"Information we collect","body":"Reading a page collects nothing about you. If you subscribe to the newsletter, we keep your email address; if you write to us, we keep your message and your address to answer it."},{"title":"How we use your information","body":"Your email address is used to send you the newsletter you asked for, and nothing else; every issue includes a way to unsubscribe. Your message is used to answer you."},{"title":"Legal bases for processing","body":"Where data protection law requires a legal basis, we rely on your consent for the newsletter, on our legitimate interest in answering the messages you send us, and on our legal obligations."},{"title":"Cookies and analytics","body":"This site sets no advertising cookie and runs no analytics. Your browser keeps your light or dark theme preference and, if you switch language, a cookie that remembers that choice."},{"title":"How we share information","body":"We never sell personal information. We share it only with the processors that help us run the site, such as the host and the email provider that sends the newsletter, each bound by a data processing agreement, and with authorities where the law requires it."},{"title":"Data retention and deletion","body":"A newsletter address is deleted when you unsubscribe; a message is deleted once the conversation is over."},{"title":"Your rights","body":"Depending on where you live, you may have the right to access, correct, export, restrict or delete the personal information we hold about you, and to object to certain processing. To exercise any of these rights, contact us through the contact page and we will respond within the legal deadline."},{"title":"Changes to this policy","body":"We may update this policy as the site or the law evolves. The date at the top of this page always gives the latest version."}]}},
+      {"id":"sections-confidentialite-fr","slug":"confidentialite","locale":"fr","translationOf":"sections-confidentialite-en","status":"published","data":{"page":"confidentialite","title":"Politique de confidentialité","lede":"Ce que nous collectons, pourquoi nous le collectons, et les choix qui vous reviennent.","revised":"2026-09-24T00:00:00.000Z","arguments":[{"title":"Qui nous sommes","body":"Cette politique décrit ce que ce site recueille lorsque vous le lisez, vous abonnez à son infolettre ou nous écrivez. Toute question à son sujet peut nous être adressée à tout moment depuis la page de contact."},{"title":"Les données que nous collectons","body":"Lire une page ne recueille rien sur vous. Si vous vous abonnez à l'infolettre, nous conservons votre adresse e-mail ; si vous nous écrivez, nous conservons votre message et votre adresse pour vous répondre."},{"title":"L'usage que nous en faisons","body":"Votre adresse e-mail sert à vous envoyer l'infolettre que vous avez demandée, et à rien d'autre ; chaque envoi comporte un moyen de vous désabonner. Votre message sert à vous répondre."},{"title":"Les bases légales du traitement","body":"Lorsque la réglementation sur la protection des données exige une base légale, nous nous appuyons sur votre consentement pour l'infolettre, sur notre intérêt légitime à répondre aux messages que vous nous adressez, et sur nos obligations légales."},{"title":"Cookies et mesure d'audience","body":"Ce site ne dépose aucun cookie publicitaire et ne mesure pas l'audience. Votre navigateur conserve votre préférence de thème clair ou sombre et, si vous changez de langue, un cookie qui retient ce choix."},{"title":"Le partage de vos données","body":"Nous ne vendons jamais de données personnelles. Nous les partageons uniquement avec les sous-traitants qui nous aident à faire tourner le site, l'hébergeur et le service d'envoi de l'infolettre par exemple, chacun étant lié par un accord de traitement des données, ainsi qu'avec les autorités lorsque la loi l'impose."},{"title":"Conservation et suppression","body":"Une adresse d'infolettre est supprimée à la désinscription ; un message l'est une fois l'échange terminé."},{"title":"Vos droits","body":"Selon votre lieu de résidence, vous disposez du droit d'accéder aux données personnelles que nous détenons sur vous, de les rectifier, de les exporter, d'en limiter le traitement ou de les faire supprimer, ainsi que de vous opposer à certains traitements. Pour exercer l'un de ces droits, écrivez-nous depuis la page de contact : nous répondons dans le délai prévu par la loi."},{"title":"Modifications de cette politique","body":"Cette politique peut évoluer avec le site ou avec la réglementation. La date en haut de cette page donne toujours la dernière version."}]}},
+      {"id":"sections-conditions-en","slug":"conditions","locale":"en","status":"published","data":{"page":"conditions","title":"Terms of use","lede":"The terms that govern your use of this site, in plain language.","revised":"2026-09-24T00:00:00.000Z","arguments":[{"title":"Agreement to these terms","body":"By reading this site you accept these terms. If you do not accept them, please do not use it."},{"title":"Acceptable use","body":"You agree to use the site lawfully and respectfully. You will not attempt to breach its security, disrupt its operation, access data that is not yours, or use its forms to send unlawful or harmful content."},{"title":"Disclaimers and limitation of liability","body":"The site and its posts are provided as is, without warranties beyond those that cannot be excluded by law. A post reflects what its author knew on the date it carries; check anything you rely on. To the maximum extent permitted, we are not liable for decisions you make on the basis of what you read here."},{"title":"Changes to the site and these terms","body":"Posts are added, corrected and sometimes retired. These terms may also be updated; the date at the top of this page always gives the latest version."},{"title":"Contact","body":"Questions about these terms, or about anything else in this document, are welcome through the contact page. For legal notices, use the postal or email address listed there, and we will confirm receipt as soon as possible."}]}},
+      {"id":"sections-conditions-fr","slug":"conditions","locale":"fr","translationOf":"sections-conditions-en","status":"published","data":{"page":"conditions","title":"Conditions d'utilisation","lede":"Les conditions qui encadrent votre utilisation de ce site, écrites en langage clair.","revised":"2026-09-24T00:00:00.000Z","arguments":[{"title":"Acceptation des présentes conditions","body":"En lisant ce site, vous acceptez les présentes conditions. Si vous ne les acceptez pas, ne l'utilisez pas."},{"title":"Usage acceptable","body":"Vous vous engagez à utiliser le site dans le respect de la loi et d'autrui. Vous ne chercherez pas à contourner sa sécurité, à perturber son fonctionnement, à accéder à des données qui ne vous appartiennent pas, ni à vous servir de ses formulaires pour envoyer des contenus illicites ou nuisibles."},{"title":"Garanties et limitation de responsabilité","body":"Le site et ses articles sont fournis en l'état, sans autre garantie que celles que la loi ne permet pas d'écarter. Un article reflète ce que son auteur savait à la date qu'il porte : vérifiez ce sur quoi vous vous appuyez. Dans la limite autorisée par le droit applicable, nous ne répondons pas des décisions prises sur la foi de ce que vous lisez ici."},{"title":"Évolutions du site et des conditions","body":"Des articles s'ajoutent, se corrigent et parfois se retirent. Les présentes conditions peuvent également être mises à jour ; la date en haut de cette page donne toujours la dernière version."},{"title":"Nous contacter","body":"Toute question sur ces conditions, ou sur un autre point de ce document, est la bienvenue via la page de contact. Pour les notifications à caractère juridique, utilisez l'adresse postale ou électronique qui y figure : nous en accusons réception dans les meilleurs délais."}]}}
+    ]
+  },
   "menus": [],
   "redirects": [],
   "widgetAreas": [],

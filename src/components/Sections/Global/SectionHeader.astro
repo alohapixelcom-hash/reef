@@ -5,6 +5,7 @@
 // magazine, en petites capitales espacees, precede d'un filet turquoise. Une
 // pastille dit "interface", un filet dit "publication", et c'est exactement la
 // distance qui separe ce theme de son grand frere.
+import { SANS_ANNOTATION, type AnnotationsDeLEntree } from "@moteur/annotations";
 import { tv, type VariantProps } from "tailwind-variants";
 
 export const sectionHeader = tv({
@@ -54,6 +55,8 @@ type Props = VariantProps<typeof sectionHeader> & {
   /** Id pose sur le titre, pratique pour aria-labelledby cote section. */
   headingId?: string;
   class?: string;
+  /** Moteur allume, en mode edition : la section de la base qui porte ces textes (annotationsDe). Chaque texte recoit l'attribut de son champ. */
+  edition?: AnnotationsDeLEntree;
 };
 
 const {
@@ -65,6 +68,7 @@ const {
   as: Tag = "h2",
   headingId,
   class: className,
+  edition = SANS_ANNOTATION,
   // L'annotation ": Props" n'est pas decorative. Des qu'un composant declare une
   // prop nommee "as", l'outillage TypeScript d'Astro le prend pour un composant
   // polymorphe et retombe sur des props non typees. Annoter la destructuration
@@ -91,7 +95,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
       n'en est pas une. */}
   {
     eyebrow ? (
-      <p class={eyebrowClass()}>
+      <p class={eyebrowClass()} {...edition.champ("eyebrow")}>
         <span class={rule()} aria-hidden="true" />
         {eyebrow}
       </p>
@@ -99,12 +103,12 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
       <span class={rule({ class: "h-0.5 w-12 rounded-pill" })} aria-hidden="true" />
     )
   }
-  <Tag id={headingId} class={heading()}>
+  <Tag id={headingId} class={heading()} {...edition.champ("title")}>
     {
       word ? (
         <Fragment>
           {before}
-          <span class="accent-script">{word}</span>
+          <span class="accent-script" {...edition.champ("accent")}>{word}</span>
           {after}
         </Fragment>
       ) : (
@@ -112,6 +116,6 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
       )
     }
   </Tag>
-  {lede && <p class={ledeClass()}>{lede}</p>}
+  {lede && <p class={ledeClass()} {...edition.champ("lede")}>{lede}</p>}
   <slot />
 </div>

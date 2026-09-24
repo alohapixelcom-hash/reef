@@ -13,7 +13,9 @@ Reef builds two ways, and one variable chooses.
 
 Engine off, the build is identical to a Reef without an engine: the 63 HTML, XML and TXT files were compared one by one (21 September 2026).
 
-The engine is [EmDash](https://github.com/emdash-cms/emdash) (MIT licence), a CMS made for Astro and Cloudflare. Reef does not rewrite it: it plugs into it.
+The engine is [EmDash](https://github.com/emdash-cms/emdash) 0.38 (MIT licence), a CMS made for Astro and Cloudflare. Reef does not rewrite it: it plugs into it.
+
+The live demo runs with the engine on: `reef.alohapixel.app` has been served since 22 September 2026 by the Worker `reef-moteur` (D1 `reef-moteur`, R2 `reef-moteur-media`), built with `pnpm build:moteur` and deployed from the Mac with `npx wrangler deploy` (DEPLOY.md). The checks below were first run on a local build.
 
 ## Running the engine locally
 
@@ -40,8 +42,9 @@ Six pieces, and no page knows where a post comes from.
 ### Adding a managed page
 
 1. Add it to `PAGES_GEREES` (`src/moteur/pages-gerees.mjs`) and to the `CHEMINS` table of `src/moteur/plan-du-site.ts`.
-2. In the page: `const props = await propsDeLaPage<Props>(Astro, getStaticPaths); if (!props) return introuvable();`.
+2. In the page: `const props = await propsDeLaPage<Props>(Astro, getStaticPaths); if (props instanceof Response) return props;`.
 3. Read posts through `@js/posts`, never through `getCollection("posts")`.
+4. Read the copy with `const t = await textesDeLaPage(Astro)` (`src/moteur/textes.ts`) before any component renders; components read it with `useTranslations(Astro)` (see "The page texts" below).
 
 A forgotten page would stay frozen on the content of the last build: that is exactly the defect the engine corrects. A page listed in `PAGES_GEREES` but missing from the `CHEMINS` table makes the sitemap throw, on purpose.
 
@@ -71,6 +74,7 @@ The theme turns every entry into an entry of the `posts` collection (`src/moteur
 | Post cards (home, blog, topics, authors, keep reading) and the featured post | the card (`<article>`) | `title` |
 | Search results | the result link | `title` |
 | Previous and next post, under a post | the link | `title` |
+| Every written section (since 3.3.0, see "The page texts") | its `<section>` or its block; on each page the first section comes before any card | `title`, `accent`, `eyebrow`, `cta`, `cta_secondary` edited in the page; `lede`, `note`, `meta_description`, `arguments`, `revised` open the back office at the field |
 
 Engine off, `annotation()` returns an empty object and the static build does not change by a byte. Engine on, an anonymous visitor gets the HTML from before, byte for byte.
 
@@ -78,10 +82,45 @@ Engine off, `annotation()` returns an empty object and the static build does not
 
 - **The body is not annotated, and does not need to be.** The bar leaves Portable Text to `InlinePortableTextEditor`, EmDash's React (TipTap) island, which EmDash's own `<PortableText>` mounts in edit mode. Reef renders the body with that component (`src/moteur/TexteRiche.emdash.astro`), so in edit mode the island is already there (seen in Chromium) and saves its own draft on blur; an annotation on the body would only draw a second frame.
 - **A draft does not show in the lists.** EmDash's lists render the published version, even in edit mode: after a save, the cards keep the old title, with "Unpublished changes" and "Publish". The post page itself shows the draft. Publishing shows it everywhere.
-- **On the home page and the lists**, the first annotated tag is the first card: the status and the link of the bar are those of that post. The about, authors and topics indexes show no post and carry no annotation.
+- **On the home page and the lists**, the first annotated tag is the first section (the hero, the header of the list): the status, the "Publish" button and the link of the bar are those of that section. A card's own entry still carries its post. On a topic page only the eyebrow is a section text (the title is the topic's name); an author page has no section text but its breadcrumb, and its first annotated tag is the first card.
+- **A text shared by two places is edited where it lives**: the eyebrow of the filmed sequence is the one of the about page, and the eyebrow of privacy and terms is the one of the legal notice; the attribute names that entry.
 - **The standfirst and the cover of a card are not annotated**: the title's link covers the card with a pseudo-element, so a click there reaches the title, which the bar edits.
 - **An annotation goes on a tag that already has a class.** Astro gives its scope class (`class="astro-..."`) to a classless tag that receives a spread in a component with a `<style>`, even when the spread object is empty, and that for every visitor.
 - **The bar speaks English**: its words are written in its script, outside the catalogue the theme completes.
+
+## The page texts
+
+Until 3.3.0 the posts came from the database but the text a reader sees first on the home page and on the fixed pages (the hero title, its standfirst, the buttons, the section headers) came from the dictionary of the files (`src/i18n/`, `src/config/legalData.json.ts`): an editor switched "Edit" on and could change nothing there. Since 3.3.0 every written section of a page is an entry of the `sections` collection ("Textes des pages" in the back office), under the same identifier in both languages, 26 entries per language:
+
+| Page | Sections | Fields |
+|---|---|---|
+| Home | `hero`, `a-la-une`, `studio` (the filmed sequence), `dernieres-notes`, `sujets`, `signatures`, `lettre-flux` | eyebrow, title, accent word, standfirst, buttons; for `hero` also the three ledger labels and the search title and description |
+| Every page | `lettre` (the newsletter block, home band and footer), `pied-de-page` (the footer line) | title, accent word, standfirst, button, note |
+| Post | `a-lire-ensuite` (keep reading) | title, accent word, standfirst, button |
+| Blog, topics, authors, search | `archives`, `rubriques`, `auteurs`, `recherche` | eyebrow, title, accent word, standfirst, search title and description |
+| About | `a-propos`, `a-propos-histoire`, `a-propos-regles`, `a-propos-signatures`, `a-propos-appel` | the same, plus the three paragraphs of the story and the three rules (repeated field `arguments`) |
+| Contact | `contact`, `contact-formulaire`, `contact-direct`, `contact-suite` | the same, plus the note and button of the form and the three next steps |
+| Legal notice, privacy, terms | `mentions-legales`, `confidentialite`, `conditions` | title, description, clauses (`arguments`), and the revision date of privacy and terms |
+
+How it is wired: `src/moteur/contenu.sections.ts` is the only table between the dictionary and the collection (for each entry, the path of every text it carries). `lireLaPage(locale)` from `@moteur/source` reads the published sections once per request and lays them on the dictionary of the files (`src/moteur/contenu.ts`), so the result has the exact shape of the dictionary and no component reads the database. The page calls `textesDeLaPage(Astro)` (`src/moteur/textes.ts`), which puts the texts and the edit proxies on `Astro.locals`; a component reads its copy with `useTranslations(Astro)` and its attributes with `annotationsDe(Astro, slug)`. Engine off, the texts are the files and nothing is annotated.
+
+The rules:
+
+- **A missing or unpublished entry, or an empty field, keeps the text of the files.** A section cannot be removed from the page, only rewritten. The `arguments` of an entry replace the list of the files (an empty list keeps it).
+- **The seed carries the exact texts of the files**, both languages (`seed/seed.json`, written by `node scripts/graine-sections.mjs`). `src/moteur/contenu.selfcheck.ts` (`pnpm test`) fails when a path of the table is missing from a dictionary, a field from the seed, or when the seed and the files disagree: change a text of the dictionary, run the script.
+- **What stays in the files, on purpose**: the labels of the interface (menu, footer columns, form fields and placeholders, pagination, empty states, templates with a token such as "{count} posts" or "Posts filed under {topic}"), the topics and the authors (their names, descriptions and bios are the content collections of `src/data/`, which the engine does not manage), the 404 page (prerendered), and the revision date of the legal notice (a constant in `legal.astro`). The breadcrumb label and the title in the head follow the section's search title (`meta_title`), edited in the back office.
+- **Contact, legal notice, privacy and terms are managed pages since 3.3.0**, rendered on demand like the others, so that a published section shows with no build.
+
+### Where the database gets them
+
+- **A new site**: the setup wizard (with its demo content) or, locally, `/_emdash/api/setup/dev-bypass` apply the seed with its content: the 52 entries are created and published.
+- **A site deployed before 3.3.0** (the live demo was deployed with 3.1.3): its database has no `sections` collection. Nothing breaks: `lireLaPage` logs the error and the pages keep the texts of the files. `seed/import-3.3.0-reef.sql` creates the collection once, and touches nothing else:
+
+```bash
+npx wrangler d1 execute reef-moteur --remote --config wrangler.moteur.jsonc --file=seed/import-3.3.0-reef.sql
+```
+
+Its first part was not written by hand but read from what EmDash 0.38 itself writes: a blank local database, the seed of 3.1.3, then the seed of the collection through the same door, and the difference read with sqlite on the local D1 file. Its second part carries the corrections of 3.3.0 to texts that also live in the database, on the published rows and on their revisions, found by slug and language: the host clause of the legal notice, and the privacy policy and terms rewritten for a blog (title, standfirst, clauses, revision date). A single clause is replaced by its exact fragment; a rewritten list or a field only while it still holds the text of the earlier seed, so a text rewritten since in the back office is left alone. It is idempotent (`CREATE TABLE IF NOT EXISTS`, `INSERT OR IGNORE`, `UPDATE` guarded by `instr` or by the old value): a second run changes nothing. It assumes the database has no `sections` collection created another way (by the seed of a new site, whose identifiers differ); such a database already has the texts of the seed, and only needs the second part.
 
 ## The back office
 
@@ -101,7 +140,9 @@ pnpm build:moteur
 npx wrangler deploy --domain blog.example.com   # never --config: see DEPLOY.md
 ```
 
-With the engine on, `/secret-spot/`, `/fr/secret-spot/` and `/_emdash/secret-spot/` answer a 302 to `/_emdash/admin` (`src/worker.moteur.ts`; `assets.run_worker_first` in `wrangler.moteur.jsonc` makes the Worker see those paths before the prerendered files): one back office per site, at the same address as every other back office of the house.
+With the engine on, `/secret-spot/`, `/fr/secret-spot/` and `/_emdash/secret-spot/` answer a 302 to `/_emdash/admin` (`src/worker.moteur.ts`): one back office per site, EmDash's, at the same address as every other back office of the house. The Git-based editor of 2.3 was removed in 3.3.0.
+
+The Worker also settles a few addresses before EmDash sees them (`src/worker-adresses.ts`, shared with the static Worker): `/sitemap.xml` answers a 301 to `/sitemap-index.xml`, any other unknown `/sitemap*.xml` a 404 (EmDash's own sitemaps, which duplicate ours, are never reached); a page asked without its trailing slash a 301; a missing page the 404 of the language of the address (`404.html`, `fr/404.html`), with the 404 code even when asked by its own address (`assets.run_worker_first` in `wrangler.moteur.jsonc` hands `/404` and `/fr/404` to the Worker); and the `Server-Timing` header EmDash sets on every answer is removed, since it describes the engine's internals. `robots.txt` disallows `/_emdash/`.
 
 ## Deploy everything
 
@@ -125,7 +166,7 @@ The Deploy Hook is created in Cloudflare, in the Worker's settings, Builds. Vari
 `/version.json` (rendered on demand, never cached) gives the version from `package.json` and the build timestamp, fixed at build time:
 
 ```json
-{ "version": "3.1.0", "construit": "2026-09-21T21:01:22.579Z", "moteur": "emdash" }
+{ "version": "3.3.0", "construit": "2026-09-24T15:49:33.372Z", "moteur": "emdash" }
 ```
 
 As long as the old Worker answers, the timestamp does not move; as soon as the new one is online, it changes. The page compares this timestamp with the last successful trigger and shows "Redeployment proven" or "Build requested, not online yet". It also shows the time of the last trigger, the HTTP code the hook returned, and the last five clicks (who, when, caches, build, code). The log keeps fifty clicks, in the extension's storage, so in the site's database.
@@ -184,3 +225,13 @@ The edit bar, 24 September 2026, same setup (production build served by workerd 
 - **After, anonymous visitor**: the 48 managed addresses (pages, feeds, `llms.txt`, content sitemap) identical byte for byte, zero `data-emdash-ref`; engine off, the static build identical file by file (171 files, same sha256).
 - **After, edit mode**: 38 pages annotated, the first annotated tag of each one carries the entry and its status; 372 attributes (170 entries, 170 titles, 16 standfirsts, 16 covers). With the attributes removed, the HTML is the one from before, in edit mode as well.
 - **In Chromium, through the bar itself**: "Edit" switches on; the title is edited in the page, Enter saves it (`PUT` 200, "Saved", "Unpublished changes") without touching the public site; "Publish" (`POST` 200) puts it online, on the post and on the blog list; back to the original title the same way. The standfirst opens the back office at `?field=description`, the cover opens the picker, the body carries EmDash's inline editor; on a list, a click on a card title edits it instead of following the link. These figures are local: online, the network and Cloudflare's edge are added, to be measured after the first deployment.
+
+The page texts, 24 September 2026, same setup (the database of the 3.1.3 measure, then the 3.3.0 seed applied by dev-bypass: 1 collection, 12 fields, 52 published entries):
+
+- **Engine off**: the static build identical file by file to 3.1.3 on 170 of 171 files; the 171st, a post with a code block, varies between two builds of the same 3.1.3 source too (Shiki's token colours under a loaded machine), and only there.
+- **Anonymous visitor, engine on**: 58 addresses. 49 identical byte for byte, zero `data-emdash-ref`. The 8 fixed pages now rendered on demand (contact, legal notice, privacy, terms, both languages) are identical but for one newline between two inlined stylesheets (Astro joins them with a newline when it prerenders, without when it renders on demand). The content sitemap gains those 8 addresses; `/sitemap-index.xml`, which the sitemap integration no longer writes (no indexable page is prerendered any more), is served on demand and names the content sitemap (`src/moteur/plan-du-site.index.ts`).
+- **Edit mode**: 52 pages annotated, the first annotated tag of each is an entry (a section, or the post on a post page); 1110 attributes: 176 section entries and 562 section fields, 170 post entries and 202 post fields. On the home page, 9 sections and 34 fields. Each of the 96 texts edited in the page on 8 pages (both homes, about, contact, legal notice, privacy, blog, topics) shows exactly the value the API returns, so a save without a change writes the same text back.
+- **In Chromium, through the bar**: on the home page the first annotated tag is the `hero` entry ("Published"); the hero title is edited in the page, Enter saves it (`PUT` 200, "Saved", "Unpublished changes") while the public page keeps the old title; "Publish" (`POST` 200) puts it online, `/fr/` keeps its French title; the original title came back by the same path.
+- **The SQL file**, applied with `wrangler d1 execute --local` to a copy of the 3.1.3 database: the result equals the one of the seed, table by table (the stored text of 17 index statements differs only by the trailing whitespace Wrangler trims); applied a second time, nothing changes; applied twice to the database with the imported posts, the posts are untouched and 26 sections per language are published.
+
+The finishing of 3.3.0, 24 September 2026, same setup (production build served by workerd locally, the database of the page-texts measure). Engine off: 171 files before, 162 after (the Git back office's pages and scripts, ten files, gone; `fr/404.html` added). Once the three changes every page carries are set aside (the footer loses the "Editorial workspace" link and, next to the demo line, the "theme by Example Studio" credit; the inlined stylesheet loses the utilities only the Git back office used; the share card's alternative text describes the photo, in the page's language), 15 files differ, each for a fix of the audit: `robots.txt` (`Disallow: /_emdash/`), `404.html` (no canonical, hreflang or `og:url`, "Three ways back"), the legal notice, privacy and terms of both languages, the six author pages (no placeholder links, so no "Elsewhere" block) and `fr/rss.xml` (French title). Engine on, 76 addresses: after the same three changes, only the 404 pages, `/about` (301 to `/about/`, before 200), the six author pages, the legal pages (from the database, after the second part of the SQL file), `fr/rss.xml`, `robots.txt` and the sitemap addresses differ. The answers: `/sitemap.xml` 301, `/sitemap-0.xml`, `/sitemap-1.xml`, `/sitemap-contenu-1.xml` 404 (before: 200, 500, 500, 500), `/404` and `/fr/404/` 404 (before: 200 and the English page), `/fr/nope/` the French 404, `Server-Timing` on none of the 76 answers (before: 70), the login page "Reef Admin" with no em dash (the catalogue self-check fails on one). Edit mode: 52 pages annotated, 1110 attributes, page for page as before. The SQL file, applied twice with `wrangler d1 execute --local` to a 3.1.3 database: the 52 sections equal the 3.3.0 seed, field for field and in their live revisions, and the second run changes nothing but D1's own change counter; its second part, applied twice to the 3.3.0-seeded database, the same. In Chromium, through the bar: the hero title edited, saved (`PUT` 200), published (`POST` 200), seen anonymously, then restored the same way; the anonymous pages are again identical to the byte.
