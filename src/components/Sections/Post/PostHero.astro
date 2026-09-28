@@ -18,6 +18,7 @@ import { readingTime } from "@js/textUtils";
 import { fmt, formatDate, getLocale, useTranslations } from "@i18n";
 import { entrySlug } from "@i18n/content";
 import { enEdition } from "@moteur/annotations";
+import { marqueInterface } from "@moteur/cadre";
 import { annotationsDeLaFiche } from "@moteur/listes";
 import { annotation } from "@moteur/source";
 import { Image } from "astro:assets";
@@ -143,7 +144,7 @@ const auteur = annotationsDeLaFiche(author);
         <p class="text-muted-foreground flex flex-wrap items-center gap-x-5 gap-y-1 font-sans text-sm">
           <span>
             {t.post.published}{" "}
-            <time datetime={iso(pubDate)} class="text-foreground">
+            <time datetime={iso(pubDate)} class="text-foreground" {...annotation(post, "pub_date")}>
               {formatDate(pubDate, locale)}
             </time>
           </span>
@@ -152,14 +153,14 @@ const auteur = annotationsDeLaFiche(author);
             updatedDate && (
               <span title={t.post.updatedNote}>
                 {t.post.updated}{" "}
-                <time datetime={iso(updatedDate)} class="text-foreground">
+                <time datetime={iso(updatedDate)} class="text-foreground" {...annotation(post, "updated_date")}>
                   {formatDate(updatedDate, locale)}
                 </time>
               </span>
             )
           }
 
-          <span>{readingLabel}</span>
+          <span {...marqueInterface(Astro)}>{readingLabel}</span>
         </p>
       </div>
 

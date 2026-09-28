@@ -16,7 +16,7 @@ import { getFooterData, getSiteRoutes } from "@config/navData.json.ts";
 import siteData from "@config/siteData.json";
 import { fmt, getLocale, localePrefix, useTranslations } from "@i18n";
 import { annotationsDe, enEdition, styleDuBloc } from "@moteur/annotations";
-import { blocVisible, marqueCadre, menuDe } from "@moteur/cadre";
+import { blocVisible, marqueCadre, marqueInterface, menuDe } from "@moteur/cadre";
 import Pastilles from "@moteur/Pastilles.astro";
 import { COLONNES_DU_PIED, identiteDuSite } from "@moteur/theme";
 
@@ -239,7 +239,7 @@ const columnLink =
         }
         {
           demoNotice && (
-            <p>
+            <p {...marqueInterface(Astro)}>
               {noticeBefore}
               <a href={studioHref} class="text-foreground font-semibold hover:underline">
                 {t.demo.studio}

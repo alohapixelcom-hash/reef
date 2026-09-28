@@ -23,6 +23,7 @@ import { getSiteRoutes } from "@config/navData.json.ts";
 import { fmt, getLocale, useTranslations } from "@i18n";
 import type { ResolvedPost } from "@js/posts";
 import { annotation } from "@moteur/source";
+import { marqueInterface } from "@moteur/cadre";
 
 type Props = {
   posts: ResolvedPost[];
@@ -95,6 +96,7 @@ const promptLabel = fmt(t.search.prompt, { count: posts.length });
     data-prompt={promptLabel}
     data-one={t.search.countOne}
     data-many={t.search.countLabel}
+    {...marqueInterface(Astro)}
   >
     {promptLabel}
   </p>
@@ -118,7 +120,7 @@ const promptLabel = fmt(t.search.prompt, { count: posts.length });
             {/* Le sujet est du texte et non un lien : une ancre dans une ancre
                 est invalide, et un resultat de recherche n'a qu'une seule
                 destination utile. */}
-            <span class="text-muted-foreground font-sans text-xs">
+            <span class="text-muted-foreground font-sans text-xs" {...marqueInterface(Astro)}>
               {fmt(t.search.inTopic, { topic: topic.data.name })}
             </span>
             <span
@@ -127,7 +129,7 @@ const promptLabel = fmt(t.search.prompt, { count: posts.length });
             >
               {post.data.title}
             </span>
-            <span class="text-muted-foreground line-clamp-2 text-[0.95rem] leading-relaxed">
+            <span class="text-muted-foreground line-clamp-2 text-[0.95rem] leading-relaxed" {...annotation(post, "description")}>
               {post.data.description}
             </span>
           </a>

@@ -9,6 +9,7 @@ import { Icon } from "@components/svg/icons";
 import { Avatar } from "@components/ui/avatar";
 import { fmt, useTranslations, type Locale } from "@i18n";
 import { annotationsDeLaFiche } from "@moteur/listes";
+import { marqueInterface } from "@moteur/cadre";
 import type { CollectionEntry } from "astro:content";
 
 type Props = {
@@ -70,7 +71,7 @@ const fiche = annotationsDeLaFiche(author);
   <p class="text-muted-foreground text-[0.95rem] leading-relaxed" {...fiche.champ("bio")}>{author.data.bio}</p>
 
   <div class="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
-    <span class="bg-muted text-muted-foreground font-sans rounded-pill px-2.5 py-1 text-xs font-medium">
+    <span class="bg-muted text-muted-foreground font-sans rounded-pill px-2.5 py-1 text-xs font-medium" {...marqueInterface(Astro)}>
       {countLabel}
     </span>
 

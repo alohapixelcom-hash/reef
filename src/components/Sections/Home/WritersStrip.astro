@@ -15,7 +15,7 @@ import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { fmt, getLocale, useTranslations } from "@i18n";
 import { annotationsDe, styleDuBloc } from "@moteur/annotations";
-import { lienDe } from "@moteur/cadre";
+import { lienDe, marqueInterface } from "@moteur/cadre";
 import Pastilles from "@moteur/Pastilles.astro";
 import { annotationsDeLaFiche } from "@moteur/listes";
 import { entrySlug } from "@i18n/content";
@@ -93,7 +93,7 @@ const active = authors.filter((author) => (counts[entrySlug(author.id)] ?? 0) > 
                   {author.data.bio}
                 </p>
 
-                <p class="text-muted-foreground font-sans text-xs font-semibold tracking-[0.14em] uppercase">
+                <p class="text-muted-foreground font-sans text-xs font-semibold tracking-[0.14em] uppercase" {...marqueInterface(Astro)}>
                   {countLabel}
                 </p>
               </div>

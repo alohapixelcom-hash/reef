@@ -15,6 +15,7 @@ import { entrySlug } from "@i18n/content";
 import { getResolvedPosts } from "@js/posts";
 import { annotationsDeLaFiche } from "@moteur/listes";
 import { annotation } from "@moteur/source";
+import { marqueInterface } from "@moteur/cadre";
 import type { CollectionEntry } from "astro:content";
 
 type Props = {
@@ -75,7 +76,7 @@ const chip =
                   etiquette : la recherche du theme couvre deja titres, chapeaux,
                   sujets et etiquettes, et elle existe dans la table des routes.
                   Une page par etiquette ferait cent routes pour trois clics. */}
-              <ul class="flex flex-wrap gap-2">
+              <ul class="flex flex-wrap gap-2" {...annotation(post, "tags")}>
                 {post.data.tags.map((tag) => (
                   <li>
                     <a class={chip} href={`${routes.search}?q=${encodeURIComponent(tag)}`}>
@@ -165,6 +166,7 @@ const chip =
               <a
                 href={authorHref}
                 class="text-primary hover:decoration-primary inline-flex items-center gap-1.5 font-sans text-sm font-medium underline decoration-transparent underline-offset-4 transition-colors duration-150"
+                {...marqueInterface(Astro)}
               >
                 {fmt(t.post.moreFromAuthor, { name: author.data.name })}
                 <Icon name="arrow-right" size={16} />

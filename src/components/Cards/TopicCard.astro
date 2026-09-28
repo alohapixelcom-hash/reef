@@ -46,6 +46,7 @@
 import { Icon } from "@components/svg/icons";
 import { fmt, useTranslations, type Locale } from "@i18n";
 import { annotationsDeLaFiche } from "@moteur/listes";
+import { marqueInterface } from "@moteur/cadre";
 import type { CollectionEntry } from "astro:content";
 import { topicTone } from "./topicTone";
 
@@ -94,7 +95,7 @@ const fiche = annotationsDeLaFiche(topic);
     {/* Le compte en sur-titre. Il etait en bas, dans une pastille teintee ;
         il monte au-dessus du nom, ou il sert a quelque chose : il dit la
         taille du sujet avant qu'on decide de l'ouvrir. */}
-    <p class:list={["text-xs font-semibold tracking-[0.14em] uppercase", tone.ghost]}>
+    <p class:list={["text-xs font-semibold tracking-[0.14em] uppercase", tone.ghost]} {...marqueInterface(Astro)}>
       {countLabel}
     </p>
 
