@@ -76,7 +76,8 @@ function enBillet(entree: Entree, locale: Locale): CollectionEntry<"posts"> {
     // Le slug, pas entree.id : l'id d'une traduction porte deja sa langue.
     id: `${locale}/${d.slug}`,
     collection: "posts",
-    body: texteBrut(d.content),
+    // Un billet sans texte (content null, un brouillon a peine commence) ne doit pas casser toutes les pages.
+    body: texteBrut(d.content ?? []),
     data: {
       title: d.title,
       description: d.description ?? "",

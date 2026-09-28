@@ -1,0 +1,227 @@
+<!-- docs/administrer.md - le guide de l'éditeur : administrer tout le site Reef depuis le back office EmDash, sans code. -->
+
+# Administrer votre site depuis le back office
+
+Ce guide est écrit pour quelqu'un qui n'a jamais ouvert le code. Tout ce que vos lecteurs voient se change depuis le back office : les articles, les sujets, les auteurs, les textes des pages, les photos, les boutons et leurs adresses, les menus, le pied de page, le nom et le logo du site, le nombre d'articles par page, le référencement, les redirections, les courriels du formulaire de contact. Une modification publiée se voit tout de suite sur le site, sans attendre de mise en ligne.
+
+Les libellés cités entre guillemets sont exactement ceux de l'écran. La version anglaise de ce guide est [administer.md](administer.md).
+
+## 1. Se connecter
+
+1. Ouvrez l'adresse de votre site suivie de `/_emdash/admin` (ou `/secret-spot/`, qui y mène aussi).
+2. Connectez-vous avec votre clé d'accès (empreinte, visage ou code de l'appareil).
+3. Vous arrivez sur le « Tableau de bord ». La colonne de gauche, le rail, montre tout ce qui agit sur le site :
+   - « Contenu » : « Textes des pages », « Sujets », « Auteurs », « Pages », « Réglages par langue », « Articles », « Médias » ;
+   - « Gérer » : « Menus », « Redirections » ;
+   - « Administration » (administrateurs seulement) : « Types de contenu », « Utilisateurs », « Modules d'extension », « Paramètres » ;
+   - « Modules d'extension » : « Tout déployer », « Courriels », « Journal des courriels », « Brancher les courriels », « Réglages des courriels ».
+
+Deux rôles comptent : un **éditeur** change les contenus, les menus et les redirections ; un **administrateur** change en plus les « Paramètres » (nom du site, logo, réseaux, articles par page), les courriels et les utilisateurs.
+
+## 2. La barre d'édition, sur le site lui-même
+
+Connecté, ouvrez n'importe quelle page du site (« Voir le site », en haut à droite du back office). Une petite barre apparaît en bas de l'écran. Ses mots viennent du moteur et restent en anglais.
+
+1. Basculez « Edit ». Les zones modifiables s'entourent au survol.
+2. Cliquez un texte court (un titre, un bouton, le nom d'un sujet) : il devient modifiable dans la page. Tapez, puis Entrée. La barre affiche « Saved » : c'est enregistré en brouillon, **les lecteurs ne voient encore rien**.
+3. Cliquez « Publish » dans la barre : c'est en ligne, la page se recharge.
+4. Un texte long, une liste, une date ou une case à cocher ouvre le back office au bon champ, dans un nouvel onglet.
+
+Sur une page d'article, le titre, le chapô, la couverture, le nom du sujet et celui de l'auteur se cliquent de la même façon : chacun ouvre l'article, le sujet ou l'auteur qu'il affiche.
+
+En mode édition, de petites **pastilles** apparaissent sur les blocs pour ce qui ne se voit pas comme un texte :
+
+- « Adresse du bouton : » et « Adresse du 2e bouton : » : cliquez l'adresse soulignée, tapez la nouvelle, Entrée. « (celle du thème) » signale l'adresse prévue d'origine.
+- « Photo : celle du thème », « Vidéo : », « Affiche : celle du thème » : cliquez pour changer l'image ou la vidéo.
+- « Masquer ce bloc » : ouvre le back office sur la case qui masque le bloc.
+
+En bas à gauche, le panneau **« Cadre du site »** donne les liens directs vers ce que la barre ne touche pas : les menus de la langue de la page, les réglages du site, les réglages par langue, les textes de l'en-tête et du pied de page, les pages libres, les redirections et la médiathèque.
+
+## 3. Changer un texte
+
+- **Dans la page** : barre, « Edit », cliquez le texte, tapez, Entrée, puis « Publish ».
+- **Dans le back office** : « Textes des pages », cliquez le bloc (la colonne « Page où se trouve ce bloc » dit sur quelle page il est), changez le champ, « Enregistrer », puis « Publier les modifications » et « Publier les modifications maintenant ».
+
+Chaque champ porte une phrase qui dit ce qu'il change. Le « Mot du titre écrit en couleur » doit reprendre un mot du titre, écrit pareil. Le titre de la page d'un sujet est un modèle : `{topic}` y devient le nom du sujet.
+
+**Revenir en arrière** : dans l'écran du bloc, « Ignorer les modifications » tant que ce n'est pas publié ; après, « Révisions » (voir la partie 18).
+
+## 4. Changer une image ou la vidéo
+
+- **Dans la page** : barre, « Edit », cliquez la pastille « Photo » du bloc. Dans la fenêtre « Image », « Upload » envoie une photo de votre ordinateur, « Replace » en choisit une dans la médiathèque. Puis « Publish ».
+- **Dans le back office** : dans le bloc, le champ « Photo du bloc (vide : la photo livrée avec le thème) » : « Sélectionner une image », puis « Choisir ». « Enregistrer », puis publiez.
+- **La vidéo du bloc studio** (accueil) : « Adresse de la vidéo du bloc » (une adresse `https://...` de fichier vidéo) et « Image montrée avant la vidéo ».
+- **La couverture d'un article** : champ « Couverture » de l'article.
+
+Le texte alternatif (ce que lit un lecteur d'écran) se saisit dans la fenêtre de l'image. Le point d'intérêt se règle dans « Médias » : la photo reste cadrée autour de lui sur tous les écrans.
+
+**Revenir à la photo du thème** : videz le champ (dans la fenêtre « Image » de la barre, « Remove »), puis publiez.
+
+## 5. Changer un bouton
+
+- **Son texte** : cliquez le bouton en mode édition, tapez, Entrée, « Publish ».
+- **Son adresse** : cliquez l'adresse dans sa pastille « Adresse du bouton : », tapez la nouvelle adresse (une page du site comme `/contact/`, une ancre comme `#newsletter`, ou une adresse complète `https://...`), Entrée, « Publish ». Une pastille vidée rend l'adresse prévue par le thème.
+- **Le masquer** : masquez le bloc (partie 6), ou videz le texte du bouton.
+
+## 6. Masquer ou réafficher un bloc
+
+1. En mode édition, cliquez la pastille « Masquer ce bloc » (ou ouvrez le bloc dans « Textes des pages »).
+2. Activez « Masquer ce bloc : les visiteurs ne le voient plus ».
+3. « Enregistrer », puis « Publier les modifications maintenant ».
+
+Les lecteurs ne voient plus le bloc. Vous, en mode édition, le voyez grisé avec sa pastille « Bloc masqué : les visiteurs ne le voient pas », pour pouvoir le réafficher de la même façon. Les huit blocs de l'accueil se masquent ainsi (l'ouverture, la bande des sujets, l'article à la une, le studio, les dernières notes, les sujets, les signatures, la lettre d'information). Masquer la lettre d'information la retire aussi du pied de page.
+
+## 7. Changer un menu
+
+« Menus » liste les menus du site. Chacun existe en anglais et en français.
+
+| Menu | Où il s'affiche |
+|---|---|
+| « Menu principal, en haut de chaque page » | la barre de navigation |
+| « Liens ajoutés au menu sur téléphone » | le menu du téléphone, en plus du menu principal (Auteurs, Recherche) |
+| « Boutons en haut à droite de chaque page » | le bouton « S'abonner » ; un lien portant la classe « bouton » est dessiné en bouton plein |
+| « Lire », « Le studio », « Légal » | les trois colonnes du pied de page (le nom du menu est le titre de la colonne) |
+
+- **Renommer ou changer l'adresse d'un lien** : « Modifier » sur la ligne, champs « Libellé » et « URL », « Enregistrer ».
+- **Ajouter un lien** : « Ajouter un lien personnalisé », « Libellé », « URL », « Ajouter ». « Ajouter du contenu » propose une page, un article, un sujet ou un auteur du back office.
+- **Réordonner** : flèches « Monter » et « Descendre ».
+- **Retirer** : « Supprimer » (poubelle). **Attention : la suppression est immédiate, sans confirmation.**
+- **Sous-menu** : « Modifier », puis « Parent » : choisissez le lien sous lequel il se range.
+- **L'autre langue** : en haut de l'écran du menu, « Traductions », ligne « FR » ou « EN », « Modifier ».
+
+Le changement se voit tout de suite sur le site, sans publier. Si un menu est vide ou absent dans une langue, le site montre les liens d'origine du thème.
+
+## 8. Changer un lien ou une colonne du pied de page
+
+- **Les liens des colonnes** : ce sont les menus « Lire », « Le studio » et « Légal » (partie 7).
+- **Le titre d'une colonne** : le nom du menu, dans « Menus », en haut de l'écran du menu.
+- **Les textes du pied** (phrase sous le logo, « Construit avec », mentions, « Thème par », « Retour en haut ») : « Textes des pages », bloc « pied-de-page » (page « Tout le site »). Le lien direct est dans le panneau « Cadre du site », « Textes du pied de page ».
+- **L'e-mail et le crédit du thème** : « Réglages par langue » (partie 10).
+
+## 9. Les réglages du site
+
+« Paramètres » (administrateurs), puis « Général » :
+
+| Champ | Ce qu'il change |
+|---|---|
+| « Titre du site » | le nom de la marque partout : barre, pied, titres des onglets, partage sur les réseaux, flux RSS, back office |
+| « Sélectionner le logo » | le logo de la barre ; vide, le pictogramme du thème |
+| « Sélectionner la favicon » | l'icône de l'onglet ; vide, celle du thème |
+| « Articles par page » | le nombre d'articles de chaque page de « Tous les billets », d'un sujet et d'un auteur (9 d'origine) |
+
+Puis « Enregistrer ». « Liens sociaux » : les réseaux du pied de page. « SEO » : le séparateur des titres (« Titre | Marque »), l'image de partage par défaut, les codes de vérification Google et Bing.
+
+**Sans effet sur ce site** (le thème les ignore volontairement) : « Slogan » (le slogan dépend de la langue : il est dans « Réglages par langue »), « URL du site », « Format des dates », « Fuseau horaire » (les dates suivent la langue de la page), et le « robots.txt » du SEO (il protège le back office et annonce le plan du site : une erreur désindexerait le site).
+
+## 10. Coordonnées, e-mail, couleur et textes communs
+
+« Réglages par langue » : une entrée par langue, qui porte ce qui change avec la langue.
+
+- la description du site (reprise par Google quand une page n'a pas la sienne) ;
+- le texte de l'image de partage pour les personnes aveugles ;
+- l'adresse e-mail de contact du pied de page et de la page Contact ;
+- le nom et le lien du crédit du pied de page ;
+- le titre du flux RSS de la langue ;
+- l'adresse d'un service externe pour la lettre d'information, et celle pour le formulaire de contact quand l'écran « Courriels » n'est pas branché (partie 17 bis) ;
+- « Couleur de la marque, sur tout le site » : un choix parmi cinq couleurs ; vide, le corail du thème.
+
+Les textes de l'en-tête et du pied de page sont des blocs de « Textes des pages » (page « Tout le site »).
+
+## 11. Écrire et publier un article
+
+1. « Articles », « Ajouter ».
+2. « Titre », « Chapo » (la phrase sous le titre et sur la carte), « Couverture », « Texte ».
+3. « Sujet » : choisissez le sujet dans la liste (elle montre l'identifiant des « Sujets », `Craft`, `Design`...). « Auteur » : de même (`Mara-lindqvist`...).
+4. « Date affichée » (vide : la date de publication), « Revu le » si vous le mettez à jour plus tard, « À la une » pour l'afficher en grand sur l'accueil.
+5. Dans « Slug », l'adresse de l'article : `mon-article` donne `/blog/mon-article/`.
+6. « Enregistrer » garde un brouillon, invisible. « Publier » le met en ligne. « Programmer » choisit une date.
+
+L'article paraît aussitôt en tête de « Tous les billets », dans la page de son sujet, dans celle de son auteur, dans le flux RSS et dans le plan du site. Le panneau « SEO » de l'article (titre, description, image, adresse canonique, ne pas indexer) passe avant le titre et le chapô pour Google et les réseaux ; « ne pas indexer » le retire du plan du site.
+
+## 12. Les sujets et les auteurs
+
+- **Un sujet** : « Sujets », cliquez le sujet. « Nom du sujet », « Description, en tête de la page du sujet et sur sa carte », « Couleur du sujet » (Corail, Aigue-marine, Encre), « Rang dans les listes (1 en premier) », « Image de partage ». « Enregistrer », puis publiez. Le nom change partout : cartes, bande défilante, page du sujet, pastille des articles.
+- **Un auteur** : « Auteurs », cliquez l'auteur. « Nom », « Rôle, sous le nom », « Biographie courte », « Portrait (vide : les initiales) », « Liens ailleurs (site, réseaux), sur sa page ».
+- **Ajouter** un sujet ou un auteur : « Ajouter », remplissez, publiez. Son **slug** est l'identifiant que les articles choisissent : `photo` donne la page `/topics/photo/`. Pour qu'il soit proposé dans le champ « Sujet » ou « Auteur » des articles, un administrateur ajoute ce slug aux choix du champ : « Types de contenu », « Articles », champ « Sujet », « Options ».
+
+## 13. Ajouter un élément à une liste
+
+Les éléments d'un bloc (les chiffres de l'ouverture, les règles de la page À propos, les étapes du contact, les clauses légales) sont dans le champ « Éléments du bloc, dans l'ordre de la page » : « Ajouter un élément ». Une clause légale a aussi une « ancre » : l'adresse `#...` du sommaire.
+
+## 14. Ajouter une page, puis la mettre au menu
+
+1. « Pages », « Ajouter ». « Titre de la page », « Texte d'introduction », « Texte de la page », photo si vous voulez.
+2. Dans « Slug », l'adresse de la page : `colophon` donne `/colophon/`.
+3. « Enregistrer », « Publier ».
+4. « Menus », le menu voulu, « Ajouter un lien personnalisé », URL `/colophon/`, « Ajouter ».
+
+Une page qui porte le nom d'une page du thème (`blog`, `topics`, `authors`, `about`, `contact`, `search`, `legal`) ou d'une langue (`fr`) ne s'affiche pas.
+
+## 15. Traduire
+
+Chaque texte existe en anglais et en français. Dans l'écran d'une entrée, le panneau « Traductions » montre les deux langues : « Modifier » ouvre l'autre version. Le sélecteur de langue en haut des listes (« EN (par défaut) ») change la langue affichée. Les menus se traduisent de la même façon (partie 7). Les rangs, les photos, les adresses, les couleurs et les cases « masquer » valent pour les deux langues.
+
+## 16. Le référencement
+
+- **Une page du thème** (accueil, listes, À propos, Contact, pages légales, page introuvable) : dans son premier bloc, « Titre de la page dans les résultats de recherche », « Description de la page dans les résultats de recherche » et « Image de partage de la page sur les réseaux ».
+- **Un article, une page ajoutée, un sujet, un auteur** : panneau « SEO » de son écran (titre, description, image, adresse canonique, ne pas indexer).
+- Le plan du site pour Google se tient à jour tout seul ; une entrée marquée « ne pas indexer » en sort.
+
+## 17. Une redirection
+
+« Redirections », « Nouvelle redirection » : « Chemin source » (l'ancienne adresse, qui commence par `/`), « Chemin d'arrivée » (une adresse du site, qui commence aussi par `/`), « Code d'état » (« 301 Permanent » le plus souvent ; 410 pour dire qu'une page a disparu), « Créer ». Changer le slug d'un article ou d'une page crée seul la redirection 301. L'onglet « Erreurs 404 » liste les adresses demandées qui n'existent pas.
+
+## 17 bis. Les courriels du formulaire de contact
+
+Les messages de la page Contact vous arrivent par courriel dès que l'écran « Courriels » est branché (administrateurs) :
+
+1. « Brancher les courriels » : l'adresse d'envoi et son domaine ; l'écran relit le domaine et dit ce qui manque.
+2. « Réglages des courriels » : l'expéditeur, l'adresse de réponse, le destinataire du formulaire de contact, l'accusé de réception envoyé au lecteur dans sa langue.
+3. « Courriels » : les envois du mois et les échecs ; « Journal des courriels » : chaque envoi, son erreur expliquée, « Renvoyer ».
+
+La lettre d'information, elle, s'envoie à un service externe (partie 10) : sans adresse, son formulaire reste une démonstration.
+
+## 18. Révisions, retour arrière, corbeille
+
+- **Avant publication** : « Ignorer les modifications » revient à la version en ligne.
+- **Après** : « Révisions » liste les versions ; restaurez-en une, puis publiez.
+- **Supprimer** : « Déplacer vers la corbeille », puis confirmer. L'onglet « Corbeille » de la liste permet de restaurer.
+- **Retirer du site sans supprimer** : « Annuler la publication ». Pour un bloc de « Textes des pages », le texte d'origine du thème revient ; pour faire disparaître un bloc, masquez-le (partie 6). Un sujet ou un auteur dépublié rend la fiche d'origine du thème.
+
+## 19. Carte du site : où se change chaque zone
+
+| Page | Zone | Où la changer |
+|---|---|---|
+| Toutes | Nom de la marque, logo, favicon | « Paramètres », « Général » |
+| Toutes | Liens de la barre, bouton « S'abonner », menu du téléphone | « Menus » : menu principal, boutons, liens du téléphone |
+| Toutes | Colonnes et liens du pied | « Menus » : « Lire », « Le studio », « Légal » |
+| Toutes | Phrase du pied, mentions, e-mail, crédit | « Textes des pages » (page « Tout le site ») et « Réglages par langue » |
+| Toutes | Lettre d'information | « Textes des pages », bloc « lettre » ; adresse du service dans « Réglages par langue » |
+| Toutes | Couleur de la marque | « Réglages par langue », « Couleur de la marque » |
+| Accueil | Photo, titre, boutons et leurs adresses, chiffres | barre (titre, boutons, pastilles) ou « Textes des pages », bloc de l'ouverture |
+| Accueil | Bande défilante, sujets, signatures | « Sujets », « Auteurs » ; titres des sections dans « Textes des pages », page « Accueil » |
+| Accueil | Article à la une, dernières notes | « Articles » (case « À la une », date) ; titres dans « Textes des pages » |
+| Accueil | Studio : vidéo, affiche, boutons | bloc « studio » : pastilles « Vidéo », « Affiche », adresses |
+| Tous les billets, sujet, auteur | En-tête, fil d'Ariane, nombre d'articles | « Textes des pages » ; « Articles par page » dans « Paramètres » |
+| Article | Tout le contenu, SEO | « Articles » ; « À lire ensuite » dans « Textes des pages », page « Billet » |
+| À propos | Texte, histoire, règles, signatures, appel | « Textes des pages », page « À propos » |
+| Contact | Formulaire, écrire directement, étapes | « Textes des pages », page « Contact » ; courriels dans « Courriels » |
+| Pages légales | Clauses, sommaire, date | « Textes des pages », pages « Mentions légales », « Confidentialité », « Conditions » |
+| Page introuvable | Code, titre, texte, trois boutons | « Textes des pages », page « Page introuvable » |
+| Pages ajoutées | Tout | « Pages » |
+
+## 20. Ce qui demande un développeur
+
+- l'ordre des blocs d'une page, un nouveau type de bloc, la mise en page et le dessin du site ;
+- les textes d'interface génériques (accessibilité, « changer de langue », « ouvrir le menu », « min de lecture », compteurs), le bandeau de cookies ;
+- les adresses des pages du thème et le fichier robots.txt ;
+- une police de caractères différente de celle du thème ;
+- l'envoi de la lettre d'information par l'écran « Courriels » (il ne reçoit que le formulaire de contact).
+
+Ce qu'il faut savoir du moteur (EmDash 0.38) :
+
+- un lien de menu vers une page en brouillon ou à la corbeille reste affiché : retirez-le du menu ;
+- le texte alternatif d'une image est copié dans le champ au moment du choix : le changer ensuite dans « Médias » ne change pas les champs déjà remplis ;
+- recadrer une image dans « Médias » crée un nouveau fichier ;
+- « Sections » (blocs réutilisables du moteur, masquées du rail) n'a rien à voir avec « Textes des pages » ;
+- la barre d'édition parle anglais.

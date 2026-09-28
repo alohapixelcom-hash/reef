@@ -4,7 +4,42 @@
 
 Versions describe the features actually shipped in this theme.
 
-Current version: **3.3.3**.
+Current version: **3.4.0**.
+
+## 3.4.0 - 2026-09-28
+
+The whole site is managed from the EmDash back office: menus, site settings,
+posts per page, topics, authors, footer, links, images, SEO, new pages; the
+edit bar works on every page, the not-found page included.
+
+- Native menus (header, phone drawer, the "Subscribe" button, the three
+  footer columns), one per language; site name, logo, favicon, social links,
+  title separator, default share image, verification codes and posts per page
+  from the native settings; a per-language `site` entry (description, contact
+  email, credit, RSS title, form endpoints, brand colour among five).
+- Topics and authors become collections (`sujets`, `auteurs`), seeded from
+  `src/data`: name, description, colour, rank, portrait, links, SEO panel.
+  The SEO panel of posts is read (title, description, image, canonical, no
+  index; no index leaves the sitemap).
+- Every block of `sections` gains button addresses, a photo, a video and its
+  poster, a breadcrumb name, a share image and a "hide this block" switch;
+  texts wrongly shared between two places get their own field. Empty fields
+  render the theme exactly as before.
+- Free pages (`pages` collection) at `/<slug>/` and `/fr/<slug>/`; the
+  not-found page is rendered on demand and editable.
+- The Courriels module: the contact form's messages are sent by email,
+  with a log and a setup screen, from the back office.
+- The back office language rule is called from the Worker; the transition
+  middleware is gone.
+- Performance: no layout shift when the header measures itself (CLS 0.06 to
+  0), a 1440 px step for the hero, the post cover and the first card of a list
+  loaded first.
+- A post with no text no longer breaks every page (engine on).
+- `import-3.4.0-reef.sql` and `scripts/base-3.4.0.mjs` bring an online
+  database to 3.4.0 without overwriting anything an editor changed.
+- Editor guides: `docs/administrer.md` (French) and `docs/administer.md`.
+
+Engine off, the static build changes only by the performance work above.
 
 ## 3.3.3 - 2026-09-28
 

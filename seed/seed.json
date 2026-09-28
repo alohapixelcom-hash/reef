@@ -124,8 +124,8 @@
         {"slug":"credit_name","label":"Nom affiché dans le pied de page après « Thème Reef par »","type":"string"},
         {"slug":"credit_link","label":"Lien de ce nom (vide : l'adresse e-mail de contact)","type":"string"},
         {"slug":"feed_title","label":"Titre du flux RSS de cette langue (vide : celui du thème)","type":"string"},
-        {"slug":"form_newsletter","label":"Adresse d'un service externe qui reçoit les inscriptions à la lettre (vide : l'écran Courriels, ou rien s'il n'est pas branché)","type":"string"},
-        {"slug":"form_contact","label":"Adresse d'un service externe qui reçoit les messages de la page Contact (vide : l'écran Courriels, ou rien s'il n'est pas branché)","type":"string"},
+        {"slug":"form_newsletter","label":"Adresse d'un service externe qui reçoit les inscriptions à la lettre (vide : le formulaire reste une démonstration et n'envoie rien)","type":"string"},
+        {"slug":"form_contact","label":"Adresse d'un service externe qui reçoit les messages de la page Contact, quand l'écran Courriels n'est pas branché (sans l'un ni l'autre, le formulaire n'envoie rien)","type":"string"},
         {"slug":"brand_color","label":"Couleur de la marque, sur tout le site (vide : le corail du thème)","type":"select","translatable":false,"validation":{"options":["Bleu océan","Bleu nuit","Vert émeraude","Rouge framboise","Orange soleil"]}}
       ]
     }
