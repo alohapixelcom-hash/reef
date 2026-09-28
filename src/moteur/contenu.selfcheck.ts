@@ -3,6 +3,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { type DonneesDeSection, extraireLaSection, lire, SECTIONS, type Textes, textesAvecLaBase } from "./contenu.ts";
+import { HORS_BASE, PAGES_DU_SITE } from "./contenu.sections.ts";
 import { chargerLesTextes } from "./textes.node.mjs";
 
 let checks = 0;
@@ -12,6 +13,8 @@ function is(actual: unknown, expected: unknown, message: string): void {
 }
 
 const textes = (await chargerLesTextes()) as Record<string, Textes>;
+// L'adaptateur du theme (ses menus) lit ses fichiers par des alias : il se charge apres le crochet de chargerLesTextes.
+const { MENUS } = await import("./theme.ts");
 const langues = Object.keys(textes);
 type Champ = { slug: string; type: string; validation?: { subFields?: { slug: string }[]; options?: string[] } };
 type Entree = { id: string; slug: string; locale: string; translationOf?: string; status: string; data: DonneesDeSection };
@@ -33,19 +36,21 @@ for (const section of SECTIONS) {
   slugs.add(section.slug);
   assert.ok(champs.get("page")?.validation?.options?.includes(section.page), `${section.slug} : page "${section.page}" absente des options de la graine`);
   const tous: [string, string][] = Object.entries(section.champs);
-  if (section.arguments) tous.push(["arguments", section.arguments.liste]);
+  if (section.arguments) tous.push(["arguments", "objet" in section.arguments ? section.arguments.objet : section.arguments.liste]);
   for (const [champ, chemin] of tous) {
     assert.ok(champs.has(champ), `${section.slug} : champ ${champ} absent de la graine`);
-    assert.ok(!chemins.has(chemin), `${chemin} porte par deux sections`);
+    const objet = champ === "arguments" && section.arguments && "objet" in section.arguments;
+    assert.ok(objet || !chemins.has(chemin), `${chemin} porte par deux sections`);
     chemins.add(chemin);
     for (const langue of langues) {
       const valeur = lire(textes[langue], chemin);
-      assert.ok(champ === "arguments" ? Array.isArray(valeur) : typeof valeur === "string", `${section.slug} : ${chemin} absent ou d'une autre forme en ${langue}`);
+      const forme = champ !== "arguments" ? typeof valeur === "string" : objet ? typeof valeur === "object" && valeur !== null : Array.isArray(valeur);
+      assert.ok(forme, `${section.slug} : ${chemin} absent ou d'une autre forme en ${langue}`);
     }
   }
   if (section.arguments) {
     const sous = new Set(champs.get("arguments")?.validation?.subFields?.map((s) => s.slug));
-    const noms = "texte" in section.arguments ? [section.arguments.texte] : Object.keys(section.arguments.cles);
+    const noms = "texte" in section.arguments ? [section.arguments.texte] : [...Object.keys(section.arguments.cles), ...(section.arguments.rendus ?? [])];
     for (const nom of noms) assert.ok(sous.has(nom), `${section.slug} : sous-champ arguments.${nom} absent de la graine`);
   }
 }
@@ -95,5 +100,35 @@ is(
   "une date de revision revient au format des fichiers",
 );
 is(avec("inconnue", { title: "x" }), en, "une entree que la table ne connait pas ne change rien");
+
+// 5. Les valeurs du champ Page de la graine sont exactement les pages de la table.
+is(champs.get("page")?.validation?.options, [...PAGES_DU_SITE], "le champ Page propose les pages de la table, dans l'ordre");
+
+// 6. TOUT texte des dictionnaires est porte par une section, par un menu
+//    natif, ou nomme dans HORS_BASE avec sa raison.
+const motif = (chemin: string) => new RegExp(`^${chemin.replaceAll(".", "\\.").replaceAll("*", "\\d+")}(\\.|$)`);
+const couverts: RegExp[] = [
+  ...HORS_BASE.map((h) => motif(h.chemin)),
+  ...MENUS.flatMap((m) => [m.libelle, ...m.liens.map((l) => l.libelle)]).filter(Boolean).map((c) => new RegExp(`^${c.replaceAll(".", "\\.")}$`)),
+];
+for (const section of SECTIONS) {
+  for (const chemin of Object.values(section.champs)) couverts.push(new RegExp(`^${chemin.replaceAll(".", "\\.")}$`));
+  const tranche = section.arguments;
+  if (!tranche) continue;
+  if ("objet" in tranche) for (const cle of Object.values(tranche.cles)) couverts.push(motif(`${tranche.objet}.${cle}`));
+  else if ("texte" in tranche) couverts.push(motif(`${tranche.liste}.*`));
+  else for (const cle of Object.values(tranche.cles)) couverts.push(motif(`${tranche.liste}.*.${cle}`));
+}
+for (const [langue, dictionnaire] of Object.entries(textes)) {
+  const oublies: string[] = [];
+  const parcourir = (valeur: unknown, chemin: string): void => {
+    if (typeof valeur === "string" || typeof valeur === "number") {
+      if (!couverts.some((m) => m.test(chemin))) oublies.push(chemin);
+    } else if (Array.isArray(valeur)) valeur.forEach((v, i) => parcourir(v, `${chemin}.${i}`));
+    else if (valeur && typeof valeur === "object") for (const [cle, v] of Object.entries(valeur)) parcourir(v, chemin ? `${chemin}.${cle}` : cle);
+  };
+  parcourir(dictionnaire, "");
+  is(oublies, [], `chaque texte en ${langue} est gere par le moteur ou nomme hors base`);
+}
 
 console.log(`contenu.selfcheck : ${checks} verifications, ${SECTIONS.length} sections, ${entrees.length} entrees de graine.`);

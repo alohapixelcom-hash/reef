@@ -25,9 +25,10 @@ import "@fontsource-variable/instrument-sans/wght-italic.css";
 // defaut, pas seulement le cas du jour.
 import policeAffichage from "@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url";
 import policeTexte from "@fontsource-variable/instrument-sans/files/instrument-sans-latin-wght-normal.woff2?url";
-import siteData from "@config/siteData.json";
 import siteSettings from "@config/siteSettings.json";
 import { defaultLocale, getAlternates, getLocale, localeMeta, localizePath } from "@i18n";
+import { feuilleDeLaPalette } from "@moteur/palette";
+import { identiteDuSite, variablesDeLaPalette } from "@moteur/theme";
 import tokensRaw from "@styles/tokens.css?raw";
 import { ClientRouter } from "astro:transitions";
 
@@ -42,29 +43,40 @@ export interface Props {
    * canonical, ni hreflang, ni og:url. Elle est deja en noindex.
    */
   introuvable?: boolean;
+  /** L'adresse canonique donnee par le panneau SEO d'une entree ; absente, celle de la page. */
+  canonical?: string;
 }
+
+// L'identite du site : moteur allume, les reglages du site (nom, separateur,
+// favicon, image de partage, verification des moteurs, reseaux) et l'entree
+// "site" de la langue ; moteur eteint, siteData, comme avant. Un reglage vide
+// rend le theme tel qu'il est (src/moteur/cadre.ts).
+const locale = getLocale(Astro);
+const marque = identiteDuSite(Astro, locale);
+const palette = feuilleDeLaPalette(Astro.locals.cadre?.site?.brand_color, variablesDeLaPalette);
 
 const {
   title,
-  description = siteData.description,
+  description = marque.description,
   image,
   type = "website",
   noindex = false,
   introuvable = false,
+  canonical: canoniqueDonnee,
 } = Astro.props;
 
 // "Titre | Marque", sauf si le titre porte deja la marque (page d'accueil).
-const fullTitle = title.includes(siteData.name) ? title : `${title} | ${siteData.name}`;
+const fullTitle = title.includes(marque.nom) ? title : `${title}${marque.separateur}${marque.nom}`;
 
 // Canonical : une seule forme d'URL, celle de trailingSlash "always" dans astro.config.
 // Les routes fichiers (rss.xml, robots.txt) gardent leur extension telle quelle.
 const base = Astro.site ?? Astro.url;
 const pathname = Astro.url.pathname;
 const canonicalPath = pathname.endsWith("/") || /\.[a-z0-9]+$/i.test(pathname) ? pathname : `${pathname}/`;
-const canonical = new URL(canonicalPath, base);
-// Sans image propre, la carte par defaut, avec l'alternative de la langue.
-const locale = getLocale(Astro);
-const carte = image ?? { src: siteData.defaultImage.src, alt: siteData.defaultImage.alt[locale] };
+const canonical = new URL(canoniqueDonnee ?? canonicalPath, base);
+// Sans image propre, la carte par defaut (celle des reglages, sinon celle du
+// theme), avec l'alternative de la langue.
+const carte = image ?? marque.image;
 const imageUrl = new URL(carte.src, base);
 
 // Les versions linguistiques de CETTE page, pas de l'accueil. La meme fonction
@@ -146,6 +158,8 @@ const groundLight = resolveToken("color-background", lightBlock);
 <link rel="preload" href={policeTexte} as="font" type="font/woff2" crossorigin />
 
 <title>{fullTitle}</title>
+{marque.verification.google && <meta name="google-site-verification" content={marque.verification.google} />}
+{marque.verification.bing && <meta name="msvalidate.01" content={marque.verification.bing} />}
 <meta name="description" content={description} />
 {!introuvable && <link rel="canonical" href={canonical.href} />}
 {noindex && <meta name="robots" content="noindex, nofollow" />}
@@ -161,15 +175,26 @@ const groundLight = resolveToken("color-background", lightBlock);
     empaquette 16, 32 et 48 dans l'ICO, donc la balise les declare tous les
     trois, et le PNG de 96 qu'il ecrit a chaque build est declare aussi, au
     lieu d'etre servi sans que personne ne sache qu'il existe. */}
-<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
-<link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96" />
-<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+{
+  marque.favicon ? (
+    <Fragment>
+      <link rel="icon" href={marque.favicon.url} type={marque.favicon.contentType} />
+      <link rel="apple-touch-icon" href={marque.favicon.url} />
+    </Fragment>
+  ) : (
+    <Fragment>
+      <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+      <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96" />
+      <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    </Fragment>
+  )
+}
 <link rel="sitemap" href="/sitemap-index.xml" />
 <link
   rel="alternate"
   type="application/rss+xml"
-  title={siteData.name}
+  title={marque.nom}
   href={localizePath("/rss.xml", locale)}
 />
 
@@ -188,7 +213,7 @@ const groundLight = resolveToken("color-background", lightBlock);
 {/* Open Graph, complet : l'apercu de partage est la premiere impression du site. */}
 <meta property="og:type" content={type} />
 {!introuvable && <meta property="og:url" content={canonical.href} />}
-<meta property="og:site_name" content={siteData.name} />
+<meta property="og:site_name" content={marque.nom} />
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={imageUrl.href} />
@@ -201,7 +226,7 @@ const groundLight = resolveToken("color-background", lightBlock);
 }
 
 <meta name="twitter:card" content="summary_large_image" />
-{siteData.author.twitter && <meta name="twitter:site" content={`@${siteData.author.twitter}`} />}
+{marque.twitter && <meta name="twitter:site" content={`@${marque.twitter}`} />}
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={imageUrl.href} />
@@ -211,3 +236,5 @@ const groundLight = resolveToken("color-background", lightBlock);
 <slot />
 
 {siteSettings.useViewTransitions && <ClientRouter />}
+{/* La couleur de marque choisie dans le back office (entree "site") : les rampes de tokens.css, recalculees. Absente, aucune balise. */}
+{palette && <style is:inline set:html={palette} />}

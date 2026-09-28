@@ -15,6 +15,7 @@ import { cheminsDuSujet } from "@js/adresses";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { annotationsDe } from "@moteur/annotations";
+import { annotationsDeLaFiche, type PanneauSeo, seoDe } from "@moteur/listes";
 import { propsDeLaPage } from "@moteur/chemins";
 import { textesDeLaPage } from "@moteur/textes";
 import type { Page } from "astro";
@@ -36,10 +37,19 @@ const locale = getLocale(Astro);
 // Les textes rediges de la page : ceux de la base moteur allume (docs/moteur.md),
 // poses sur la requete pour ses composants.
 const t = await textesDeLaPage(Astro);
-// Le titre est le nom du sujet (sa fiche dans src/data/topics) : seul le
-// surtitre vient de la section "rubriques", et seul lui s'edite ici.
-const rubriques = annotationsDe(Astro, "rubriques");
-const surtitre = { entree: rubriques.entree, champ: (nom: string) => (nom === "eyebrow" ? rubriques.champ(nom) : {}) };
+// Moteur allume, en mode edition : la fiche du sujet (collection "sujets")
+// porte l'entree de la page, son nom (le mot en couleur du titre, et le fil
+// d'Ariane) et sa description ; l'entree "sujet" porte le surtitre et le
+// modele du titre ({topic} y devient le nom), ouvert au back office.
+const fiche = annotationsDeLaFiche(topic);
+const modele = annotationsDe(Astro, "sujet");
+const CHAMPS: Record<string, () => Record<string, string>> = {
+  eyebrow: () => modele.champ("eyebrow"),
+  title: () => modele.champ("body"),
+  accent: () => fiche.champ("name"),
+  lede: () => fiche.champ("description"),
+};
+const edition = { entree: fiche.entree, champ: (nom: string) => CHAMPS[nom]?.() ?? {} };
 
 const slug = entrySlug(topic.id);
 const heading = fmt(t.archive.topicTitle, { topic: topic.data.name });
@@ -47,19 +57,22 @@ const title =
   page.currentPage > 1
     ? `${heading}, ${fmt(t.archive.pageSuffix, { n: page.currentPage })}`
     : heading;
-const description = topic.data.description;
+// Le panneau SEO du sujet passe avant ses champs ; son image, avant celle du site.
+const seo = seoDe((topic as unknown as { seo?: PanneauSeo }).seo, { title, description: topic.data.description });
+const photo = (topic as unknown as { image?: { src: string } }).image;
+const image = seo.image ?? photo?.src;
 
 const base = Astro.site ?? Astro.url;
 const crumbs = breadcrumbList([
   { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
-  { name: t.topics.metaTitle, url: new URL(localizePath("/topics/", locale), base).href },
+  { name: t.topics.crumb, url: new URL(localizePath("/topics/", locale), base).href },
   { name: topic.data.name, url: new URL(localizePath(`/topics/${slug}/`, locale), base).href },
 ]);
 
-const noindex = page.currentPage > 1;
+const noindex = page.currentPage > 1 || seo.noindex;
 ---
 
-<BaseLayout {title} {description} {noindex}>
+<BaseLayout title={seo.title} description={seo.description} {noindex} image={image ? { src: image, alt: topic.data.name } : undefined} canonical={seo.canonical}>
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
   </Fragment>
@@ -68,14 +81,14 @@ const noindex = page.currentPage > 1;
 
   <main id="content">
     <PageHero
-      edition={surtitre}
-      eyebrow={t.topics.eyebrow}
+      edition={edition}
+      eyebrow={t.topics.pageEyebrow}
       title={heading}
       accentWord={topic.data.name}
       lede={topic.data.description}
       crumbs={[
-        { label: t.topics.metaTitle, href: localizePath("/topics/", locale) },
-        { label: topic.data.name },
+        { label: t.topics.crumb, href: localizePath("/topics/", locale), attributs: annotationsDe(Astro, "rubriques").champ("breadcrumb") },
+        { label: topic.data.name, attributs: fiche.champ("name") },
       ]}
     >
       <TopicNav {topics} {locale} activeSlug={slug} class="mt-2" />

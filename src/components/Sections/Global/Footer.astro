@@ -15,7 +15,10 @@ import { LocaleSwitcher } from "@components/ui/locale-switcher";
 import { getFooterData, getSiteRoutes } from "@config/navData.json.ts";
 import siteData from "@config/siteData.json";
 import { fmt, getLocale, localePrefix, useTranslations } from "@i18n";
-import { annotationsDe } from "@moteur/annotations";
+import { annotationsDe, enEdition, styleDuBloc } from "@moteur/annotations";
+import { blocVisible, marqueCadre, menuDe } from "@moteur/cadre";
+import Pastilles from "@moteur/Pastilles.astro";
+import { COLONNES_DU_PIED, identiteDuSite } from "@moteur/theme";
 
 type Props = {
   /**
@@ -27,34 +30,56 @@ type Props = {
   newsletter?: boolean;
 };
 
-const { newsletter = true }: Props = Astro.props;
+// La lettre peut etre masquee dans le back office (champ "hidden" de l'entree "lettre").
+const newsletter = (Astro.props as Props).newsletter !== false && blocVisible(Astro, "lettre");
 
 const locale = getLocale(Astro);
 const t = useTranslations(Astro);
 // Moteur allume, en mode edition : les sections "pied-de-page" et "lettre" de la base.
 const pied = annotationsDe(Astro, "pied-de-page");
 const lettre = annotationsDe(Astro, "lettre");
-const columns = getFooterData(locale);
+const site = annotationsDe(Astro, "site");
+const edition = enEdition(Astro);
 const routes = getSiteRoutes(locale);
+// Moteur allume : le nom et le logo viennent des reglages du site, l'adresse
+// e-mail et le credit de l'entree "site" de la langue, chaque colonne d'un menu
+// du back office (son libelle est le titre de la colonne), et les phrases de
+// l'entree "pied-de-page". Le pied vient apres <main> : il porte ses
+// annotations normalement. Moteur eteint, tout vient des fichiers, comme avant.
+const marque = identiteDuSite(Astro, locale);
+const columns = getFooterData(locale).map((repli, rang) => {
+  const nom = COLONNES_DU_PIED[rang] ?? "";
+  const menu = menuDe(Astro, nom, locale);
+  return {
+    nom,
+    title: menu?.label ?? repli.title,
+    links: menu
+      ? menu.items.map((item): { text: string; href: string; target?: string } => ({ text: item.label, href: item.url, target: item.target }))
+      : repli.links.map((lien): { text: string; href: string; target?: string } => lien),
+  };
+});
+const cible = (target?: string) => (target ? { target, rel: target === "_blank" ? "noopener" : undefined } : {});
+// L'adresse du service qui recoit les inscriptions (entree "site") : vide, le
+// formulaire reste une demonstration sans action, comme les fichiers le livrent.
+const envoiLettre = marque.formulaires.newsletter ? { action: marque.formulaires.newsletter, method: "post" } : {};
 
 // L'annee est calculee au build : le theme n'embarque pas une date qui vieillit
 // dans un fichier de config.
 const year = new Date().getFullYear();
 
 // Rangee d'icones : uniquement le set maison, et chaque lien porte un nom
-// accessible, parce qu'une icone seule n'en a aucun.
-const social: { label: string; href: string; icon: IconName }[] = [
-  ...(siteData.author.twitter
-    ? [
-        {
-          label: fmt(t.footer.followOn, { name: siteData.author.name, network: "X" }),
-          href: `https://x.com/${siteData.author.twitter}`,
-          icon: "arrow-up-right" as IconName,
-        },
-      ]
-    : []),
-  { label: t.footer.emailStudio, href: `mailto:${siteData.author.email}`, icon: "mail" },
-  { label: t.footer.subscribeRss, href: routes.rss, icon: "rss" },
+// accessible, parce qu'une icone seule n'en a aucun. Les reseaux sont ceux
+// des reglages du site, dans leur ordre ; le jeu d'icones de la maison n'a pas
+// de logo de marque, donc une fleche sortante.
+const social: { label: string; href: string; icon: IconName; origine: string }[] = [
+  ...marque.reseaux.map(({ reseau, url }) => ({
+    label: fmt(t.footer.followOn, { name: marque.credit.nom, network: reseau }),
+    href: url,
+    icon: "arrow-up-right" as IconName,
+    origine: "reglages",
+  })),
+  { label: t.footer.emailStudio, href: `mailto:${marque.email}`, icon: "mail", origine: "site" },
+  { label: t.footer.subscribeRss, href: routes.rss, icon: "rss", origine: "" },
 ];
 
 // Le titre de la lettre porte le mot d'accent : la decoupe se fait ici plutot
@@ -67,9 +92,7 @@ const before = at >= 0 ? title.slice(0, at) : title;
 const word = at >= 0 ? title.slice(at, at + accent.length) : "";
 const after = at >= 0 ? title.slice(at + accent.length) : "";
 
-const creditHref = siteData.author.twitter
-  ? `https://x.com/${siteData.author.twitter}`
-  : `mailto:${siteData.author.email}`;
+const creditHref = marque.credit.lien;
 
 // --- Ligne de demonstration ------------------------------------------------
 // Elle n'existe que si siteData.demoNotice est renseigne : l'utilisateur vide ce
@@ -100,9 +123,15 @@ const columnLink =
           remplir. La description garde sa longueur de ligne confortable par
           measure-prose, ce qui protege la lecture sans figer la colonne. */}
       <div class="flex flex-col gap-6 lg:col-span-4">
-        <a href={routes.home} class="flex min-h-11 items-center gap-2" aria-label={t.nav.brandHome}>
-          <Icon name="wave" size={22} class="text-primary" />
-          <span class="font-display text-xl font-semibold tracking-tight">{siteData.name}</span>
+        <a href={routes.home} class="flex min-h-11 items-center gap-2" aria-label={t.nav.brandHome} {...marqueCadre(Astro, "reglages")}>
+          {
+            marque.logo ? (
+              <img src={marque.logo.url} alt="" width={marque.logo.width} height={marque.logo.height} style="height:1.6rem;width:auto" />
+            ) : (
+              <Icon name="wave" size={22} class="text-primary" />
+            )
+          }
+          <span class="font-display text-xl font-semibold tracking-tight">{marque.nom}</span>
         </a>
         <p class="text-muted-foreground measure-prose text-[0.95rem] leading-relaxed" {...pied.champ("lede")}>
           {t.footer.tagline}
@@ -118,7 +147,8 @@ const columnLink =
             balisage, les libelles et les etats de reponse sont deja ecrits. */}
         {
           newsletter && (
-            <section class="flex flex-col gap-3" id="newsletter" aria-labelledby="newsletter-title" {...lettre.entree}>
+            <section class="flex flex-col gap-3" id="newsletter" aria-labelledby="newsletter-title" {...lettre.entree} style={styleDuBloc(Astro, "lettre")}>
+              <Pastilles cle="lettre" masquable enLigne />
               <h2 id="newsletter-title" class="font-display text-xl font-bold tracking-tight" {...lettre.champ("title")}>
                 {word ? (
                   <Fragment>
@@ -131,7 +161,7 @@ const columnLink =
                 )}
               </h2>
               <p class="text-muted-foreground text-sm leading-relaxed" {...lettre.champ("lede")}>{t.newsletter.lede}</p>
-              <form class="mt-1 flex flex-col gap-3 sm:flex-row" name="newsletter">
+              <form class="mt-1 flex flex-col gap-3 sm:flex-row" name="newsletter" {...envoiLettre}>
                 <label class="sr-only" for="footer-newsletter-email">
                   {t.newsletter.emailLabel}
                 </label>
@@ -161,14 +191,14 @@ const columnLink =
       <div class="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-8 lg:col-start-5">
         {
           columns.map((column) => (
-            <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-2" {...marqueCadre(Astro, `menu:${column.nom}`)}>
               <h3 class="font-sans text-muted-foreground text-xs font-medium tracking-[0.18em] uppercase">
                 {column.title}
               </h3>
               <ul class="flex flex-col">
                 {column.links.map((link) => (
                   <li>
-                    <a href={link.href} class={columnLink}>
+                    <a href={link.href} class={columnLink} {...cible(link.target)}>
                       {link.text}
                     </a>
                   </li>
@@ -184,17 +214,25 @@ const columnLink =
       class="border-border mt-14 flex flex-col gap-6 border-t pt-8 sm:flex-row sm:items-end sm:justify-between"
     >
       <div class="text-muted-foreground flex flex-col gap-1 text-sm">
-        <p>&copy; {year} {siteData.name}. {t.footer.rights}</p>
-        <p>{t.footer.builtWith}</p>
+        {
+          edition ? (
+            <p>
+              &copy; {year} <span {...marqueCadre(Astro, "reglages")}>{marque.nom}</span>. <span {...pied.champ("note")}>{t.footer.rights}</span>
+            </p>
+          ) : (
+            <p>&copy; {year} {marque.nom}. {t.footer.rights}</p>
+          )
+        }
+        <p {...pied.champ("body")}>{t.footer.builtWith}</p>
         {/* Une seule signature : sur la demonstration, la ligne de demo nomme
             l'atelier qui a fait le theme ; "theme by Example Studio" la
             contredirait sur la meme ligne. Sans demoNotice, le credit revient. */}
         {
           !demoNotice && (
             <p>
-              {t.footer.themeBy}{" "}
-              <a href={creditHref} class="text-foreground font-semibold hover:underline">
-                {siteData.author.name}
+              {edition ? <span {...pied.champ("cta")}>{t.footer.themeBy}</span> : t.footer.themeBy}{" "}
+              <a href={creditHref} class="text-foreground font-semibold hover:underline" {...site.champ("credit_name")}>
+                {marque.credit.nom}
               </a>
             </p>
           )
@@ -222,6 +260,7 @@ const columnLink =
               <a
                 href={item.href}
                 aria-label={item.label}
+                {...(item.origine ? marqueCadre(Astro, item.origine) : {})}
                 class="border-border text-muted-foreground hover:bg-muted hover:text-foreground rounded-pill grid size-11 place-items-center border transition-colors duration-150"
               >
                 <Icon name={item.icon} size={17} />
@@ -235,7 +274,7 @@ const columnLink =
             class="border-border text-muted-foreground hover:bg-muted hover:text-foreground rounded-pill inline-flex min-h-11 items-center gap-2 border px-4 text-sm transition-colors duration-150"
           >
             <Icon name="chevron-up" size={16} />
-            {t.footer.backToTop}
+            {edition ? <span {...pied.champ("cta_secondary")}>{t.footer.backToTop}</span> : t.footer.backToTop}
           </a>
         </li>
       </ul>

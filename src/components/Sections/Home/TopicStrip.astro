@@ -11,7 +11,9 @@ import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, useTranslations } from "@i18n";
-import { annotationsDe } from "@moteur/annotations";
+import { annotationsDe, styleDuBloc } from "@moteur/annotations";
+import { lienDe } from "@moteur/cadre";
+import Pastilles from "@moteur/Pastilles.astro";
 import { entrySlug } from "@i18n/content";
 import type { CollectionEntry } from "astro:content";
 
@@ -26,6 +28,8 @@ const locale = getLocale(Astro);
 const t = useTranslations(Astro);
 const ed = annotationsDe(Astro, "sujets");
 const routes = getSiteRoutes(locale);
+// L'adresse du bouton : celle que l'editeur a saisie (entree "sujets"), sinon la page prevue par le theme.
+const lien = lienDe(Astro, "sujets", "cta_link") ?? routes.topics;
 
 const filled = topics.filter((topic) => (counts[entrySlug(topic.id)] ?? 0) > 0);
 
@@ -49,7 +53,9 @@ const firstWide = filled.length - tail;
   aria-labelledby="topics-title"
   data-slot="topic-strip"
   {...ed.entree}
+  style={styleDuBloc(Astro, "sujets")}
 >
+  <Pastilles cle="sujets" liens={[["cta_link", routes.topics]]} masquable />
   {/* Titre a gauche, sortie vers l'index a droite, sur la meme ligne de base.
       Le bouton n'est pas sous la grille : la derniere rangee de sujets est
       pleine, et un bouton pose sous une rangee pleine flotte sans appui. */}
@@ -64,7 +70,7 @@ const firstWide = filled.length - tail;
       class="sm:flex-1"
     />
     <Button
-      href={routes.topics}
+      href={lien}
       variant="ghost"
       size="md"
       class="shrink-0 self-start sm:self-auto"

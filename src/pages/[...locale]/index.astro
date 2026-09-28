@@ -18,22 +18,31 @@ import NewsletterInvite from "@components/Sections/Home/NewsletterInvite.astro";
 import TopicMarquee from "@components/Sections/Home/TopicMarquee.astro";
 import TopicStrip from "@components/Sections/Home/TopicStrip.astro";
 import WritersStrip from "@components/Sections/Home/WritersStrip.astro";
-import siteData from "@config/siteData.json";
 import { getLocale, localePaths, locales, localizePath } from "@i18n";
-import { getLocalizedCollection } from "@i18n/content";
-import { getResolvedPosts, getSortedTopics } from "@js/posts";
+import { getResolvedPosts, getSortedTopics, getSortedAuthors } from "@js/posts";
 import { organization, website } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { blocVisible, imageDePartage } from "@moteur/cadre";
 import { propsDeLaPage } from "@moteur/chemins";
+import { adresseDePageLibre } from "@moteur/pages";
 import { textesDeLaPage } from "@moteur/textes";
+import { identiteDuSite } from "@moteur/theme";
 
 // Une seule page source, une sortie par langue : / et /fr/.
 export const getStaticPaths = localePaths;
 
 // Moteur allume, cette page se rend a la demande et [...locale] accepte
 // n'importe quel segment : une langue inconnue repond 404, comme au build.
+// Une adresse que l'accueil ne connait pas peut etre celle d'une page libre,
+// ecrite dans le back office (collection "pages", src/moteur/pages.ts) : elle
+// est reecrite vers [...locale]/page-libre.astro, qui la rend avec le cadre du
+// site (ou repond 404). Moteur eteint, aucune.
 const demande = await propsDeLaPage(Astro, getStaticPaths);
-if (demande instanceof Response) return demande;
+if (demande instanceof Response) {
+  const libre = adresseDePageLibre(Astro.params.locale);
+  if (!libre) return demande;
+  return Astro.rewrite(`${libre.locale === "en" ? "" : `/${libre.locale}`}/page-libre/`);
+}
 
 const locale = getLocale(Astro);
 // Les textes rediges de la page : ceux de la base moteur allume (docs/moteur.md),
@@ -49,9 +58,7 @@ const featured = posts.find((entry) => entry.post.data.featured) ?? posts.at(0);
 const latest = posts.filter((entry) => entry !== featured).slice(0, 6);
 
 const topics = await getSortedTopics(locale);
-const authors = (await getLocalizedCollection("authors", locale)).sort((a, b) =>
-  a.data.name.localeCompare(b.data.name),
-);
+const authors = await getSortedAuthors(locale);
 
 // Un seul passage sur les billets pour les deux compteurs : compter dans les
 // sections obligerait a leur passer la liste complete, qu'elles n'affichent pas.
@@ -67,22 +74,28 @@ for (const entry of posts) {
 // le hero n'ait aucune collection a relire.
 const ledger = [posts.length, topics.length, locales.length] as const;
 
+// Chaque bloc de la page peut etre masque dans le back office (champ "hidden") ;
+// en mode edition, un bloc masque reste visible, estompe, avec sa pastille.
+const voir = (slug: string): boolean => blocVisible(Astro, slug);
+
 const title = t.home.metaTitle;
 const description = t.home.metaDescription;
 
+// Le nom et les reseaux du site : les reglages du back office, sinon siteData.
+const marque = identiteDuSite(Astro, locale);
 const base = Astro.site ?? Astro.url;
 const siteUrl = new URL(localizePath("/", locale), base).href;
 const schemas = [
   organization({
-    name: siteData.name,
+    name: marque.nom,
     url: siteUrl,
-    sameAs: siteData.author.twitter ? [`https://x.com/${siteData.author.twitter}`] : undefined,
+    sameAs: marque.reseaux.length > 0 ? marque.reseaux.map((r) => r.url) : undefined,
   }),
-  website({ name: siteData.name, url: siteUrl, description }),
+  website({ name: marque.nom, url: siteUrl, description }),
 ];
 ---
 
-<BaseLayout {title} {description}>
+<BaseLayout {title} {description} image={imageDePartage(Astro, "hero")}>
   <Fragment slot="head">
     {
       schemas.map((node) => (
@@ -94,12 +107,12 @@ const schemas = [
   <Navbar />
 
   <main id="content">
-    <Hero {ledger} />
+    {voir("hero") && <Hero {ledger} />}
     {/* La bande defilante mord les deux bords juste sous le hero : c'est elle
         qui casse la largeur de panneau du premier ecran et lance le rythme de
         la page. Elle porte les vrais sujets, pas des mots decoratifs. */}
-    <TopicMarquee {topics} counts={topicCounts} />
-    {featured && <FeaturedPost entry={featured} />}
+    {voir("bande-sujets") && <TopicMarquee {topics} counts={topicCounts} />}
+    {featured && voir("a-la-une") && <FeaturedPost entry={featured} />}
     {/* La sequence filmee remplace le bloc "mot du studio" : c'est le meme
         message, mais le lecteur le deroule lui-meme. Le composant StudioNote
         reste dans le theme pour qui prefere un bloc sans video.
@@ -113,11 +126,11 @@ const schemas = [
         composition, ils se lisent comme un raccord rate. Au milieu de la
         page, la sequence coupe au contraire deux grilles de cartes, ce qui
         est exactement ce qu'une pleine largeur doit faire. */}
-    <FilmScene />
-    {latest.length > 0 && <LatestPosts posts={latest} />}
-    <TopicStrip {topics} counts={topicCounts} />
-    <WritersStrip {authors} counts={authorCounts} />
-    <NewsletterInvite />
+    {voir("studio") && <FilmScene />}
+    {latest.length > 0 && voir("dernieres-notes") && <LatestPosts posts={latest} />}
+    {voir("sujets") && <TopicStrip {topics} counts={topicCounts} />}
+    {voir("signatures") && <WritersStrip {authors} counts={authorCounts} />}
+    {voir("lettre") && <NewsletterInvite />}
   </main>
 
   {/* La bande d'inscription de l'accueil porte deja l'ancre et le formulaire :

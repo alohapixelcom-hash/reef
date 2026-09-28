@@ -1,0 +1,26 @@
+---
+// src/pages/[...locale]/404-introuvable.astro - moteur allume : la page introuvable rendue comme une page ordinaire, barre d'edition comprise, que le Worker sert a la place de toute reponse 404.
+//
+// POURQUOI UNE ROUTE A PART. Astro rend sa page 404 hors du chemin normal de
+// la requete : la barre d'EmDash n'y etait pas posee et l'entree "introuvable"
+// n'y etait pas annotee (mesure du 28 septembre 2026). src/worker.moteur.ts
+// demande donc cette adresse-ci pour toute page qui repond 404, avec les
+// cookies du visiteur, et rend le resultat toujours en 404. Le HTML est celui
+// de 404.astro (meme composant, memes textes) : un visiteur ne voit aucune
+// difference.
+//
+// Moteur eteint : aucune sortie (getStaticPaths vide) ; 404.html et
+// fr/404.html restent les pages figees de 404.astro et [locale]/404.astro.
+import NotFound from "@components/Sections/Global/NotFound.astro";
+import { defaultLocale, isLocale } from "@i18n";
+
+export function getStaticPaths() {
+  return [];
+}
+
+const segment = (Astro.params as { locale?: string }).locale;
+if (segment !== undefined && !(isLocale(segment) && segment !== defaultLocale)) return new Response(null, { status: 404 });
+Astro.response.status = 404;
+---
+
+<NotFound />

@@ -4,8 +4,11 @@
 // se voie sans build. Depuis la 3.3.0, les pages fixes aussi (contact,
 // mentions legales, confidentialite, conditions) : leurs textes rediges
 // viennent de la base (collection `sections`, voir contenu.ts), et une section
-// publiee doit se voir sans build. Seules la page introuvable et robots.txt
-// restent figees : elles ne citent aucun texte de la base.
+// publiee doit se voir sans build. Depuis la 3.4.0, la page introuvable aussi
+// (entree "introuvable") : le Worker la demande a 404-introuvable pour toute
+// reponse 404, afin qu'elle passe par le chemin normal de la requete (barre
+// d'edition), et page-libre rend les pages ecrites dans le back office. Seul
+// robots.txt reste fige : il ne cite aucun texte de la base.
 //
 // Une seule liste, lue par moteur.config.mjs (qui partage les pages) ET par le
 // plan de site du moteur (qui les inventorie) : une page oubliee resterait
@@ -28,5 +31,13 @@ export const PAGES_GEREES = [
   "src/pages/[...locale]/privacy.astro",
   "src/pages/[...locale]/terms.astro",
   "src/pages/[...locale]/rss.xml.ts",
+  "src/pages/404.astro",
+  "src/pages/[...locale]/404-introuvable.astro",
+  "src/pages/[...locale]/page-libre.astro",
   "src/pages/llms.txt.ts",
 ];
+
+// Les pages que le cache de routes peut garder (ALOHA_CACHE_ROUTES) : toutes,
+// sauf la page introuvable (un 404 ne se garde pas) et la page libre (son
+// adresse est celle de la page demandee, reecrite par l'accueil).
+export const PAGES_EN_CACHE = PAGES_GEREES.filter((page) => !/\/404(-introuvable)?\.astro$|\/page-libre\.astro$/.test(page));

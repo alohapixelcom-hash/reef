@@ -13,6 +13,7 @@ import { getLocale, localePaths, localizePath } from "@i18n";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { annotationsDe } from "@moteur/annotations";
+import { argumentDe, imageDePartage } from "@moteur/cadre";
 import { propsDeLaPage } from "@moteur/chemins";
 import { textesDeLaPage } from "@moteur/textes";
 
@@ -29,18 +30,17 @@ const locale = getLocale(Astro);
 const t = await textesDeLaPage(Astro);
 const doc = t.legalData.privacy;
 const ed = annotationsDe(Astro, "confidentialite");
-// Le surtitre est celui des mentions legales : il s'edite sur leur entree.
-const mentions = annotationsDe(Astro, "mentions-legales");
-const tete = { entree: ed.entree, champ: (nom: string) => (nom === "eyebrow" ? mentions.champ(nom) : ed.champ(nom)) };
+// L'ancre de chaque clause : celle que l'editeur a donnee, sinon celle du titre.
+const ancres = doc.sections.map((_, rang) => argumentDe(Astro, "confidentialite", rang).anchor as string | undefined);
 
 const base = Astro.site ?? Astro.url;
 const crumbs = breadcrumbList([
   { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
-  { name: doc.title, url: new URL(localizePath("/privacy/", locale), base).href },
+  { name: t.legal.privacyCrumb, url: new URL(localizePath("/privacy/", locale), base).href },
 ]);
 ---
 
-<BaseLayout title={doc.title} description={doc.description}>
+<BaseLayout title={doc.title} description={doc.description} image={imageDePartage(Astro, "confidentialite")}>
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
   </Fragment>
@@ -49,11 +49,12 @@ const crumbs = breadcrumbList([
 
   <main id="content">
     <PageHero
-      edition={tete}
-      eyebrow={t.legal.eyebrow}
+      cle="confidentialite"
+      edition={ed}
+      eyebrow={t.legal.privacyEyebrow}
       title={doc.title}
       lede={doc.description}
-      crumbs={[{ label: doc.title }]}
+      crumbs={[{ label: t.legal.privacyCrumb }]}
     />
 
     <LegalArticle
@@ -64,6 +65,7 @@ const crumbs = breadcrumbList([
       backToTopLabel={t.legal.backToTop}
       annotationDeLaDate={ed.champ("revised")}
       annotationDesClauses={ed.champ("arguments")}
+      {ancres}
       {locale}
     />
   </main>

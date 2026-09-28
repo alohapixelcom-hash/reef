@@ -19,6 +19,8 @@ export const breadcrumb = tv({
 type Crumb = {
   label: string;
   href?: string;
+  /** Les attributs de la barre d'edition du moteur (le champ qui porte ce libelle), vides hors edition. */
+  attributs?: Record<string, string>;
 };
 
 type Props = HTMLAttributes<"nav"> & {
@@ -39,11 +41,11 @@ const { root, list, item, link, page, separator } = breadcrumb();
         return (
           <li class={item()}>
             {crumb.href && !isLast ? (
-              <a class={link()} href={crumb.href}>
+              <a class={link()} href={crumb.href} {...crumb.attributs}>
                 {crumb.label}
               </a>
             ) : (
-              <span class={page()} aria-current={isLast ? "page" : undefined}>
+              <span class={page()} aria-current={isLast ? "page" : undefined} {...crumb.attributs}>
                 {crumb.label}
               </span>
             )}

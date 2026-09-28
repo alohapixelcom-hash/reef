@@ -6,10 +6,11 @@ import Navbar from "@components/Sections/Global/Navbar.astro";
 import PageHero from "@components/Sections/Global/PageHero.astro";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, localePaths, localizePath } from "@i18n";
-import { entrySlug, getLocalizedCollection } from "@i18n/content";
-import { getResolvedPosts } from "@js/posts";
+import { entrySlug } from "@i18n/content";
+import { getResolvedPosts, getSortedAuthors } from "@js/posts";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { imageDePartage } from "@moteur/cadre";
 import { annotationsDe } from "@moteur/annotations";
 import { propsDeLaPage } from "@moteur/chemins";
 import { textesDeLaPage } from "@moteur/textes";
@@ -27,9 +28,7 @@ const locale = getLocale(Astro);
 const t = await textesDeLaPage(Astro);
 const routes = getSiteRoutes(locale);
 
-const authors = (await getLocalizedCollection("authors", locale)).sort((a, b) =>
-  a.data.name.localeCompare(b.data.name),
-);
+const authors = await getSortedAuthors(locale);
 const posts = await getResolvedPosts(locale);
 
 const counts: Record<string, number> = {};
@@ -41,11 +40,11 @@ const description = t.authors.metaDescription;
 const base = Astro.site ?? Astro.url;
 const crumbs = breadcrumbList([
   { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
-  { name: t.authors.metaTitle, url: new URL(localizePath("/authors/", locale), base).href },
+  { name: t.authors.crumb, url: new URL(localizePath("/authors/", locale), base).href },
 ]);
 ---
 
-<BaseLayout {title} {description}>
+<BaseLayout {title} {description} image={imageDePartage(Astro, "auteurs")}>
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
   </Fragment>
@@ -54,12 +53,13 @@ const crumbs = breadcrumbList([
 
   <main id="content">
     <PageHero
+      cle="auteurs"
       edition={annotationsDe(Astro, "auteurs")}
       eyebrow={t.authors.eyebrow}
       title={t.authors.title}
       accentWord={t.authors.accent}
       lede={t.authors.lede}
-      crumbs={[{ label: t.authors.metaTitle }]}
+      crumbs={[{ label: t.authors.crumb }]}
     />
 
     <section class="container-page py-14 md:py-20" aria-label={t.authors.metaTitle}>

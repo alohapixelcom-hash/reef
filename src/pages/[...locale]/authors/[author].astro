@@ -17,7 +17,9 @@ import { cheminsDeLAuteur } from "@js/adresses";
 import type { ResolvedPost } from "@js/posts";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { annotationsDe } from "@moteur/annotations";
 import { propsDeLaPage } from "@moteur/chemins";
+import { annotationsDeLaFiche, type PanneauSeo, seoDe } from "@moteur/listes";
 import { textesDeLaPage } from "@moteur/textes";
 import type { CollectionEntry } from "astro:content";
 
@@ -37,18 +39,20 @@ const locale = getLocale(Astro);
 const t = await textesDeLaPage(Astro);
 
 const slug = entrySlug(author.id);
-const title = fmt(t.authors.postsBy, { name: author.data.name });
-const description = author.data.bio;
+// Moteur allume : le panneau SEO de l'auteur passe avant ses champs, et en
+// mode edition sa fiche (collection "auteurs") porte chaque texte de la page.
+const seo = seoDe((author as unknown as { seo?: PanneauSeo }).seo, { title: fmt(t.authors.postsBy, { name: author.data.name }), description: author.data.bio });
+const fiche = annotationsDeLaFiche(author);
 
 const base = Astro.site ?? Astro.url;
 const crumbs = breadcrumbList([
   { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
-  { name: t.authors.metaTitle, url: new URL(localizePath("/authors/", locale), base).href },
+  { name: t.authors.crumb, url: new URL(localizePath("/authors/", locale), base).href },
   { name: author.data.name, url: new URL(localizePath(`/authors/${slug}/`, locale), base).href },
 ]);
 ---
 
-<BaseLayout {title} {description}>
+<BaseLayout title={seo.title} description={seo.description} noindex={seo.noindex} canonical={seo.canonical}>
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
   </Fragment>
@@ -56,14 +60,14 @@ const crumbs = breadcrumbList([
   <Navbar />
 
   <main id="content">
-    <section class="bg-surface border-border border-b" aria-labelledby="author-name">
+    <section class="bg-surface border-border border-b" aria-labelledby="author-name" {...fiche.entree}>
       <div class="container-page flex flex-col gap-6 pt-28 pb-12 md:pt-36 md:pb-16">
         <Breadcrumb
           label={t.common.breadcrumbLabel}
           items={[
-            { label: t.common.home, href: localizePath("/", locale) },
-            { label: t.authors.metaTitle, href: localizePath("/authors/", locale) },
-            { label: author.data.name },
+            { label: t.common.home, href: localizePath("/", locale), attributs: annotationsDe(Astro, "en-tete").champ("eyebrow") },
+            { label: t.authors.crumb, href: localizePath("/authors/", locale), attributs: annotationsDe(Astro, "auteurs").champ("breadcrumb") },
+            { label: author.data.name, attributs: fiche.champ("name") },
           ]}
         />
 
@@ -74,16 +78,17 @@ const crumbs = breadcrumbList([
             size="xl"
             alt=""
             class="size-24 shrink-0"
+            {...fiche.champ("avatar")}
           />
           <div class="flex flex-col gap-3">
             <p class="font-sans text-muted-foreground text-xs font-medium tracking-[0.18em] uppercase">
               {t.authors.roleLabel}
             </p>
-            <h1 id="author-name" class="font-display text-display-sm sm:text-display-md text-foreground">
+            <h1 id="author-name" class="font-display text-display-sm sm:text-display-md text-foreground" {...fiche.champ("name")}>
               {author.data.name}
             </h1>
-            <p class="text-foreground font-sans text-base">{author.data.role}</p>
-            <p class="text-muted-foreground measure-prose text-lg leading-relaxed">
+            <p class="text-foreground font-sans text-base" {...fiche.champ("role")}>{author.data.role}</p>
+            <p class="text-muted-foreground measure-prose text-lg leading-relaxed" {...fiche.champ("bio")}>
               {author.data.bio}
             </p>
 
@@ -93,7 +98,7 @@ const crumbs = breadcrumbList([
                   <p class="font-sans text-muted-foreground text-xs font-medium tracking-[0.18em] uppercase">
                     {t.authors.linksLabel}
                   </p>
-                  <ul class="flex flex-wrap gap-2">
+                  <ul class="flex flex-wrap gap-2" {...fiche.champ("links")}>
                     {author.data.links.map((link) => (
                       <li>
                         <Button href={link.href} variant="outline" size="sm" rel="noopener">

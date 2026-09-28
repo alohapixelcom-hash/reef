@@ -58,6 +58,8 @@ export const enReading = {
     metaTitle: "All posts",
     metaDescription:
       "Every post published on Reef Notes, newest first: build logs, performance work, typography, and the business of a small studio.",
+    /** Le nom de la page dans le fil d'Ariane et son balisage : court, distinct du titre donne aux moteurs de recherche. */
+    crumb: "All posts",
     eyebrow: "Archive",
     title: "Everything we have written",
     accent: "Everything",

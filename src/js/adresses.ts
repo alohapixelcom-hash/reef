@@ -8,11 +8,10 @@
 // 2026 : le back office heritait de la taille de police fluide du site. Une
 // page n'est importee par personne ; ses chemins, si.
 import { defaultLocale, locales } from "@i18n";
-import { entryLocale, entrySlug, getLocalizedCollection } from "@i18n/content";
-import { getResolvedPosts, getSortedTopics } from "@js/posts";
-import { billetsPublies } from "@moteur/source";
+import { entryLocale, entrySlug } from "@i18n/content";
+import { getResolvedPosts, getSortedTopics, referencesDuBillet } from "@js/posts";
+import { auteursPublies, billetsParPage, billetsPublies } from "@moteur/source";
 import type { GetStaticPaths } from "astro";
-import { getEntry } from "astro:content";
 
 /** Un billet par langue : l'adresse ne porte que le slug, la langue est deja dans le param locale. */
 export const cheminsDuBillet = (async () => {
@@ -24,10 +23,7 @@ export const cheminsDuBillet = (async () => {
     posts.map(async (post) => {
       // Une reference cassee arrete le build avec le nom du fichier fautif,
       // plutot que de rendre une page a moitie vide en production.
-      const author = await getEntry(post.data.author);
-      if (!author) throw new Error(`Auteur inconnu "${post.data.author.id}" dans "${post.id}"`);
-      const topic = await getEntry(post.data.topic);
-      if (!topic) throw new Error(`Sujet inconnu "${post.data.topic.id}" dans "${post.id}"`);
+      const { author, topic } = await referencesDuBillet(post);
 
       const locale = entryLocale(post.id);
       return {
@@ -45,6 +41,7 @@ export const cheminsDuBillet = (async () => {
 
 /** L'archive paginee d'un sujet, par langue. */
 export const cheminsDuSujet = (async ({ paginate }) => {
+  const pageSize = await billetsParPage();
   const groups = await Promise.all(
     locales.map(async (locale) => {
       const posts = await getResolvedPosts(locale);
@@ -54,7 +51,7 @@ export const cheminsDuSujet = (async ({ paginate }) => {
         const slug = entrySlug(topic.id);
         const inTopic = posts.filter((entry) => entry.topicSlug === slug);
         return paginate(inTopic, {
-          pageSize: 9,
+          pageSize,
           params: { locale: locale === defaultLocale ? undefined : locale, topic: slug },
           props: { topic, topics },
         });
@@ -68,7 +65,7 @@ export const cheminsDuSujet = (async ({ paginate }) => {
 export const cheminsDeLAuteur = (async () => {
   const groups = await Promise.all(
     locales.map(async (locale) => {
-      const authors = await getLocalizedCollection("authors", locale);
+      const authors = await auteursPublies(locale);
       const posts = await getResolvedPosts(locale);
 
       return authors.map((author) => {

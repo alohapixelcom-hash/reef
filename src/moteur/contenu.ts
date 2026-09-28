@@ -56,8 +56,12 @@ const renseigne = (valeur: unknown): valeur is string => typeof valeur === "stri
 const versLaBase = (jour: string): string => new Date(`${jour}T00:00:00.000Z`).toISOString();
 const versLesFichiers = (valeur: string): string => valeur.slice(0, 10);
 
-/** Les lignes du champ repete, lues dans les textes. */
+/** Les lignes du champ repete, lues dans les textes. Un objet du dictionnaire donne une seule ligne. */
 function extraireLaListe(textes: Textes, tranche: Tranche): Objet[] {
+  if ("objet" in tranche) {
+    const objet = (lire(textes, tranche.objet) as Objet | undefined) ?? {};
+    return [Object.fromEntries(Object.entries(tranche.cles).map(([champ, cle]) => [champ, objet[cle]]))];
+  }
   const elements = (lire(textes, tranche.liste) as unknown[] | undefined) ?? [];
   if ("texte" in tranche) return elements.map((phrase) => ({ [tranche.texte]: phrase }));
   return elements.map((element) =>
@@ -84,6 +88,14 @@ export function extraireLaSection(section: Section, textes: Textes): DonneesDeSe
  * des fichiers ; une ligne ajoutee au-dela n'a que ce qu'elle porte.
  */
 function appliquerLaListe(textes: Objet, tranche: Tranche, lignes: Objet[]): void {
+  if ("objet" in tranche) {
+    // Un objet du dictionnaire : la premiere ligne remplace ses textes, champ par champ.
+    const ligne = lignes[0] ?? {};
+    for (const [champ, cle] of Object.entries(tranche.cles)) {
+      if (renseigne(ligne[champ]) && ligne[champ] !== "") ecrire(textes, `${tranche.objet}.${cle}`, ligne[champ]);
+    }
+    return;
+  }
   const anciennes = (lire(textes, tranche.liste) as unknown[] | undefined) ?? [];
   if ("texte" in tranche) {
     const phrases = lignes.map((ligne, i) => (renseigne(ligne[tranche.texte]) ? ligne[tranche.texte] : (anciennes[i] ?? "")));

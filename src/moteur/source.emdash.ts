@@ -6,13 +6,18 @@
 // billet feraient deux themes a maintenir.
 import { getLegalData } from "@config/legalData.json.ts";
 import { type Locale, useTranslations } from "@i18n";
+import { getLocalizedCollection } from "@i18n/content";
 import type { MarkdownHeading } from "astro";
 import type { CollectionEntry } from "astro:content";
-import { getEmDashCollection, getEmDashEntry } from "emdash";
+import { getEmDashCollection, getEmDashEntry, getSiteSettings } from "emdash";
 import GithubSlugger from "github-slugger";
 import { annotationDe, estEditable, type Annotation, type Editions } from "./annotations";
+import type { Cadre, DonneesDesSections } from "./cadre";
+import { lireLeCadre } from "./cadre.emdash";
 import { adresseDeLaCarte, cleDeLaCouverture } from "./carte-du-billet.regles";
 import { type DonneesDeSection, type Textes, textesAvecLaBase } from "./contenu";
+import { type DonneesAuteur, type DonneesSujet, liensDeLAuteur, teinteDuSujet } from "./listes";
+import { MENUS } from "./theme";
 import type { CorpsDeBillet } from "./types";
 
 export const MOTEUR = true;
@@ -39,6 +44,7 @@ interface DonneesBillet {
   pub_date?: Date | string | null;
   updated_date?: Date | string | null;
   publishedAt?: Date | string | null;
+  seo?: unknown;
 }
 
 const texteDuBloc = (bloc: Bloc): string =>
@@ -86,6 +92,9 @@ function enBillet(entree: Entree, locale: Locale): CollectionEntry<"posts"> {
     },
     // Garde pour corpsDuBillet : les blocs voyagent avec l'entree, hors du schema.
     blocs: d.content ?? [],
+    // Le panneau SEO de l'entree (titre, description, image, canonique,
+    // noindex), lu par la page du billet et le plan du site ; hors du schema.
+    seo: d.seo,
     // LE PROXY D'EDITION D'EMDASH, en mode edition seulement (voir
     // annotations.ts) : c'est lui qui donne aux gabarits l'attribut que la
     // barre d'EmDash cherche. Hors edition la cle n'existe pas, et le billet
@@ -112,6 +121,87 @@ export async function billetParSlug(locale: Locale, slug: string): Promise<Colle
   // une traduction absente est un 404, pas un contenu dans la mauvaise langue.
   if (!entry || fallbackLocale) return undefined;
   return enBillet(entry, locale);
+}
+
+/** Toutes les entrees publiees d'une collection dans une langue ; null si la collection n'existe pas (une base d'avant la 3.4.0). */
+async function toutesPubliees(collection: string, locale: Locale): Promise<Entree[] | null> {
+  const entrees: Entree[] = [];
+  let cursor: string | undefined;
+  try {
+    do {
+      const page = await getEmDashCollection(collection, { locale, status: "published", limit: 100, cursor });
+      if (page.error) return null;
+      entrees.push(...(page.entries as Entree[]));
+      cursor = page.nextCursor ?? undefined;
+    } while (cursor);
+  } catch {
+    return null;
+  }
+  return entrees;
+}
+
+/** Une media de la base, reduite a ce que le theme lit d'une image de contenu (src, largeur, hauteur). */
+function imageDe(valeur: unknown): { src: string; width: number; height: number } | undefined {
+  const m = valeur as DonneesBillet["cover"];
+  if (!m) return undefined;
+  const cle = m.meta?.storageKey ?? m.id;
+  const src = m.src ?? (cle ? `/_emdash/api/media/file/${cle}` : undefined);
+  return src ? { src, width: m.width ?? 0, height: m.height ?? 0 } : undefined;
+}
+
+/** Un sujet de la base, sous la forme d'une entree de la collection topics. */
+function enSujet(entree: Entree, locale: Locale): CollectionEntry<"topics"> {
+  const d = entree.data as DonneesSujet;
+  const slug = d.slug ?? entree.id;
+  return {
+    id: `${locale}/${slug}`,
+    collection: "topics",
+    data: { name: d.name ?? slug, description: d.description ?? "", accent: teinteDuSujet(d.color), order: typeof d.order === "number" ? d.order : 0 },
+    image: imageDe(d.image),
+    seo: d.seo,
+    ...(estEditable(entree.edit) ? { edition: entree.edit } : {}),
+  } as unknown as CollectionEntry<"topics">;
+}
+
+/** Un auteur de la base, sous la forme d'une entree de la collection authors. */
+function enAuteur(entree: Entree, locale: Locale): CollectionEntry<"authors"> {
+  const d = entree.data as DonneesAuteur;
+  const slug = d.slug ?? entree.id;
+  return {
+    id: `${locale}/${slug}`,
+    collection: "authors",
+    data: { name: d.name ?? slug, role: d.role ?? "", bio: d.bio ?? "", avatar: imageDe(d.avatar), links: liensDeLAuteur(d.links) },
+    seo: d.seo,
+    ...(estEditable(entree.edit) ? { edition: entree.edit } : {}),
+  } as unknown as CollectionEntry<"authors">;
+}
+
+/**
+ * Les sujets publies d'une langue (collection "sujets"). Une base qui n'a pas
+ * la collection, ou qui n'en publie aucun dans la langue, rend les fichiers de
+ * src/data/topics : le rendu d'avant la 3.4.0.
+ */
+export async function sujetsPublies(locale: Locale): Promise<CollectionEntry<"topics">[]> {
+  const entrees = await toutesPubliees("sujets", locale);
+  if (!entrees || entrees.length === 0) return getLocalizedCollection("topics", locale);
+  return entrees.map((entree) => enSujet(entree, locale));
+}
+
+/** Les auteurs publies d'une langue (collection "auteurs"), sinon les fichiers de src/data/authors. */
+export async function auteursPublies(locale: Locale): Promise<CollectionEntry<"authors">[]> {
+  const entrees = await toutesPubliees("auteurs", locale);
+  if (!entrees || entrees.length === 0) return getLocalizedCollection("authors", locale);
+  return entrees.map((entree) => enAuteur(entree, locale));
+}
+
+/** Le nombre de billets par page des listes : le reglage "Articles par page" du back office, sinon 9 (le theme). */
+export async function billetsParPage(): Promise<number> {
+  try {
+    const n = ((await getSiteSettings()) as { postsPerPage?: unknown } | null)?.postsPerPage;
+    return typeof n === "number" && Number.isInteger(n) && n >= 1 ? n : 9;
+  } catch {
+    return 9;
+  }
 }
 
 /** Les titres du billet, avec les memes ancres que celles d'un fichier Markdown. */
@@ -189,8 +279,20 @@ async function sectionsPubliees(locale: Locale): Promise<{ sections: Map<string,
   return { sections, editions };
 }
 
-/** Les textes rediges de la page dans cette langue (les fichiers, completes par ce que la base publie) et les proxys d'edition des sections. */
-export async function lireLaPage(locale: Locale): Promise<{ textes: Textes; editions: Editions }> {
-  const { sections, editions } = await sectionsPubliees(locale);
-  return { textes: textesAvecLaBase(textesDesFichiers(locale), sections), editions };
+/**
+ * Les textes rediges de la page dans cette langue (les fichiers, completes par
+ * ce que la base publie), les proxys d'edition des sections, le CADRE (les
+ * reglages natifs, l'entree "site" de la langue et les menus natifs de la
+ * langue, lus par cadre.ts) et les donnees brutes de chaque section (photos,
+ * adresses des boutons, bloc masque), lues une fois par requete.
+ */
+export async function lireLaPage(locale: Locale): Promise<{ textes: Textes; editions: Editions; cadre: Cadre; sections: DonneesDesSections }> {
+  const [{ sections, editions }, cadreLu] = await Promise.all([sectionsPubliees(locale), lireLeCadre(locale, MENUS.map((m) => m.nom))]);
+  if (estEditable(cadreLu.edition)) (editions as Map<string, unknown>).set("site", cadreLu.edition);
+  return {
+    textes: textesAvecLaBase(textesDesFichiers(locale), sections),
+    editions,
+    cadre: { reglages: cadreLu.reglages, site: cadreLu.site, menus: cadreLu.menus },
+    sections,
+  };
 }

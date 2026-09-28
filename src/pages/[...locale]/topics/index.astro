@@ -10,6 +10,7 @@ import { entrySlug } from "@i18n/content";
 import { getResolvedPosts, getSortedTopics } from "@js/posts";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { imageDePartage } from "@moteur/cadre";
 import { annotationsDe } from "@moteur/annotations";
 import { propsDeLaPage } from "@moteur/chemins";
 import { textesDeLaPage } from "@moteur/textes";
@@ -39,7 +40,7 @@ const description = t.topics.metaDescription;
 const base = Astro.site ?? Astro.url;
 const crumbs = breadcrumbList([
   { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
-  { name: t.topics.metaTitle, url: new URL(localizePath("/topics/", locale), base).href },
+  { name: t.topics.crumb, url: new URL(localizePath("/topics/", locale), base).href },
 ]);
 
 // Voir le commentaire de la grille plus bas : les dernieres cartes s'elargissent
@@ -49,7 +50,7 @@ const tail = rest === 0 ? 0 : rest === 2 ? 2 : Math.min(topics.length, 4);
 const firstWide = topics.length - tail;
 ---
 
-<BaseLayout {title} {description}>
+<BaseLayout {title} {description} image={imageDePartage(Astro, "rubriques")}>
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
   </Fragment>
@@ -58,12 +59,13 @@ const firstWide = topics.length - tail;
 
   <main id="content">
     <PageHero
+      cle="rubriques"
       edition={annotationsDe(Astro, "rubriques")}
       eyebrow={t.topics.eyebrow}
       title={t.topics.title}
       accentWord={t.topics.accent}
       lede={t.topics.lede}
-      crumbs={[{ label: t.topics.metaTitle }]}
+      crumbs={[{ label: t.topics.crumb }]}
     />
 
     <section class="container-page py-14 md:py-20" aria-label={t.topics.allTopics}>

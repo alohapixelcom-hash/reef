@@ -12,6 +12,8 @@ import { getSiteRoutes } from "@config/navData.json.ts";
 import { useTranslations, type Locale } from "@i18n";
 import { entrySlug } from "@i18n/content";
 import { topicTone } from "@components/Cards/topicTone";
+import { enEdition } from "@moteur/annotations";
+import { annotationsDeLaFiche } from "@moteur/listes";
 import type { CollectionEntry } from "astro:content";
 
 type Props = {
@@ -24,6 +26,8 @@ type Props = {
 
 const { topics, locale, activeSlug, class: className } = Astro.props;
 const t = useTranslations(locale);
+// En mode edition seulement, le nom de chaque sujet porte le champ de sa fiche.
+const edition = enEdition(Astro);
 const routes = getSiteRoutes(locale);
 
 const pill = [
@@ -61,7 +65,7 @@ const active = "border-transparent bg-foreground text-background font-medium";
                 class:list={["size-1.5 rounded-pill", isActive ? "bg-background" : topicTone[topic.data.accent].dot]}
                 aria-hidden="true"
               />
-              {topic.data.name}
+              {edition ? <span {...annotationsDeLaFiche(topic).champ("name")}>{topic.data.name}</span> : topic.data.name}
             </a>
           </li>
         );

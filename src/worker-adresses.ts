@@ -85,11 +85,20 @@ export function estLaPageIntrouvable(request: Request): boolean {
  * il decrit le fonctionnement interne du moteur (initialisation de la base,
  * cle de chiffrement, nombre de requetes).
  */
-export async function reponseAuVisiteur(request: Request, reponse: Response, fichiers: Fichiers): Promise<Response> {
+export async function reponseAuVisiteur(request: Request, reponse: Response, fichiers: Fichiers | null): Promise<Response> {
   const chemin = new URL(request.url).pathname;
   const page = request.method === "GET" || request.method === "HEAD";
   const html = (reponse.headers.get("Content-Type") ?? "text/html").startsWith("text/html");
-  if (reponse.status === 404 && page && html && !chemin.startsWith("/_")) return pageIntrouvable(request, fichiers);
+  // Sans fichiers (le Worker du moteur), la page introuvable est deja rendue a
+  // la demande, dans la langue de l'adresse : elle passe telle quelle, jamais
+  // mise en cache.
+  if (reponse.status === 404 && page && html && !chemin.startsWith("/_")) {
+    if (fichiers) return pageIntrouvable(request, fichiers);
+    const entetes = new Headers(reponse.headers);
+    entetes.delete("Server-Timing");
+    entetes.set("Cache-Control", "no-store");
+    return new Response(reponse.body, { status: 404, statusText: reponse.statusText, headers: entetes });
+  }
   if (!reponse.headers.has("Server-Timing")) return reponse;
   const entetes = new Headers(reponse.headers);
   entetes.delete("Server-Timing");

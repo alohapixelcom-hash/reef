@@ -24,7 +24,11 @@ import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, useTranslations } from "@i18n";
-import { annotationsDe } from "@moteur/annotations";
+import { annotationsDe, styleDuBloc } from "@moteur/annotations";
+import { imageDe, lienDe } from "@moteur/cadre";
+import Pastilles from "@moteur/Pastilles.astro";
+import PhotoDuMoteur from "@moteur/PhotoDuMoteur.astro";
+import { identiteDuSite } from "@moteur/theme";
 import { Image } from "astro:assets";
 import heroVague from "../../../assets/reef-hero-vague.webp";
 
@@ -34,6 +38,13 @@ const t = useTranslations(Astro);
 const ed = annotationsDe(Astro, "lettre");
 const flux = annotationsDe(Astro, "lettre-flux");
 const routes = getSiteRoutes(locale);
+// Moteur allume : la photo de fond (champ image de l'entree "lettre"),
+// l'adresse du bouton du flux (cta_link de "lettre-flux") et l'adresse du
+// service qui recoit les inscriptions (entree "site"). Vide, le theme.
+const photo = imageDe(Astro, "lettre");
+const lienDuFlux = lienDe(Astro, "lettre-flux", "cta_link") ?? routes.rss;
+const envoi = identiteDuSite(Astro, locale).formulaires.newsletter;
+const attributsDuFormulaire = envoi ? { action: envoi, method: "post" } : {};
 
 const title = t.newsletter.title;
 const accent = t.newsletter.accent;
@@ -57,6 +68,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     id="newsletter"
     aria-labelledby="invite-title"
     {...ed.entree}
+    style={styleDuBloc(Astro, "lettre")}
   >
     {/* La photographie, tout au fond. Ce bloc portait deux halos flous, un
         corail en haut a gauche et un turquoise en bas a droite, qui derivaient
@@ -74,16 +86,30 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
         Decorative au sens strict, le titre dit deja ce que fait ce bandeau :
         alt vide et aria-hidden. Chargee paresseusement, c'est le bas de la
         page et personne ne l'attend. */}
-    <Image
-      src={heroVague}
-      alt=""
-      widths={[720, 1200, 1800]}
-      sizes="100vw"
-      loading="lazy"
-      decoding="async"
-      class="pointer-events-none absolute inset-0 -z-30 size-full object-cover object-[center_78%]"
-      aria-hidden="true"
-    />
+    {
+      photo ? (
+        <PhotoDuMoteur
+          media={photo}
+          widths={[720, 1200, 1800]}
+          sizes="100vw"
+          class="pointer-events-none absolute inset-0 -z-30 size-full object-cover object-[center_78%]"
+          attributs={ed.champ("image")}
+        />
+      ) : (
+        <Image
+          src={heroVague}
+          alt=""
+          widths={[720, 1200, 1800]}
+          sizes="100vw"
+          loading="lazy"
+          decoding="async"
+          class="pointer-events-none absolute inset-0 -z-30 size-full object-cover object-[center_78%]"
+          aria-hidden="true"
+          {...ed.champ("image")}
+        />
+      )
+    }
+    <Pastilles cle="lettre" images={[{ champ: "image", sorte: "photo" }]} masquable />
 
     {/* Le voile : dense a gauche, la ou le texte et le formulaire se posent,
         ouvert a droite pour que la photo existe vraiment. Il bascule en
@@ -108,7 +134,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
         </h2>
         <p class="text-muted-foreground measure-wide text-lg leading-relaxed" {...ed.champ("lede")}>{t.newsletter.lede}</p>
 
-        <form class="mt-2 flex flex-col gap-3 sm:max-w-xl sm:flex-row" name="newsletter-home">
+        <form class="mt-2 flex flex-col gap-3 sm:max-w-xl sm:flex-row" name="newsletter-home" {...attributsDuFormulaire}>
           <label class="sr-only" for="home-newsletter-email">{t.newsletter.emailLabel}</label>
           <Input
             id="home-newsletter-email"
@@ -138,7 +164,8 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
         <span class="text-accent-text" aria-hidden="true"><Icon name="rss" size={22} /></span>
         <h3 class="font-display text-xl font-bold tracking-tight" {...flux.champ("title")}>{t.newsletter.rssTitle}</h3>
         <p class="text-muted-foreground text-[0.95rem] leading-relaxed" {...flux.champ("lede")}>{t.newsletter.rssLede}</p>
-        <Button href={routes.rss} variant="outline" size="md" class="mt-auto self-start" {...flux.champ("cta")}>
+        <Pastilles cle="lettre-flux" liens={[["cta_link", routes.rss]]} enLigne />
+        <Button href={lienDuFlux} variant="outline" size="md" class="mt-auto self-start" {...flux.champ("cta")}>
           {t.newsletter.rssCta}
           <Icon name="arrow-up-right" size={17} />
         </Button>

@@ -1,0 +1,103 @@
+---
+// src/moteur/Pastilles.astro - en mode edition seulement, les pastilles d'un bloc : l'adresse de chaque bouton, la photo, la video, l'affiche, et "Masquer ce bloc", chacune annotee sur son champ.
+//
+// CE QUI NE S'AFFICHE PAS COMME TEXTE n'a rien que la barre d'EmDash puisse
+// attraper : l'adresse d'un bouton, une photo de fond, un bloc masque. Une
+// pastille est une petite etiquette posee dans le coin du bloc, qui porte
+// l'attribut du champ : un clic dessus fait ce que la barre fait pour ce
+// champ. Une adresse se modifie dans la pastille meme (Entree enregistre, un
+// texte vide rend l'adresse prevue par le theme) ; une photo ouvre la fenetre
+// de la mediatheque ; une case a cocher ouvre le back office sur le champ.
+//
+// Le libelle ("Adresse du bouton :") est HORS de la partie annotee : la barre
+// n'enregistre que le texte de l'element annote, donc seulement l'adresse.
+//
+// HORS EDITION, RIEN : le composant ne rend pas une balise, ni moteur eteint,
+// ni pour un visiteur. Styles en ligne, aucune classe du theme : src/moteur/
+// est hors du scan de Tailwind, et le HTML anonyme ne change pas.
+import { getLocale } from "@i18n";
+import { annotationsDe } from "./annotations";
+import { donneesDe, media } from "./cadre";
+import { langueDuBackOffice, MOTS, STYLES } from "./textes-edition";
+
+type Sorte = "photo" | "affiche" | "partage" | "avatar" | "capture";
+
+interface Props {
+  /** L'identifiant de l'entree de `sections`, ou la cle d'une entree de liste ("pricing.plans.1"). */
+  cle: string;
+  /** Les champs de lien a montrer : [nom du champ, adresse rendue par defaut, libelle]. */
+  liens?: [string, string, string?][];
+  /** Les champs image a montrer, avec leur sorte pour le libelle. */
+  images?: { champ: string; sorte: Sorte }[];
+  /** L'adresse de la video livree avec le theme, si le bloc porte un champ "video". */
+  video?: string;
+  /** Vrai si le bloc se masque (champ "hidden"). */
+  masquable?: boolean;
+  /** Vrai pour une offre : sa case "Mettre en avant" (champ "featured"). */
+  vedette?: boolean;
+  /** Pose la rangee en bas du bloc plutot qu'en haut (le premier ecran, sous la barre de navigation). */
+  bas?: boolean;
+  /** Pose la rangee dans le flux, a sa place, plutot qu'en surimpression dans le coin. */
+  enLigne?: boolean;
+}
+
+const { cle, liens = [], images = [], video, masquable = false, vedette = false, bas = false, enLigne = false } = Astro.props;
+const entree = annotationsDe(Astro, cle);
+const actif = Object.keys(entree.entree).length > 0;
+const donnees = donneesDe(Astro, cle);
+const defautDuBackOffice = typeof __ALOHA_BO_LANGUE__ === "undefined" ? null : __ALOHA_BO_LANGUE__;
+const mots = MOTS[langueDuBackOffice(Astro.cookies.get("emdash-locale")?.value, defautDuBackOffice ?? getLocale(Astro))];
+
+const texte = (valeur: unknown): string | null => (typeof valeur === "string" && valeur.trim() !== "" ? valeur.trim() : null);
+const libelleImage: Record<Sorte, readonly [string, string]> = {
+  photo: [mots.photo, mots.photoDefaut],
+  affiche: [mots.affiche, mots.afficheDefaut],
+  partage: [mots.partage, mots.partageDefaut],
+  avatar: [mots.avatar, mots.avatarDefaut],
+  capture: [mots.capture, mots.captureDefaut],
+};
+const rangee = enLigne ? STYLES.rangeeEnLigne : bas ? STYLES.rangee.replace("top:.75rem", "bottom:.75rem") : STYLES.rangee;
+const pastille = (defaut: boolean) => `${STYLES.pastille}${defaut ? `;${STYLES.pastilleDefaut}` : ""}`;
+---
+
+{
+  actif && (
+    <div style={rangee} data-aloha-pastilles>
+      {liens.map(([champ, defaut, libelle]) => {
+        const valeur = texte(donnees[champ]);
+        return (
+          <span style={pastille(!valeur)}>
+            <span style={STYLES.etiquette}>{libelle ?? (champ.includes("secondary") ? mots.lienSecondaire : mots.lien)}</span>
+            <span style={STYLES.valeur} {...entree.champ(champ)}>{valeur ?? defaut}</span>
+            {!valeur && <span style={STYLES.etiquette}>{mots.lienDefaut}</span>}
+          </span>
+        );
+      })}
+      {images.map(({ champ, sorte }) => {
+        const choisie = media(donnees[champ]);
+        return (
+          <span style={pastille(!choisie)} {...entree.champ(champ)}>
+            {choisie ? `${libelleImage[sorte][0]} : ${choisie.alt || mots.choisie}` : libelleImage[sorte][1]}
+          </span>
+        );
+      })}
+      {video && (
+        <span style={pastille(!texte(donnees.video))}>
+          <span style={STYLES.etiquette}>{mots.video}</span>
+          <span style={STYLES.valeur} {...entree.champ("video")}>{texte(donnees.video) ?? video}</span>
+          {!texte(donnees.video) && <span style={STYLES.etiquette}>{mots.lienDefaut}</span>}
+        </span>
+      )}
+      {vedette && (
+        <span style={pastille(donnees.featured !== true)} {...entree.champ("featured")}>
+          {donnees.featured === true ? mots.enAvant : mots.pasEnAvant}
+        </span>
+      )}
+      {masquable && (
+        <span style={pastille(donnees.hidden !== true)} {...entree.champ("hidden")}>
+          {donnees.hidden === true ? mots.masque : mots.masquer}
+        </span>
+      )}
+    </div>
+  )
+}

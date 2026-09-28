@@ -30,6 +30,8 @@ type Props = {
   annotationDeLaDate?: Annotation;
   /** Moteur allume, en mode edition : l'attribut du champ repete des clauses, qui s'ouvre dans le back office. */
   annotationDesClauses?: Annotation;
+  /** Moteur allume : l'ancre donnee par l'editeur a chaque clause (sous-champ "anchor"), par rang ; vide, celle du titre. */
+  ancres?: readonly (string | undefined)[];
 };
 
 const {
@@ -42,12 +44,14 @@ const {
   class: className,
   annotationDeLaDate = {},
   annotationDesClauses = {},
+  ancres = [],
 } = Astro.props;
 
 // Les ancres viennent du titre de la section, donc de la langue : les URLs
 // francaises et anglaises ne partagent pas leurs ancres, et c'est correct,
-// puisqu'elles ne partagent pas leurs titres.
-const anchored = sections.map((section) => ({ ...section, id: slugify(section.title) }));
+// puisqu'elles ne partagent pas leurs titres. Moteur allume, l'editeur peut
+// en donner une autre a chaque clause (sous-champ "anchor" de ses elements).
+const anchored = sections.map((section, rang) => ({ ...section, id: ancres[rang]?.trim() || slugify(section.title) }));
 ---
 
 <div class:list={["container-page py-14 md:py-20", className]} data-slot="legal-article">

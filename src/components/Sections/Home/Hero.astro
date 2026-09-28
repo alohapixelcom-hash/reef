@@ -27,7 +27,10 @@ import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, useTranslations } from "@i18n";
-import { annotationsDe } from "@moteur/annotations";
+import { annotationsDe, styleDuBloc } from "@moteur/annotations";
+import { imageDe, lienDe } from "@moteur/cadre";
+import Pastilles from "@moteur/Pastilles.astro";
+import PhotoDuMoteur from "@moteur/PhotoDuMoteur.astro";
 import { Picture } from "astro:assets";
 
 interface Props {
@@ -42,6 +45,12 @@ const t = useTranslations(Astro);
 // Moteur allume, en mode edition : la section "hero" de la base (docs/moteur.md).
 const ed = annotationsDe(Astro, "hero");
 const routes = getSiteRoutes(locale);
+// Ce que l'editeur a choisi dans le back office, sinon le theme : la photo de
+// fond (champ image) et l'adresse des deux boutons (cta_link,
+// cta_secondary_link). Moteur eteint, tout vaut le theme (src/moteur/cadre.ts).
+const photo = imageDe(Astro, "hero");
+const lienPrincipal = lienDe(Astro, "hero", "cta_link") ?? routes.posts;
+const lienSecondaire = lienDe(Astro, "hero", "cta_secondary_link") ?? routes.about;
 
 // Decoupe du titre autour du mot accentue, insensible a la casse.
 const title = t.home.heroTitle;
@@ -55,7 +64,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
 {/* Le fond de page sur lequel la scene est posee. C'est lui qui fait exister le
     cadre : sans marge autour, le coin arrondi n'aurait rien contre quoi se
     detacher, et la scene redeviendrait un bandeau pleine largeur. */}
-<div class="bg-background p-2 sm:p-3 md:p-4" data-slot="home-hero" {...ed.entree}>
+<div class="bg-background p-2 sm:p-3 md:p-4" data-slot="home-hero" {...ed.entree} style={styleDuBloc(Astro, "hero")}>
   <section
     class="deep-scene rounded-panel relative isolate overflow-hidden"
     aria-labelledby="hero-title"
@@ -94,19 +103,35 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
     {/* QUALITE 75, EN AVIF COMME EN WEBP : l'image de tete est la premiere chose
        qu'on voit, en grand. A 50 (le defaut de sharp en AVIF) la texture de la
        photo s'empate ; a 75 elle reste nette, pour environ 50 % de poids en plus. */}
-    <Picture
-      src={heroVague}
-      formats={["avif"]}
-      fallbackFormat="webp"
-      alt=""
-      widths={[720, 800, 1200, 1920, 2560]}
-      sizes="100vw"
-      loading="eager"
-      fetchpriority="high"
-      quality={75}
-      class="pointer-events-none absolute inset-0 size-full object-cover object-[center_62%]"
-      aria-hidden="true"
-    />
+    {
+      photo ? (
+        <PhotoDuMoteur
+          media={photo}
+          widths={[720, 800, 1200, 1920, 2560]}
+          sizes="100vw"
+          loading="eager"
+          fetchpriority="high"
+          class="pointer-events-none absolute inset-0 size-full object-cover object-[center_62%]"
+          attributs={ed.champ("image")}
+        />
+      ) : (
+        <Picture
+          src={heroVague}
+          formats={["avif"]}
+          fallbackFormat="webp"
+          alt=""
+          widths={[720, 800, 1200, 1920, 2560]}
+          sizes="100vw"
+          loading="eager"
+          fetchpriority="high"
+          quality={75}
+          class="pointer-events-none absolute inset-0 size-full object-cover object-[center_62%]"
+          aria-hidden="true"
+          {...ed.champ("image")}
+        />
+      )
+    }
+    <Pastilles cle="hero" liens={[["cta_link", routes.posts], ["cta_secondary_link", routes.about]]} images={[{ champ: "image", sorte: "photo" }]} masquable bas />
 
     {/* Voile de lecture, en deux couches et pas une.
         Reglage trouve en trois essais, et les deux ratages valent d'etre notes
@@ -209,11 +234,11 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
           </p>
 
           <div class="mt-8 flex flex-wrap items-center gap-3">
-            <Button href={routes.posts} variant="primary" size="lg" {...ed.champ("cta")}>
+            <Button href={lienPrincipal} variant="primary" size="lg" {...ed.champ("cta")}>
               {t.home.heroPrimary}
               <Icon name="arrow-right" size={18} />
             </Button>
-            <Button href={routes.about} variant="outline" size="lg" {...ed.champ("cta_secondary")}>{t.home.heroSecondary}</Button>
+            <Button href={lienSecondaire} variant="outline" size="lg" {...ed.champ("cta_secondary")}>{t.home.heroSecondary}</Button>
           </div>
         </div>
       </div>

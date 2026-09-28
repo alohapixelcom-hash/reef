@@ -10,8 +10,8 @@
 // et retours au lieu d'un seul.
 
 import type { Locale } from "@i18n";
-import { entrySlug, getLocalizedCollection } from "@i18n/content";
-import { billetsPublies } from "@moteur/source";
+import { entrySlug } from "@i18n/content";
+import { auteursPublies, billetsPublies, MOTEUR, sujetsPublies } from "@moteur/source";
 import { readingTime } from "@js/textUtils";
 import { getEntry, type CollectionEntry } from "astro:content";
 
@@ -48,10 +48,7 @@ export async function getResolvedPosts(locale: Locale): Promise<ResolvedPost[]> 
 
   return Promise.all(
     posts.map(async (post) => {
-      const author = await getEntry(post.data.author);
-      if (!author) throw new Error(`Auteur inconnu "${post.data.author.id}" dans "${post.id}"`);
-      const topic = await getEntry(post.data.topic);
-      if (!topic) throw new Error(`Sujet inconnu "${post.data.topic.id}" dans "${post.id}"`);
+      const { author, topic } = await referencesDuBillet(post);
       return {
         post,
         author,
@@ -66,13 +63,44 @@ export async function getResolvedPosts(locale: Locale): Promise<ResolvedPost[]> 
 }
 
 /**
+ * L'auteur et le sujet d'un billet, lus dans les listes de la source (les
+ * fichiers, ou moteur allume les collections "auteurs" et "sujets" du back
+ * office), sinon dans les fichiers. Moteur eteint, une reference cassee arrete
+ * le build ; moteur allume, un billet dont l'auteur ou le sujet n'est pas (ou
+ * pas encore) publie garde son identifiant pour nom, plutot que de faire
+ * tomber la page.
+ */
+export async function referencesDuBillet(post: CollectionEntry<"posts">): Promise<{ author: CollectionEntry<"authors">; topic: CollectionEntry<"topics"> }> {
+  const locale = post.id.split("/")[0] as Locale;
+  const [auteurs, sujets] = await Promise.all([auteursPublies(locale), sujetsPublies(locale)]);
+  const author = auteurs.find((a) => a.id === post.data.author.id) ?? (await getEntry(post.data.author)) ?? repli("authors", post.data.author.id);
+  if (!author) throw new Error(`Auteur inconnu "${post.data.author.id}" dans "${post.id}"`);
+  const topic = sujets.find((s) => s.id === post.data.topic.id) ?? (await getEntry(post.data.topic)) ?? repli("topics", post.data.topic.id);
+  if (!topic) throw new Error(`Sujet inconnu "${post.data.topic.id}" dans "${post.id}"`);
+  return { author: author as CollectionEntry<"authors">, topic: topic as CollectionEntry<"topics"> };
+}
+
+/** Moteur allume seulement : une fiche minimale, nommee par son identifiant. */
+function repli(collection: "authors" | "topics", id: string): CollectionEntry<"authors"> | CollectionEntry<"topics"> | undefined {
+  if (!MOTEUR) return undefined;
+  const nom = entrySlug(id);
+  const data = collection === "authors" ? { name: nom, role: "", bio: "", links: [] } : { name: nom, description: "", accent: "coral", order: 0 };
+  return { id, collection, data } as unknown as CollectionEntry<"authors">;
+}
+
+/** Les auteurs d'une langue, par nom : l'ordre de toutes les listes d'auteurs du theme. */
+export async function getSortedAuthors(locale: Locale): Promise<CollectionEntry<"authors">[]> {
+  return (await auteursPublies(locale)).sort((a, b) => a.data.name.localeCompare(b.data.name));
+}
+
+/**
  * Les sujets d'une langue, dans l'ordre editorial (champ `order`, puis nom).
  *
  * Le tri vit ici et pas dans les pages : deux pages qui trient differemment la
  * meme liste donnent deux navigations differentes, et c'est le lecteur qui paie.
  */
 export async function getSortedTopics(locale: Locale): Promise<CollectionEntry<"topics">[]> {
-  const topics = await getLocalizedCollection("topics", locale);
+  const topics = await sujetsPublies(locale);
   return topics.sort(
     (a, b) => a.data.order - b.data.order || a.data.name.localeCompare(b.data.name),
   );
