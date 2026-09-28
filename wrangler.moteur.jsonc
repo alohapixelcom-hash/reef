@@ -17,6 +17,10 @@
   },
   // Optimise a la demande les images des pages gerees (voir moteur.config.mjs).
   "images": { "binding": "IMAGES" },
+  // Les courriels du site (formulaire de contact, essais, renvois) : la
+  // liaison Cloudflare Email Sending, que l'extension Courriels du back office
+  // utilise (src/moteur/extensions/courriels/). Sans elle, rien ne part.
+  "send_email": [{ "name": "EMAIL" }],
   // Publication programmee et entretien : une minute de resolution.
   "triggers": { "crons": ["* * * * *"] }
 }

@@ -17,7 +17,9 @@
 //   - ROUTES_DU_THEME : les segments d'adresse que ses pages fixes prennent
 //     (une page libre du back office ne peut pas s'appeler ainsi) ;
 //   - ICONES : les noms francais des icones qu'un editeur choisit ;
-//   - ADMIN_EXTERNE : le back office d'un catalogue externe ; null ici.
+//   - ADMIN_EXTERNE : le back office d'un catalogue externe ; null ici ;
+//   - ADRESSES_DE_COUVERTURE : les pages que scripts/couverture-edition.mjs
+//     parcourt (un exemplaire de chaque gabarit, dans les deux langues).
 import type { IconName } from "@components/svg/icons";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import siteData from "@config/siteData.json";
@@ -193,6 +195,24 @@ export const ICONES = {
   Cœur: "heart",
   Étoile: "star",
 } as const satisfies Record<string, IconName>;
+
+/** Les pages que l'outil de couverture de la barre parcourt : chaque gabarit, dans les deux langues, la page introuvable comprise. */
+export const ADRESSES_DE_COUVERTURE = [
+  "/", "/fr/",
+  "/blog/", "/fr/blog/",
+  "/blog/a-type-scale-you-can-defend/", "/fr/blog/a-type-scale-you-can-defend/",
+  "/topics/", "/fr/topics/",
+  "/topics/craft/", "/fr/topics/craft/",
+  "/authors/", "/fr/authors/",
+  "/authors/mara-lindqvist/", "/fr/authors/mara-lindqvist/",
+  "/search/", "/fr/search/",
+  "/about/", "/fr/about/",
+  "/contact/", "/fr/contact/",
+  "/legal/", "/fr/legal/",
+  "/privacy/", "/fr/privacy/",
+  "/terms/", "/fr/terms/",
+  "/nope/", "/fr/nope/",
+];
 
 /** Reef n'a pas de catalogue externe. */
 export const ADMIN_EXTERNE: { libelle: string; url: string } | null = null;

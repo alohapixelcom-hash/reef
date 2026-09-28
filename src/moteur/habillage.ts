@@ -20,7 +20,8 @@
 // feuilles (back-office.css et, s'il en a, les suivantes), la marque qui
 // reconnait sa feuille publique. Ce fichier-ci est le meme partout : il
 // reunit les trois corrections que les depots avaient faites chacun de leur
-// cote (commentaires retires, pont des polices, feuille du site retiree).
+// cote (commentaires retires, pont des polices, feuille du site retiree),
+// et le correctif de l'ecran Parametres d'EmDash 0.38 trouve par Swell.
 import { defineMiddleware } from "astro:middleware";
 import { sansLaFeuilleDuSite } from "./feuille";
 import { FEUILLES, JETONS, MARQUE_DU_SITE, POLICES } from "./habillage.site";
@@ -48,13 +49,23 @@ const pont = `:root { --aloha-police-texte: ${pile("sans")}; --aloha-police-titr
 
 const FEUILLE = `<style data-aloha-back-office>${POLICES}\n${pont}\n${jetons}\n${FEUILLES.map(sansCommentaires).join("\n")}</style>`;
 
+// UN CORRECTIF DE L'ECRAN PARAMETRES D'EMDASH 0.38. "Supprimer" sous le logo
+// (ou la favicon, ou l'image de partage du SEO) vide le champ du formulaire,
+// mais "Enregistrer" envoie alors un corps SANS ce champ, et le moteur, qui
+// fusionne, garde l'ancienne image : le logo ne se retirait pas (mesure du
+// 28 septembre 2026, POST /_emdash/api/settings). Ce script recopie le vide
+// dans l'envoi, sous la seule forme que l'API accepte ({ mediaId: "" }, une
+// reference qui ne mene a aucun fichier) ; la page, qui ne trouve pas
+// d'adresse, rend alors l'image du theme (cadre.ts, identite).
+const CORRECTIF_PARAMETRES = `<script data-aloha-back-office>(function(){var f=window.fetch;window.fetch=function(i,o){try{var u=typeof i==="string"?i:(i&&i.url)||"";if(/\\/_emdash\\/api\\/settings$/.test(u)&&o&&(o.method||"").toUpperCase()==="POST"&&typeof o.body==="string"){var b=JSON.parse(o.body);if("title" in b||"tagline" in b){["logo","favicon"].forEach(function(k){if(!(k in b))b[k]={mediaId:""};});}if(b.seo&&typeof b.seo==="object"&&!("defaultOgImage" in b.seo))b.seo.defaultOgImage={mediaId:""};o=Object.assign({},o,{body:JSON.stringify(b)});}}catch(e){}return f.call(this,i,o);};})();</script>`;
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const reponse = await next();
   if (!context.url.pathname.startsWith("/_emdash/admin")) return reponse;
   if (!(reponse.headers.get("content-type") ?? "").includes("text/html")) return reponse;
   const html = await reponse.text();
   // La feuille du site sort d'abord (voir feuille.ts), l'habillage entre ensuite.
-  return new Response(sansLaFeuilleDuSite(html, MARQUE_DU_SITE).replace("</head>", `${FEUILLE}</head>`), {
+  return new Response(sansLaFeuilleDuSite(html, MARQUE_DU_SITE).replace("</head>", `${FEUILLE}${CORRECTIF_PARAMETRES}</head>`), {
     status: reponse.status,
     headers: reponse.headers,
   });

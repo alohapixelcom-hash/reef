@@ -12,7 +12,9 @@
     "ci"
   ],
   "extensions": [
-    "deployer"
+    "deployer",
+    "courriels",
+    "administrable"
   ],
   "exclus": [],
   "chemins": {},
@@ -20,6 +22,7 @@
     "cleDuTheme": "reef-theme"
   },
   "notes": [
-    "BlocAncre.astro et TexteRiche.emdash.astro restent au site jusqu'a l'adoption du module rendu-riche (BlocAncre y devient Bloc.astro, meme code)."
+    "BlocAncre.astro et TexteRiche.emdash.astro restent au site jusqu'a l'adoption du module rendu-riche (BlocAncre y devient Bloc.astro, meme code).",
+    "Courriels et Tout administrable (3.4.0) : configuration.ts du site (formulaire de contact), la liaison send_email dans wrangler.moteur.jsonc, les blocs de moteur.config.mjs (liaison, extension, route du formulaire, alias @moteur/courriels, @moteur/texte-riche et @moteur/cadre-base) ; theme.ts et PageLibre.astro sont les fichiers du site de l'extension administrable."
   ]
 }

@@ -4,8 +4,9 @@
 // Rendue par [...locale]/index.astro quand l'adresse est celle d'une page
 // libre (src/moteur/pages.ts), a la demande, moteur allume seulement. Elle
 // reprend les pieces des pages annexes (bandeau PageHero, colonne .prose) et
-// n'a aucune classe a elle : src/moteur/ est hors du scan de Tailwind, et le
-// build statique ne doit pas bouger d'un octet.
+// n'a aucune classe a elle, seulement des classes que le theme emploie deja :
+// ce fichier est hors du scan de Tailwind (src/styles/global.css), et le build
+// statique ne doit pas bouger d'un octet.
 //
 // SEO : le panneau SEO de l'entree passe avant ses champs, qui passent avant
 // les valeurs du site. Un noindex la retire aussi du plan du site.
@@ -56,7 +57,7 @@ const corps = Array.isArray(data.body) && data.body.length > 0 ? data.body : nul
     <PageHero title={titre} lede={texte(data.lede)} crumbs={[{ label: titre }]} edition={edition} />
     {
       (photo || edition.champ("image")["data-emdash-ref"]) && (
-        <div class="container-page pt-14" {...edition.champ("image")}>
+        <div class="container-page mt-10" {...edition.champ("image")}>
           {photo && <PhotoDuMoteur media={photo} class="rounded-card w-full" widths={[720, 1200, 1920]} sizes="100vw" alt={photo.alt ?? ""} />}
         </div>
       )

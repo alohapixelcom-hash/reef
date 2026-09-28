@@ -9,7 +9,7 @@ import { type Locale, useTranslations } from "@i18n";
 import { getLocalizedCollection } from "@i18n/content";
 import type { MarkdownHeading } from "astro";
 import type { CollectionEntry } from "astro:content";
-import { getEmDashCollection, getEmDashEntry, getSiteSettings } from "emdash";
+import { getEmDashCollection, getEmDashEntry, getRequestContext, getSiteSettings } from "emdash";
 import GithubSlugger from "github-slugger";
 import { annotationDe, estEditable, type Annotation, type Editions } from "./annotations";
 import type { Cadre, DonneesDesSections } from "./cadre";
@@ -103,7 +103,31 @@ function enBillet(entree: Entree, locale: Locale): CollectionEntry<"posts"> {
   } as unknown as CollectionEntry<"posts">;
 }
 
+// UNE LECTURE PAR REQUETE. Une page de billet demande les billets de sa
+// langue trois fois (la page, son pied, les lectures suivantes), et chacune de
+// ces demandes lisait aussi les sujets et les auteurs : neuf lectures de la
+// base pour trois listes. Le resultat est garde le temps de la requete, dans
+// le contexte que le moteur ouvre pour elle (le meme mecanisme que son propre
+// cache de requete) ; hors requete (un script), rien n'est garde. La requete
+// suivante relit la base : une publication se voit toujours a la visite
+// suivante.
+const PAR_REQUETE = new WeakMap<object, Map<string, Promise<unknown>>>();
+
+function parRequete<T>(cle: string, lire: () => Promise<T>): Promise<T> {
+  const contexte = getRequestContext() as object | undefined;
+  if (!contexte) return lire();
+  let memoire = PAR_REQUETE.get(contexte);
+  if (!memoire) PAR_REQUETE.set(contexte, (memoire = new Map()));
+  if (!memoire.has(cle)) memoire.set(cle, lire());
+  return memoire.get(cle) as Promise<T>;
+}
+
 export async function billetsPublies(locale: Locale): Promise<CollectionEntry<"posts">[]> {
+  // Une copie de la liste gardee : un appelant peut la trier sans deranger les autres.
+  return [...(await parRequete(`billets:${locale}`, () => lireLesBillets(locale)))];
+}
+
+async function lireLesBillets(locale: Locale): Promise<CollectionEntry<"posts">[]> {
   const billets: CollectionEntry<"posts">[] = [];
   let cursor: string | undefined;
   do {
@@ -182,6 +206,10 @@ function enAuteur(entree: Entree, locale: Locale): CollectionEntry<"authors"> {
  * src/data/topics : le rendu d'avant la 3.4.0.
  */
 export async function sujetsPublies(locale: Locale): Promise<CollectionEntry<"topics">[]> {
+  return [...(await parRequete(`sujets:${locale}`, () => lireLesSujets(locale)))];
+}
+
+async function lireLesSujets(locale: Locale): Promise<CollectionEntry<"topics">[]> {
   const entrees = await toutesPubliees("sujets", locale);
   if (!entrees || entrees.length === 0) return getLocalizedCollection("topics", locale);
   return entrees.map((entree) => enSujet(entree, locale));
@@ -189,6 +217,10 @@ export async function sujetsPublies(locale: Locale): Promise<CollectionEntry<"to
 
 /** Les auteurs publies d'une langue (collection "auteurs"), sinon les fichiers de src/data/authors. */
 export async function auteursPublies(locale: Locale): Promise<CollectionEntry<"authors">[]> {
+  return [...(await parRequete(`auteurs:${locale}`, () => lireLesAuteurs(locale)))];
+}
+
+async function lireLesAuteurs(locale: Locale): Promise<CollectionEntry<"authors">[]> {
   const entrees = await toutesPubliees("auteurs", locale);
   if (!entrees || entrees.length === 0) return getLocalizedCollection("authors", locale);
   return entrees.map((entree) => enAuteur(entree, locale));
@@ -196,6 +228,10 @@ export async function auteursPublies(locale: Locale): Promise<CollectionEntry<"a
 
 /** Le nombre de billets par page des listes : le reglage "Articles par page" du back office, sinon 9 (le theme). */
 export async function billetsParPage(): Promise<number> {
+  return parRequete("par-page", lireLeNombreParPage);
+}
+
+async function lireLeNombreParPage(): Promise<number> {
   try {
     const n = ((await getSiteSettings()) as { postsPerPage?: unknown } | null)?.postsPerPage;
     return typeof n === "number" && Number.isInteger(n) && n >= 1 ? n : 9;
