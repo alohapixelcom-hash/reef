@@ -4,7 +4,13 @@
 
 Versions describe the features actually shipped in this theme.
 
-Current version: **3.3.2**.
+Current version: **3.3.3**.
+
+## 3.3.3 - 2026-09-28
+
+Version number aligned with the Aloha Pixel family (3.3.3: screenshots on
+alohapixel.com and Holo re-shot without the wave, prices with cents formatted
+with both digits in Kai, Kona and Nalu). No functional change in this theme.
 
 ## 3.3.2 - 2026-09-28
 
