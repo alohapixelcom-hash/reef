@@ -184,6 +184,7 @@ const auteur = annotationsDeLaFiche(author);
           sizes="(min-width: 80rem) 72rem, 100vw"
           class="rounded-card shadow-float measure-wide mx-auto w-full object-cover"
           loading="eager"
+          fetchpriority="high"
           decoding="async"
           {...annotation(post, "cover")}
         />

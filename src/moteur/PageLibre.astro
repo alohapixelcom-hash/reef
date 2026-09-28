@@ -58,7 +58,7 @@ const corps = Array.isArray(data.body) && data.body.length > 0 ? data.body : nul
     {
       (photo || edition.champ("image")["data-emdash-ref"]) && (
         <div class="container-page mt-10" {...edition.champ("image")}>
-          {photo && <PhotoDuMoteur media={photo} class="rounded-card w-full" widths={[720, 1200, 1920]} sizes="100vw" alt={photo.alt ?? ""} />}
+          {photo && <PhotoDuMoteur media={photo} class="rounded-card w-full" widths={[720, 1200, 1440, 1920]} sizes="100vw" alt={photo.alt ?? ""} />}
         </div>
       )
     }

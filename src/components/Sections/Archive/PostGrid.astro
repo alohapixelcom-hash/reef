@@ -90,9 +90,9 @@ import { marqueInterface } from "@moteur/cadre";
           class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
           aria-label={t.archive.listLabel}
         >
-          {posts.map((entry) => (
+          {posts.map((entry, rang) => (
             <li class="flex">
-              <PostCard {entry} {locale} as={headingLevel} class="w-full" />
+              <PostCard {entry} {locale} as={headingLevel} class="w-full" prioritaire={rang === 0} />
             </li>
           ))}
         </ul>

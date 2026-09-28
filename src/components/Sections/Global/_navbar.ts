@@ -76,6 +76,12 @@ function measureCompact(header: HTMLElement, nav: HTMLElement, track: HTMLElemen
 
   if (restore === undefined) delete header.dataset.shrunk;
   else header.dataset.shrunk = restore;
+  // Le style restaure est calcule ICI, transitions encore coupees. Sans cette
+  // lecture, le navigateur voyait l'etat resserre de la mesure puis l'etat
+  // restaure avec les transitions revenues : la barre glissait au chargement
+  // (et a chaque document.fonts.ready), et chaque glissement comptait dans le
+  // CLS (recette du socle, mesuree sur Kona le 28 septembre 2026).
+  void header.offsetWidth;
   delete header.dataset.measuring;
 
   return Math.ceil(Math.max(width, MIN_COMPACT));

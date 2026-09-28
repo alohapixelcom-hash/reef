@@ -100,6 +100,10 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
         donc personne n'y perd. fallbackFormat EST OBLIGATOIRE : sans lui
         Astro fabrique un PNG de secours par palier, soit pres de vingt
         megaoctets de fichiers que personne ne telechargera jamais. */}
+    {/* 1440 EN PLUS, ET C'EST UNE CORRECTION MESUREE (recette du socle,
+        mesuree sur Kona le 28 septembre 2026) : un ecran de bureau de 1440
+        points a un pixel par point prenait le palier 1920, un tiers de
+        pixels de trop pour la photo qui decide du premier affichage. */}
     {/* QUALITE 75, EN AVIF COMME EN WEBP : l'image de tete est la premiere chose
        qu'on voit, en grand. A 50 (le defaut de sharp en AVIF) la texture de la
        photo s'empate ; a 75 elle reste nette, pour environ 50 % de poids en plus. */}
@@ -107,7 +111,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
       photo ? (
         <PhotoDuMoteur
           media={photo}
-          widths={[720, 800, 1200, 1920, 2560]}
+          widths={[720, 800, 1200, 1440, 1920, 2560]}
           sizes="100vw"
           loading="eager"
           fetchpriority="high"
@@ -120,7 +124,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
           formats={["avif"]}
           fallbackFormat="webp"
           alt=""
-          widths={[720, 800, 1200, 1920, 2560]}
+          widths={[720, 800, 1200, 1440, 1920, 2560]}
           sizes="100vw"
           loading="eager"
           fetchpriority="high"

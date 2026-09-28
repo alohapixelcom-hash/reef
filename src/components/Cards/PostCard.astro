@@ -27,9 +27,11 @@ type Props = {
   /** Niveau de titre reel : h2 dans une grille sans sous-titre, h3 sous un titre de section. */
   as?: "h2" | "h3";
   class?: string;
+  /** La premiere carte d'une liste : sa couverture est souvent le plus grand element du premier ecran, elle part tout de suite. */
+  prioritaire?: boolean;
 };
 
-const { entry, locale, as: Tag = "h3", class: className }: Props = Astro.props;
+const { entry, locale, as: Tag = "h3", class: className, prioritaire = false }: Props = Astro.props;
 const { post, author, topic, slug, topicSlug, minutes } = entry;
 
 const t = useTranslations(locale);
@@ -68,7 +70,8 @@ const auteur = annotationsDeLaFiche(author);
         widths={[420, 760]}
         sizes="(min-width: 1024px) 24rem, (min-width: 640px) 45vw, 92vw"
         class="aspect-[16/9] w-full object-cover"
-        loading="lazy"
+        loading={prioritaire ? "eager" : "lazy"}
+        fetchpriority={prioritaire ? "high" : undefined}
         decoding="async"
         {...annotation(post, "cover")}
       />
