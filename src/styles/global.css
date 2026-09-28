@@ -130,23 +130,15 @@
    * ======================================================================= */
 
   /* Le mot d'accent d'un titre. Un seul par titre, jamais deux.
-   * Plus AUCUNE police a part : meme police que le titre, turquoise, souligne
-   * d'une VAGUE - la signature Aloha Pixel (le logo est une vague), pas un
-   * tic d'outil. L'italique serif d'accent est bannie de toute la famille :
-   * un mot en serif italique au milieu d'un titre sans serif est l'ornement
-   * le plus repandu du web, et il ne veut rien dire de la marque.
-   * La vague vit dans --accent-wave (tokens.css), une par mode puisque le
-   * primaire de Reef change entre clair et sombre. */
+   * Meme police que le titre, dans la couleur primaire du theme, SANS
+   * soulignement : la vague qui le soulignait est retiree depuis la 3.3.1
+   * (regle de l'editeur du 28 septembre 2026 : aucun trait decoratif sous un
+   * titre, sur aucun site de la maison). L'italique serif d'accent reste
+   * bannie de toute la famille : un mot en serif italique au milieu d'un
+   * titre sans serif est l'ornement le plus repandu du web, et il ne dit
+   * rien de la marque. */
   .accent-script {
     @apply text-primary font-normal not-italic;
-    /* La vague loge dans la zone des descendantes, jamais dans l'interligne :
-     * les titres sont composes tres serres, un trait qui deborde mord la
-     * ligne suivante. Pas de padding vertical, position remontee. */
-    background-image: var(--accent-wave);
-    background-repeat: repeat-x;
-    background-position: left calc(100% - 0.05em);
-    background-size: 1.3em 0.16em;
-    padding-inline: 0.04em;
   }
 
   /* =========================================================================
@@ -174,7 +166,6 @@
     --reef-primary-foreground: var(--color-ink-950);
     /* Le primaire de la scene est le turquoise 400 du sombre, dans les deux
      * modes : la vague du mot d'accent suit, comme les autres roles. */
-    --accent-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 10' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q 6 2.5 12 7 T 24 7 T 36 7 T 48 7' fill='none' stroke='%233fc0e0' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
     --reef-accent: var(--color-coral-400);
     --reef-accent-foreground: var(--color-ink-950);
     --reef-border: color-mix(in oklab, var(--color-paper-50) 15%, transparent);

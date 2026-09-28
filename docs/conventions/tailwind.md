@@ -105,6 +105,5 @@ that forgot its role.
 - Sections breathe: `py-24 md:py-32`.
 - Display headings: `font-display` (Space Grotesk), and exactly one word per
   big title wrapped in `<span class="accent-script">`: it keeps the heading
-  font, turns the house turquoise and carries the turquoise wave underline
-  (`--accent-wave`). Coral is the second accent, rationed. Never an italic
-  serif.
+  font, turns the house turquoise, no underline (the wave was removed in
+  3.3.1). Coral is the second accent, rationed. Never an italic serif.

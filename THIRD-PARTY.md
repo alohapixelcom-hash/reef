@@ -25,9 +25,8 @@ bundling, self-hosting and commercial use.
 The imports live at the top of src/layouts/BaseHead.astro. Each package
 carries its own LICENSE file in node_modules; the license fields above were
 read from the packages' own metadata. The accent word of a big title loads no
-extra font: it keeps the heading font, turns the house turquoise and carries a
-turquoise wave underline (--accent-wave, an original inline SVG covered by the
-theme LICENSE). Coral is the second accent, rationed.
+extra font: it keeps the heading font, turns the house turquoise, with no
+underline (the wave was removed in 3.3.1). Coral is the second accent, rationed.
 
 ## Icons
 

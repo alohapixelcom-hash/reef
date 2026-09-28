@@ -79,8 +79,9 @@ Aloha Pixel logo is a wave. The mark and the typography say the same thing.
 That is what a signature is.
 
 One accent word per title; two is a decoration. The rule lives in
-`.accent-script` in `src/styles/global.css`, and the wave in `--accent-wave` in
-`tokens.css`, one per colour mode.
+`.accent-script` in `src/styles/global.css`: same font as the title, primary
+colour, no underline (the wave was removed in 3.3.1: no decorative stroke under
+a title, anywhere in the house).
 
 **Scale.** Five display steps, tuned with `clamp()` so they hold from 320 px to
 1440 px. Line height tightens as size grows: 1.6 for prose, under 1.1 for the

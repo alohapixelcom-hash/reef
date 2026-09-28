@@ -42,8 +42,7 @@ Inside `@theme`: three colour ramps and the non-colour tokens.
   Instrument Sans (body and interface); only these two fonts load.
   `--font-serif` and `--font-script` are compatibility aliases of the display
   font: the accent word of a big title keeps the heading font, turns the house
-  turquoise and carries a turquoise wave underline (`--accent-wave`, one per
-  mode since the primary turquoise changes between light and dark), never an
+  turquoise, with no underline (the wave was removed in 3.3.1), never an
   italic serif. The display scale runs to 5.5rem; both variable families load
   the weight axis only.
 - **Radii**: card 0.875rem, panel 1.25rem, pill 999px. Buttons are pills; cards

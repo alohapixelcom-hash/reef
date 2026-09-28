@@ -97,8 +97,8 @@
    * dessinee pour l'ecran. C'est elle qu'on lit pendant huit minutes.
    *
    * Le mot d'accent des titres n'a PLUS de police a lui : il garde la police
-   * du titre et porte une vague soulignee (--accent-wave, definie par mode
-   * plus bas, pres du primaire). Plus aucune italique serif nulle part :
+   * du titre, en primaire, sans soulignement (la vague est retiree depuis la
+   * 3.3.1, regle du 28 septembre 2026). Plus aucune italique serif nulle part :
    * --font-serif et --font-script ne subsistent que comme alias du display,
    * pour le contenu qui les cite encore. */
   --font-display: "Space Grotesk Variable", "Space Grotesk", system-ui, sans-serif;
@@ -228,7 +228,6 @@
    * est une vague), dessine dans le turquoise du primaire. Le primaire change
    * entre les modes, donc une vague par mode : turquoise 600 ici,
    * turquoise 400 en sombre. */
-  --accent-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 10' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q 6 2.5 12 7 T 24 7 T 36 7 T 48 7' fill='none' stroke='%23147ea0' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
   --reef-accent: var(--color-coral-600);
   /* L'accent QUAND IL PORTE DU TEXTE, et rien d'autre.
    *
@@ -274,7 +273,6 @@
   --reef-primary-foreground: var(--color-ink-950);
   --reef-primary-text: var(--reef-primary);
   /* Le primaire passe en turquoise 400 : la vague du mot d'accent suit. */
-  --accent-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 10' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q 6 2.5 12 7 T 24 7 T 36 7 T 48 7' fill='none' stroke='%233fc0e0' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
   --reef-accent: var(--color-coral-400);
   /* En sombre, l'accent passe deja largement AA sur les trois fonds : le texte
    * en accent garde donc exactement la couleur de l'accent. */

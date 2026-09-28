@@ -167,9 +167,9 @@ work is done".
    CSS before any `<script>`. There is no React and no island in this theme.
 7. Buttons are pills (rounded-pill). Cards float (bg-card rounded-card
    shadow-float). Sections breathe (py-24 md:py-32). Exactly one accent-script
-   word per big title: it keeps the heading font, turns the house turquoise and
-   carries the turquoise wave underline (--accent-wave). Coral is the second
-   accent, rationed. Never an italic serif.
+   word per big title: it keeps the heading font, turns the house turquoise,
+   no underline (the wave was removed in 3.3.1). Coral is the second accent,
+   rationed. Never an italic serif.
 8. Bilingual is mandatory: `export const getStaticPaths = localePaths;` on
    every page under [...locale]/ (dynamic routes multiply it), every internal
    href through `localizePath()`, and the French is written, not translated. A
