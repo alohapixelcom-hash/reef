@@ -71,6 +71,20 @@ assert.deepEqual(
   `${avecTiret.length} messages du catalogue francais portent un tiret cadratin ou demi-cadratin`,
 );
 
+// Le dictionnaire lui-meme non plus (ajout venu de Kona) : une traduction de
+// la maison qui porterait un tiret serait invisible au controle ci-dessus
+// tant que le message qu'elle remplace n'est pas servi.
+const valeursDeLaMaison = [
+  ...Object.values(DICTIONNAIRE.simples),
+  ...Object.values(DICTIONNAIRE.composes),
+  ...Object.values(DICTIONNAIRE.maison.simples),
+  ...Object.values(DICTIONNAIRE.maison.composes),
+];
+assert.ok(
+  !valeursDeLaMaison.some((valeur) => /[\u2013\u2014]/.test(JSON.stringify(valeur))),
+  "une traduction de la maison porte un tiret cadratin ou demi-cadratin",
+);
+
 // Aucun message du catalogue complete ne doit avoir disparu ni changer de forme.
 assert.equal(Object.keys(complete).length, total, "le catalogue complete a perdu ou gagne des messages");
 

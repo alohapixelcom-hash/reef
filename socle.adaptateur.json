@@ -1,0 +1,25 @@
+{
+  "$schema": "le format est decrit dans LISEZMOI.md du socle, section Adaptateur",
+  "depot": "reef",
+  "modules": [
+    "outillage",
+    "moteur-base",
+    "catalogue-bo",
+    "habillage-bo",
+    "langue-bo",
+    "mouvement",
+    "plan-du-site",
+    "ci"
+  ],
+  "extensions": [
+    "deployer"
+  ],
+  "exclus": [],
+  "chemins": {},
+  "parametres": {
+    "cleDuTheme": "reef-theme"
+  },
+  "notes": [
+    "BlocAncre.astro et TexteRiche.emdash.astro restent au site jusqu'a l'adoption du module rendu-riche (BlocAncre y devient Bloc.astro, meme code)."
+  ]
+}

@@ -1,7 +1,7 @@
 // src/moteur/langue-bo.selfcheck.ts - self-check des regles de la langue du back office.
 // Lancer : node src/moteur/langue-bo.selfcheck.ts
 import assert from "node:assert/strict";
-import { avecLeCookie, cookieDeLangue, langueDesTextes, langueParDefaut, poserLeCookie } from "./langue-bo.regles.ts";
+import { avecLeCookie, cookieDeLangue, langueDesTextes, langueDuBackOffice, langueParDefaut, poserLeCookie } from "./langue-bo.regles.ts";
 
 let checks = 0;
 function is(actual: unknown, expected: unknown, message: string): void {
@@ -41,5 +41,34 @@ is(langueDesTextes(requete({ "accept-language": "de-DE,de;q=0.9" }), null), "en"
 is(langueDesTextes(requete({ "accept-language": "en-US" }), "fr"), "fr", "la langue du site passe devant le navigateur");
 is(langueDesTextes(requete({ cookie: "emdash-locale=en", "accept-language": "fr" }), "fr"), "en", "le choix de la personne passe devant tout");
 is(langueDesTextes(requete({ cookie: "emdash-locale=fr" }), null), "fr", "le cookie seul suffit");
+
+// La langue posee dans le Worker (verifications venues d'alohapixel.com).
+const page = (chemin: string, entetes: Record<string, string> = {}, method = "GET") =>
+  new Request(`https://exemple.test${chemin}`, { method, headers: entetes });
+const admin = page("/_emdash/admin", { "accept-language": "en-US,en;q=0.9" });
+is(langueDuBackOffice(admin, "fr").headers.get("accept-language"), "fr", "la langue du site remplace celle du navigateur");
+is(langueDuBackOffice(admin, "fr") === admin, false, "la requete modifiee est une copie");
+is(langueDuBackOffice(page("/_emdash/admin"), "fr").headers.get("accept-language"), "fr", "sans preference du navigateur, la langue du site");
+is(
+  langueDuBackOffice(page("/_emdash/admin/content/blog", { cookie: "session=abc" }), "pt-BR").headers.get("accept-language"),
+  "pt-BR",
+  "un autre code de langue passe tel quel, sous-pages comprises",
+);
+is(langueDuBackOffice(admin, "fr").url, admin.url, "l'adresse ne change pas");
+is(langueDuBackOffice(admin, "fr").headers.get("cookie"), null, "aucun cookie n'est ecrit");
+const choisi = page("/_emdash/admin", { cookie: "session=abc; emdash-locale=en", "accept-language": "fr" });
+is(langueDuBackOffice(choisi, "fr") === choisi, true, "un cookie de langue laisse la requete telle quelle");
+is(
+  langueDuBackOffice(page("/_emdash/admin", { cookie: "xemdash-locale=en" }), "fr").headers.get("accept-language"),
+  "fr",
+  "un cookie au nom voisin n'est pas le cookie de langue",
+);
+const api = page("/_emdash/api/content/blog", { "accept-language": "en" });
+is(langueDuBackOffice(api, "fr") === api, true, "l'API du moteur n'est pas touchee");
+const publique = page("/journal/", { "accept-language": "en" });
+is(langueDuBackOffice(publique, "fr") === publique, true, "le site public n'est pas touche");
+const envoi = page("/_emdash/admin", { "accept-language": "en" }, "POST");
+is(langueDuBackOffice(envoi, "fr") === envoi, true, "seule une lecture de page est concernee");
+is(langueDuBackOffice(admin, null) === admin, true, "ALOHA_BO_LANGUE=navigateur : la regle ne fait rien");
 
 console.log(`langue-bo.selfcheck: ${checks} verifications passees`);

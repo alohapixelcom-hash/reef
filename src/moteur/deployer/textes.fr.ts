@@ -1,25 +1,28 @@
 // src/moteur/deployer/textes.fr.ts - tout ce que la page "Tout deployer" affiche, en francais. Sa forme est le contrat du dictionnaire anglais.
+//
+// La seule phrase propre au site, l'introduction (ce qu'on publie et ce que
+// le build refige), vit dans site.ts, que le site possede. Le reste est le
+// meme dans tous les depots.
 import type { Build } from "./journal";
+import { INTRODUCTION } from "./site";
 
 export const FR = {
   titre: "Tout déployer",
-  intro:
-    "Publier un billet se voit déjà sur le site, sans rien faire : les pages gérées se rendent depuis la base. Ce bouton sert à la fin d'une séance de modifications. Il vide les caches du contenu, puis relance le build des pages figées (contact, pages légales, et tout ce qui ne change qu'au build).",
+  intro: INTRODUCTION.fr,
   bouton: "Tout déployer",
   actualiser: "Actualiser",
   inconnu: "inconnu",
   jamais: "Jamais",
-  aucune: "Aucune",
+  aucun: "Aucun",
 
   etat: {
     version: "Version servie",
-    construit: "Build servi, construit le",
+    construit: (quand: string) => `Build du ${quand}.`,
     dernier: "Dernier déclenchement",
-    reponse: "Réponse du hook",
-    objets: "Cache d'objets",
-    routes: "Cache de routes",
-    configure: (nom: string) => `Configuré (${nom})`,
-    nonConfigure: "Aucun configuré",
+    aucunDeclenchement: "Aucun build demandé depuis ce back office.",
+    caches: "Caches du contenu",
+    detailDesCaches: (objets: string, routes: string) => `Objets : ${objets}. Routes : ${routes}.`,
+    nonConfigure: "aucun",
     http: (code: number) => `HTTP ${code}`,
     sansReponse: "Aucune réponse",
   },

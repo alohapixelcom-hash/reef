@@ -1,25 +1,24 @@
 // src/moteur/deployer/textes.en.ts - everything the "Deploy everything" page displays, in English. Same shape as textes.fr.ts, checked by the compiler.
+import { INTRODUCTION } from "./site";
 import type { Textes } from "./textes";
 
 export const EN: Textes = {
   titre: "Deploy everything",
-  intro:
-    "Publishing a post already shows on the site, with nothing to do: managed pages are rendered from the database. This button is for the end of an editing session. It empties the content caches, then restarts the build of the prerendered pages (contact, legal pages, and everything that only changes at build time).",
+  intro: INTRODUCTION.en,
   bouton: "Deploy everything",
   actualiser: "Refresh",
   inconnu: "unknown",
   jamais: "Never",
-  aucune: "None",
+  aucun: "None",
 
   etat: {
     version: "Version served",
-    construit: "Build served, built on",
+    construit: (quand: string) => `Built on ${quand}.`,
     dernier: "Last trigger",
-    reponse: "Hook response",
-    objets: "Object cache",
-    routes: "Route cache",
-    configure: (nom: string) => `Configured (${nom})`,
-    nonConfigure: "None configured",
+    aucunDeclenchement: "No build requested from this back office yet.",
+    caches: "Content caches",
+    detailDesCaches: (objets: string, routes: string) => `Objects: ${objets}. Routes: ${routes}.`,
+    nonConfigure: "none",
     http: (code: number) => `HTTP ${code}`,
     sansReponse: "No response",
   },

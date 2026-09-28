@@ -1,14 +1,14 @@
 // src/moteur/qualite-image.ts - la qualite d'encodage des images rendues a la demande : celle que sharp applique au build statique, ecrite dans l'adresse.
 //
 // LE DEFAUT MESURE EN LIGNE LE 24 SEPTEMBRE 2026. Au build, aucune image du
-// theme ne declare de qualite : le service sharp d'Astro laisse alors sharp
+// site ne declare de qualite : le service sharp d'Astro laisse alors sharp
 // appliquer ses defauts, 80 en WebP et en JPEG, 50 en AVIF. A la demande
 // (moteur allume), l'adresse /_image ne portait pas de parametre q, et le
-// liant Cloudflare Images encode alors presque sans perte : l'image de tete
-// de la demo pesait 569 Ko a 390 px et 1,5 Mo a 1440 px, quand le build
-// statique sort les memes images entre 100 et 200 Ko. La regle ci-dessous
-// ecrit donc dans l'adresse la qualite que le build aurait appliquee, format
-// par format.
+// liant Cloudflare Images encode alors presque sans perte : sur les demos de
+// la famille, l'image de tete pesait de 569 a 953 Ko a 390 px et jusqu'a
+// 2,9 Mo a 1440 px, contre 100 a 200 Ko pour la variante du build statique.
+// La regle ci-dessous ecrit donc dans l'adresse la qualite que le build aurait
+// appliquee, format par format.
 //
 // Pur, sans import : le self-check (qualite-image.selfcheck.ts) le compare
 // aux defauts de la version de sharp installee.

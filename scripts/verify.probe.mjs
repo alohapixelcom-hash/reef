@@ -128,7 +128,16 @@ export const PROBE = ({ asked }) => {
      quand meme dans la barre d'Aloha, ou il poussait le bouton du menu hors
      de sa pastille. Une regle documentee n'est pas une regle tenue. */
   const BREAKPOINT = { sm: 640, md: 768, lg: 1024, xl: 1280, "2xl": 1536 };
-  const DISPLAY = /^(block|flex|inline-flex|grid|inline|inline-block|inline-grid|table|contents|flow-root)$/;
+  // Les affichages de TABLEAU comptent comme les autres. Sans eux, un en-tete
+  // de tableau masque sur telephone et rendu en groupe d'en-tete a partir de
+  // md (le tableau qui devient une liste de cartes) etait signale comme un
+  // defaut alors que la bascule est declaree, en toutes lettres, sur
+  // l'element. La classe n'est pas ecrite ici en clair : Tailwind lit aussi
+  // scripts/, et une classe citee dans un commentaire part dans la feuille du
+  // site (mesure a l'essai du socle, 28 septembre 2026 : une regle de plus
+  // dans chaque page de Reef).
+  const DISPLAY =
+    /^(block|flex|inline-flex|grid|inline|inline-block|inline-grid|table|table-header-group|table-row-group|table-footer-group|table-row|table-cell|table-caption|table-column|table-column-group|list-item|contents|flow-root)$/;
   const sombre = document.documentElement.classList.contains("dark");
   for (const el of document.querySelectorAll(".hidden")) {
     if (getComputedStyle(el).display === "none") continue;
@@ -146,13 +155,11 @@ export const PROBE = ({ asked }) => {
     for (const cls of classes) {
       const [prefix, value] = cls.split(":");
       if (value && DISPLAY.test(value) && BREAKPOINT[prefix]) from = Math.min(from, BREAKPOINT[prefix]);
-      // Le mode sombre est une bascule comme les autres. La lune de
-      // l'interrupteur de theme s'ecrit "hidden dark:block" : masquee en clair,
-      // affichee en sombre, et c'est l'auteur qui l'a demande. Depuis que le
-      // banc mesure les deux modes (5 septembre 2026), un element qui porte une
-      // variante dark: d'affichage sur une page dont <html> porte .dark est
-      // affiche a dessein. Sans cette clause, la premiere passe sombre a
-      // signale cette icone sur chacune des cinquante-quatre pages de Reef.
+      // Le mode sombre est une bascule comme les autres : "hidden dark:block"
+      // est masque en clair, affiche en sombre, et c'est l'auteur qui l'a
+      // demande. Depuis que le banc mesure les deux modes (5 septembre 2026),
+      // un element qui porte une variante dark: d'affichage sur une page dont
+      // <html> porte .dark est affiche a dessein : 124 faux defauts sinon.
       if (value && DISPLAY.test(value) && prefix === "dark" && sombre) from = 0;
     }
     if (VW >= from) continue;
@@ -240,9 +247,22 @@ export const PROBE = ({ asked }) => {
   // signaler la typographie serree comme un defaut. Le vrai chevauchement,
   // celui du 31 aout sur la boutique, est ENTRE deux blocs voisins : une
   // colonne flex comprimee sous la largeur de son mot deborde sur sa voisine.
+  // Un enfant d'un conteneur EN LIGNE reste dans la ligne, meme quand le
+  // moteur l'a "blockifie" : un `inline-block` pose comme item d'un
+  // `inline-flex` se calcule en `block`, mais il n'ouvre aucun bloc de mise en
+  // page. C'est le cas de chaque mot des titres reveles mot a mot (un masque
+  // inline-flex, un mot dedans) : sans cette clause, le mot d'accent avait son
+  // propre "bloc" et le banc voyait deux titres superposes la ou il n'y a
+  // qu'une ligne serree.
+  const inlineLike = (n) => {
+    const d = getComputedStyle(n).display;
+    if (d.startsWith("inline")) return true;
+    const p = n.parentElement;
+    return !!p && getComputedStyle(p).display.startsWith("inline");
+  };
   const blockOf = (el) => {
     for (let n = el.parentElement; n; n = n.parentElement) {
-      if (!getComputedStyle(n).display.startsWith("inline")) return n;
+      if (!inlineLike(n)) return n;
     }
     return document.body;
   };

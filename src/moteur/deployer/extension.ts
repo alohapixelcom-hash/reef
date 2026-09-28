@@ -34,7 +34,10 @@ async function page(ctx: RouteContext): Promise<Reponse> {
       hook: hookConfigure(),
       dernier: await dernierDeclenchement(ctx),
       passages: await derniers(ctx, LIGNES_DU_JOURNAL),
-      adresseVersion: ctx.url("/version.json"),
+      // L'adresse du Worker qui repond a CET instant, et non celle que le site
+      // a declaree a son installation : c'est lui que la preuve doit montrer
+      // (correction venue d'Aloha et d'alohapixel.com).
+      adresseVersion: new URL("/version.json", ctx.request.url).href,
     },
     clic,
   );

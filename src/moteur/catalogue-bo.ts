@@ -25,8 +25,9 @@
 //      lui, le rail garde "Categories" et "Tags" en anglais, et une etiquette
 //      francaise ajoutee a la main ferait une seconde entree.
 //   5. Variable d'environnement, facultative : ALOHA_BO_LANGUE. Sans elle, le
-//      francais est la langue par defaut du back office (voir langue-bo.ts et
-//      la constante LANGUE_BO de la configuration) ; un code de langue la
+//      francais est la langue par defaut du back office (la constante
+//      LANGUE_BO de la configuration, appliquee par langue-bo.ts, ou par le
+//      fichier propre au site qui en tient lieu) ; un code de langue la
 //      change, `navigateur` rend la decision au navigateur. Ce catalogue, lui,
 //      ne depend pas de la variable : il complete le francais chaque fois que
 //      le francais est la langue servie.

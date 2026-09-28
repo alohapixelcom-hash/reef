@@ -52,15 +52,28 @@ const DIST = join(ROOT, "dist");
 // l'ordinateur portable le plus courant. Ces deux-la ne se retirent plus.
 const WIDTHS = [390, 768, 1024, 1280, 1440];
 // LES DEUX MODES, ET POURQUOI LE SOMBRE MANQUAIT. Le 5 septembre 2026 l'editeur
-// a vu, sur l'accueil de alohapixel.com en mode sombre, trois cartes blanches
-// au texte clair : illisibles. Le banc les avait declarees saines parce qu'il
-// ne mesurait que le mode clair. Un jeton qui suit le theme (bg-card) se
+// a vu, sur l'accueil d'un site de la maison en mode sombre, trois cartes
+// blanches au texte clair : illisibles. Le banc les avait declarees saines
+// parce qu'il ne mesurait que le mode clair. Un jeton qui suit le theme (bg-card) se
 // retourne avec lui ; un blanc ecrit en dur (bg-white) reste blanc sous un
 // texte devenu clair. Le banc mesure donc chaque page dans les deux modes : le
 // sombre est pose par la meme cle de stockage que lit ThemeInit, avant tout
 // script de la page.
 const MODES = ["clair", "sombre"];
-const THEME_KEY = "reef-theme";
+// La cle vient de socle.adaptateur.json (parametres.cleDuTheme) : c'etait la
+// seule ligne de code qui differait entre les huit copies de ce fichier, et
+// elle ne se deduit pas du nom du paquet (alohapixel.com lit "aloha-theme").
+// Sans adaptateur, "<nom du paquet>-theme", la convention des sept themes.
+const THEME_KEY = (() => {
+  const lire = (nom) => {
+    try {
+      return JSON.parse(readFileSync(join(ROOT, nom), "utf8"));
+    } catch {
+      return {};
+    }
+  };
+  return lire("socle.adaptateur.json").parametres?.cleDuTheme ?? `${lire("package.json").name}-theme`;
+})();
 const TARGET_MIN = 44;
 
 let chromium;

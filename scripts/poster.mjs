@@ -118,6 +118,11 @@ const server = await serveDist();
 const origin = `http://127.0.0.1:${server.address().port}`;
 
 const browser = await chromium.launch({
+  // CHROMIUM_PATH designe un binaire deja present : une machine d'integration,
+  // une image docker, un poste ou `playwright install` n'a pas le droit
+  // d'ecrire. Sans la variable, Playwright resout seul. Meme convention que
+  // scripts/verify.mjs, pour qu'un seul reglage serve aux deux outils.
+  ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
   args: [
     "--disable-background-networking",
     "--disable-component-update",
