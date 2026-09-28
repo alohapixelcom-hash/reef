@@ -4,7 +4,15 @@
 
 Versions describe the features actually shipped in this theme.
 
-Current version: **3.3.0**.
+Current version: **3.3.2**.
+
+## 3.3.2 - 2026-09-28
+
+The phone mockup on the home page (`public/reef-iphone-poster.webp`) is
+re-shot from the 3.3.1 demo: the picture inside the drawn phone no longer shows
+the wave under the accent word. Regenerate it yourself after any change with
+`pnpm build && pnpm poster`. Nothing else changes; same number, 3.3.2, on every
+repository of the Aloha Pixel family.
 
 ## 3.3.1 - 2026-09-28
 
