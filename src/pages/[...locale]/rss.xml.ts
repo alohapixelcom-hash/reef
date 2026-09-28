@@ -32,7 +32,10 @@ export const GET: APIRoute = async ({ site, url, currentLocale, params, props })
 
   const locale = getLocale({ currentLocale });
   // La description du flux est celle de l'archive : moteur allume, celle que la base publie.
-  const { textes: t } = await lireLaPage(locale);
+  const { textes: t, cadre } = await lireLaPage(locale);
+  // Le titre du flux : celui de l'entree "site" de la langue, sinon siteData.
+  const titreSaisi = (cadre.site as { feed_title?: unknown } | undefined)?.feed_title;
+  const titre = typeof titreSaisi === "string" && titreSaisi.trim() !== "" ? titreSaisi.trim() : siteData.title[locale];
 
   // getResolvedPosts ecarte deja les brouillons et trie du plus recent au plus
   // ancien : le flux ne peut donc pas diverger des listes du site.
@@ -69,7 +72,7 @@ export const GET: APIRoute = async ({ site, url, currentLocale, params, props })
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
-    <title>${escapeXml(siteData.title[locale])}</title>
+    <title>${escapeXml(titre)}</title>
     <link>${absolute(localizePath("/", locale))}</link>
     <description>${escapeXml(t.archive.metaDescription)}</description>
     <language>${localeMeta[locale].intl.toLowerCase()}</language>

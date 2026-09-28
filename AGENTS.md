@@ -72,7 +72,12 @@ EmDash's own page, and no public page gains an island. Everything on this page
 describes the default, static build, which must stay identical, file by file,
 to what it was: read docs/moteur.md before touching src/moteur/,
 src/js/posts.ts or a managed page. Posts are listed through `@js/posts`, never
-through `getCollection("posts")`.
+through `getCollection("posts")`. Since 3.4.0 the whole site is run from the
+back office (menus, settings, the per-language `site` entry, topics, authors,
+footer, photos, button addresses, free pages): a new visible text or image
+must be reachable there, with an empty field rendering the theme as before;
+`scripts/couverture-edition.mjs` must stay at zero orphan and
+`docs/administrer.md` (the editor's guide) must stay true.
 
 ## Structure
 

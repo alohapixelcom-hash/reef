@@ -46,6 +46,11 @@ export const enPages = {
     aboutLede:
       "One builds, one measures, one designs, and all three write. Three or four projects a year, and everything we learn on them ends up here.",
     aboutCta: "How we work",
+    /** Le surtitre et le second bouton de la scene filmee de l'accueil : leurs propres textes, distincts de la page A propos et du menu. */
+    aboutEyebrow: "About",
+    aboutContact: "Contact",
+    /** Le nom de la bande defilante des sujets, sous l'ouverture, pour les lecteurs d'ecran. */
+    marqueeLabel: "All topics",
   },
 
   // --- A propos ------------------------------------------------------------
@@ -53,6 +58,8 @@ export const enPages = {
     metaTitle: "About the studio",
     metaDescription:
       "Who runs Reef Notes, how the studio works, what we take on and what we turn down, and why the working notes are published instead of filed away.",
+    /** Le nom de la page dans le fil d'Ariane et son balisage : court, distinct du titre donne aux moteurs de recherche. */
+    crumb: "About the studio",
     eyebrow: "About",
     title: "A three-person studio that writes things down",
     accent: "writes",
@@ -99,6 +106,8 @@ export const enPages = {
     metaTitle: "Contact",
     metaDescription:
       "Project enquiries, a correction on a post, or a question about something we published. One inbox, read by a person, answered within two working days.",
+    /** Le nom de la page dans le fil d'Ariane et son balisage : court, distinct du titre donne aux moteurs de recherche. */
+    crumb: "Contact",
     eyebrow: "Contact",
     title: "Write to us, we read all of it",
     accent: "all",
@@ -133,6 +142,10 @@ export const enPages = {
     metaTitle: "Topics",
     metaDescription:
       "Every subject covered on Reef Notes: front-end craft, performance work, typography, and the business of running a small studio.",
+    /** Le nom de la page dans le fil d'Ariane et son balisage : court, distinct du titre donne aux moteurs de recherche. */
+    crumb: "Topics",
+    /** Le surtitre de la page d'un sujet, distinct de celui de la liste des sujets. */
+    pageEyebrow: "Topics",
     eyebrow: "Topics",
     title: "Five threads we keep pulling",
     accent: "threads",
@@ -152,6 +165,8 @@ export const enPages = {
     metaTitle: "Authors",
     metaDescription:
       "The people who write Reef Notes: what they work on day to day, where to find them elsewhere, and everything they have published here.",
+    /** Le nom de la page dans le fil d'Ariane et son balisage : court, distinct du titre donne aux moteurs de recherche. */
+    crumb: "Authors",
     eyebrow: "Authors",
     title: "Who writes here",
     accent: "writes",
@@ -174,6 +189,8 @@ export const enPages = {
     metaTitle: "Search",
     metaDescription:
       "Search every post on Reef Notes by title, summary, topic or tag. It runs in your browser: nothing is sent to a server and nothing is logged.",
+    /** Le nom de la page dans le fil d'Ariane et son balisage : court, distinct du titre donne aux moteurs de recherche. */
+    crumb: "Search",
     eyebrow: "Search",
     title: "Find it again",
     accent: "again",
@@ -214,6 +231,14 @@ export const enPages = {
   // les conditions. Les passages entre crochets sont a completer par l'utilisateur,
   // et ce texte ne vaut pas un avis juridique.
   legal: {
+    /** Les noms des trois pages legales dans le fil d'Ariane, et le surtitre des deux documents : distincts des titres et de la page des mentions. */
+    crumb: "Legal notice",
+    privacyCrumb: "Privacy policy",
+    termsCrumb: "Terms of use",
+    privacyEyebrow: "Legal",
+    termsEyebrow: "Legal",
+    /** La date de derniere revision des mentions legales (AAAA-MM-JJ). */
+    updated: "2026-09-24",
     eyebrow: "Legal",
     title: "Legal notice",
     description: "Who publishes this site, who hosts it, and how to reach the publisher.",

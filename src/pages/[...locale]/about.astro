@@ -9,15 +9,16 @@ import SectionHeader from "@components/Sections/Global/SectionHeader.astro";
 import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
-import siteData from "@config/siteData.json";
 import { getLocale, localePaths, localizePath } from "@i18n";
-import { entrySlug, getLocalizedCollection } from "@i18n/content";
-import { getResolvedPosts } from "@js/posts";
+import { entrySlug } from "@i18n/content";
+import { getResolvedPosts, getSortedAuthors } from "@js/posts";
 import { breadcrumbList, organization } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { imageDePartage } from "@moteur/cadre";
 import { annotationsDe } from "@moteur/annotations";
 import { propsDeLaPage } from "@moteur/chemins";
 import { textesDeLaPage } from "@moteur/textes";
+import { identiteDuSite } from "@moteur/theme";
 
 export const getStaticPaths = localePaths;
 
@@ -36,9 +37,7 @@ const signatures = annotationsDe(Astro, "a-propos-signatures");
 const appel = annotationsDe(Astro, "a-propos-appel");
 const routes = getSiteRoutes(locale);
 
-const authors = (await getLocalizedCollection("authors", locale)).sort((a, b) =>
-  a.data.name.localeCompare(b.data.name),
-);
+const authors = await getSortedAuthors(locale);
 const posts = await getResolvedPosts(locale);
 const counts: Record<string, number> = {};
 for (const entry of posts) counts[entry.authorSlug] = (counts[entry.authorSlug] ?? 0) + 1;
@@ -46,22 +45,24 @@ for (const entry of posts) counts[entry.authorSlug] = (counts[entry.authorSlug] 
 const title = t.about.metaTitle;
 const description = t.about.metaDescription;
 
+// Le nom et les reseaux du site : les reglages du back office, sinon siteData.
+const marque = identiteDuSite(Astro, locale);
 const base = Astro.site ?? Astro.url;
 const siteUrl = new URL(localizePath("/", locale), base).href;
 const schemas = [
   organization({
-    name: siteData.name,
+    name: marque.nom,
     url: siteUrl,
-    sameAs: siteData.author.twitter ? [`https://x.com/${siteData.author.twitter}`] : undefined,
+    sameAs: marque.reseaux.length > 0 ? marque.reseaux.map((r) => r.url) : undefined,
   }),
   breadcrumbList([
     { name: t.common.home, url: siteUrl },
-    { name: t.about.metaTitle, url: new URL(localizePath("/about/", locale), base).href },
+    { name: t.about.crumb, url: new URL(localizePath("/about/", locale), base).href },
   ]),
 ];
 ---
 
-<BaseLayout {title} {description}>
+<BaseLayout {title} {description} image={imageDePartage(Astro, "a-propos")}>
   <Fragment slot="head">
     {
       schemas.map((node) => (
@@ -74,12 +75,13 @@ const schemas = [
 
   <main id="content">
     <PageHero
+      cle="a-propos"
       edition={annotationsDe(Astro, "a-propos")}
       eyebrow={t.about.eyebrow}
       title={t.about.title}
       accentWord={t.about.accent}
       lede={t.about.lede}
-      crumbs={[{ label: t.about.metaTitle }]}
+      crumbs={[{ label: t.about.crumb }]}
     />
 
     {/* L'histoire est du texte long : elle passe donc par .prose, la colonne de

@@ -1,4 +1,4 @@
-// src/moteur/langue-bo.regles.ts - les regles pures de la langue du back office : lire le cookie du moteur, et choisir entre les deux dictionnaires du theme.
+// src/moteur/langue-bo.regles.ts - les regles pures de la langue du back office : la langue par defaut posee dans le Worker, le cookie du moteur, et le choix entre les deux dictionnaires du site.
 //
 // CE QUE FAIT LE MOTEUR TOUT SEUL. L'administration d'EmDash est traduite (28
 // langues, dont le francais) et choisit sa langue a chaque requete : le cookie
@@ -6,18 +6,28 @@
 // ses reglages), sinon l'entete Accept-Language du navigateur, sinon
 // l'anglais.
 //
-// CE QU'AJOUTE LE THEME. Une langue PAR DEFAUT pour le site, le francais sauf
+// CE QU'AJOUTE LE SITE. Une langue PAR DEFAUT pour le site, le francais sauf
 // si ALOHA_BO_LANGUE dit autre chose (voir moteur.config.mjs et langue-bo.ts) :
 // elle passe devant le navigateur, jamais devant le choix de la personne. Les
 // textes que le theme ajoute au back office (la page "Tout deployer", la carte
 // du tableau de bord) suivent la meme langue, avec deux dictionnaires :
 // francais, et anglais pour tout le reste. Ce que le moteur laisse en anglais
 // dans son propre catalogue est complete ailleurs, par catalogue-bo.ts.
+//
+// OU POSER LA LANGUE PAR DEFAUT : DANS LE WORKER. langueDuBackOffice, plus
+// bas, vient d'alohapixel.com (et Koa et Nalu faisaient la meme chose dans
+// leur worker.moteur.ts) : la requete de la page du back office entre dans
+// Astro avec la langue du site pour Accept-Language, sans rien ecrire dans le
+// navigateur. alohapixel.com a mesure le 22 septembre 2026 que la reecriture
+// de la requete DANS un middleware Astro (ce que fait encore langue-bo.ts)
+// faisait echouer sous workerd les pages du back office arrivees a plusieurs
+// ("Cannot perform I/O on behalf of a different request"). langue-bo.ts reste
+// le temps que chaque site appelle langueDuBackOffice depuis son Worker.
 
 /** Le cookie que pose et que lit l'administration d'EmDash. */
 export const COOKIE_DE_LANGUE = "emdash-locale";
 
-/** Les deux dictionnaires que le theme ecrit pour le back office. */
+/** Les deux dictionnaires que le site ecrit pour le back office. */
 export type LangueDesTextes = "fr" | "en";
 
 /** "fr", "pt-BR", "zh-CN" : la forme d'un code de langue. Le moteur verifie lui-meme qu'il le connait. */
@@ -72,4 +82,25 @@ export function langueDesTextes(requete: Request, parDefaut: string | null): Lan
   const choisie =
     cookieDeLangue(requete.headers.get("cookie")) ?? parDefaut ?? premiereLangue(requete.headers.get("accept-language"));
   return choisie?.toLowerCase().split("-")[0] === "fr" ? "fr" : "en";
+}
+
+/** Vrai des que la personne a deja choisi une langue, quelle qu'elle soit : le cookie que pose le selecteur du back office. */
+const LANGUE_DEJA_CHOISIE = /(?:^|;\s*)emdash-locale=/;
+
+/** Le prefixe des pages du back office ; l'API du moteur ne rend aucune interface et n'est pas touchee. */
+const BACK_OFFICE = "/_emdash/admin";
+
+/**
+ * La requete telle que le moteur doit la lire, a appeler dans le Worker AVANT
+ * Astro : la meme, sauf que la page du back office demandee sans cookie de
+ * langue annonce la langue par defaut du site. Toute autre requete sort telle
+ * quelle, sans copie.
+ */
+export function langueDuBackOffice(request: Request, langue: string | null): Request {
+  if (langue === null || request.method !== "GET") return request;
+  if (!new URL(request.url).pathname.startsWith(BACK_OFFICE)) return request;
+  if (LANGUE_DEJA_CHOISIE.test(request.headers.get("cookie") ?? "")) return request;
+  const entetes = new Headers(request.headers);
+  entetes.set("accept-language", langue);
+  return new Request(request, { headers: entetes });
 }

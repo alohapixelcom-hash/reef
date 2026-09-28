@@ -5,6 +5,14 @@
 @import "./prose.css";
 @import "./motion/index.css";
 
+/* La page libre du socle (src/moteur/PageLibre.astro) n'est rendue que moteur
+ * allume : ses classes ne doivent pas entrer dans la feuille du build
+ * statique, qui cesserait d'etre identique a lui-meme. Swell exclut tout
+ * src/moteur/ ; Reef ne le peut pas encore sans changer sa feuille (le
+ * dictionnaire du back office y fait entrer une utilitaire que le site
+ * n'emploie pas, voir rapports/reef.md). */
+@source not "../moteur/PageLibre.astro";
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ---------------------------------------------------------------------------

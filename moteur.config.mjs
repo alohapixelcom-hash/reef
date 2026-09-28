@@ -12,7 +12,8 @@ import { fileURLToPath } from "node:url";
 import { IDENTITE as ACCUEIL } from "./src/moteur/accueil/identite.mjs";
 import { catalogueDuBackOffice } from "./src/moteur/catalogue-bo.config.mjs";
 import { IDENTITE as DEPLOYER } from "./src/moteur/deployer/identite.mjs";
-import { PAGES_GEREES } from "./src/moteur/pages-gerees.mjs";
+import { capacites, IDENTITE as COURRIELS } from "./src/moteur/extensions/courriels/identite.mjs";
+import { PAGES_EN_CACHE, PAGES_GEREES } from "./src/moteur/pages-gerees.mjs";
 import { routesDuCache } from "./src/moteur/routes-du-cache.mjs";
 
 const ici = (chemin) => fileURLToPath(new URL(chemin, import.meta.url));
@@ -26,6 +27,15 @@ const NOM_DU_SITE =
 
 /** Vrai quand le moteur est allume. Lu au build ET par `astro dev`. */
 export const MOTEUR_ACTIF = process.env.ALOHA_MOTEUR === "emdash";
+
+// LES COURRIELS ONT-ILS LEUR LIAISON ? Lu dans le fichier du Worker, ligne
+// par ligne, commentaires ecartes : une entree "send_email" non commentee.
+// Sans elle, l'extension Courriels ne se declare pas fournisseur du canal
+// d'EmDash (src/moteur/extensions/courriels/extension.ts) : Reef s'installe
+// et tourne sans courriels, et le back office dit ce qui manque.
+const LIAISON_COURRIELS = readFileSync(ici("./wrangler.moteur.jsonc"), "utf8")
+  .split("\n")
+  .some((ligne) => /^\s*"send_email"\s*:/.test(ligne));
 
 // LES IMAGES DES PAGES RENDUES A LA DEMANDE.
 //
@@ -105,19 +115,23 @@ function partageDesPages() {
           const { locales, defaultLocale } = config.i18n ?? { locales: [], defaultLocale: "" };
           const langues = locales.map((l) => (typeof l === "string" ? l : l.path));
           updateConfig({
-            routeRules: { ...routesDuCache(PAGES_GEREES, langues, defaultLocale, regle), "/sitemap-contenu.xml": regle },
+            routeRules: { ...routesDuCache(PAGES_EN_CACHE, langues, defaultLocale, regle), "/sitemap-contenu.xml": regle },
           });
         }
         // Habille le back office aux jetons du theme (voir habillage.ts).
         addMiddleware({ entrypoint: ici("./src/moteur/habillage.ts"), order: "post" });
-        // La langue par defaut du back office, seulement si elle est demandee.
-        if (LANGUE_BO) addMiddleware({ entrypoint: ici("./src/moteur/langue-bo.ts"), order: "post" });
+        // La langue par defaut du back office n'est plus posee par un
+        // middleware : src/worker.moteur.ts applique la regle du socle
+        // (langueDuBackOffice) avant Astro, comme Nalu.
         injectRoute({ pattern: "/sitemap-contenu.xml", entrypoint: ici("./src/moteur/plan-du-site.ts"), prerender: false });
         // Toutes les pages indexables se rendent a la demande depuis la 3.3.0 :
         // l'integration sitemap n'a plus de page figee a inventorier et n'ecrit
         // plus l'index. Il est servi ici (voir plan-du-site.index.ts).
         injectRoute({ pattern: "/sitemap-index.xml", entrypoint: ici("./src/moteur/plan-du-site.index.ts"), prerender: false });
         injectRoute({ pattern: "/version.json", entrypoint: ici("./src/moteur/version.ts"), prerender: false });
+        // Le formulaire de contact poste ici quand les courriels sont
+        // branches (src/moteur/extensions/courriels/reception.ts).
+        injectRoute({ pattern: "/_emdash/courriels/envoyer", entrypoint: ici("./src/moteur/extensions/courriels/reception.ts"), prerender: false });
         // La carte de partage d'un billet : sa couverture de la mediatheque,
         // recadree en JPEG 1200x630 (voir src/moteur/carte-du-billet.regles.ts).
         injectRoute({ pattern: "/og/billet/[cle].jpg", entrypoint: ici("./src/moteur/carte-du-billet.ts"), prerender: false });
@@ -158,6 +172,15 @@ const alias = (source) => [
   { find: "@moteur/source", replacement: ici(`./src/moteur/source.${source}.ts`) },
   { find: "@moteur/live", replacement: ici(`./src/moteur/live.${source}.ts`) },
   { find: "@moteur/TexteRiche.astro", replacement: ici(`./src/moteur/TexteRiche.${source}.astro`) },
+  // Le texte riche des pages libres : le rendu d'EmDash moteur allume, rien
+  // moteur eteint (aucune page libre n'existe, et aucun paquet du moteur
+  // n'entre dans le build statique).
+  { find: "@moteur/texte-riche", replacement: ici(`./src/moteur/texte-riche.${source}.astro`) },
+  // Le cadre du site (reglages, entree "site", menus, pages libres) : lu dans
+  // la base moteur allume, vide moteur eteint (src/moteur/cadre.*.ts).
+  { find: "@moteur/cadre-base", replacement: ici(`./src/moteur/cadre.${source}.ts`) },
+  // Le formulaire de contact : aucun envoi moteur eteint, l'extension Courriels moteur allume.
+  { find: "@moteur/courriels", replacement: ici(`./src/moteur/extensions/courriels/formulaire.${source}.ts`) },
   // LA QUALITE DES IMAGES RENDUES A LA DEMANDE. Le service d'image que
   // l'adapter pose pour IMAGES ci-dessus ecrit des adresses /_image sans
   // qualite, et le liant Cloudflare Images encode alors presque sans perte
@@ -216,8 +239,11 @@ async function allume() {
         ...(cacheObjets ? { objectCache: cacheObjets() } : {}),
         // "Tout deployer" : extension native rangee dans le depot. EmDash
         // l'importe par son chemin et l'embarque dans le Worker au build.
+        // "Courriels" : reglages, journal, branchement et envoi par la liaison
+        // Cloudflare Email du Worker (src/moteur/extensions/courriels/).
         plugins: [
           { ...DEPLOYER, entrypoint: ici("./src/moteur/deployer/extension.ts") },
+          { ...COURRIELS, entrypoint: ici("./src/moteur/extensions/courriels/extension.ts"), options: { livrer: LIAISON_COURRIELS }, capabilities: capacites(LIAISON_COURRIELS) },
           // La carte du site sur le tableau de bord : une extension React, son
           // composant est importe par le paquet de l'administration.
           {

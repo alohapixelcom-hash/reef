@@ -1,0 +1,79 @@
+---
+// src/moteur/CadreDuSite.astro - en mode edition seulement, le panneau "Cadre du site" en fin de body : les liens directs vers ce que la barre ne touche pas (menus de la langue, reglages, entree site, en-tete, pied, redirections, mediatheque, pages).
+//
+// L'EN-TETE NE PORTE AUCUNE ANNOTATION D'ENTREE : il vient avant <main>, et
+// la premiere annotation du document decide de ce que le bouton Publier de la
+// barre publie (voir annotations.ts). Les menus et les reglages natifs ne
+// sont de toute facon pas joignables par la barre. Ce panneau, ferme par
+// defaut, donne a l'editeur le chemin de chacun dans le back office, dans la
+// langue de la page.
+//
+// HORS EDITION, RIEN : ni balise, ni style. Le HTML anonyme ne change pas.
+import { getLocale } from "@i18n";
+import { annotationsDe, enEdition, REF } from "./annotations";
+import { menuDe } from "./cadre";
+import { LIBELLES_DES_MENUS } from "./menus";
+import { CORRECTIF_DE_LA_BARRE, langueDuBackOffice, MOTS, STYLES } from "./textes-edition";
+import { ADMIN_EXTERNE, MENUS, VARIABLES_D_EDITION } from "./theme";
+
+const locale = getLocale(Astro);
+const actif = enEdition(Astro);
+const defautDuBackOffice = typeof __ALOHA_BO_LANGUE__ === "undefined" ? null : __ALOHA_BO_LANGUE__;
+const langue = langueDuBackOffice(Astro.cookies.get("emdash-locale")?.value, defautDuBackOffice ?? locale);
+const mots = MOTS[langue];
+const ADMIN = "/_emdash/admin";
+// Les jetons du theme que les pastilles et ce panneau lisent (--edition-*),
+// poses a la racine en mode edition seulement : les styles en ligne de
+// textes-edition.ts ne nomment aucune variable propre a un theme.
+const variables = `:root{${Object.entries(VARIABLES_D_EDITION)
+  .map(([nom, valeur]) => `${nom}:${valeur}`)
+  .join(";")}}`;
+
+/** Le libelle d'un menu tel que le back office le montre : celui de la base, sinon celui de la graine dans la langue du back office, sinon son nom (les colonnes du pied). */
+const libelleDuMenu = (nom: string): string => menuDe(Astro, nom, locale)?.label ?? LIBELLES_DES_MENUS[nom] ?? nom;
+
+/** L'adresse d'une entree de `sections` dans le back office, lue sur son annotation ; la liste de la collection si l'entree n'est pas publiee. */
+function adresseDeLEntree(cle: string, collection = "sections"): string {
+  const ref = annotationsDe(Astro, cle).entree[REF];
+  try {
+    const lue = JSON.parse(ref ?? "") as { collection: string; id: string };
+    return `${ADMIN}/content/${lue.collection}/${lue.id}`;
+  } catch {
+    return `${ADMIN}/content/${collection}?locale=${locale}`;
+  }
+}
+---
+
+{/* Un Fragment et non une balise style : le compilateur d'Astro range toute
+    balise style, meme en ligne, dans les feuilles de la page, ce qui decalait
+    l'ordre de leurs regles dans le HTML anonyme (mesure du 28 septembre). */}
+{actif && <Fragment set:html={`<style>${variables}</style><script>${CORRECTIF_DE_LA_BARRE}</script>`} />}
+{
+  actif && (
+    <details style={STYLES.panneau} data-aloha-cadre="panneau">
+      <summary style={STYLES.resume}>{mots.panneau}</summary>
+      <p style={STYLES.intro}>{mots.panneauIntro}</p>
+      <p style="margin:0 0 .25rem;font-weight:700">{mots.menus}</p>
+      <ul style={STYLES.liste}>
+        {MENUS.map(({ nom }) => (
+          <li>
+            <a style={STYLES.lien} href={`${ADMIN}/menus/${nom}?locale=${locale}`} target="_blank" rel="noopener">
+              {libelleDuMenu(nom)}
+            </a>
+            {!menuDe(Astro, nom, locale) && <span style="color:var(--edition-discret)"> {mots.menuAbsent}</span>}
+          </li>
+        ))}
+      </ul>
+      <ul style={`${STYLES.liste};margin-top:.6rem`}>
+        <li><a style={STYLES.lien} href={`${ADMIN}/settings/general`} target="_blank" rel="noopener">{mots.reglages}</a></li>
+        <li><a style={STYLES.lien} href={adresseDeLEntree("site", "site")} target="_blank" rel="noopener">{mots.site}</a></li>
+        <li><a style={STYLES.lien} href={adresseDeLEntree("en-tete")} target="_blank" rel="noopener">{mots.entete}</a></li>
+        <li><a style={STYLES.lien} href={adresseDeLEntree("pied-de-page")} target="_blank" rel="noopener">{mots.pied}</a></li>
+        <li><a style={STYLES.lien} href={`${ADMIN}/content/pages?locale=${locale}`} target="_blank" rel="noopener">{mots.pages}</a></li>
+        <li><a style={STYLES.lien} href={`${ADMIN}/redirects`} target="_blank" rel="noopener">{mots.redirections}</a></li>
+        <li><a style={STYLES.lien} href={`${ADMIN}/media`} target="_blank" rel="noopener">{mots.medias}</a></li>
+        {ADMIN_EXTERNE && <li><a style={STYLES.lien} href={ADMIN_EXTERNE.url} target="_blank" rel="noopener">{ADMIN_EXTERNE.libelle}</a></li>}
+      </ul>
+    </details>
+  )
+}

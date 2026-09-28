@@ -5,7 +5,9 @@
 // dans chaque page une seconde facon de trouver son contenu, on rappelle la
 // premiere et on y cherche l'adresse demandee. Une seule logique par page :
 // ce qui existe au build existe a la demande, au meme endroit, et une adresse
-// que le build n'aurait pas produite repond 404.
+// que le build n'aurait pas produite repond 404. C'est ce qui compte pour une
+// route [...locale] : a la demande, elle accepte n'importe quel segment.
+// `paginer` ne sert qu'aux sites qui paginent ; les autres ne l'importent pas.
 //
 // Moteur eteint, la page est figee et ses props arrivent d'Astro : la fonction
 // les rend telles quelles.

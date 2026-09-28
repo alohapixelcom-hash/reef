@@ -45,6 +45,8 @@
 // trois lignes tiennent dans la meme hauteur d'une carte a l'autre.
 import { Icon } from "@components/svg/icons";
 import { fmt, useTranslations, type Locale } from "@i18n";
+import { annotationsDeLaFiche } from "@moteur/listes";
+import { marqueInterface } from "@moteur/cadre";
 import type { CollectionEntry } from "astro:content";
 import { topicTone } from "./topicTone";
 
@@ -67,6 +69,8 @@ const { topic, href, count, locale, as: Tag = "h3", class: className }: Props = 
 const t = useTranslations(locale);
 const tone = topicTone[topic.data.accent];
 const countLabel = count === 1 ? t.topics.countOne : fmt(t.topics.countLabel, { count });
+// Moteur allume, en mode edition : la fiche du sujet (collection "sujets").
+const fiche = annotationsDeLaFiche(topic);
 ---
 
 <article
@@ -78,6 +82,7 @@ const countLabel = count === 1 ? t.topics.countOne : fmt(t.topics.countLabel, { 
     className,
   ]}
   data-slot="topic-card"
+  {...fiche.entree}
 >
   {/* Le bord de couleur. Trois pixels, toute la largeur, en haut : c'est le
       seul endroit ou la couleur d'un sujet peut se voir sans se poser sur du
@@ -90,14 +95,14 @@ const countLabel = count === 1 ? t.topics.countOne : fmt(t.topics.countLabel, { 
     {/* Le compte en sur-titre. Il etait en bas, dans une pastille teintee ;
         il monte au-dessus du nom, ou il sert a quelque chose : il dit la
         taille du sujet avant qu'on decide de l'ouvrir. */}
-    <p class:list={["text-xs font-semibold tracking-[0.14em] uppercase", tone.ghost]}>
+    <p class:list={["text-xs font-semibold tracking-[0.14em] uppercase", tone.ghost]} {...marqueInterface(Astro)}>
       {countLabel}
     </p>
 
     <Tag class="font-display text-foreground text-2xl leading-tight font-bold tracking-tight">
       {/* Le lien couvre toute la carte via ::after : un seul arret de tabulation,
           et pourtant la surface cliquable est celle que le doigt vise. */}
-      <a href={href} class="after:absolute after:inset-0 after:content-['']">
+      <a href={href} class="after:absolute after:inset-0 after:content-['']" {...fiche.champ("name")}>
         {topic.data.name}
       </a>
     </Tag>
@@ -106,7 +111,7 @@ const countLabel = count === 1 ? t.topics.countOne : fmt(t.topics.countLabel, { 
         carte de deux tiers de page, une description qui va d'un bord a l'autre
         donne des lignes de cent trente signes : plus personne ne les lit, et la
         carte cesse d'etre une carte pour devenir un paragraphe encadre. */}
-    <p class="text-muted-foreground line-clamp-3 max-w-[62ch] text-[0.95rem] leading-relaxed">
+    <p class="text-muted-foreground line-clamp-3 max-w-[62ch] text-[0.95rem] leading-relaxed" {...fiche.champ("description")}>
       {topic.data.description}
     </p>
 

@@ -16,9 +16,10 @@
 // dans le manifeste de 73 routes d'API (mesure le 21 septembre 2026). Les
 // chemins vivent donc dans des modules partages (@i18n, @js/archive,
 // @js/adresses), que la page et ce plan importent chacun de leur cote.
-import { defaultLocale, localePaths, locales } from "@i18n";
+import { defaultLocale, localePaths, localePrefix, locales } from "@i18n";
 import { cheminsDeLAuteur, cheminsDuBillet, cheminsDuSujet } from "@js/adresses";
 import { cheminsArchive } from "@js/archive";
+import { pagesLibres } from "@moteur/cadre-base";
 import type { APIRoute, GetStaticPaths } from "astro";
 import { paginer } from "./chemins";
 import { PAGES_GEREES } from "./pages-gerees.mjs";
@@ -52,7 +53,16 @@ const CHEMINS: Record<string, GetStaticPaths | null> = {
   "src/pages/[...locale]/privacy.astro": localePaths,
   "src/pages/[...locale]/terms.astro": localePaths,
   "src/pages/[...locale]/rss.xml.ts": null,
+  "src/pages/404.astro": null,
+  "src/pages/[...locale]/404-introuvable.astro": null,
+  "src/pages/[...locale]/page-libre.astro": null,
   "src/pages/llms.txt.ts": null,
+};
+
+/** Vrai quand le panneau SEO de l'entree de la page (billet, sujet, auteur) l'exclut des moteurs. */
+const exclueParSonSeo = (props: Record<string, unknown> | undefined): boolean => {
+  const entree = (props?.post ?? props?.topic ?? props?.author) as { seo?: { noIndex?: boolean } } | undefined;
+  return entree?.seo?.noIndex === true;
 };
 
 /** "src/pages/[...locale]/blog/[id].astro" + params -> "/fr/blog/mon-billet/". */
@@ -81,12 +91,16 @@ export const GET: APIRoute = async ({ site, url }) => {
     const getStaticPaths = CHEMINS[page];
     if (getStaticPaths === undefined) throw new Error(`Page geree sans chemins dans le plan de site : ${page}`);
     if (getStaticPaths === null) continue;
-    const liste = (await getStaticPaths({ paginate: paginer, routePattern: "" })) as { params: Params }[];
-    for (const { params } of liste.flat()) {
+    const liste = (await getStaticPaths({ paginate: paginer, routePattern: "" })) as { params: Params; props?: Record<string, unknown> }[];
+    for (const { params, props } of liste.flat()) {
       const chemin = adresse(page, params);
-      if (!EXCLUES.some((exclue) => chemin.includes(exclue))) chemins.add(chemin);
+      if (!EXCLUES.some((exclue) => chemin.includes(exclue)) && !exclueParSonSeo(props)) chemins.add(chemin);
     }
   }
+  // Les pages libres publiees du back office (collection "pages"), sauf celles
+  // que leur panneau SEO exclut des moteurs. Moteur eteint ou base sans
+  // collection : aucune.
+  for (const l of locales) for (const p of await pagesLibres(l)) if (!p.noindex) chemins.add(`${localePrefix(l)}/${p.slug}/`);
 
   const parSuffixe = new Map<string, Map<string, string>>();
   for (const chemin of chemins) {

@@ -14,11 +14,24 @@
 // le head ne declare ni canonical ni hreflang (prop `introuvable`).
 import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
-import { getLocale, localeMeta, localePrefix, locales, useTranslations } from "@i18n";
+import { getLocale, isLocale, localeMeta, localePrefix, locales, useTranslations, type Locale } from "@i18n";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { annotationsDe, styleDuBloc } from "@moteur/annotations";
+import { argumentDe, lienDe } from "@moteur/cadre";
+import Pastilles from "@moteur/Pastilles.astro";
+import { textesDeLaPage } from "@moteur/textes";
 
-const locale = getLocale(Astro);
-const t = useTranslations(locale);
+// La langue de l'adresse : moteur allume, cette page se rend a la demande pour
+// toute adresse introuvable, /fr/... comprise, et c'est le premier segment qui
+// dit la langue. Figee (moteur eteint, ou fr/404.html), le meme calcul donne
+// la langue de la page.
+const tete = Astro.url.pathname.split("/")[1] ?? "";
+const locale: Locale = isLocale(tete) ? tete : getLocale(Astro);
+// Moteur allume, les textes viennent de l'entree "introuvable" (collection des
+// textes des pages) ; moteur eteint, des fichiers, comme avant.
+await textesDeLaPage(Astro, locale);
+const t = useTranslations(Astro);
+const page = annotationsDe(Astro, "introuvable");
 const title = t.notFound.metaTitle;
 const description = t.notFound.metaDescription;
 
@@ -31,22 +44,32 @@ const word = at >= 0 ? heading.slice(at, at + accent.length) : "";
 const after = at >= 0 ? heading.slice(at + accent.length) : "";
 
 const others = locales.filter((autre) => autre !== locale);
+// Les trois boutons : l'adresse saisie dans le back office, sinon celle du
+// theme (le troisieme lit le sous-champ "link" de la ligne de ses elements).
+const root = `${localePrefix(locale)}/`;
+const texte = (valeur: unknown): string | null => (typeof valeur === "string" && valeur.trim() !== "" ? valeur.trim() : null);
+const liens = {
+  accueil: lienDe(Astro, "introuvable", "cta_link") ?? root,
+  billets: lienDe(Astro, "introuvable", "cta_secondary_link") ?? `${localePrefix(locale)}/blog/`,
+  recherche: texte(argumentDe(Astro, "introuvable", 0).link) ?? `${localePrefix(locale)}/search/`,
+};
 ---
 
 
 <BaseLayout {title} {description} noindex introuvable>
-  <main id="content" class="grid min-h-dvh place-items-center py-20">
+  <main id="content" class="grid min-h-dvh place-items-center py-20" {...page.entree} style={styleDuBloc(Astro, "introuvable")}>
+    <Pastilles cle="introuvable" liens={[["cta_link", root], ["cta_secondary_link", `${localePrefix(locale)}/blog/`]]} />
     <div class="container-page flex flex-col items-center gap-6 text-center">
-      <p class="font-display text-primary text-display-lg leading-none font-semibold" aria-hidden="true">
+      <p class="font-display text-primary text-display-lg leading-none font-semibold" aria-hidden="true" {...page.champ("eyebrow")}>
         {t.notFound.code}
       </p>
 
-      <h1 class="font-display text-display-sm md:text-display-md text-foreground">
+      <h1 class="font-display text-display-sm md:text-display-md text-foreground" {...page.champ("title")}>
         {
           word ? (
             <Fragment>
               {before}
-              <span class="accent-script">{word}</span>
+              <span class="accent-script" {...page.champ("accent")}>{word}</span>
               {after}
             </Fragment>
           ) : (
@@ -55,16 +78,16 @@ const others = locales.filter((autre) => autre !== locale);
         }
       </h1>
 
-      <p class="text-muted-foreground measure-prose text-lg leading-relaxed">{t.notFound.lede}</p>
+      <p class="text-muted-foreground measure-prose text-lg leading-relaxed" {...page.champ("lede")}>{t.notFound.lede}</p>
 
       <div class="mt-2 flex flex-wrap items-center justify-center gap-3">
-        <Button href={`${localePrefix(locale)}/`} variant="primary" size="lg">
+        <Button href={liens.accueil} variant="primary" size="lg" {...page.champ("cta")}>
           {t.notFound.homeCta}
         </Button>
-        <Button href={`${localePrefix(locale)}/blog/`} variant="outline" size="lg">
+        <Button href={liens.billets} variant="outline" size="lg" {...page.champ("cta_secondary")}>
           {t.notFound.postsCta}
         </Button>
-        <Button href={`${localePrefix(locale)}/search/`} variant="ghost" size="lg">
+        <Button href={liens.recherche} variant="ghost" size="lg" {...page.champ("arguments")}>
           <Icon name="search" size={17} />
           {t.notFound.searchCta}
         </Button>

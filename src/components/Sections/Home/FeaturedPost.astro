@@ -6,7 +6,8 @@
 // page, seul endroit qui voit tous les billets a la fois.
 import FeaturedPostCard from "@components/Cards/FeaturedPostCard.astro";
 import { getLocale, useTranslations } from "@i18n";
-import { annotationsDe } from "@moteur/annotations";
+import { annotationsDe, styleDuBloc } from "@moteur/annotations";
+import Pastilles from "@moteur/Pastilles.astro";
 import type { ResolvedPost } from "@js/posts";
 
 type Props = {
@@ -29,7 +30,9 @@ const ed = annotationsDe(Astro, "a-la-une");
   aria-labelledby="featured-eyebrow"
   data-slot="featured-post"
   {...ed.entree}
+  style={styleDuBloc(Astro, "a-la-une")}
 >
+  <Pastilles cle="a-la-une" masquable />
   <p
     id="featured-eyebrow"
     class="font-sans text-muted-foreground mb-6 flex items-center gap-3 text-xs font-medium tracking-[0.18em] uppercase"

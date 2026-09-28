@@ -37,6 +37,8 @@ const t = useTranslations(locale);
 // h2 et h3 seulement. Le h1 est le titre de la page, il n'est pas une etape ;
 // le h4 est un aparte, et un sommaire qui le liste cesse d'etre une carte.
 const items = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+// Le sommaire est tire des intertitres du billet, qui s'editent dans le billet : en mode edition, il est marque comme de l'interface.
+import { marqueInterface } from "@moteur/cadre";
 ---
 
 {
@@ -49,7 +51,7 @@ const items = headings.filter((heading) => heading.depth === 2 || heading.depth 
           <Icon name="chevron-down" size={18} class="toc-chevron text-muted-foreground" />
         </summary>
         <nav aria-label={t.post.tocLabel} class="px-4 pb-3">
-          <ol class="toc-list">
+          <ol class="toc-list" {...marqueInterface(Astro)}>
             {items.map((item) => (
               <li class:list={["toc-item", item.depth === 3 && "toc-item-sub"]}>
                 <a class="toc-link" href={`#${item.slug}`} data-toc-link={item.slug}>
@@ -67,7 +69,7 @@ const items = headings.filter((heading) => heading.depth === 2 || heading.depth 
         <p class="font-sans text-muted-foreground mb-3 text-xs font-medium tracking-[0.18em] uppercase">
           {t.post.toc}
         </p>
-        <ol class="toc-list">
+        <ol class="toc-list" {...marqueInterface(Astro)}>
           {items.map((item) => (
             <li class:list={["toc-item", item.depth === 3 && "toc-item-sub"]}>
               <a class="toc-link" href={`#${item.slug}`} data-toc-link={item.slug}>

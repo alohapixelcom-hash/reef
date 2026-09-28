@@ -78,7 +78,9 @@ import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, useTranslations } from "@i18n";
-import { annotationsDe } from "@moteur/annotations";
+import { annotationsDe, styleDuBloc } from "@moteur/annotations";
+import { imageDe, lienDe } from "@moteur/cadre";
+import Pastilles from "@moteur/Pastilles.astro";
 
 interface Props {
   /** Paysage, densite standard. */
@@ -100,12 +102,19 @@ interface Props {
 const affichePaysage = await getImage({ src: filmPoster, width: 1920, height: 1080, format: "webp" });
 const affichePortrait = await getImage({ src: filmPoster, width: 608, height: 1080, fit: "cover", position: "center", format: "webp" });
 
+// Moteur allume : la video et son affiche choisies dans le back office (entree
+// "studio", champs video et video_poster) passent avant celles du theme ; une
+// seule adresse sert alors les trois formats.
+const VIDEO_DU_THEME = "https://videos.pexels.com/video-files/4863640/4863640-hd_1920_1080_24fps.mp4";
+const videoChoisie = lienDe(Astro, "studio", "video");
+const afficheChoisie = imageDe(Astro, "studio", "video_poster");
+
 const {
-  src = "https://videos.pexels.com/video-files/4863640/4863640-hd_1920_1080_24fps.mp4",
-  srcHd = "https://videos.pexels.com/video-files/4863640/4863640-hd_1920_1080_24fps.mp4",
-  srcPortrait = "https://videos.pexels.com/video-files/4863640/4863640-hd_1920_1080_24fps.mp4",
-  poster = affichePaysage.src,
-  posterPortrait = affichePortrait.src,
+  src = videoChoisie ?? VIDEO_DU_THEME,
+  srcHd = videoChoisie ?? VIDEO_DU_THEME,
+  srcPortrait = videoChoisie ?? VIDEO_DU_THEME,
+  poster = afficheChoisie?.src ?? affichePaysage.src,
+  posterPortrait = afficheChoisie?.src ?? affichePortrait.src,
   from = 0,
   to = 12,
 }: Props = Astro.props;
@@ -115,8 +124,11 @@ const t = useTranslations(Astro);
 // Moteur allume, en mode edition : la section "studio" ; le surtitre est celui
 // de la page a propos, et s'edite donc sur son entree.
 const ed = annotationsDe(Astro, "studio");
-const surtitre = annotationsDe(Astro, "a-propos").champ("eyebrow");
 const routes = getSiteRoutes(locale);
+// Les adresses des deux boutons : celles que l'editeur a saisies (entree
+// "studio"), sinon les pages prevues par le theme.
+const lienPrincipal = lienDe(Astro, "studio", "cta_link") ?? routes.about;
+const lienSecondaire = lienDe(Astro, "studio", "cta_secondary_link") ?? routes.contact;
 
 const title = t.home.aboutTitle;
 const accent = t.home.aboutAccent;
@@ -134,8 +146,10 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
   aria-labelledby="studio-title"
   data-slot="film-scene"
   {...ed.entree}
+  style={styleDuBloc(Astro, "studio")}
 >
   <div class="film__pin">
+    <Pastilles cle="studio" liens={[["cta_link", routes.about], ["cta_secondary_link", routes.contact]]} images={[{ champ: "video_poster", sorte: "affiche" }]} video={VIDEO_DU_THEME} masquable />
     {/* La video est decorative : le texte pose par dessus porte tout le sens,
         et le decrire deux fois n'aiderait personne. */}
     <div class="film__media">
@@ -146,6 +160,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
         preload="none"
         disablepictureinpicture
         aria-hidden="true"
+        {...ed.champ("video_poster")}
         data-src={src}
         data-src-hd={srcHd}
         data-src-portrait={srcPortrait}
@@ -161,10 +176,10 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
       <div class="max-w-2xl">
         <p
           class="film__item flex items-center gap-3 text-xs font-medium tracking-[0.18em] text-white/80 uppercase"
-          {...surtitre}
+          {...ed.champ("eyebrow")}
         >
           <span class="bg-primary inline-block h-px w-8 shrink-0" aria-hidden="true"></span>
-          {t.about.eyebrow}
+          {t.home.aboutEyebrow}
         </p>
 
         <h2
@@ -190,11 +205,11 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
         </p>
 
         <div class="film__item mt-8 flex flex-wrap gap-3">
-          <Button href={routes.about} variant="primary" size="md" {...ed.champ("cta")}>
+          <Button href={lienPrincipal} variant="primary" size="md" {...ed.champ("cta")}>
             {t.home.aboutCta}
             <Icon name="arrow-right" size={17} />
           </Button>
-          <Button href={routes.contact} variant="outline" size="md">{t.nav.contact}</Button>
+          <Button href={lienSecondaire} variant="outline" size="md" {...ed.champ("cta_secondary")}>{t.home.aboutContact}</Button>
         </div>
       </div>
     </div>

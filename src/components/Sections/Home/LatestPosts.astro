@@ -6,7 +6,9 @@ import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, useTranslations } from "@i18n";
-import { annotationsDe } from "@moteur/annotations";
+import { annotationsDe, styleDuBloc } from "@moteur/annotations";
+import { lienDe } from "@moteur/cadre";
+import Pastilles from "@moteur/Pastilles.astro";
 import type { ResolvedPost } from "@js/posts";
 
 type Props = {
@@ -19,6 +21,8 @@ const locale = getLocale(Astro);
 const t = useTranslations(Astro);
 const ed = annotationsDe(Astro, "dernieres-notes");
 const routes = getSiteRoutes(locale);
+// L'adresse du bouton : celle que l'editeur a saisie (entree "dernieres-notes"), sinon la page prevue par le theme.
+const lien = lienDe(Astro, "dernieres-notes", "cta_link") ?? routes.posts;
 ---
 
 <section
@@ -26,7 +30,9 @@ const routes = getSiteRoutes(locale);
   aria-labelledby="latest-title"
   data-slot="latest-posts"
   {...ed.entree}
+  style={styleDuBloc(Astro, "dernieres-notes")}
 >
+  <Pastilles cle="dernieres-notes" liens={[["cta_link", routes.posts]]} masquable />
   <div class="container-page py-16 md:py-24">
     <SectionHeader
       as="h2"
@@ -50,7 +56,7 @@ const routes = getSiteRoutes(locale);
     {/* La grille est pleine et se termine en bas a droite : la sortie se pose
         la ou l'oeil quitte la derniere carte, pas au milieu d'une ligne vide. */}
     <div class="mt-10 flex justify-end">
-      <Button href={routes.posts} variant="outline" size="lg" {...ed.champ("cta")}>
+      <Button href={lien} variant="outline" size="lg" {...ed.champ("cta")}>
         {t.home.latestCta}
         <Icon name="arrow-right" size={18} />
       </Button>

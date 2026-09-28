@@ -30,7 +30,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const ROOT = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
-const SKIP = new Set(["node_modules", "dist", ".git", ".astro", "public", ".vercel", ".wrangler"]);
+const SKIP = new Set(["node_modules", "dist", ".git", ".astro", "public", ".vercel", ".wrangler", ".emdash"]);
 const LINTABLE = /\.(astro|ts|tsx|mjs|js|css|md|json)$/;
 
 /**
@@ -58,7 +58,7 @@ const EXEMPTIONS = [
   {
     rule: "length",
     match: /src\/moteur\/catalogue-bo\.fr\.ts$/,
-    why: "dictionnaire de traduction : 678 messages qu'EmDash laisse en anglais, une paire par ligne ; le decouper n'enleverait pas une ligne et cacherait le total",
+    why: "dictionnaire de traduction : les messages qu'EmDash laisse en anglais, une paire par ligne ; le decouper n'enleverait pas une ligne et cacherait le total",
   },
   {
     rule: "palette",

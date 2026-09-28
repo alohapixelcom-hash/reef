@@ -13,7 +13,9 @@ import { getSiteRoutes } from "@config/navData.json.ts";
 import { fmt, getLocale, useTranslations } from "@i18n";
 import { entrySlug } from "@i18n/content";
 import { getResolvedPosts } from "@js/posts";
+import { annotationsDeLaFiche } from "@moteur/listes";
 import { annotation } from "@moteur/source";
+import { marqueInterface } from "@moteur/cadre";
 import type { CollectionEntry } from "astro:content";
 
 type Props = {
@@ -31,6 +33,8 @@ const t = useTranslations(locale);
 const routes = getSiteRoutes(locale);
 
 const authorHref = `${routes.authors}${entrySlug(author.id)}/`;
+// Moteur allume, en mode edition : la fiche de l'auteur (collection "auteurs").
+const fiche = annotationsDeLaFiche(author);
 
 // --- Billet precedent et suivant -------------------------------------------
 // La liste est celle de la langue courante, publiee, du plus recent au plus
@@ -72,7 +76,7 @@ const chip =
                   etiquette : la recherche du theme couvre deja titres, chapeaux,
                   sujets et etiquettes, et elle existe dans la table des routes.
                   Une page par etiquette ferait cent routes pour trois clics. */}
-              <ul class="flex flex-wrap gap-2">
+              <ul class="flex flex-wrap gap-2" {...annotation(post, "tags")}>
                 {post.data.tags.map((tag) => (
                   <li>
                     <a class={chip} href={`${routes.search}?q=${encodeURIComponent(tag)}`}>
@@ -117,28 +121,29 @@ const chip =
       {/* La signature. Une biographie en fin d'article ne decore pas : elle
           repond a la question que le lecteur se pose une fois convaincu, qui
           est "qui me dit ca". */}
-      <section class="border-border bg-card rounded-card flex flex-col gap-4 border p-6 md:p-7">
+      <section class="border-border bg-card rounded-card flex flex-col gap-4 border p-6 md:p-7" {...fiche.entree}>
         <h2 class={eyebrow}>{t.post.aboutAuthor}</h2>
 
         <div class="flex flex-col gap-4 sm:flex-row sm:gap-5">
-          <Avatar name={author.data.name} src={author.data.avatar?.src} size="xl" alt="" />
+          <Avatar name={author.data.name} src={author.data.avatar?.src} size="xl" alt="" {...fiche.champ("avatar")} />
 
           <div class="flex min-w-0 flex-col gap-2">
             <p class="flex flex-wrap items-baseline gap-x-3">
               <a
                 href={authorHref}
                 class="font-display text-foreground text-lg font-semibold tracking-tight"
+                {...fiche.champ("name")}
               >
                 {author.data.name}
               </a>
-              <span class="text-muted-foreground font-sans text-sm">{author.data.role}</span>
+              <span class="text-muted-foreground font-sans text-sm" {...fiche.champ("role")}>{author.data.role}</span>
             </p>
 
-            <p class="text-muted-foreground text-[0.95rem] leading-relaxed">{author.data.bio}</p>
+            <p class="text-muted-foreground text-[0.95rem] leading-relaxed" {...fiche.champ("bio")}>{author.data.bio}</p>
 
             {
               author.data.links.length > 0 && (
-                <ul class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+                <ul class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1" {...fiche.champ("links")}>
                   {author.data.links.map((link) => (
                     <li>
                       <a
@@ -161,6 +166,7 @@ const chip =
               <a
                 href={authorHref}
                 class="text-primary hover:decoration-primary inline-flex items-center gap-1.5 font-sans text-sm font-medium underline decoration-transparent underline-offset-4 transition-colors duration-150"
+                {...marqueInterface(Astro)}
               >
                 {fmt(t.post.moreFromAuthor, { name: author.data.name })}
                 <Icon name="arrow-right" size={16} />

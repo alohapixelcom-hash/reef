@@ -15,6 +15,8 @@ import { Avatar } from "@components/ui/avatar";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { fmt, formatDate, useTranslations, type Locale } from "@i18n";
 import type { ResolvedPost } from "@js/posts";
+import { marqueInterface } from "@moteur/cadre";
+import { annotationsDeLaFiche } from "@moteur/listes";
 import { annotation } from "@moteur/source";
 import { Image } from "astro:assets";
 import { topicTone } from "./topicTone";
@@ -25,9 +27,11 @@ type Props = {
   /** Niveau de titre reel : h2 dans une grille sans sous-titre, h3 sous un titre de section. */
   as?: "h2" | "h3";
   class?: string;
+  /** La premiere carte d'une liste : sa couverture est souvent le plus grand element du premier ecran, elle part tout de suite. */
+  prioritaire?: boolean;
 };
 
-const { entry, locale, as: Tag = "h3", class: className }: Props = Astro.props;
+const { entry, locale, as: Tag = "h3", class: className, prioritaire = false }: Props = Astro.props;
 const { post, author, topic, slug, topicSlug, minutes } = entry;
 
 const t = useTranslations(locale);
@@ -36,6 +40,10 @@ const href = `${routes.posts}${slug}/`;
 const topicHref = `${routes.topics}${topicSlug}/`;
 const tone = topicTone[topic.data.accent];
 const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: minutes });
+// Moteur allume, en mode edition : le sujet et l'auteur portent les champs de
+// leurs fiches ; le temps de lecture, calcule, est marque comme de l'interface.
+const sujet = annotationsDeLaFiche(topic);
+const auteur = annotationsDeLaFiche(author);
 // La barre d'edition d'EmDash (moteur allume, mode edition) : la carte porte
 // l'entree, le titre son champ. Le titre, pas le lien qu'il contient : le
 // lien couvre la carte par un pseudo-element, c'est lui qui recoit le clic
@@ -62,8 +70,10 @@ const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: m
         widths={[420, 760]}
         sizes="(min-width: 1024px) 24rem, (min-width: 640px) 45vw, 92vw"
         class="aspect-[16/9] w-full object-cover"
-        loading="lazy"
+        loading={prioritaire ? "eager" : "lazy"}
+        fetchpriority={prioritaire ? "high" : undefined}
         decoding="async"
+        {...annotation(post, "cover")}
       />
     )
   }
@@ -78,11 +88,12 @@ const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: m
           "font-sans rounded-pill relative z-10 px-2.5 py-1 text-xs font-medium",
           tone.chip,
         ]}
+        {...sujet.champ("name")}
       >
         {topic.data.name}
       </a>
       <span class="text-muted-foreground font-sans text-xs">
-        <time datetime={post.data.pubDate.toISOString()}>
+        <time datetime={post.data.pubDate.toISOString()} {...annotation(post, "pub_date")}>
           {formatDate(post.data.pubDate, locale)}
         </time>
       </span>
@@ -94,14 +105,14 @@ const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: m
       </a>
     </Tag>
 
-    <p class="text-muted-foreground line-clamp-3 text-[0.95rem] leading-relaxed">
+    <p class="text-muted-foreground line-clamp-3 text-[0.95rem] leading-relaxed" {...annotation(post, "description")}>
       {post.data.description}
     </p>
 
     <div class="border-border mt-auto flex items-center gap-2.5 border-t pt-4">
-      <Avatar name={author.data.name} src={author.data.avatar?.src} size="sm" alt="" />
-      <span class="text-foreground font-sans text-sm font-medium">{author.data.name}</span>
-      <span class="text-muted-foreground ml-auto font-sans text-xs">{readLabel}</span>
+      <Avatar name={author.data.name} src={author.data.avatar?.src} size="sm" alt="" {...auteur.champ("avatar")} />
+      <span class="text-foreground font-sans text-sm font-medium" {...auteur.champ("name")}>{author.data.name}</span>
+      <span class="text-muted-foreground ml-auto font-sans text-xs" {...marqueInterface(Astro)}>{readLabel}</span>
     </div>
   </div>
 </article>

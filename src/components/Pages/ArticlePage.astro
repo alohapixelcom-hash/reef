@@ -13,13 +13,14 @@ import ReadingProgress from "@components/Sections/Post/ReadingProgress.astro";
 import RelatedPosts from "@components/Sections/Post/RelatedPosts.astro";
 import TableOfContents from "@components/Sections/Post/TableOfContents.astro";
 import { getSiteRoutes } from "@config/navData.json.ts";
-import siteData from "@config/siteData.json";
 import { getLocale, localizePath, useTranslations } from "@i18n";
 import { entrySlug } from "@i18n/content";
 import { article, breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { carteDuBillet, corpsDuBillet } from "@moteur/source";
 import TexteRiche from "@moteur/TexteRiche.astro";
+import { type PanneauSeo, seoDe } from "@moteur/listes";
+import { identiteDuSite } from "@moteur/theme";
 import type { CollectionEntry } from "astro:content";
 
 interface Props {
@@ -46,8 +47,12 @@ const url = new URL(`${routes.posts}${entrySlug(post.id)}/`, base).href;
 // La couverture illustre l'article dans schema.org, entiere ; sans elle,
 // l'image par defaut du site. Les adresses sont rendues absolues, ce
 // qu'exigent OG et schema.org.
+// L'identite du site (reglages du back office, sinon siteData) et le panneau
+// SEO du billet (moteur allume), qui passe avant ses propres champs.
+const marque = identiteDuSite(Astro, locale);
+const seo = seoDe((post as unknown as { seo?: PanneauSeo }).seo, { title: post.data.title, description: post.data.description });
 const cover = post.data.cover;
-const imageParDefaut = { src: siteData.defaultImage.src, alt: siteData.defaultImage.alt[locale] };
+const imageParDefaut = marque.image;
 const share = cover ? { src: cover.src, alt: post.data.coverAlt ?? post.data.title } : imageParDefaut;
 
 // La carte de partage (og:image, twitter:image) est une photo en JPEG
@@ -55,7 +60,7 @@ const share = cover ? { src: cover.src, alt: post.data.coverAlt ?? post.data.tit
 // a la demande (moteur allume, voir src/moteur/carte-du-billet.ts). Un
 // billet sans couverture partage la carte par defaut du site.
 const carte = await carteDuBillet(post);
-const carteDePartage = carte ? { src: carte, alt: share.alt } : imageParDefaut;
+const carteDePartage = seo.image ? { src: seo.image, alt: share.alt } : carte ? { src: carte, alt: share.alt } : imageParDefaut;
 
 const articleSchema = article({
   title: post.data.title,
@@ -66,22 +71,23 @@ const articleSchema = article({
   image: new URL(share.src, base).href,
   authorName: author.data.name,
   authorUrl: new URL(`${routes.authors}${entrySlug(author.id)}/`, base).href,
-  publisherName: siteData.name,
+  publisherName: marque.nom,
 });
 
 const crumbSchema = breadcrumbList([
   { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
-  { name: t.archive.metaTitle, url: new URL(routes.posts, base).href },
+  { name: t.archive.crumb, url: new URL(routes.posts, base).href },
   { name: post.data.title, url },
 ]);
 ---
 
 <BaseLayout
-  title={post.data.title}
-  description={post.data.description}
+  title={seo.title}
+  description={seo.description}
   type="article"
-  noindex={post.data.draft}
+  noindex={post.data.draft || seo.noindex}
   image={carteDePartage}
+  canonical={seo.canonical}
 >
   <Fragment slot="head">
     <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />

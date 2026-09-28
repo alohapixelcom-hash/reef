@@ -21,6 +21,7 @@ import { fmt, getLocale, localizePath, useTranslations } from "@i18n";
 import type { ResolvedPost } from "@js/posts";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { imageDePartage } from "@moteur/cadre";
 import type { Page } from "astro";
 import type { CollectionEntry } from "astro:content";
 
@@ -43,7 +44,7 @@ const description = t.archive.metaDescription;
 const base = Astro.site ?? Astro.url;
 const crumbs = breadcrumbList([
   { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
-  { name: t.archive.metaTitle, url: new URL(localizePath("/blog/", locale), base).href },
+  { name: t.archive.crumb, url: new URL(localizePath("/blog/", locale), base).href },
 ]);
 
 // Les pages 2 et suivantes ne meritent pas d'etre indexees : elles n'ont pas de
@@ -51,7 +52,7 @@ const crumbs = breadcrumbList([
 const noindex = page.currentPage > 1;
 ---
 
-<BaseLayout {title} {description} {noindex}>
+<BaseLayout {title} {description} {noindex} image={imageDePartage(Astro, "archives")}>
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
   </Fragment>
@@ -60,12 +61,13 @@ const noindex = page.currentPage > 1;
 
   <main id="content">
     <PageHero
+      cle="archives"
       section="archives"
       eyebrow={t.archive.eyebrow}
       title={t.archive.title}
       accentWord={t.archive.accent}
       lede={t.archive.lede}
-      crumbs={[{ label: t.archive.metaTitle }]}
+      crumbs={[{ label: t.archive.crumb }]}
     >
       <TopicNav {topics} {locale} class="mt-2" />
     </PageHero>

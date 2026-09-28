@@ -47,6 +47,8 @@ export const frReading: Pick<Dictionary, "post" | "archive" | "newsletter"> = {
     metaTitle: "Tous les articles",
     metaDescription:
       "Tous les articles publiés sur Reef Notes, du plus récent au plus ancien : journaux de chantier, performance, typographie et gestion d'un petit studio.",
+    /** Le nom de la page dans le fil d'Ariane et son balisage : court, distinct du titre donne aux moteurs de recherche. */
+    crumb: "Tous les articles",
     eyebrow: "Archives",
     title: "Tout ce que nous avons écrit",
     accent: "Tout",

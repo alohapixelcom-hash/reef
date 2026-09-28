@@ -1,7 +1,7 @@
 // src/moteur/routes-du-cache.selfcheck.ts - self-check des motifs de cache : une page geree, un motif par langue, et jamais un motif qui avale tout.
 // Lancer : node src/moteur/routes-du-cache.selfcheck.ts
 import assert from "node:assert/strict";
-import { PAGES_GEREES } from "./pages-gerees.mjs";
+import { PAGES_EN_CACHE, PAGES_GEREES } from "./pages-gerees.mjs";
 import { routesDeLaPage, routesDuCache } from "./routes-du-cache.mjs";
 
 let checks = 0;
@@ -19,8 +19,9 @@ is(routesDeLaPage("src/pages/[...locale]/rss.xml.ts", L, "en"), ["/rss.xml", "/f
 is(routesDeLaPage("src/pages/llms.txt.ts", L, "en"), ["/llms.txt"], "une page sans langue : un seul motif");
 
 const regle = { maxAge: 60, swr: 600, tags: ["posts"] };
-const routes = routesDuCache(PAGES_GEREES, L, "en", regle);
-is(Object.keys(routes).length, PAGES_GEREES.length * 2 - 1, "chaque page geree a deux motifs, sauf llms.txt");
+const routes = routesDuCache(PAGES_EN_CACHE, L, "en", regle);
+is(Object.keys(routes).length, PAGES_EN_CACHE.length * 2 - 1, "chaque page gardee en cache a deux motifs, sauf llms.txt");
+is(PAGES_GEREES.length - PAGES_EN_CACHE.length, 3, "la page introuvable (deux routes) et la page libre ne se gardent pas en cache");
 is(routes["/fr/authors/[author]"], regle, "la regle est posee sur chaque motif");
 for (const motif of Object.keys(routes)) {
   is(motif.startsWith("/[") || motif.startsWith("/_"), false, `aucun motif ne commence par un parametre ou par une route interne : ${motif}`);

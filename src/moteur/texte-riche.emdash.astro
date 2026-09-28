@@ -1,0 +1,16 @@
+---
+// src/moteur/texte-riche.emdash.astro - moteur allume : le texte riche d'une page libre, rendu par EmDash (et, pour un editeur en mode edition, son editeur integre).
+//
+// La valeur doit arriver telle que getEmDashEntry l'a rendue : EmDash y
+// attache ses marques d'edition, que PortableText lit pour ouvrir l'editeur
+// dans la page. Choisi par l'alias @moteur/texte-riche (moteur.config.mjs).
+import { PortableText } from "emdash/ui";
+
+interface Props {
+  value: unknown[];
+}
+
+const { value } = Astro.props;
+---
+
+<PortableText value={value as never} />

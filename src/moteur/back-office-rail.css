@@ -1,0 +1,27 @@
+/* src/moteur/back-office-rail.css - le rail du back office ne montre que ce qui agit sur le site (generique) : les contenus, les medias, les menus, les redirections, les reglages et les utilisateurs.
+ *
+ * EmDash livre un rail complet, pense pour un site qui lui confie tout. Trois
+ * de ses ecrans n'ont aucun effet sur un site de la maison, et une entree qui
+ * ecrit dans le vide est un piege (on y cree un encart, rien ne change) :
+ *   - les encarts (widgets) : aucune langue en 0.38, aucune barre d'edition ;
+ *     leurs usages vivent dans les entrees "pied-de-page", "en-tete" et "site" ;
+ *   - les sections natives d'EmDash, des blocs copies dans un texte riche, sans
+ *     lien vivant (a ne pas confondre avec la collection des textes des pages,
+ *     qui reste) ;
+ *   - les taxonomies natives, les signatures (bylines), les commentaires et
+ *     l'import WordPress, que le site ne lit pas.
+ * Leurs pages restent joignables par leur adresse : rien n'est casse, elles
+ * disparaissent seulement du rail. Menus et Redirections restent, ce sont des
+ * ecrans du site.
+ */
+[data-sidebar="menu-item"]:has(
+    > a[href="/_emdash/admin/comments"],
+    > a[href="/_emdash/admin/widgets"],
+    > a[href="/_emdash/admin/sections"],
+    > a[href^="/_emdash/admin/taxonomies/"],
+    > a[href="/_emdash/admin/bylines"],
+    > a[href="/_emdash/admin/byline-schema"],
+    > a[href^="/_emdash/admin/import/"]
+  ) {
+  display: none;
+}

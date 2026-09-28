@@ -38,6 +38,15 @@
       "@moteur/live": [
         "src/moteur/live.fichiers.ts"
       ],
+      "@moteur/texte-riche": [
+        "src/moteur/texte-riche.fichiers.astro"
+      ],
+      "@moteur/cadre-base": [
+        "src/moteur/cadre.fichiers.ts"
+      ],
+      "@moteur/courriels": [
+        "src/moteur/extensions/courriels/formulaire.fichiers.ts"
+      ],
       "@moteur/catalogue-emdash": [
         "src/moteur/catalogue-emdash.d.ts"
       ],

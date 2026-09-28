@@ -1,4 +1,4 @@
-// src/moteur/deployer/page.ts - compose la page "Tout deployer" en Block Kit : l'etat, le bouton, la preuve, le journal.
+// src/moteur/deployer/page.ts - compose la page "Tout deployer" en Block Kit : le bouton, l'etat en trois cartes, la preuve, le journal.
 //
 // POURQUOI BLOCK KIT ET PAS REACT : la page est une liste de faits et deux
 // boutons. Block Kit la decrit en JSON, le back office la rend avec SES
@@ -12,7 +12,7 @@
 import { versionServie } from "../version";
 import type { Resultat } from "./action";
 import type { Passage } from "./journal";
-import { DELAI_MS, heure as heureDuSite, type Hook, secondes } from "./regles";
+import { DELAI_MS, FUSEAU_PAR_DEFAUT, heure as heureDuSite, type Hook, lireLeFuseau, secondes } from "./regles";
 import { COMMANDE_DU_SECRET, type LangueDesTextes, type Textes, textesPour } from "./textes";
 
 type Bouton = { type: "button"; action_id: string; label: string; style?: "primary" | "secondary" };
@@ -21,13 +21,13 @@ type Bloc =
   | { type: "section"; text: string }
   | { type: "context"; text: string }
   | { type: "divider" }
-  | { type: "fields"; fields: { label: string; value: string }[] }
+  | { type: "stats"; items: { label: string; value: string; description?: string }[] }
   | { type: "banner"; title?: string; description: string; variant: "default" | "alert" | "error" }
   | { type: "code"; code: string; language: "bash" }
   | { type: "actions"; elements: Bouton[] }
   | {
       type: "table";
-      columns: { key: string; label: string }[];
+      columns: { key: string; label: string; format?: "text" | "badge" | "code" }[];
       rows: Record<string, string>[];
       page_action_id: string;
       empty_text: string;
@@ -124,13 +124,23 @@ function avertissementDuHook(TEXTES: Textes, hook: Hook): Bloc[] {
 }
 
 function reponseDuHook(TEXTES: Textes, dernier: Passage | null): string {
-  if (!dernier) return TEXTES.aucune;
+  if (!dernier) return TEXTES.jamais;
   return dernier.code === null ? TEXTES.etat.sansReponse : TEXTES.etat.http(dernier.code);
 }
 
+/** Les caches reellement configures, par leur nom ; "Aucun" quand le site n'en a pas. */
+function nomsDesCaches(TEXTES: Textes, caches: typeof __ALOHA_CACHES__): string {
+  const noms = [caches.objets, caches.routes].filter((nom): nom is NonNullable<typeof nom> => nom !== null);
+  return noms.length > 0 ? noms.join(" + ") : TEXTES.aucun;
+}
+
+// Le fuseau du site : un site qui ne fige pas encore __ALOHA_BO_FUSEAU__ (avant
+// la 3.4.0) lit l'heure de Paris, comme avant, au lieu de planter la page.
+const FUSEAU = lireLeFuseau(typeof __ALOHA_BO_FUSEAU__ === "string" ? __ALOHA_BO_FUSEAU__ : FUSEAU_PAR_DEFAUT);
+
 export function composer(etat: Etat, clic?: Resultat): Reponse {
   const TEXTES = textesPour(etat.langue);
-  const heure = (iso: string): string => heureDuSite(iso, etat.langue, __ALOHA_BO_FUSEAU__);
+  const heure = (iso: string): string => heureDuSite(iso, etat.langue, FUSEAU);
   const bandeau = clic ? bandeauDuClic(TEXTES, clic) : undefined;
   const caches = __ALOHA_CACHES__;
   const blocks: Bloc[] = [
@@ -145,20 +155,33 @@ export function composer(etat: Etat, clic?: Resultat): Reponse {
         { type: "button", action_id: ACTION_ACTUALISER, label: TEXTES.actualiser, style: "secondary" },
       ],
     },
-    { type: "divider" },
+    // L'etat en trois cartes (disposition venue de Kai) : la version servie,
+    // le dernier declenchement, les caches. Chaque carte dit sa valeur en
+    // grand et son detail dessous, au lieu de six lignes de meme poids.
     {
-      type: "fields",
-      fields: [
-        { label: TEXTES.etat.version, value: versionServie.version },
-        { label: TEXTES.etat.construit, value: heure(versionServie.construit) },
-        { label: TEXTES.etat.dernier, value: etat.dernier ? heure(etat.dernier.quand) : TEXTES.jamais },
-        { label: TEXTES.etat.reponse, value: reponseDuHook(TEXTES, etat.dernier) },
-        { label: TEXTES.etat.objets, value: caches.objets ? TEXTES.etat.configure(caches.objets) : TEXTES.etat.nonConfigure },
-        { label: TEXTES.etat.routes, value: caches.routes ? TEXTES.etat.configure(caches.routes) : TEXTES.etat.nonConfigure },
+      type: "stats",
+      items: [
+        {
+          label: TEXTES.etat.version,
+          value: versionServie.version,
+          description: TEXTES.etat.construit(heure(versionServie.construit)),
+        },
+        {
+          label: TEXTES.etat.dernier,
+          value: reponseDuHook(TEXTES, etat.dernier),
+          description: etat.dernier ? heure(etat.dernier.quand) : TEXTES.etat.aucunDeclenchement,
+        },
+        {
+          label: TEXTES.etat.caches,
+          value: nomsDesCaches(TEXTES, caches),
+          description: TEXTES.etat.detailDesCaches(
+            caches.objets ?? TEXTES.etat.nonConfigure,
+            caches.routes ?? TEXTES.etat.nonConfigure,
+          ),
+        },
       ],
     },
     ...preuve(TEXTES, heure, etat.dernier),
-    { type: "divider" },
     { type: "header", text: TEXTES.journal.titre },
     {
       type: "table",
@@ -168,7 +191,7 @@ export function composer(etat: Etat, clic?: Resultat): Reponse {
         { key: "quand", label: TEXTES.journal.quand },
         { key: "qui", label: TEXTES.journal.qui },
         { key: "caches", label: TEXTES.journal.caches },
-        { key: "build", label: TEXTES.journal.build },
+        { key: "build", label: TEXTES.journal.build, format: "badge" },
         { key: "code", label: TEXTES.journal.code },
       ],
       rows: etat.passages.map((passage) => ({
@@ -179,7 +202,7 @@ export function composer(etat: Etat, clic?: Resultat): Reponse {
         code: passage.code === null ? "-" : String(passage.code),
       })),
     },
-    { type: "context", text: TEXTES.journal.note(etat.adresseVersion, __ALOHA_BO_FUSEAU__) },
+    { type: "context", text: TEXTES.journal.note(etat.adresseVersion, FUSEAU) },
   ];
   return { blocks, ...(bandeau ? { toast: bandeau.toast } : {}) };
 }

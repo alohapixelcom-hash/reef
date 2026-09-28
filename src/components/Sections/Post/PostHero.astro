@@ -17,6 +17,9 @@ import { getSiteRoutes } from "@config/navData.json.ts";
 import { readingTime } from "@js/textUtils";
 import { fmt, formatDate, getLocale, useTranslations } from "@i18n";
 import { entrySlug } from "@i18n/content";
+import { enEdition } from "@moteur/annotations";
+import { marqueInterface } from "@moteur/cadre";
+import { annotationsDeLaFiche } from "@moteur/listes";
 import { annotation } from "@moteur/source";
 import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
@@ -57,6 +60,11 @@ const authorHref = `${routes.authors}${entrySlug(author.id)}/`;
 // datetime porte la date complete pour les machines ; le texte visible passe
 // par Intl et suit les usages de la langue affichee.
 const iso = (date: Date): string => date.toISOString();
+// Moteur allume, en mode edition : le nom du sujet et la signature portent les
+// champs de leurs fiches (collections "sujets" et "auteurs").
+const edition = enEdition(Astro);
+const sujet = annotationsDeLaFiche(topic);
+const auteur = annotationsDeLaFiche(author);
 
 // LA BARRE D'EDITION D'EMDASH (moteur allume, editeur connecte, "Edit"
 // bascule) : chaque balise qui affiche un champ du billet en recoit
@@ -82,7 +90,7 @@ const iso = (date: Date): string => date.toISOString();
           class="font-sans text-muted-foreground hover:text-foreground text-xs font-medium tracking-[0.18em] uppercase transition-colors duration-150"
         >
           <span class="sr-only">{t.post.topicLabel}: </span>
-          {topic.data.name}
+          {edition ? <span {...sujet.champ("name")}>{topic.data.name}</span> : topic.data.name}
         </a>
         {draft && <Badge variant="outline">{t.post.draft}</Badge>}
       </p>
@@ -114,18 +122,19 @@ const iso = (date: Date): string => date.toISOString();
           ouvre les metadonnees, au lieu de border la page pour rien. */}
       <div class="border-border mt-8 flex flex-wrap items-center gap-x-5 gap-y-4 border-t pt-5">
         <div class="flex items-center gap-3">
-          <Avatar name={author.data.name} src={author.data.avatar?.src} size="md" alt="" />
+          <Avatar name={author.data.name} src={author.data.avatar?.src} size="md" alt="" {...auteur.champ("avatar")} />
           <span class="flex flex-col">
             <span class="font-sans text-sm">
               <span class="text-muted-foreground">{t.post.writtenBy} </span>
               <a
                 href={authorHref}
                 class="text-foreground decoration-primary/50 font-medium underline-offset-4 hover:underline"
+                {...auteur.champ("name")}
               >
                 {author.data.name}
               </a>
             </span>
-            <span class="text-muted-foreground font-sans text-xs">{author.data.role}</span>
+            <span class="text-muted-foreground font-sans text-xs" {...auteur.champ("role")}>{author.data.role}</span>
           </span>
         </div>
 
@@ -135,7 +144,7 @@ const iso = (date: Date): string => date.toISOString();
         <p class="text-muted-foreground flex flex-wrap items-center gap-x-5 gap-y-1 font-sans text-sm">
           <span>
             {t.post.published}{" "}
-            <time datetime={iso(pubDate)} class="text-foreground">
+            <time datetime={iso(pubDate)} class="text-foreground" {...annotation(post, "pub_date")}>
               {formatDate(pubDate, locale)}
             </time>
           </span>
@@ -144,14 +153,14 @@ const iso = (date: Date): string => date.toISOString();
             updatedDate && (
               <span title={t.post.updatedNote}>
                 {t.post.updated}{" "}
-                <time datetime={iso(updatedDate)} class="text-foreground">
+                <time datetime={iso(updatedDate)} class="text-foreground" {...annotation(post, "updated_date")}>
                   {formatDate(updatedDate, locale)}
                 </time>
               </span>
             )
           }
 
-          <span>{readingLabel}</span>
+          <span {...marqueInterface(Astro)}>{readingLabel}</span>
         </p>
       </div>
 
@@ -175,6 +184,7 @@ const iso = (date: Date): string => date.toISOString();
           sizes="(min-width: 80rem) 72rem, 100vw"
           class="rounded-card shadow-float measure-wide mx-auto w-full object-cover"
           loading="eager"
+          fetchpriority="high"
           decoding="async"
           {...annotation(post, "cover")}
         />

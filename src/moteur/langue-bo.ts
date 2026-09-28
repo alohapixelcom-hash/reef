@@ -11,6 +11,13 @@
 // La personne garde la main : des qu'elle choisit une langue dans ses reglages,
 // son cookie existe et ce fichier ne fait plus rien. moteur.config.mjs ne
 // l'enregistre que si la variable est posee.
+//
+// TRANSITION. Ce middleware reecrit la requete dans Astro, ce qu'alohapixel.com
+// a vu echouer sous workerd quand plusieurs pages du back office arrivent
+// ensemble (voir langue-bo.regles.ts). La bonne place est le Worker :
+// src/worker.moteur.ts appelle langueDuBackOffice(request, __ALOHA_BO_LANGUE__)
+// avant de passer la main, et moteur.config.mjs n'enregistre plus ce fichier.
+// Il disparaitra du socle quand les sept themes auront fait cette bascule.
 import { defineMiddleware } from "astro:middleware";
 import { avecLeCookie, cookieDeLangue, poserLeCookie } from "./langue-bo.regles";
 

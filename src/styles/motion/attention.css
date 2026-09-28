@@ -49,7 +49,13 @@
 }
 
 /* Onde sonar : a poser sur l'echo (copie absolue) derriere un point de
- * statut, jamais sur le point lui-meme. */
+ * statut, jamais sur le point lui-meme.
+ *
+ * Aucun theme de la maison ne s'en sert, et ce n'est pas un oubli : le point
+ * qui bat sous une capsule "beta publique" a quitte le premier ecran le
+ * 24 aout, docs/design.md refusant la pastille de statut posee au-dessus d'un
+ * titre. L'utilitaire reste au catalogue pour un vrai indicateur de direct,
+ * dans un produit, jamais pour decorer une page de vente. */
 @utility animate-ping-soft {
   animation: ping-soft 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
@@ -59,14 +65,16 @@
   animation: heartbeat 1.9s ease-in-out infinite;
 }
 
-/* Halo respirant : suit --color-primary, donc le turquoise de la maison dans
- * les deux modes. Un seul par ecran, sur l'appel a l'action qui compte. */
+/* Halo respirant : suit --color-primary, donc corail en clair comme en
+ * sombre. Un seul par ecran, sur le CTA que la page veut vraiment vendre. */
 @utility animate-glow-pulse {
   animation: glow-pulse 3.2s ease-in-out infinite;
 }
 
-/* Fait voyager un degrade dans son propre fond. Se marie avec
- * .text-gradient-shore ou tout fond en linear-gradient. */
+/* Fait voyager un degrade dans son propre fond. A reserver a un FOND en
+ * linear-gradient : le degrade pose sur du TEXTE (background-clip: text) est
+ * un refus nomme de docs/design.md, et l'utilitaire qui le posait a ete retire
+ * de global.css le 24 aout. */
 @utility animate-gradient-shift {
   background-size: 200% 200%;
   animation: gradient-shift 8s ease-in-out infinite;

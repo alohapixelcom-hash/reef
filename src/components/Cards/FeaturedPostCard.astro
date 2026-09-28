@@ -27,6 +27,8 @@ import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { fmt, formatDate, useTranslations, type Locale } from "@i18n";
 import type { ResolvedPost } from "@js/posts";
+import { marqueInterface } from "@moteur/cadre";
+import { annotationsDeLaFiche } from "@moteur/listes";
 import { annotation } from "@moteur/source";
 import { Image } from "astro:assets";
 import { topicTone } from "./topicTone";
@@ -56,6 +58,10 @@ const href = `${routes.posts}${slug}/`;
 const topicHref = `${routes.topics}${topicSlug}/`;
 const tone = topicTone[topic.data.accent];
 const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: minutes });
+// Moteur allume, en mode edition : le sujet et l'auteur portent les champs de
+// leurs fiches ; le temps de lecture, calcule, est marque comme de l'interface.
+const sujet = annotationsDeLaFiche(topic);
+const auteur = annotationsDeLaFiche(author);
 // La barre d'edition d'EmDash : la bande porte l'entree, le titre son champ,
 // comme PostCard et pour la meme raison (le lien du titre couvre la bande,
 // chapeau et couverture compris). Rien hors edition.
@@ -77,11 +83,12 @@ const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: m
         <a
           href={topicHref}
           class:list={["font-sans rounded-pill relative z-10 px-2.5 py-1 text-xs font-medium", tone.chip]}
+          {...sujet.champ("name")}
         >
           {topic.data.name}
         </a>
         <span class="text-muted-foreground font-sans text-xs">
-          <time datetime={post.data.pubDate.toISOString()}>
+          <time datetime={post.data.pubDate.toISOString()} {...annotation(post, "pub_date")}>
             {formatDate(post.data.pubDate, locale)}
           </time>
         </span>
@@ -93,16 +100,16 @@ const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: m
         </a>
       </Tag>
 
-      <p class="text-muted-foreground measure-prose text-lg leading-relaxed">
+      <p class="text-muted-foreground measure-prose text-lg leading-relaxed" {...annotation(post, "description")}>
         {post.data.description}
       </p>
 
       <div class="mt-2 flex flex-wrap items-center gap-4">
         <span class="flex items-center gap-2.5">
-          <Avatar name={author.data.name} src={author.data.avatar?.src} size="md" alt="" />
+          <Avatar name={author.data.name} src={author.data.avatar?.src} size="md" alt="" {...auteur.champ("avatar")} />
           <span class="flex flex-col">
-            <span class="text-foreground font-sans text-sm font-medium">{author.data.name}</span>
-            <span class="text-muted-foreground font-sans text-xs">{readLabel}</span>
+            <span class="text-foreground font-sans text-sm font-medium" {...auteur.champ("name")}>{author.data.name}</span>
+            <span class="text-muted-foreground font-sans text-xs" {...marqueInterface(Astro)}>{readLabel}</span>
           </span>
         </span>
         {/* Le bouton double le lien de carte : il ne sert qu'a annoncer l'action
@@ -133,6 +140,7 @@ const readLabel = minutes === 1 ? t.post.minReadOne : fmt(t.post.minRead, { n: m
             class="h-full min-h-56 w-full object-cover"
             loading="eager"
             decoding="async"
+            {...annotation(post, "cover")}
           />
         ) : (
           <div

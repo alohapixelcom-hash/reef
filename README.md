@@ -76,6 +76,11 @@ with `npx wrangler deploy` (see [DEPLOY.md](DEPLOY.md)).
 - **A dashboard card** (last published content, version served) and a
   **"Deploy everything"** button that empties the caches and rebuilds the
   prerendered pages through a Cloudflare Deploy Hook.
+- **The whole site from the back office** (since 3.4.0): menus, site settings,
+  posts per page, topics and authors, footer, photos, button addresses, SEO,
+  free pages, the not-found page, and the contact form's emails (Courriels
+  screens). The editor's guide is [docs/administrer.md](docs/administrer.md)
+  (French) and [docs/administer.md](docs/administer.md) (English).
 
 ```bash
 pnpm dev:moteur                                              # back office at http://localhost:4321/_emdash/admin

@@ -5,20 +5,26 @@
 // ses langues, sinon un agent conclut que la moitie du site n'existe pas. Le
 // fichier lui-meme reste redige en anglais, langue de travail des agents, mais
 // il liste et nomme les URLs de chaque langue.
-import siteData from "@config/siteData.json";
-import { localeMeta, localizePath, locales } from "@i18n";
+import { defaultLocale, localeMeta, localizePath, locales } from "@i18n";
 import { entrySlug } from "@i18n/content";
 import { getResolvedPosts, getSortedTopics } from "@js/posts";
+import { identite } from "@moteur/cadre";
+import { lireLaPage } from "@moteur/source";
+import { repliDuSite } from "@moteur/theme";
 import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async ({ site, url }) => {
   const base = site ?? url;
   const absolute = (path: string): string => new URL(path, base).href;
+  // Le nom et la description du site : les reglages et l'entree "site" de la
+  // langue par defaut, sinon siteData (moteur eteint : siteData).
+  const { cadre } = await lireLaPage(defaultLocale);
+  const marque = identite({ locals: { cadre } }, repliDuSite(defaultLocale));
 
   const lines = [
-    `# ${siteData.name}`,
+    `# ${marque.nom}`,
     "",
-    `> ${siteData.description}`,
+    `> ${marque.description}`,
     "",
     `This site is published in ${locales.length} languages: ` +
       locales

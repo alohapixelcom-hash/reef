@@ -57,6 +57,8 @@ const countLabel =
     : total === 1
       ? t.archive.countOne
       : fmt(t.archive.countLabel, { count: total });
+// Le compteur de billets est calcule : en mode edition, il est marque comme de l'interface.
+import { marqueInterface } from "@moteur/cadre";
 ---
 
 <section class:list={["container-page py-14 md:py-20", className]} data-slot="post-grid">
@@ -72,7 +74,7 @@ const countLabel =
     ) : (
       <Fragment>
         {countLabel && (
-          <p class="text-muted-foreground mb-8 font-sans text-sm tabular-nums">
+          <p class="text-muted-foreground mb-8 font-sans text-sm tabular-nums" {...marqueInterface(Astro)}>
             {countLabel}
             {totalPages > 1 && (
               <Fragment>
@@ -88,9 +90,9 @@ const countLabel =
           class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
           aria-label={t.archive.listLabel}
         >
-          {posts.map((entry) => (
+          {posts.map((entry, rang) => (
             <li class="flex">
-              <PostCard {entry} {locale} as={headingLevel} class="w-full" />
+              <PostCard {entry} {locale} as={headingLevel} class="w-full" prioritaire={rang === 0} />
             </li>
           ))}
         </ul>

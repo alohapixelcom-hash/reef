@@ -11,6 +11,7 @@ import PageHero from "@components/Sections/Global/PageHero.astro";
 import { getLocale, localePaths } from "@i18n";
 import { getResolvedPosts } from "@js/posts";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { imageDePartage } from "@moteur/cadre";
 import { annotationsDe } from "@moteur/annotations";
 import { propsDeLaPage } from "@moteur/chemins";
 import { textesDeLaPage } from "@moteur/textes";
@@ -32,17 +33,18 @@ const title = t.search.metaTitle;
 const description = t.search.metaDescription;
 ---
 
-<BaseLayout {title} {description} noindex>
+<BaseLayout {title} {description} noindex image={imageDePartage(Astro, "recherche")}>
   <Navbar />
 
   <main id="content">
     <PageHero
+      cle="recherche"
       edition={annotationsDe(Astro, "recherche")}
       eyebrow={t.search.eyebrow}
       title={t.search.title}
       accentWord={t.search.accent}
       lede={t.search.lede}
-      crumbs={[{ label: t.search.metaTitle }]}
+      crumbs={[{ label: t.search.crumb }]}
     />
 
     <Search {posts} />

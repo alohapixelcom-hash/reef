@@ -1263,8 +1263,20 @@ const IDENTIQUES: string[] = [
  * reecrits avec deux-points ou virgule ; le self-check exige un catalogue
  * complete sans aucun des deux tirets. Les cles gardent le tiret de l'anglais
  * d'origine, ecrit en echappement : c'est le texte que le moteur compare.
+ *
+ * "Select" : le catalogue d'EmDash le traduit par un nom, "Liste deroulante",
+ * alors que c'est le bouton qui valide le choix d'une image (logo, favicon,
+ * photo d'un champ). Un client qui choisit son logo doit lire "Choisir"
+ * (releve du 28 septembre 2026, fenetre "Choisir le logo").
+ *
+ * "Item added" et "Item updated" : traduits "Article ajoute" et "Article mis
+ * a jour", alors qu'ils saluent l'ajout d'un lien de menu (le meme ecran dit
+ * "Element supprime" a la suppression) : "Element", comme la suppression.
  */
 const MAISON_SIMPLES: Record<string, string> = {
+  Select: "Choisir",
+  "Item added": "Élément ajouté",
+  "Item updated": "Élément mis à jour",
   "Currently set \u2014 enter a new value to replace":
     "Valeur actuellement définie : saisissez une nouvelle valeur pour la remplacer",
   "Empty gallery \u2014 open settings to add images": "Galerie vide : ouvrez les paramètres pour ajouter des images",

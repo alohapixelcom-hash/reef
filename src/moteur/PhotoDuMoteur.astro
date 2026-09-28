@@ -1,0 +1,73 @@
+---
+// src/moteur/PhotoDuMoteur.astro - une photo choisie dans la mediatheque du back office, rendue comme le theme rend les siennes : plusieurs largeurs, WebP, point focal, texte alternatif.
+//
+// QUAND UN CHAMP IMAGE EST REMPLI, la section rend ce composant a la place
+// de sa photo livree ; quand il est vide, elle rend sa photo comme avant, et
+// le HTML ne change pas. La valeur vient de cadre.ts (media()) : l'adresse
+// du fichier (/_emdash/api/media/file/...), ses dimensions, son texte
+// alternatif et son point focal quand la mediatheque en a un.
+//
+// L'OPTIMISATION passe par astro:assets, comme les photos du theme : le
+// moteur autorise sa propre mediatheque dans image.remotePatterns (voir
+// siteUrl dans moteur.config.mjs), et son point /_image lit le fichier dans
+// le stockage sans le telecharger. Sans dimensions connues, l'image est
+// servie telle quelle. Aucune classe nouvelle ici : la classe est celle de la
+// photo qu'elle remplace, passee par l'appelant.
+import { getImage } from "astro:assets";
+import { type Media, positionFocale } from "./cadre";
+
+interface Props {
+  media: Media;
+  class?: string;
+  /** Les largeurs demandees, comme pour la photo du theme qu'elle remplace. */
+  widths?: number[];
+  sizes?: string;
+  loading?: "eager" | "lazy";
+  fetchpriority?: "high" | "low" | "auto";
+  /** Vide par defaut : la photo est decorative, le titre du bloc dit deja ce qu'elle montre. */
+  alt?: string;
+  /** Un style en ligne de l'appelant (le point focal s'y ajoute). */
+  style?: string;
+  /** Les attributs de la barre d'edition (champ image), vides hors edition. */
+  attributs?: Record<string, string>;
+}
+
+const { media, class: className, widths = [720, 1200, 1920], sizes = "100vw", loading = "lazy", fetchpriority, alt = "", style, attributs = {} } = Astro.props;
+
+const absolue = new URL(media.src ?? "", Astro.site ?? Astro.url).href;
+const largeur = typeof media.width === "number" ? media.width : undefined;
+const hauteur = typeof media.height === "number" ? media.height : undefined;
+
+// Les largeurs demandees ne depassent pas celle du fichier : au-dela on
+// etirerait, en payant les octets en plus.
+const largeurs = largeur ? widths.filter((w) => w <= largeur) : [];
+let src = media.src ?? "";
+let srcset: string | undefined;
+if (largeur && hauteur) {
+  try {
+    const image = await getImage({ src: absolue, width: largeur, height: hauteur, widths: largeurs.length > 0 ? largeurs : [largeur], sizes, format: "webp", quality: 75 });
+    src = image.src;
+    srcset = image.srcSet.attribute || undefined;
+  } catch {
+    // Le service d'image refuse la source (mediatheque non autorisee) : le fichier est servi tel quel.
+  }
+}
+const focale = positionFocale(media);
+const styles = [style, focale ? `object-position:${focale}` : null].filter(Boolean).join(";") || undefined;
+---
+
+<img
+  src={src}
+  srcset={srcset}
+  sizes={srcset ? sizes : undefined}
+  width={largeur}
+  height={hauteur}
+  alt={alt}
+  loading={loading}
+  fetchpriority={fetchpriority}
+  decoding="async"
+  class={className}
+  style={styles}
+  aria-hidden={alt === "" ? "true" : undefined}
+  {...attributs}
+/>

@@ -45,6 +45,11 @@ export const frPages: Pick<
     aboutLede:
       "L'un construit, l'une mesure, l'autre dessine, et tous les trois écrivent. Trois ou quatre projets par an, et tout ce qu'ils nous apprennent finit ici.",
     aboutCta: "Notre façon de travailler",
+    /** Le surtitre et le second bouton de la scene filmee de l'accueil : leurs propres textes, distincts de la page A propos et du menu. */
+    aboutEyebrow: "À propos",
+    aboutContact: "Contact",
+    /** Le nom de la bande defilante des sujets, sous l'ouverture, pour les lecteurs d'ecran. */
+    marqueeLabel: "Tous les sujets",
   },
 
   // --- A propos ------------------------------------------------------------
@@ -52,6 +57,8 @@ export const frPages: Pick<
     metaTitle: "À propos du studio",
     metaDescription:
       "Qui tient Reef Notes, comment le studio travaille, ce que nous acceptons et ce que nous refusons, et pourquoi les notes de chantier sont publiées plutôt que classées.",
+    /** Le nom de la page dans le fil d'Ariane et son balisage : court, distinct du titre donne aux moteurs de recherche. */
+    crumb: "À propos du studio",
     eyebrow: "À propos",
     title: "Un studio à trois qui note tout",
     accent: "note",
@@ -96,6 +103,8 @@ export const frPages: Pick<
     metaTitle: "Contact",
     metaDescription:
       "Une demande de projet, une correction sur un article, une question sur ce que nous avons publié. Une seule boîte, lue par une personne, réponse sous deux jours ouvrés.",
+    /** Le nom de la page dans le fil d'Ariane et son balisage : court, distinct du titre donne aux moteurs de recherche. */
+    crumb: "Contact",
     eyebrow: "Contact",
     title: "Écrivez-nous, nous lisons tout",
     accent: "tout",
@@ -131,6 +140,10 @@ export const frPages: Pick<
     metaTitle: "Sujets",
     metaDescription:
       "Tous les sujets couverts par Reef Notes : artisanat du front-end, performance, typographie et gestion d'un petit studio.",
+    /** Le nom de la page dans le fil d'Ariane et son balisage : court, distinct du titre donne aux moteurs de recherche. */
+    crumb: "Sujets",
+    /** Le surtitre de la page d'un sujet, distinct de celui de la liste des sujets. */
+    pageEyebrow: "Sujets",
     eyebrow: "Sujets",
     title: "Cinq fils que nous tirons sans cesse",
     accent: "fils",
@@ -149,6 +162,8 @@ export const frPages: Pick<
     metaTitle: "Auteurs",
     metaDescription:
       "Les personnes qui écrivent Reef Notes : ce qu'elles font au quotidien, où les retrouver ailleurs, et tout ce qu'elles ont publié ici.",
+    /** Le nom de la page dans le fil d'Ariane et son balisage : court, distinct du titre donne aux moteurs de recherche. */
+    crumb: "Auteurs",
     eyebrow: "Auteurs",
     title: "Qui écrit ici",
     accent: "écrit",
@@ -169,6 +184,8 @@ export const frPages: Pick<
     metaTitle: "Recherche",
     metaDescription:
       "Cherchez dans tous les articles de Reef Notes par titre, résumé, sujet ou étiquette. La recherche tourne dans votre navigateur : rien n'est envoyé à un serveur, rien n'est enregistré.",
+    /** Le nom de la page dans le fil d'Ariane et son balisage : court, distinct du titre donne aux moteurs de recherche. */
+    crumb: "Recherche",
     eyebrow: "Recherche",
     title: "Retrouver un article",
     accent: "Retrouver",
@@ -207,6 +224,14 @@ export const frPages: Pick<
   // vaut pas un avis juridique, et sa version anglaise pas davantage : les deux
   // disent la meme chose, aucune ne fait foi sur l'autre.
   legal: {
+    /** Les noms des trois pages legales dans le fil d'Ariane, et le surtitre des deux documents : distincts des titres et de la page des mentions. */
+    crumb: "Mentions légales",
+    privacyCrumb: "Politique de confidentialité",
+    termsCrumb: "Conditions d'utilisation",
+    privacyEyebrow: "Légal",
+    termsEyebrow: "Légal",
+    /** La date de derniere revision des mentions legales (AAAA-MM-JJ). */
+    updated: "2026-09-24",
     eyebrow: "Légal",
     title: "Mentions légales",
     description: "Qui publie ce site, qui l'héberge, et comment joindre l'éditeur.",

@@ -15,6 +15,9 @@ import { Marquee } from "@components/ui/marquee";
 import { topicTone, type TopicAccent } from "@components/Cards/topicTone";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, useTranslations } from "@i18n";
+import { annotationsDe, styleDuBloc } from "@moteur/annotations";
+import { annotationsDeLaFiche } from "@moteur/listes";
+import Pastilles from "@moteur/Pastilles.astro";
 import { entrySlug } from "@i18n/content";
 import type { CollectionEntry } from "astro:content";
 
@@ -26,7 +29,10 @@ interface Props {
 const { topics, counts } = Astro.props;
 
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+const t = useTranslations(Astro);
+// Moteur allume, en mode edition : l'entree "bande-sujets" (le bloc, masquable)
+// et, sur chaque nom, la fiche du sujet dans la collection "sujets".
+const ed = annotationsDe(Astro, "bande-sujets");
 const routes = getSiteRoutes(locale);
 
 // La bande boucle sur elle-meme : avec cinq sujets et un ecran large, une
@@ -48,11 +54,13 @@ const items = [...topics, ...topics, ...topics].map((topic, i) => {
     count: counts[slug] ?? 0,
     tone: topicTone[topic.data.accent as TopicAccent],
     filler: i >= topics.length,
+    fiche: annotationsDeLaFiche(topic),
   };
 });
 ---
 
-<section class="border-border bg-card/50 border-y" aria-label={t.topics.allTopics}>
+<section class="border-border bg-card/50 border-y" aria-label={t.home.marqueeLabel} {...ed.entree} style={styleDuBloc(Astro, "bande-sujets")}>
+  <Pastilles cle="bande-sujets" masquable />
   <Marquee speed="slow" gap="lg" fade class="py-5">
     {
       items.map((item) => (
@@ -61,6 +69,7 @@ const items = [...topics, ...topics, ...topics].map((topic, i) => {
           class="group/topic flex shrink-0 items-baseline gap-3 whitespace-nowrap"
           inert={item.filler}
           aria-hidden={item.filler ? "true" : undefined}
+          {...item.fiche.entree}
         >
           {/* Le point prend la couleur du sujet : c'est le seul endroit de la
               bande ou la couleur classe, et elle ne classe rien d'autre. */}
@@ -68,7 +77,7 @@ const items = [...topics, ...topics, ...topics].map((topic, i) => {
             class:list={["size-1.5 shrink-0 self-center rounded-full", item.tone.dot]}
             aria-hidden="true"
           />
-          <span class="font-display group-hover/topic:text-primary text-foreground text-lg font-semibold tracking-tight transition-colors duration-200 md:text-xl">
+          <span class="font-display group-hover/topic:text-primary text-foreground text-lg font-semibold tracking-tight transition-colors duration-200 md:text-xl" {...item.fiche.champ("name")}>
             {item.name}
           </span>
           <span class="text-muted-foreground font-sans text-xs tabular-nums">{item.count}</span>

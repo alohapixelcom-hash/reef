@@ -15,13 +15,34 @@ import { LocaleSwitcher } from "@components/ui/locale-switcher";
 import { Sheet, SheetClose, SheetHeader, SheetTitle, SheetTrigger } from "@components/ui/sheet";
 import { ThemeToggle } from "@components/ui/theme-toggle";
 import { getNavData, getSiteRoutes } from "@config/navData.json.ts";
-import siteData from "@config/siteData.json";
 import { getLocale, useTranslations } from "@i18n";
+import { enEdition } from "@moteur/annotations";
+import { liensDuMenu, marqueCadre } from "@moteur/cadre";
+import { ACTIONS, PRINCIPAL, TIROIR } from "@moteur/menus";
+import { identiteDuSite } from "@moteur/theme";
 
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
-const navData = getNavData(locale);
+const t = useTranslations(Astro);
 const routes = getSiteRoutes(locale);
+// L'inscription vit dans le pied de page, present sur toutes les pages : une
+// ancre suffit et ne depend d'aucune langue.
+const subscribeHref = "#newsletter";
+// Moteur allume, les liens viennent des menus du back office (un par langue)
+// et le nom et le logo des reglages du site ; un menu absent, vide ou d'une
+// autre langue rend les liens des fichiers, et moteur eteint rien ne change
+// (src/moteur/cadre.ts). La barre ne porte AUCUNE annotation de la barre
+// d'edition : elle vient avant <main>, et la premiere annotation du document
+// decide de ce que publie le bouton Publier. En mode edition, une marque
+// data-aloha-cadre dit seulement d'ou vient chaque lien ; le panneau "Cadre du
+// site" mene a l'ecran qui le change.
+const marque = identiteDuSite(Astro, locale);
+const navData = liensDuMenu(Astro, PRINCIPAL, locale, getNavData(locale));
+const tiroir = liensDuMenu(Astro, TIROIR, locale, [
+  { text: t.nav.authors, href: routes.authors },
+  { text: t.nav.search, href: routes.search },
+]);
+const actions = liensDuMenu(Astro, ACTIONS, locale, [{ text: t.nav.subscribe, href: subscribeHref, bouton: true }]);
+const cible = (target?: string) => (target ? { target, rel: target === "_blank" ? "noopener" : undefined } : {});
 
 // Etat actif : correspondance exacte ou par prefixe, pour qu'un billet allume
 // "Posts". La racine ne compte jamais comme prefixe, sinon elle serait active
@@ -44,10 +65,6 @@ const navLink = [
   "font-sans text-[0.9rem] font-medium whitespace-nowrap text-current",
   "transition-colors duration-200 hover:bg-current/8",
 ].join(" ");
-
-// L'inscription vit dans le pied de page, present sur toutes les pages : une
-// ancre suffit et ne depend d'aucune langue.
-const subscribeHref = "#newsletter";
 ---
 
 {/* Le lien d'evitement est le premier element focalisable du document. Il ne
@@ -93,12 +110,19 @@ const subscribeHref = "#newsletter";
         class="flex min-h-11 shrink-0 items-center gap-2 text-current"
         aria-label={t.nav.brandHome}
         data-header-brand
+        {...marqueCadre(Astro, "reglages")}
       >
-        <Icon name="wave" size={20} class="text-primary" />
-        <span class="font-display text-lg font-semibold tracking-tight">{siteData.name}</span>
+        {
+          marque.logo ? (
+            <img src={marque.logo.url} alt="" width={marque.logo.width} height={marque.logo.height} style="height:1.5rem;width:auto" />
+          ) : (
+            <Icon name="wave" size={20} class="text-primary" />
+          )
+        }
+        <span class="font-display text-lg font-semibold tracking-tight">{marque.nom}</span>
       </a>
 
-      <ul class="mx-auto hidden items-center gap-0.5 lg:flex">
+      <ul class="mx-auto hidden items-center gap-0.5 lg:flex" {...marqueCadre(Astro, `menu:${PRINCIPAL}`)}>
         {
           navData.map((item) => (
             <li>
@@ -106,6 +130,7 @@ const subscribeHref = "#newsletter";
                 href={item.href}
                 class:list={["inline-flex", navLink, isActive(item.href) && "bg-current/8 font-semibold"]}
                 aria-current={isActive(item.href) ? "page" : undefined}
+                {...cible(item.target)}
               >
                 {item.text}
               </a>
@@ -124,9 +149,17 @@ const subscribeHref = "#newsletter";
         </a>
         <LocaleSwitcher class="max-sm:hidden" />
         <ThemeToggle class="text-current hover:bg-current/8" label={t.nav.toggleTheme} />
-        <Button href={subscribeHref} variant="primary" size="sm" class="hidden sm:inline-flex">
-          {t.nav.subscribe}
-        </Button>
+        {
+          actions.map((item) =>
+            item.bouton ? (
+              <Button href={item.href} variant="primary" size="sm" class="hidden sm:inline-flex" {...cible(item.target)} {...marqueCadre(Astro, `menu:${ACTIONS}`)}>
+                {item.text}
+              </Button>
+            ) : (
+              <a href={item.href} class:list={["hidden sm:inline-flex", navLink]} {...cible(item.target)} {...marqueCadre(Astro, `menu:${ACTIONS}`)}>{item.text}</a>
+            ),
+          )
+        }
         <SheetTrigger
           for="mobile-nav"
           variant="ghost"
@@ -147,21 +180,28 @@ const subscribeHref = "#newsletter";
   <SheetClose />
   <SheetHeader>
     <SheetTitle id="mobile-nav-title" class="flex items-center gap-2">
-      <Icon name="wave" size={20} class="text-primary" />
-      {siteData.name}
+      {
+        marque.logo ? (
+          <img src={marque.logo.url} alt="" width={marque.logo.width} height={marque.logo.height} style="height:1.5rem;width:auto" />
+        ) : (
+          <Icon name="wave" size={20} class="text-primary" />
+        )
+      }
+      {enEdition(Astro) ? <span {...marqueCadre(Astro, "reglages")}>{marque.nom}</span> : marque.nom}
     </SheetTitle>
   </SheetHeader>
 
   <nav aria-label={t.nav.mobileLabel}>
-    <ul class="flex flex-col">
+    <ul class="flex flex-col" {...marqueCadre(Astro, `menu:${TIROIR}`)}>
       {
-        [...navData, { text: t.nav.authors, href: routes.authors }, { text: t.nav.search, href: routes.search }].map(
+        [...navData, ...tiroir].map(
           (item) => (
             <li>
               <a
                 href={item.href}
                 class="font-display text-foreground hover:bg-muted flex min-h-12 items-center rounded-card px-3 text-lg font-semibold"
                 aria-current={isActive(item.href) ? "page" : undefined}
+                {...cible(item.target)}
               >
                 {item.text}
               </a>
@@ -172,8 +212,14 @@ const subscribeHref = "#newsletter";
     </ul>
   </nav>
 
-  <div class="mt-auto flex flex-col gap-4">
-    <Button href={subscribeHref} variant="primary" size="lg">{t.nav.subscribe}</Button>
+  <div class="mt-auto flex flex-col gap-4" {...marqueCadre(Astro, `menu:${ACTIONS}`)}>
+    {
+      [...actions.filter((item) => item.bouton), ...actions.filter((item) => !item.bouton)].map((item) => (
+        <Button href={item.href} variant={item.bouton ? "primary" : "outline"} size="lg" {...cible(item.target)}>
+          {item.text}
+        </Button>
+      ))
+    }
     {/* Sur mobile le selecteur vit dans le tiroir : la barre garde sa place
         pour le menu et l'abonnement, qui comptent davantage a cette largeur. */}
     <LocaleSwitcher variant="inline" class="self-center sm:hidden" />

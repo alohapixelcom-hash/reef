@@ -10,6 +10,7 @@
 import { Breadcrumb } from "@components/ui/breadcrumb";
 import { getLocale, localizePath, useTranslations } from "@i18n";
 import { annotationsDe, type AnnotationsDeLEntree } from "@moteur/annotations";
+import Pastilles from "@moteur/Pastilles.astro";
 import { tv, type VariantProps } from "tailwind-variants";
 
 export const pageHero = tv({
@@ -44,7 +45,7 @@ export const pageHero = tv({
   defaultVariants: { align: "left" },
 });
 
-type Crumb = { label: string; href?: string };
+type Crumb = { label: string; href?: string; attributs?: Record<string, string> };
 
 type Props = VariantProps<typeof pageHero> & {
   /** Surtitre court au-dessus du titre : nomme la section, jamais une phrase. */
@@ -61,9 +62,11 @@ type Props = VariantProps<typeof pageHero> & {
   edition?: AnnotationsDeLEntree;
   /** Raccourci d'edition : le slug de la section de la base, quand elle porte tous les textes du hero. */
   section?: string;
+  /** Moteur allume, en mode edition : l'entree qui porte la tete de la page, pour la pastille de son image de partage (champ meta_image). */
+  cle?: string;
 };
 
-const { eyebrow, title, accentWord, lede, crumbs = [], align, class: className, section = "" } = Astro.props;
+const { eyebrow, title, accentWord, lede, crumbs = [], align, class: className, section = "", cle } = Astro.props;
 const edition = Astro.props.edition ?? annotationsDe(Astro, section);
 const {
   root,
@@ -77,9 +80,22 @@ const {
 // Le premier maillon est toujours l'accueil : il est ajoute ici, dans la bonne
 // langue et vers la bonne racine, pour qu'aucune page n'ait a y penser.
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+const t = useTranslations(Astro);
+// Moteur allume, en mode edition : "Accueil" vient de l'entree "en-tete"
+// (commune a tout le site), le nom de la page du champ "breadcrumb" de la
+// section de la page, sauf quand l'appelant nomme lui-meme le champ.
+// Une page libre (collection "pages") n'a pas de champ "breadcrumb" : son nom
+// dans le fil d'Ariane est son titre.
+const accueil = annotationsDe(Astro, "en-tete").champ("eyebrow");
+const deLaSection = (edition.entree["data-emdash-ref"] ?? "").includes('"collection":"sections"');
+const champDuNom = edition.champ(deLaSection ? "breadcrumb" : "title");
 const trail =
-  crumbs.length > 0 ? [{ label: t.common.home, href: localizePath("/", locale) }, ...crumbs] : [];
+  crumbs.length > 0
+    ? [
+        { label: t.common.home, href: localizePath("/", locale), attributs: accueil },
+        ...crumbs.map((crumb, i) => ({ ...crumb, attributs: crumb.attributs ?? (i === crumbs.length - 1 ? champDuNom : {}) })),
+      ]
+    : [];
 
 // Decoupe du titre autour du mot accentue, insensible a la casse.
 const accent = accentWord?.trim() ?? "";
@@ -90,6 +106,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
 ---
 
 <section class={root({ class: className })} data-slot="page-hero" {...edition.entree}>
+  {cle && <Pastilles cle={cle} images={[{ champ: "meta_image", sorte: "partage" }]} bas />}
   {/* PAS DE HALO. Un disque flou derivait ici, dans l'aigue-marine de la
       maison, pour rattacher une page interieure a l'accueil. C'est la
       signature des pages fabriquees a la chaine, et la maison l'interdit. Le

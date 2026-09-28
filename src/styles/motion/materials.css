@@ -12,7 +12,7 @@
  *      permanence, un gris plat devient illisible : on remonte le contraste et
  *      on ajoute une nuance de graisse plutot que de baisser l'opacite.
  *   3. Tout le monde n'en veut pas. Trois preferences systeme existent, et un
- *      theme qui les ignore est un theme qui casse chez une partie de ses
+ *      theme vendu qui les ignore est un theme qui casse chez une partie de ses
  *      utilisateurs finaux.
  * ------------------------------------------------------------------------- */
 
@@ -69,19 +69,22 @@
 /* --- Vibrance -------------------------------------------------------------
  * Le texte secondaire pose sur du verre ne doit PAS etre le meme gris que sur
  * une surface opaque : le fond bouge sous lui, et un gris a 60% disparait des
- * qu'une zone claire passe dessous. On garde donc une opacite haute et on
- * compense la perte de presence par un demi-cran de graisse et un souffle de
- * chasse, ce qui se lit comme du texte pose sur du verre et non comme du texte
- * delave. */
+ * qu'une zone claire passe dessous. On compense donc la perte de presence par
+ * un demi-cran de graisse et un souffle de chasse, ce qui se lit comme du
+ * texte pose sur du verre et non comme du texte delave.
+ *
+ * AUCUNE couleur ici, et c est le point. Cette classe habille du texte pose
+ * sur une image : elle epaissit et desserre, rien de plus. Elle a porte
+ * color: color-mix(in oklab, currentColor 88%, transparent), ce qui PARAIT
+ * inoffensif et ne l est pas : dans une declaration color, currentColor se
+ * resout sur la couleur HERITEE, donc sur celle du PARENT. La declaration
+ * jetait ainsi l utilitaire de couleur pose sur l element (le text-white/85
+ * du chapeau) et reprenait celle du parent. En navigation privee localStorage
+ * est vide, la page rend en theme CLAIR, le parent est l encre sombre : le
+ * chapeau et le sur-titre de la sequence filmee disparaissaient sur la
+ * photographie. La couleur vient de l utilitaire pose sur l element, toujours.
+ * Ne remettre cette ligne dans aucun des deux blocs .vibrant de ce fichier. */
 .vibrant {
-  /* AUCUNE couleur ici, et c est le point. Cette classe habille du texte pose
-   * sur une image : elle epaissit et desserre, rien de plus. Elle a longtemps
-   * porte color: color-mix(in oklab, currentColor 88%, transparent), ce qui
-   * PARAIT inoffensif et ne l est pas : currentColor se resout sur la couleur
-   * HERITEE, donc la declaration jetait le text-white/85 pose sur l element et
-   * reprenait la couleur du parent. Sur une page en theme clair, le parent est
-   * l encre sombre : le texte devenait invisible sur la photographie. La
-   * couleur vient de l utilitaire, toujours. */
   font-weight: 500;
   letter-spacing: 0.006em;
 }

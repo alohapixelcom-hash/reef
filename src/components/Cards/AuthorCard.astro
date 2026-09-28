@@ -8,6 +8,8 @@
 import { Icon } from "@components/svg/icons";
 import { Avatar } from "@components/ui/avatar";
 import { fmt, useTranslations, type Locale } from "@i18n";
+import { annotationsDeLaFiche } from "@moteur/listes";
+import { marqueInterface } from "@moteur/cadre";
 import type { CollectionEntry } from "astro:content";
 
 type Props = {
@@ -40,6 +42,8 @@ const {
 const t = useTranslations(locale);
 const countLabel = count === 1 ? t.authors.countOne : fmt(t.authors.countLabel, { count });
 const links = author.data.links;
+// Moteur allume, en mode edition : la fiche de l'auteur (collection "auteurs").
+const fiche = annotationsDeLaFiche(author);
 ---
 
 <article
@@ -50,29 +54,30 @@ const links = author.data.links;
     className,
   ]}
   data-slot="author-card"
+  {...fiche.entree}
 >
   <div class="flex items-center gap-4">
-    <Avatar name={author.data.name} src={author.data.avatar?.src} size={avatarSize} alt="" />
+    <Avatar name={author.data.name} src={author.data.avatar?.src} size={avatarSize} alt="" {...fiche.champ("avatar")} />
     <div class="flex min-w-0 flex-col gap-0.5">
       <Tag class="font-display text-foreground text-xl font-semibold tracking-tight">
-        <a href={href} class="after:absolute after:inset-0 after:content-['']">
+        <a href={href} class="after:absolute after:inset-0 after:content-['']" {...fiche.champ("name")}>
           {author.data.name}
         </a>
       </Tag>
-      <p class="text-muted-foreground font-sans text-sm">{author.data.role}</p>
+      <p class="text-muted-foreground font-sans text-sm" {...fiche.champ("role")}>{author.data.role}</p>
     </div>
   </div>
 
-  <p class="text-muted-foreground text-[0.95rem] leading-relaxed">{author.data.bio}</p>
+  <p class="text-muted-foreground text-[0.95rem] leading-relaxed" {...fiche.champ("bio")}>{author.data.bio}</p>
 
   <div class="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
-    <span class="bg-muted text-muted-foreground font-sans rounded-pill px-2.5 py-1 text-xs font-medium">
+    <span class="bg-muted text-muted-foreground font-sans rounded-pill px-2.5 py-1 text-xs font-medium" {...marqueInterface(Astro)}>
       {countLabel}
     </span>
 
     {
       showLinks && links.length > 0 && (
-        <ul class="flex flex-wrap items-center gap-3" aria-label={t.authors.linksLabel}>
+        <ul class="flex flex-wrap items-center gap-3" aria-label={t.authors.linksLabel} {...fiche.champ("links")}>
           {links.map((link) => (
             <li>
               {/* z-10 : ces liens sortent vers l'exterieur et doivent passer

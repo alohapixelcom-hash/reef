@@ -342,7 +342,14 @@ export const LISIBILITE = ({ TARGET_MIN }) => {
   const h1 = [...document.querySelectorAll("h1")].filter(visible);
   if (h1.length === 0) add("titre", "aucun h1 sur la page");
   if (h1.length > 1) add("titre", `${h1.length} h1 sur la page, il en faut un`);
-  if (h1.length === 1) {
+  // LE BANDEAU DES PAGES INTERIEURES EST L'EXCEPTION, ET ELLE EST VOULUE.
+  // alohapixel.com ouvre chaque page interieure sur une bande sombre de 277 px
+  // avec un titre de 40 px, puis des sections a 72-90 px : c'est la
+  // composition du site, relevee et reproduite (PageHero.astro), et l'editeur
+  // l'a confirmee le 4 septembre 2026 en montrant la page d'origine. Un h1
+  // pose dans ce bandeau n'est donc pas compare a ses h2.
+  const dansBandeau = h1.length === 1 && !!h1[0].closest('[data-slot="page-hero"]');
+  if (h1.length === 1 && !dansBandeau) {
     const size = parseFloat(getComputedStyle(h1[0]).fontSize);
     for (const h2 of [...document.querySelectorAll("h2")].filter(visible).filter(isSectionTitle)) {
       const s2 = parseFloat(getComputedStyle(h2).fontSize);

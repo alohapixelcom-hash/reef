@@ -13,6 +13,7 @@ import { getLocale, localePaths, localizePath } from "@i18n";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { annotationsDe } from "@moteur/annotations";
+import { argumentDe, imageDePartage } from "@moteur/cadre";
 import { propsDeLaPage } from "@moteur/chemins";
 import { textesDeLaPage } from "@moteur/textes";
 
@@ -27,24 +28,26 @@ if (demande instanceof Response) return demande;
 // confidentialite et aux conditions, ce document n'a pas d'entree dans
 // src/config/legalData.json.ts. C'est la ligne a changer le jour ou le texte
 // change, et la seule.
-const LEGAL_UPDATED = "2026-09-24";
-
 const locale = getLocale(Astro);
 // Les textes rediges de la page : ceux de la base moteur allume (docs/moteur.md),
 // poses sur la requete pour ses composants.
 const t = await textesDeLaPage(Astro);
 
+const mentions = annotationsDe(Astro, "mentions-legales");
+// L'ancre de chaque clause : celle que l'editeur a donnee (sous-champ
+// "anchor"), sinon celle que le titre donne, comme avant.
+const ancres = t.legal.sections.map((_, rang) => argumentDe(Astro, "mentions-legales", rang).anchor as string | undefined);
 const title = t.legal.title;
 const description = t.legal.description;
 
 const base = Astro.site ?? Astro.url;
 const crumbs = breadcrumbList([
   { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
-  { name: t.legal.title, url: new URL(localizePath("/legal/", locale), base).href },
+  { name: t.legal.crumb, url: new URL(localizePath("/legal/", locale), base).href },
 ]);
 ---
 
-<BaseLayout {title} {description}>
+<BaseLayout {title} {description} image={imageDePartage(Astro, "mentions-legales")}>
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
   </Fragment>
@@ -53,20 +56,23 @@ const crumbs = breadcrumbList([
 
   <main id="content">
     <PageHero
-      edition={annotationsDe(Astro, "mentions-legales")}
+      cle="mentions-legales"
+      edition={mentions}
       eyebrow={t.legal.eyebrow}
       title={t.legal.title}
       lede={t.legal.description}
-      crumbs={[{ label: t.legal.title }]}
+      crumbs={[{ label: t.legal.crumb }]}
     />
 
     <LegalArticle
       sections={t.legal.sections}
-      updated={LEGAL_UPDATED}
+      updated={t.legal.updated}
       updatedTemplate={t.legal.lastUpdated}
       tocLabel={t.legal.toc}
       backToTopLabel={t.legal.backToTop}
-      annotationDesClauses={annotationsDe(Astro, "mentions-legales").champ("arguments")}
+      annotationDeLaDate={mentions.champ("revised")}
+      annotationDesClauses={mentions.champ("arguments")}
+      {ancres}
       {locale}
     />
   </main>

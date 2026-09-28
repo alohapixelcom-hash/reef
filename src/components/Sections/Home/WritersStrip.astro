@@ -14,7 +14,10 @@ import { Avatar } from "@components/ui/avatar";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { fmt, getLocale, useTranslations } from "@i18n";
-import { annotationsDe } from "@moteur/annotations";
+import { annotationsDe, styleDuBloc } from "@moteur/annotations";
+import { lienDe, marqueInterface } from "@moteur/cadre";
+import Pastilles from "@moteur/Pastilles.astro";
+import { annotationsDeLaFiche } from "@moteur/listes";
 import { entrySlug } from "@i18n/content";
 import type { CollectionEntry } from "astro:content";
 
@@ -29,6 +32,8 @@ const locale = getLocale(Astro);
 const t = useTranslations(Astro);
 const ed = annotationsDe(Astro, "signatures");
 const routes = getSiteRoutes(locale);
+// L'adresse du bouton : celle que l'editeur a saisie (entree "signatures"), sinon la page prevue par le theme.
+const lien = lienDe(Astro, "signatures", "cta_link") ?? routes.authors;
 
 // Une signature sans billet publie n'a rien a faire sur l'accueil : la page
 // auteur existe, elle attend simplement son premier texte.
@@ -40,7 +45,9 @@ const active = authors.filter((author) => (counts[entrySlug(author.id)] ?? 0) > 
   aria-labelledby="writers-title"
   data-slot="writers-strip"
   {...ed.entree}
+  style={styleDuBloc(Astro, "signatures")}
 >
+  <Pastilles cle="signatures" liens={[["cta_link", routes.authors]]} masquable />
   <div class="container-page py-16 md:py-24">
     <SectionHeader
       as="h2"
@@ -57,8 +64,9 @@ const active = authors.filter((author) => (counts[entrySlug(author.id)] ?? 0) > 
           const slug = entrySlug(author.id);
           const count = counts[slug] ?? 0;
           const countLabel = count === 1 ? t.authors.countOne : fmt(t.authors.countLabel, { count });
+          const fiche = annotationsDeLaFiche(author);
           return (
-            <li class="group relative grid items-start gap-x-6 gap-y-3 py-7 sm:grid-cols-[auto_minmax(0,1fr)_auto] md:py-8">
+            <li class="group relative grid items-start gap-x-6 gap-y-3 py-7 sm:grid-cols-[auto_minmax(0,1fr)_auto] md:py-8" {...fiche.entree}>
               {/* Le portrait garde sa colonne sur telephone aussi : c'est lui
                   qui distingue une ligne de la suivante quand le texte, lui,
                   se ressemble d'une signature a l'autre. */}
@@ -68,23 +76,24 @@ const active = authors.filter((author) => (counts[entrySlug(author.id)] ?? 0) > 
                 size="xl"
                 alt=""
                 class="size-14 sm:size-20"
+                {...fiche.champ("avatar")}
               />
 
               <div class="flex min-w-0 flex-col gap-2">
                 <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <h3 class="font-display text-foreground text-xl font-semibold tracking-tight">
-                    <a href={`${routes.authors}${slug}/`} class="after:absolute after:inset-0 after:content-['']">
+                    <a href={`${routes.authors}${slug}/`} class="after:absolute after:inset-0 after:content-['']" {...fiche.champ("name")}>
                       {author.data.name}
                     </a>
                   </h3>
-                  <p class="text-muted-foreground font-sans text-sm">{author.data.role}</p>
+                  <p class="text-muted-foreground font-sans text-sm" {...fiche.champ("role")}>{author.data.role}</p>
                 </div>
 
-                <p class="text-muted-foreground measure-wide text-[0.95rem] leading-relaxed">
+                <p class="text-muted-foreground measure-wide text-[0.95rem] leading-relaxed" {...fiche.champ("bio")}>
                   {author.data.bio}
                 </p>
 
-                <p class="text-muted-foreground font-sans text-xs font-semibold tracking-[0.14em] uppercase">
+                <p class="text-muted-foreground font-sans text-xs font-semibold tracking-[0.14em] uppercase" {...marqueInterface(Astro)}>
                   {countLabel}
                 </p>
               </div>
@@ -107,7 +116,7 @@ const active = authors.filter((author) => (counts[entrySlug(author.id)] ?? 0) > 
     {/* Fer a gauche : apres la liste, l'oeil revient a la marge, et c'est la
         qu'on lui tend la suite. Rien sur cette page ne se range au centre. */}
     <div class="mt-10 flex justify-start">
-      <Button href={routes.authors} variant="ghost" size="md" {...ed.champ("cta")}>
+      <Button href={lien} variant="ghost" size="md" {...ed.champ("cta")}>
         {t.home.authorsCta}
         <Icon name="arrow-right" size={17} />
       </Button>

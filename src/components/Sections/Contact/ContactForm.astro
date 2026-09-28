@@ -1,0 +1,115 @@
+---
+// src/components/Sections/Contact/ContactForm.astro - le formulaire de contact : ecrit, accessible, branche sur l'extension Courriels quand le moteur l'est.
+//
+// Build statique : il n'envoie rien, ni action ni methode (voir l'en-tete de
+// la page contact.astro). Moteur allume, deux branchements, dans cet ordre :
+//   - les courriels du back office (ecran "Courriels" : adresse d'expedition
+//     et destinataire du contact reglees) : le formulaire poste vers
+//     l'extension Courriels, sans script, et la page affiche au retour la
+//     phrase du resultat ;
+//   - sinon, l'adresse d'un service externe saisie dans l'entree "site" de la
+//     langue (champ form_contact).
+// Aucune adresse n'est ecrite ici (src/moteur/extensions/courriels/).
+import { Icon } from "@components/svg/icons";
+import { Button } from "@components/ui/button";
+import { Input } from "@components/ui/input";
+import { Label } from "@components/ui/label";
+import { Textarea } from "@components/ui/textarea";
+import { getLocale, useTranslations } from "@i18n";
+import { annotationsDe } from "@moteur/annotations";
+import { envoiDuFormulaire } from "@moteur/courriels";
+import { identiteDuSite } from "@moteur/theme";
+
+const t = useTranslations(Astro);
+const formulaire = annotationsDe(Astro, "contact-formulaire");
+const marque = identiteDuSite(Astro, getLocale(Astro));
+const envoi = await envoiDuFormulaire(Astro);
+const attributsDuFormulaire = envoi?.attributs ?? (marque.formulaires.contact ? { action: marque.formulaires.contact, method: "post" } : {});
+---
+
+  <section class="lg:col-span-7" aria-labelledby="form-title" {...formulaire.entree}>
+    <div class="border-border bg-card rounded-panel border p-7 sm:p-9">
+      <h2
+        id="form-title"
+        class="font-display text-foreground text-2xl font-semibold tracking-tight"
+        {...formulaire.champ("title")}
+      >
+        {t.contact.formTitle}
+      </h2>
+
+      <form class="mt-7 flex flex-col gap-5" name="contact" aria-describedby="contact-note" {...attributsDuFormulaire}>
+        {envoi?.avis && (
+          <p id="courriel" role="status" class="border-border bg-background rounded-card text-foreground flex items-start gap-2 border p-5 text-sm leading-relaxed">
+            <Icon name={envoi.avis.ton === "succes" ? "check-circle" : "info"} size={17} class="mt-0.5 shrink-0" />
+            {envoi.avis.texte}
+          </p>
+        )}
+        {envoi && (
+          <Fragment>
+            <input type="hidden" name="retour" value={envoi.caches.retour} />
+            <input type="hidden" name="langue" value={envoi.caches.langue} />
+            <div class="sr-only" aria-hidden="true">
+              <input type="text" name={envoi.caches.piege} tabindex="-1" autocomplete="off" />
+            </div>
+          </Fragment>
+        )}
+        <div class="grid gap-5 sm:grid-cols-2">
+          <p class="flex flex-col gap-2">
+            <Label for="contact-name" required>{t.contact.nameLabel}</Label>
+            <Input
+              id="contact-name"
+              name="name"
+              type="text"
+              autocomplete="name"
+              placeholder={t.contact.namePlaceholder}
+              required
+            />
+          </p>
+          <p class="flex flex-col gap-2">
+            <Label for="contact-email" required>{t.contact.emailLabel}</Label>
+            <Input
+              id="contact-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              spellcheck="false"
+              placeholder={t.contact.emailPlaceholder}
+              required
+            />
+          </p>
+        </div>
+
+        <p class="flex flex-col gap-2">
+          <Label for="contact-subject">{t.contact.subjectLabel}</Label>
+          <Input
+            id="contact-subject"
+            name={envoi ? "topic" : "subject"}
+            type="text"
+            placeholder={t.contact.subjectPlaceholder}
+          />
+        </p>
+
+        <p class="flex flex-col gap-2">
+          <Label for="contact-message" required>{t.contact.messageLabel}</Label>
+          <Textarea
+            id="contact-message"
+            name="message"
+            rows="6"
+            placeholder={t.contact.messagePlaceholder}
+            required
+          />
+        </p>
+
+        <p id="contact-note" class="text-muted-foreground text-sm leading-relaxed" {...formulaire.champ("note")}>
+          {t.contact.formNote}
+        </p>
+
+        <div>
+          <Button type="submit" variant="primary" size="lg" {...formulaire.champ("cta")}>
+            {t.contact.submit}
+            <Icon name="send" size={17} />
+          </Button>
+        </div>
+      </form>
+    </div>
+  </section>
