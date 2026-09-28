@@ -78,6 +78,7 @@ import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, useTranslations } from "@i18n";
+import { annotationsDe } from "@moteur/annotations";
 
 interface Props {
   /** Paysage, densite standard. */
@@ -110,7 +111,11 @@ const {
 }: Props = Astro.props;
 
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+const t = useTranslations(Astro);
+// Moteur allume, en mode edition : la section "studio" ; le surtitre est celui
+// de la page a propos, et s'edite donc sur son entree.
+const ed = annotationsDe(Astro, "studio");
+const surtitre = annotationsDe(Astro, "a-propos").champ("eyebrow");
 const routes = getSiteRoutes(locale);
 
 const title = t.home.aboutTitle;
@@ -128,6 +133,7 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
   data-to={to}
   aria-labelledby="studio-title"
   data-slot="film-scene"
+  {...ed.entree}
 >
   <div class="film__pin">
     {/* La video est decorative : le texte pose par dessus porte tout le sens,
@@ -155,17 +161,22 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
       <div class="max-w-2xl">
         <p
           class="film__item flex items-center gap-3 text-xs font-medium tracking-[0.18em] text-white/80 uppercase"
+          {...surtitre}
         >
           <span class="bg-primary inline-block h-px w-8 shrink-0" aria-hidden="true"></span>
           {t.about.eyebrow}
         </p>
 
-        <h2 id="studio-title" class="film__item font-display text-display-sm md:text-display-md mt-6 text-white">
+        <h2
+          id="studio-title"
+          class="film__item font-display text-display-sm md:text-display-md mt-6 text-white"
+          {...ed.champ("title")}
+        >
           {
             word ? (
               <Fragment>
                 {before}
-                <span class="accent-script">{word}</span>
+                <span class="accent-script" {...ed.champ("accent")}>{word}</span>
                 {after}
               </Fragment>
             ) : (
@@ -174,12 +185,12 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
           }
         </h2>
 
-        <p class="film__item measure-wide mt-6 leading-relaxed text-white/85 md:text-lg">
+        <p class="film__item measure-wide mt-6 leading-relaxed text-white/85 md:text-lg" {...ed.champ("lede")}>
           {t.home.aboutLede}
         </p>
 
         <div class="film__item mt-8 flex flex-wrap gap-3">
-          <Button href={routes.about} variant="primary" size="md">
+          <Button href={routes.about} variant="primary" size="md" {...ed.champ("cta")}>
             {t.home.aboutCta}
             <Icon name="arrow-right" size={17} />
           </Button>

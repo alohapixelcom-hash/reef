@@ -6,6 +6,7 @@ import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import { getLocale, useTranslations } from "@i18n";
+import { annotationsDe } from "@moteur/annotations";
 import type { ResolvedPost } from "@js/posts";
 
 type Props = {
@@ -15,14 +16,21 @@ type Props = {
 
 const { posts } = Astro.props;
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+const t = useTranslations(Astro);
+const ed = annotationsDe(Astro, "dernieres-notes");
 const routes = getSiteRoutes(locale);
 ---
 
-<section class="bg-surface border-border border-y" aria-labelledby="latest-title" data-slot="latest-posts">
+<section
+  class="bg-surface border-border border-y"
+  aria-labelledby="latest-title"
+  data-slot="latest-posts"
+  {...ed.entree}
+>
   <div class="container-page py-16 md:py-24">
     <SectionHeader
       as="h2"
+      edition={ed}
       headingId="latest-title"
       title={t.home.latestTitle}
       accentWord={t.home.latestAccent}
@@ -42,7 +50,7 @@ const routes = getSiteRoutes(locale);
     {/* La grille est pleine et se termine en bas a droite : la sortie se pose
         la ou l'oeil quitte la derniere carte, pas au milieu d'une ligne vide. */}
     <div class="mt-10 flex justify-end">
-      <Button href={routes.posts} variant="outline" size="lg">
+      <Button href={routes.posts} variant="outline" size="lg" {...ed.champ("cta")}>
         {t.home.latestCta}
         <Icon name="arrow-right" size={18} />
       </Button>

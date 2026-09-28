@@ -89,14 +89,18 @@ src/
   js/           pure logic + selfchecks (schema, pagination, textUtils)
   layouts/      BaseLayout (html shell) and BaseHead (the whole <head>)
   pages/        [...locale]/{index,blog,topics,authors,about,contact,legal},
-                404, robots, llms, rss
+                404 and [locale]/404 (one per language), robots, llms, rss
   styles/       tokens.css (design system), global.css, prose.css, motion/
   moteur/       the optional publication engine: two post sources behind one
-                alias, managed pages, on-demand sitemap, back office skin, and
-                the "Tout deployer" extension
+                alias, the page texts (collection `sections`, laid over the
+                dictionary by contenu.ts), managed pages, on-demand sitemap,
+                back office skin, and the "Tout deployer" extension
 scripts/        og.mjs (share cards), rebrand.mjs (repaint), app.mjs (Capacitor),
-                moteur-import.mjs (pours src/data/posts into the engine, once)
-seed/           seed.json, the engine's schema (collection and fields)
+                moteur-import.mjs (pours src/data/posts into the engine, once),
+                graine-sections.mjs (copies the page texts into the seed)
+seed/           seed.json, the engine's schema and the page texts;
+                import-3.3.0-reef.sql (the texts, and their 3.3.0 corrections, for a
+                database older than 3.3.0)
 wiki/           the maintained knowledge base
 ```
 
@@ -107,7 +111,7 @@ Import through aliases (tsconfig.json): @components/*, @config/*,
 
 ```bash
 pnpm dev        # dev server
-pnpm build      # static build into dist/ (55 pages when green)
+pnpm build      # static build into dist/ (54 pages when green)
 pnpm preview    # serve dist/
 pnpm dev:moteur   # the same site with the publication engine on (docs/moteur.md)
 pnpm build:moteur # the Worker build: managed pages on demand, the rest prerendered
@@ -227,7 +231,7 @@ work is done".
 
 ## Definition of done
 
-`pnpm check` at 0 errors, 0 warnings, 0 hints, `pnpm build` green with 55
+`pnpm check` at 0 errors, 0 warnings, 0 hints, `pnpm build` green with 54
 pages, the selfchecks passing, no em dash anywhere, no file over 400 lines,
 the review checklist at the end of docs/design.md passed (or you fixed
 what it found), and if the change was structural, the wiki got a sync

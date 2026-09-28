@@ -4,13 +4,15 @@
 // que les cartes, l'en-tete d'article et le flux connaissent deja. Aucun
 // composant n'a ete reecrit pour le moteur, et c'est voulu : deux formes de
 // billet feraient deux themes a maintenir.
-import type { Locale } from "@i18n";
+import { getLegalData } from "@config/legalData.json.ts";
+import { type Locale, useTranslations } from "@i18n";
 import type { MarkdownHeading } from "astro";
 import type { CollectionEntry } from "astro:content";
 import { getEmDashCollection, getEmDashEntry } from "emdash";
 import GithubSlugger from "github-slugger";
-import { annotationDe, estEditable, type Annotation } from "./annotations";
+import { annotationDe, estEditable, type Annotation, type Editions } from "./annotations";
 import { adresseDeLaCarte, cleDeLaCouverture } from "./carte-du-billet.regles";
+import { type DonneesDeSection, type Textes, textesAvecLaBase } from "./contenu";
 import type { CorpsDeBillet } from "./types";
 
 export const MOTEUR = true;
@@ -150,4 +152,45 @@ export async function carteDuBillet(billet: CollectionEntry<"posts">): Promise<s
   const src = billet.data.cover?.src;
   const cle = src ? cleDeLaCouverture(src) : undefined;
   return cle ? adresseDeLaCarte(cle) : undefined;
+}
+
+/** Les textes des fichiers d'une langue : le dictionnaire complet et les deux documents legaux, sur lesquels la base se pose. */
+export function textesDesFichiers(locale: Locale): Textes {
+  return { ...useTranslations(locale), legalData: getLegalData(locale) };
+}
+
+/**
+ * Les sections PUBLIEES d'une langue, par slug, et leurs proxys d'edition (en
+ * mode edition seulement : voir annotations.ts). Une base qui n'a pas encore
+ * la collection (un Worker deploye avant import-3.3.0-reef.sql, voir
+ * docs/moteur.md) ne casse pas le site : la page garde les textes des
+ * fichiers, et le journal du Worker le dit.
+ */
+async function sectionsPubliees(locale: Locale): Promise<{ sections: Map<string, DonneesDeSection>; editions: Editions }> {
+  const sections = new Map<string, DonneesDeSection>();
+  const editions = new Map<string, unknown>();
+  try {
+    let cursor: string | undefined;
+    do {
+      const page = await getEmDashCollection("sections", { locale, status: "published", limit: 100, cursor });
+      if (page.error) throw page.error;
+      for (const entree of page.entries as Entree[]) {
+        const donnees = entree.data as DonneesDeSection & { slug?: string };
+        const slug = donnees.slug ?? entree.id;
+        sections.set(slug, donnees);
+        if (estEditable(entree.edit)) editions.set(slug, entree.edit);
+      }
+      cursor = page.nextCursor ?? undefined;
+    } while (cursor);
+  } catch (erreur) {
+    console.error("[reef] sections illisibles, textes des fichiers :", erreur);
+    return { sections: new Map(), editions: new Map() };
+  }
+  return { sections, editions };
+}
+
+/** Les textes rediges de la page dans cette langue (les fichiers, completes par ce que la base publie) et les proxys d'edition des sections. */
+export async function lireLaPage(locale: Locale): Promise<{ textes: Textes; editions: Editions }> {
+  const { sections, editions } = await sectionsPubliees(locale);
+  return { textes: textesAvecLaBase(textesDesFichiers(locale), sections), editions };
 }

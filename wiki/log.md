@@ -13,6 +13,32 @@ nothing needed updating. Open threads are questions or known gaps waiting on
 a decision; close them by editing this list and noting the resolution in a
 dated entry.
 
+## 2026-09-24 - 3.3.0, finishing after the audit of the live demo
+
+- The Git-based back office of 2.3 is removed (pages, `src/backoffice/`,
+  scripts, preview Worker, docs/backoffice.md); EmDash is the one back office.
+- `src/worker-adresses.ts`, shared by both Workers: sitemaps, trailing slash,
+  404 in the language of the address, no `Server-Timing`. French 404 from
+  `src/pages/[locale]/404.astro`, renamed to `fr/404.html` by astro.config.mjs.
+- Legal, privacy and terms rewritten for a blog; the database gets them from
+  `seed/import-3.3.0-reef.sql`. Share-card alt and RSS title per language.
+- Pages updated: overview (build output, 404, sync entry), seo subsystem
+  (robots, 404, sitemaps, card alt). DEPLOY.md, docs/moteur.md, SPEC and README
+  say the live demo runs with the engine.
+
+## 2026-09-24 - 3.3.0, the page texts are managed by the engine
+
+- Engine on, the written copy of the pages is the `sections` collection
+  (26 entries per language, seeded with the exact file texts by
+  `scripts/graine-sections.mjs`). `src/moteur/contenu.sections.ts` maps each
+  entry to its dictionary paths; `contenu.ts` lays the published entries on
+  the dictionary (`lireLaPage` of `@moteur/source`); the page calls
+  `textesDeLaPage(Astro)` and components read `useTranslations(Astro)` and
+  `annotationsDe(Astro, slug)`. Engine off: the files, no attribute.
+- Contact, legal, privacy and terms join `PAGES_GEREES`.
+- Pages updated: i18n subsystem (useTranslations takes Astro), overview
+  (sync entry). Mechanism, limits and measures in docs/moteur.md.
+
 ## 2026-09-24 - 3.1.3, the EmDash edit bar finds what it edits
 
 - Engine on, edit mode: `enBillet` (source.emdash.ts) keeps EmDash's `edit`
@@ -266,4 +292,4 @@ Added the internal Aloha editorial shell, bilingual article forms, a server guar
 restricted authentication relay, GitHub conflict checks and a protected build-hash
 manifest. Default builds omit the administrative pages. Local browser tests use
 simulated services; real authentication and deployment remain to be validated.
-See [back-office integration](../docs/backoffice.md). No 2.3 release has been published.
+Its documentation, docs/backoffice.md, was removed with the editor in 3.3.0. No 2.3 release has been published.

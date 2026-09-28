@@ -46,3 +46,9 @@ Thumbs.db
 # Moteur de publication : etat local de D1 et R2, et types generes.
 .emdash/
 emdash-env.d.ts
+
+# Favicons fabriques au build par scripts/favicon.mjs : jamais versionnes.
+public/favicon.svg
+public/favicon.ico
+public/favicon-96.png
+public/apple-touch-icon.png

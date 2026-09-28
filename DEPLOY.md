@@ -1,17 +1,28 @@
-<!-- DEPLOY.md - how the live demo is published, and how the optional publication engine is deployed for the first time. -->
+<!-- DEPLOY.md - how the live demo is published (with the engine), and how the optional publication engine is deployed for the first time. -->
 
 # Deploying the demo
 
-`reef.alohapixel.app` is the Cloudflare Worker **reef-demo**. Since
-19 August 2026 it has been published automatically by **Workers Builds** on
-every push to `main`. There is nothing left to run from a Mac.
+`reef.alohapixel.app` has been served since 22 September 2026 by the
+**reef-moteur** Worker (EmDash engine, D1 `reef-moteur`, R2
+`reef-moteur-media`), described by `wrangler.moteur.jsonc`. The static
+`reef-demo` Worker no longer carries the domain.
 
 | Setting | Value |
 |---|---|
-| Repository | `alohapixelcom-hash/reef` |
-| Production branch | `main` |
-| Build command | `pnpm run build` |
-| Deploy command | `npx wrangler deploy` |
+| Worker | `reef-moteur` (`wrangler.moteur.jsonc`) |
+| Build command | `pnpm build:moteur` (sets `ALOHA_MOTEUR=emdash` itself) |
+| Deploy command | `npx wrangler deploy`, from the Mac, after the build |
+| Check | `https://reef.alohapixel.app/version.json` answers `{"version":"3.3.0",...,"moteur":"emdash"}` |
+
+A release whose texts also live in the database ships a SQL file to run once
+after the deployment. For 3.3.0, `seed/import-3.3.0-reef.sql` (the page texts,
+and the corrected legal notice, privacy policy and terms):
+
+```bash
+npx wrangler d1 execute reef-moteur --remote --config wrangler.moteur.jsonc --file=seed/import-3.3.0-reef.sql
+```
+
+It is idempotent: a second run changes nothing.
 
 ## Three things not to break
 
@@ -26,9 +37,10 @@ where the exact error was `ERROR packages field missing or empty`.
 why the worker tests the extension of the path itself: it sees every request and
 has to let stylesheets through.
 
-**`wrangler.toml` and `src/worker.ts` belong to the demo.** They publish
-`reef.alohapixel.app` and nothing else. The theme itself compiles to static HTML
-and deploys to any host without them.
+**`wrangler.toml` and `src/worker.ts` describe the frozen static demo**
+(`reef-demo`, `pnpm run build`), kept off the domain: the language redirect,
+the sitemaps and the French 404 page, with no engine. The theme itself compiles
+to static HTML and deploys to any host without them.
 
 ## The images
 
@@ -42,13 +54,12 @@ concerned.
 
 ## First deployment of the engine
 
-Everything above concerns the static demo. The optional publication engine
-(`ALOHA_MOTEUR=emdash`, see `docs/moteur.md`) is a second, separate Worker,
-described by `wrangler.moteur.jsonc`. It needs a Cloudflare account with
-Workers, D1 and R2 enabled, and Cloudflare Images for the on-demand image
-optimisation (set `ALOHA_IMAGES=origine` at build time to do without it). The
-steps below were written from the configuration files and the EmDash 0.38
-routes; they have not yet been run against a live account.
+For your own site. The optional publication engine (`ALOHA_MOTEUR=emdash`, see
+`docs/moteur.md`) is a Worker described by `wrangler.moteur.jsonc`, the one
+that serves the live demo. It needs a Cloudflare account with Workers, D1 and
+R2 enabled, and Cloudflare Images for the on-demand image optimisation (set
+`ALOHA_IMAGES=origine` at build time to do without it). These steps are the
+ones the demo went through in September 2026.
 
 1. **Sign in and create the storage.** `wrangler deploy` creates a missing D1
    database and R2 bucket on its own, but creating them first keeps the first
@@ -104,7 +115,7 @@ routes; they have not yet been run against a live account.
 
 4. **The first administrator.** Open `https://<your-domain>/secret-spot/`
    (with the engine on, that address, and its French twin, open
-   `/_emdash/admin`; the static back office of the theme is not served).
+   `/_emdash/admin`, the one back office of the site).
    Do it on the final domain: the passkey is bound to the hostname it was
    created on.
    The setup wizard asks for the site title and tagline, then an email and a
@@ -130,12 +141,20 @@ routes; they have not yet been run against a live account.
    covers, and publishes what was not a draft. It can be run again: a post
    already present is skipped.
 
+   The page texts (collection `sections`, docs/moteur.md, "The page texts")
+   come with the seed when the setup wizard is run with its demo content. A
+   database set up without it, or deployed before 3.3.0, gets them once from
+   `npx wrangler d1 execute reef-moteur --remote --config wrangler.moteur.jsonc --file=seed/import-3.3.0-reef.sql`
+   (idempotent). Until then the pages show the texts of the files.
+
 7. **Check.** `https://<your-domain>/version.json` gives the version and the
    build time; `/blog/`, a post, `/sitemap-index.xml` and
-   `/sitemap-contenu.xml` must answer 200; an invented address 404. Publish a
+   `/sitemap-contenu.xml` must answer 200, `/sitemap.xml` a 301 to the index;
+   an invented address 404, in French under `/fr/`. Publish a
    post in the back office and reload it on the site: no build is involved.
 
-8. **Workers Builds, for the prerendered pages.** Connect the repository in the
+8. **Optional: Workers Builds, for the prerendered pages.** The demo is
+   deployed from the Mac; to have the button rebuild on its own, connect the repository in the
    Worker's settings, with `ALOHA_MOTEUR=emdash pnpm build:moteur` as the build
    command and `npx wrangler deploy` as the
    deploy command. Then create the Deploy Hook of step 3. From then on, the

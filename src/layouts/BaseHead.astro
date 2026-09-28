@@ -37,14 +37,20 @@ export interface Props {
   image?: { src: string; alt: string };
   type?: "website" | "article";
   noindex?: boolean;
+  /**
+   * Page introuvable : son adresse n'existe dans aucune langue, donc ni
+   * canonical, ni hreflang, ni og:url. Elle est deja en noindex.
+   */
+  introuvable?: boolean;
 }
 
 const {
   title,
   description = siteData.description,
-  image = siteData.defaultImage,
+  image,
   type = "website",
   noindex = false,
+  introuvable = false,
 } = Astro.props;
 
 // "Titre | Marque", sauf si le titre porte deja la marque (page d'accueil).
@@ -56,13 +62,15 @@ const base = Astro.site ?? Astro.url;
 const pathname = Astro.url.pathname;
 const canonicalPath = pathname.endsWith("/") || /\.[a-z0-9]+$/i.test(pathname) ? pathname : `${pathname}/`;
 const canonical = new URL(canonicalPath, base);
-const imageUrl = new URL(image.src, base);
+// Sans image propre, la carte par defaut, avec l'alternative de la langue.
+const locale = getLocale(Astro);
+const carte = image ?? { src: siteData.defaultImage.src, alt: siteData.defaultImage.alt[locale] };
+const imageUrl = new URL(carte.src, base);
 
 // Les versions linguistiques de CETTE page, pas de l'accueil. La meme fonction
 // alimente le selecteur de langue de la barre : les deux ne peuvent pas mentir
 // l'un sur l'autre. x-default pointe vers la langue par defaut, ce que Google
 // attend pour choisir quoi servir a un visiteur dont la langue n'est pas servie.
-const locale = getLocale(Astro);
 const alternates = getAlternates(Astro.url, Astro.site, locale);
 const xDefault = alternates.find((alt) => alt.locale === defaultLocale);
 // og:locale veut du snake_case (en_US), pas du BCP-47 (en-US).
@@ -139,7 +147,7 @@ const groundLight = resolveToken("color-background", lightBlock);
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
-<link rel="canonical" href={canonical.href} />
+{!introuvable && <link rel="canonical" href={canonical.href} />}
 {noindex && <meta name="robots" content="noindex, nofollow" />}
 
 {/* L'ordre compte pour les navigateurs, pas pour Google : le SVG est
@@ -168,8 +176,8 @@ const groundLight = resolveToken("color-background", lightBlock);
 {/* hreflang : chaque page declare ses soeurs, y compris elle-meme. Un ensemble
     hreflang incomplet est pire que pas de hreflang du tout, donc la liste est
     generee, jamais ecrite a la main. */}
-{alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
-{xDefault && <link rel="alternate" hreflang="x-default" href={xDefault.href} />}
+{!introuvable && alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
+{!introuvable && xDefault && <link rel="alternate" hreflang="x-default" href={xDefault.href} />}
 
 {/* La barre du navigateur suit le theme : le fond clair de la page en
     clair, le fond sombre en sombre. Les deux sont resolus depuis
@@ -179,12 +187,12 @@ const groundLight = resolveToken("color-background", lightBlock);
 
 {/* Open Graph, complet : l'apercu de partage est la premiere impression du site. */}
 <meta property="og:type" content={type} />
-<meta property="og:url" content={canonical.href} />
+{!introuvable && <meta property="og:url" content={canonical.href} />}
 <meta property="og:site_name" content={siteData.name} />
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={imageUrl.href} />
-<meta property="og:image:alt" content={image.alt} />
+<meta property="og:image:alt" content={carte.alt} />
 <meta property="og:locale" content={ogLocale} />
 {
   ogAlternates.map((alt) => (
@@ -197,7 +205,7 @@ const groundLight = resolveToken("color-background", lightBlock);
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={imageUrl.href} />
-<meta name="twitter:image:alt" content={image.alt} />
+<meta name="twitter:image:alt" content={carte.alt} />
 
 {/* Le slot recoit les <script type="application/ld+json"> construits avec @js/schema. */}
 <slot />

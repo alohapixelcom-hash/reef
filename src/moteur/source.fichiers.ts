@@ -3,12 +3,14 @@
 // Deux sources, une seule forme. Ce module et source.emdash.ts exportent
 // exactement les memes fonctions ; l'alias "@moteur/source" (astro.config.mjs)
 // choisit l'un ou l'autre, et aucune page ne sait d'ou vient un billet.
-import type { Locale } from "@i18n";
+import { getLegalData } from "@config/legalData.json.ts";
+import { type Locale, useTranslations } from "@i18n";
 import { entryIdIn, getLocalizedCollection } from "@i18n/content";
 import { getImage } from "astro:assets";
 import { getEntry, render, type CollectionEntry } from "astro:content";
-import type { Annotation } from "./annotations";
+import type { Annotation, Editions } from "./annotations";
 import { CARTE } from "./carte-du-billet.regles";
+import type { Textes } from "./contenu";
 import type { CorpsDeBillet } from "./types";
 
 /** Vrai quand les billets viennent de la base : les pages gerees se rendent alors a la demande. */
@@ -58,3 +60,17 @@ export async function carteDuBillet(billet: CollectionEntry<"posts">): Promise<s
  * build statique reste identique au fichier pres.
  */
 export const annotation = (_billet: CollectionEntry<"posts">, _champ?: string): Annotation => ({});
+
+/** Les textes des fichiers d'une langue : le dictionnaire complet et les deux documents legaux. */
+export function textesDesFichiers(locale: Locale): Textes {
+  return { ...useTranslations(locale), legalData: getLegalData(locale) };
+}
+
+/**
+ * Les textes rediges de la page, et aucun proxy d'edition : moteur eteint,
+ * ce sont ceux des fichiers, rien ne s'edite depuis la page, aucune balise ne
+ * recoit d'attribut, et le build statique reste identique au fichier pres.
+ */
+export async function lireLaPage(locale: Locale): Promise<{ textes: Textes; editions: Editions }> {
+  return { textes: textesDesFichiers(locale), editions: new Map() };
+}

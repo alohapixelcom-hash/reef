@@ -23,10 +23,21 @@ export type { Dictionary };
 
 const dictionaries: Record<Locale, Dictionary> = { en, fr };
 
-/** La copie de la langue demandee. Jamais de secours silencieux vers l'anglais :
- *  une cle manquante est impossible, le type l'interdit deja. */
-export function useTranslations(locale: Locale): Dictionary {
-  return dictionaries[locale];
+/** Ce qu'un composant tend pour recevoir la copie de la page : la langue courante, et ce que la page a pose sur la requete. */
+type PageEnCours = { currentLocale?: string | undefined; locals?: { textes?: Dictionary } };
+
+/** La copie de la page en cours (Astro), ou celle de la langue demandee. Jamais
+ *  de secours silencieux vers l'anglais : une cle manquante est impossible, le
+ *  type l'interdit deja.
+ *
+ *  Moteur allume, les textes rediges d'une page viennent de la base
+ *  (docs/moteur.md) : la page les lit une fois et les pose sur la requete
+ *  (src/moteur/textes.ts), et un composant qui tend Astro recoit cette
+ *  copie-la. Sans moteur, ou sans page pour la poser, c'est le dictionnaire des
+ *  fichiers. */
+export function useTranslations(page: Locale | PageEnCours): Dictionary {
+  if (typeof page === "string") return dictionaries[page];
+  return page.locals?.textes ?? dictionaries[getLocale(page)];
 }
 
 /**

@@ -1,0 +1,15 @@
+---
+// src/pages/[locale]/404.astro - page introuvable des autres langues (fr/404.html) : le meme ecran, dans la langue de l'adresse.
+//
+// Figee dans les deux modes, jamais listee dans le plan du site. Le build la
+// range en fr/404/index.html ; l'integration de astro.config.mjs la deplace en
+// fr/404.html, le nom que cherchent les hebergeurs statiques et le Worker.
+import NotFound from "@components/Sections/Global/NotFound.astro";
+import { defaultLocale, locales } from "@i18n";
+
+export function getStaticPaths() {
+  return locales.filter((locale) => locale !== defaultLocale).map((locale) => ({ params: { locale } }));
+}
+---
+
+<NotFound />

@@ -7,7 +7,7 @@
 src/layouts/BaseHead.astro writes every meta, canonical, OG, twitter,
 favicon and feed tag by hand. No SEO package enters this repo; if a tag is
 missing, add it there, readable and diffable. BaseLayout passes its
-`title/description/image/type/noindex` props straight through
+`title/description/image/type/noindex/introuvable` props straight through
 (src/layouts/BaseLayout.astro:31).
 
 - Title: `"Title | Brand"` unless the title already carries the brand, which
@@ -58,14 +58,15 @@ Placement map:
 
 Three hand-written endpoints, all deriving URLs from `site`:
 
-- src/pages/robots.txt.ts: allow all, disallow /search/, absolute sitemap.
+- src/pages/robots.txt.ts: allow all, disallow /search/ and /_emdash/ (the
+  engine's back office), absolute sitemap.
 - src/pages/llms.txt.ts: the site presented to agents; core pages plus the
   published posts.
 - src/pages/[...locale]/rss.xml.ts: a per-language RSS 2.0 feed built by hand,
   drafts excluded, deterministic lastBuildDate (the newest post).
 
-The sitemap integration filters out /404/, /examples/, /secret-spot/ and
-/search/ (astro.config.mjs), and the engine's on-demand sitemap
+The sitemap integration filters out /404/, /examples/ and /search/
+(astro.config.mjs), and the engine's on-demand sitemap
 (src/moteur/plan-du-site.ts) keeps the same list. A page hidden from robots
 should be hidden from the sitemap too; keep them in step. Its `serialize`
 hook (astro.config.mjs) re-reads the `<link rel="alternate" hreflang>` tags

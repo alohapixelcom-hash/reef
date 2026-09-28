@@ -70,22 +70,31 @@ website only (index.astro), a post carries article + breadcrumbList
 
 ## The text endpoints
 
-- src/pages/robots.txt.ts: allow everything except `Disallow: /search/`,
-  absolute sitemap URL derived from site.
+- src/pages/robots.txt.ts: allow everything except `Disallow: /search/` and
+  `Disallow: /_emdash/` (the engine's back office), absolute sitemap URL
+  derived from site.
 - src/pages/llms.txt.ts: the site presented to language-model agents; the
   core pages (home, blog, topics, authors) plus the published posts.
 - src/pages/[...locale]/rss.xml.ts: a per-language RSS 2.0 feed assembled by
   hand with minimal XML escaping, drafts excluded, deterministic lastBuildDate
   taken from the newest post.
 
-The sitemap integration filters /404/, /examples/, /secret-spot/ and
-/search/ out (astro.config.mjs), and the engine's on-demand sitemap
+The sitemap integration filters /404/, /examples/ and /search/ out
+(astro.config.mjs), and the engine's on-demand sitemap
 (src/moteur/plan-du-site.ts) excludes the same paths. A page hidden from
 robots should be hidden from the sitemap too; keep them in step. Its
 `serialize` hook (astro.config.mjs) re-reads the `<link rel="alternate"
 hreflang>` tags of the built page in dist/ and writes those, x-default
 included, as the sitemap alternates; a page without them keeps the
 integration's own pairing.
+
+The 404 page exists once per language (`404.html`, `fr/404.html`, from
+src/pages/404.astro and src/pages/[locale]/404.astro, the screen in
+Sections/Global/NotFound.astro); it is `noindex` and declares neither
+canonical nor hreflang, since its address exists in no language. Both
+Workers (src/worker-adresses.ts) answer it with a 404 code, redirect
+`/sitemap.xml` to `/sitemap-index.xml` with a 301 and answer 404 to any other
+unknown `/sitemap*.xml`.
 
 ## OG images
 
@@ -96,7 +105,8 @@ already fetched by scripts/covers.mjs into public/og/<slug>.jpg with sharp
 (1200x630, fit cover, position "attention", JPEG 86 mozjpeg 4:4:4), checks
 the size, and deletes any file in public/og/ it did not make. Its CARTES table
 lists only the cards a page cites: today `default` (siteData.defaultImage),
-cropped from src/assets/reef-hero-vague.webp. `pnpm build`, `build:moteur`,
+cropped from src/assets/reef-hero-vague.webp. Its alternative text describes
+the photograph, one value per language (`defaultImage.alt.en`, `.fr`). `pnpm build`, `build:moteur`,
 `app` and `predev` run it right after covers.mjs, and public/og/ is ignored by
 git, so a missing photo fails the build with a message naming covers.mjs. A
 post with a cover shares that cover cropped to a 1200x630 JPEG instead

@@ -1256,8 +1256,27 @@ const IDENTIQUES: string[] = [
  * concernes suit, sans quoi le rail et la page ne diraient pas la meme chose.
  * Une seule exception a l'exception : le "widget" d'un champ de module
  * d'extension n'est pas un encart de contenu, c'est un composant d'interface.
+ *
+ * Les tirets : la maison n'ecrit ni tiret cadratin ni demi-cadratin, nulle
+ * part, et le catalogue francais d'EmDash 0.38 en pose treize (dont "Copiez
+ * ce jeton maintenant", sur un ecran que tout editeur voit). Ces messages sont
+ * reecrits avec deux-points ou virgule ; le self-check exige un catalogue
+ * complete sans aucun des deux tirets. Les cles gardent le tiret de l'anglais
+ * d'origine, ecrit en echappement : c'est le texte que le moteur compare.
  */
 const MAISON_SIMPLES: Record<string, string> = {
+  "Currently set \u2014 enter a new value to replace":
+    "Valeur actuellement définie : saisissez une nouvelle valeur pour la remplacer",
+  "Empty gallery \u2014 open settings to add images": "Galerie vide : ouvrez les paramètres pour ajouter des images",
+  "Copy this token now \u2014 it won't be shown again.": "Copiez ce jeton maintenant : il ne sera plus affiché.",
+  "Sites on Cloudflare D1 can additionally restore the database to any minute within the last 30 days using D1 Time Travel \u2014 always on, no setup required.":
+    "Les sites hébergés sur Cloudflare D1 peuvent également restaurer la base de données à n'importe quel moment des 30 derniers jours grâce à « D1 Time Travel », toujours actif, sans configuration requise.",
+  "Stored per locale \u2014 each translation of a byline gets its own value.":
+    "Groupé par langue : chaque traduction d'un collaborateur possède sa propre valeur.",
+  "Mark as Gone (410) \u2014 tells search engines it was permanently deleted":
+    "Marquer comme disparu (410) : indique aux moteurs de recherche que le contenu a été définitivement supprimé",
+  "Define custom fields stored on every byline \u2014 job title, pronouns, social handles, and more.":
+    "Définissez des champs personnalisés enregistrés pour chaque collaborateur : intitulé du poste, pronoms, identifiants sur les réseaux sociaux, etc.",
   Widgets: "Encarts",
   widget: "encart",
   "Untitled Widget": "Encart sans titre",
@@ -1292,6 +1311,21 @@ const MAISON_SIMPLES: Record<string, string> = {
 };
 
 const MAISON_COMPOSES_SOURCE: [unknown, unknown][] = [
+  [
+    [["0"], " can't be moved here \u2014 its parent has no translation in this locale, so this list isn't the group it belongs to."],
+    [["0"], " ne peut pas être déplacé ici : son parent n'a pas de traduction dans cette langue, donc cette liste n'est pas le groupe auquel il appartient."],
+  ],
+  [
+    ["Move ", ["0"], " up \u2014 unavailable, its parent has no translation in this locale"],
+    ["Déplacer ", ["0"], " vers le haut : indisponible, son parent n'a pas de traduction dans cette langue"],
+  ],
+  [
+    ["Move ", ["0"], " down \u2014 unavailable, its parent has no translation in this locale"],
+    ["Déplacer ", ["0"], " vers le bas : indisponible, son parent n'a pas de traduction dans cette langue"],
+  ],
+  [[["0"], " ", ["1"], " required \u2014 you have ", ["2"], "."], [["0"], " ", ["1"], " requis, vous avez ", ["2"], "."]],
+  [[["label"], " \u2014 view translation"], [["label"], " : voir la traduction"]],
+  [[["label"], " \u2014 no translation"], [["label"], " : aucune traduction"]],
   [["Delete ", ["0"], " widget area"], ["Supprimer la zone d'encarts ", ["0"]]],
   [
     ["Unsupported widget element type: ", ["0"]],

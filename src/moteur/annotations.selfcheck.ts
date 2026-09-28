@@ -3,7 +3,7 @@
 import assert from "node:assert/strict";
 import { spreadAttributes } from "astro/runtime/server/index.js";
 import { createEditable, createNoop } from "emdash";
-import { REF, annotationDe, estEditable } from "./annotations.ts";
+import { REF, SANS_ANNOTATION, annotationDe, annotationsDe, estEditable } from "./annotations.ts";
 
 let checks = 0;
 function is(actual: unknown, expected: unknown, message: string): void {
@@ -40,5 +40,16 @@ is(annotationDe(null, "title"), {}, "null ne casse rien");
 is(annotationDe({ [REF]: 42 }), {}, "une valeur qui n'est pas du texte est ignoree");
 is(annotationDe({ title: "pas un objet" }, "title"), {}, "un champ d'une autre forme est ignore");
 is(annotationDe({ [REF]: "" }), {}, "une annotation vide n'est pas ecrite");
+
+// --- Les sections des pages : les proxys voyagent sur la requete -----------
+const section = createEditable("sections", "01K5SECTION", { status: "published", hasDraft: false });
+const requete = { locals: { editions: new Map<string, unknown>([["hero", section], ["muette", createNoop()]]) } };
+const hero = annotationsDe(requete, "hero");
+is(JSON.parse(hero.entree[REF] ?? "{}"), { collection: "sections", id: "01K5SECTION", status: "published" }, "une section porte son entree");
+is(JSON.parse(hero.champ("accent")[REF] ?? "{}").field, "accent", "et chacun de ses champs");
+is(annotationsDe(requete, "absente"), SANS_ANNOTATION, "une section non publiee n'annote rien");
+is(annotationsDe(requete, "muette"), SANS_ANNOTATION, "hors edition, le proxy muet n'annote rien");
+is(annotationsDe({ locals: {} }, "hero").champ("title"), {}, "moteur eteint : aucune carte, aucun attribut");
+is(html(annotationsDe({}, "hero").entree), "", "sans requete : la balise reste celle du build statique");
 
 console.log(`annotations.selfcheck: ${checks} verifications passees`);

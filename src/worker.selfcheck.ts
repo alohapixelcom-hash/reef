@@ -1,4 +1,4 @@
-// src/worker.selfcheck.ts - erreurs de cookies, langues et routage, sans reseau.
+// src/worker.selfcheck.ts - erreurs de cookies, langues et routage du Worker de la demo figee, sans reseau.
 import assert from "node:assert/strict";
 import worker from "./worker.ts";
 
@@ -34,13 +34,13 @@ const post = await worker.fetch(new Request("https://example.com/", {
   method: "POST", headers: { "Accept-Language": "fr" },
 }), env);
 assert.equal(post.status, 200);
-let demoAuthCalls = 0;
-const demoEnv = { ...env, ALOHA_DEMO_BACKOFFICE: "1", ALOHA_AUTH: { async fetch() { demoAuthCalls++; return Response.json({ authenticated: true, role: "admin" }); } } };
-for (const path of ["/api/editorial/fr/test", "/api/editorial-categories/fr/test", "/api/auth/verify", "/%61pi/editorial/fr/test", "/api%2Feditorial/fr/test"]) {
-  const response = await worker.fetch(new Request("https://example.com" + path, { method: "POST", body: "{}" }), demoEnv);
-  assert.equal(response.status, 403); assert.equal((await response.json() as { error: string }).error, "demo_read_only");
-}
-assert.equal(demoAuthCalls, 0);
-assert.equal((await worker.fetch(new Request("https://example.com/fr/secret-spot/"), demoEnv)).status, 200);
-assert.equal((await worker.fetch(new Request("https://example.com/secret-spot/build.json"), demoEnv)).status, 404);
-console.log("Routage et demonstration en lecture seule verifies, meme avec un service de connexion present.");
+// Les adresses reglees d'avance (detail dans worker-adresses.selfcheck.ts).
+const plan = await worker.fetch(new Request("https://example.com/sitemap.xml"), env);
+assert.equal(plan.status, 301);
+assert.equal(plan.headers.get("Location"), "/sitemap-index.xml");
+assert.equal((await worker.fetch(new Request("https://example.com/sitemap-1.xml"), env)).status, 404);
+assert.equal((await worker.fetch(new Request("https://example.com/sitemap-0.xml"), env)).status, 200);
+assert.equal((await worker.fetch(new Request("https://example.com/fr/404/"), env)).status, 404);
+// L'ancien back office Git n'existe plus : ses adresses sont des fichiers comme les autres.
+assert.equal((await worker.fetch(new Request("https://example.com/api/editorial/fr/test", { method: "POST", body: "{}" }), env)).status, 200);
+console.log("Routage, langues, plans du site et page introuvable verifies.");

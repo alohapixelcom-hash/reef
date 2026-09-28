@@ -15,7 +15,7 @@ import { LocaleSwitcher } from "@components/ui/locale-switcher";
 import { getFooterData, getSiteRoutes } from "@config/navData.json.ts";
 import siteData from "@config/siteData.json";
 import { fmt, getLocale, localePrefix, useTranslations } from "@i18n";
-import { backofficeCopy } from "@i18n/backoffice";
+import { annotationsDe } from "@moteur/annotations";
 
 type Props = {
   /**
@@ -30,7 +30,10 @@ type Props = {
 const { newsletter = true }: Props = Astro.props;
 
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+const t = useTranslations(Astro);
+// Moteur allume, en mode edition : les sections "pied-de-page" et "lettre" de la base.
+const pied = annotationsDe(Astro, "pied-de-page");
+const lettre = annotationsDe(Astro, "lettre");
 const columns = getFooterData(locale);
 const routes = getSiteRoutes(locale);
 
@@ -84,7 +87,7 @@ const columnLink =
   "text-muted-foreground hover:text-foreground inline-flex min-h-11 items-center text-[0.95rem] transition-colors duration-150";
 ---
 
-<footer class="bg-surface border-border border-t" data-slot="footer">
+<footer class="bg-surface border-border border-t" data-slot="footer" {...pied.entree}>
   <div class="container-page py-16 md:py-20">
     <div class="grid gap-12 lg:grid-cols-12 lg:gap-10">
       {/* La colonne de marque prend quatre colonnes sur douze, pas cinq, et
@@ -101,7 +104,7 @@ const columnLink =
           <Icon name="wave" size={22} class="text-primary" />
           <span class="font-display text-xl font-semibold tracking-tight">{siteData.name}</span>
         </a>
-        <p class="text-muted-foreground measure-prose text-[0.95rem] leading-relaxed">
+        <p class="text-muted-foreground measure-prose text-[0.95rem] leading-relaxed" {...pied.champ("lede")}>
           {t.footer.tagline}
         </p>
 
@@ -115,19 +118,19 @@ const columnLink =
             balisage, les libelles et les etats de reponse sont deja ecrits. */}
         {
           newsletter && (
-            <section class="flex flex-col gap-3" id="newsletter" aria-labelledby="newsletter-title">
-              <h2 id="newsletter-title" class="font-display text-xl font-bold tracking-tight">
+            <section class="flex flex-col gap-3" id="newsletter" aria-labelledby="newsletter-title" {...lettre.entree}>
+              <h2 id="newsletter-title" class="font-display text-xl font-bold tracking-tight" {...lettre.champ("title")}>
                 {word ? (
                   <Fragment>
                     {before}
-                    <span class="accent-script">{word}</span>
+                    <span class="accent-script" {...lettre.champ("accent")}>{word}</span>
                     {after}
                   </Fragment>
                 ) : (
                   title
                 )}
               </h2>
-              <p class="text-muted-foreground text-sm leading-relaxed">{t.newsletter.lede}</p>
+              <p class="text-muted-foreground text-sm leading-relaxed" {...lettre.champ("lede")}>{t.newsletter.lede}</p>
               <form class="mt-1 flex flex-col gap-3 sm:flex-row" name="newsletter">
                 <label class="sr-only" for="footer-newsletter-email">
                   {t.newsletter.emailLabel}
@@ -143,11 +146,11 @@ const columnLink =
                   aria-describedby="footer-newsletter-note"
                   required
                 />
-                <Button type="submit" variant="primary" class="sm:shrink-0">
+                <Button type="submit" variant="primary" class="sm:shrink-0" {...lettre.champ("cta")}>
                   {t.newsletter.submit}
                 </Button>
               </form>
-              <p id="footer-newsletter-note" class="text-muted-foreground text-xs">
+              <p id="footer-newsletter-note" class="text-muted-foreground text-xs" {...lettre.champ("note")}>
                 {t.newsletter.note}
               </p>
             </section>
@@ -183,13 +186,19 @@ const columnLink =
       <div class="text-muted-foreground flex flex-col gap-1 text-sm">
         <p>&copy; {year} {siteData.name}. {t.footer.rights}</p>
         <p>{t.footer.builtWith}</p>
-        <a class="inline-flex min-h-11 items-center hover:underline" href={`${localePrefix(locale)}/secret-spot/`}>{backofficeCopy[locale].space}</a>
-        <p>
-          {t.footer.themeBy}{" "}
-          <a href={creditHref} class="text-foreground font-semibold hover:underline">
-            {siteData.author.name}
-          </a>
-        </p>
+        {/* Une seule signature : sur la demonstration, la ligne de demo nomme
+            l'atelier qui a fait le theme ; "theme by Example Studio" la
+            contredirait sur la meme ligne. Sans demoNotice, le credit revient. */}
+        {
+          !demoNotice && (
+            <p>
+              {t.footer.themeBy}{" "}
+              <a href={creditHref} class="text-foreground font-semibold hover:underline">
+                {siteData.author.name}
+              </a>
+            </p>
+          )
+        }
         {
           demoNotice && (
             <p>

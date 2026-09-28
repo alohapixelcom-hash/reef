@@ -196,7 +196,7 @@ export const frPages: Pick<
     title: "Rien à cette adresse",
     accent: "Rien",
     lede:
-      "Le lien est faux, ou l'article a déménagé sans que nous ayons laissé de redirection. Ni l'un ni l'autre n'est votre problème. Deux chemins de retour, ci-dessous.",
+      "Le lien est faux, ou l'article a déménagé sans que nous ayons laissé de redirection. Ni l'un ni l'autre n'est votre problème. Trois chemins de retour, ci-dessous.",
     homeCta: "Retour à l'accueil",
     postsCta: "Voir tous les articles",
     searchCta: "Rechercher dans le blog",
@@ -220,7 +220,7 @@ export const frPages: Pick<
       },
       {
         title: "Hébergement",
-        body: "Le site est un ensemble de fichiers statiques servis par [nom de l'hébergeur], [adresse de l'hébergeur], joignable au [contact de l'hébergeur]. Il n'y a ni base de données, ni session serveur, ni compte : rien n'est conservé de notre côté lorsque vous lisez une page.",
+        body: "Le site est servi par [nom de l'hébergeur], [adresse de l'hébergeur], joignable au [contact de l'hébergeur]. Lire une page ne crée ni compte ni session : rien ne vous concernant n'est conservé de notre côté.",
       },
       {
         title: "Contenus et réutilisation",

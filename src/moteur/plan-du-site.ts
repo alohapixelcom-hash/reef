@@ -29,7 +29,7 @@ export const prerender = false;
 // une page geree, donc rendue a la demande et inventoriee ici : elle part en
 // noindex, et un plan de site ne propose pas une page qu'on demande de ne pas
 // indexer.
-const EXCLUES = ["/404/", "/examples/", "/secret-spot/", "/search/"];
+const EXCLUES = ["/404/", "/examples/", "/search/"];
 
 type Params = Record<string, string | number | undefined>;
 
@@ -47,6 +47,10 @@ const CHEMINS: Record<string, GetStaticPaths | null> = {
   "src/pages/[...locale]/authors/[author].astro": cheminsDeLAuteur,
   "src/pages/[...locale]/search.astro": localePaths,
   "src/pages/[...locale]/about.astro": localePaths,
+  "src/pages/[...locale]/contact.astro": localePaths,
+  "src/pages/[...locale]/legal.astro": localePaths,
+  "src/pages/[...locale]/privacy.astro": localePaths,
+  "src/pages/[...locale]/terms.astro": localePaths,
   "src/pages/[...locale]/rss.xml.ts": null,
   "src/pages/llms.txt.ts": null,
 };

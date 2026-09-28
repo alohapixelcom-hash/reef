@@ -15,6 +15,11 @@ Pexels photographs (one hero, nine covers) shipped with the demo. The demo
 publication is called Reef Notes and it is fictional: the user replaces Reef
 Notes and keeps Reef.
 
+The live demo, `reef.alohapixel.app`, runs with the optional publication
+engine: since 22 September 2026 it is served by the `reef-moteur` Worker
+(EmDash, D1, R2), whose back office at `/_emdash/admin` is the only one of the
+site. The default build stays 100 % static (docs/moteur.md, DEPLOY.md).
+
 The art direction is cold and made for reading: midnight-blue ink as the
 neutral, reef turquoise for action, coral as a rationed second accent, Space
 Grotesk for display and Instrument Sans for body text; the accent word keeps the
@@ -28,7 +33,7 @@ Numbers recounted from the source (`pnpm build` green, `astro check` at 0/0/0).
 
 | Item | Count |
 |---|---|
-| Pages rendered by `pnpm build` | 55 |
+| Pages rendered by `pnpm build` | 54 |
 | Content collections | 3 (posts, authors, topics), validated by zod |
 | Demo content | 9 posts, 3 authors, 5 topics, in 2 languages |
 | UI primitives (`src/components/ui`) | 36 families, 63 `.astro` files |

@@ -6,6 +6,7 @@
 // page, seul endroit qui voit tous les billets a la fois.
 import FeaturedPostCard from "@components/Cards/FeaturedPostCard.astro";
 import { getLocale, useTranslations } from "@i18n";
+import { annotationsDe } from "@moteur/annotations";
 import type { ResolvedPost } from "@js/posts";
 
 type Props = {
@@ -14,7 +15,8 @@ type Props = {
 
 const { entry } = Astro.props;
 const locale = getLocale(Astro);
-const t = useTranslations(locale);
+const t = useTranslations(Astro);
+const ed = annotationsDe(Astro, "a-la-une");
 ---
 
 {/* Le titre visible de cette section est celui de la carte : le surtitre sert
@@ -26,10 +28,12 @@ const t = useTranslations(locale);
   class="container-page py-14 md:py-20"
   aria-labelledby="featured-eyebrow"
   data-slot="featured-post"
+  {...ed.entree}
 >
   <p
     id="featured-eyebrow"
     class="font-sans text-muted-foreground mb-6 flex items-center gap-3 text-xs font-medium tracking-[0.18em] uppercase"
+    {...ed.champ("eyebrow")}
   >
     <span class="bg-primary inline-block h-px w-8 shrink-0" aria-hidden="true"></span>
     {t.home.featuredEyebrow}

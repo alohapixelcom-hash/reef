@@ -1,8 +1,11 @@
 // src/config/types/configDataTypes.ts - types partages par tous les fichiers de config de src/config.
 
+import type { Locale } from "@i18n";
+
 export interface SiteDataProps {
   name: string;
-  title: string;
+  /** Le titre de la publication, une valeur par langue (titre des flux RSS). */
+  title: Record<Locale, string>;
   description: string;
   useViewTransitions?: boolean;
   /** Cle i18n de la ligne "ce site est une demonstration" affichee en pied
@@ -15,7 +18,8 @@ export interface SiteDataProps {
   };
   defaultImage: {
     src: string;
-    alt: string;
+    /** Decrit la photo, une valeur par langue (og:image:alt, twitter:image:alt). */
+    alt: Record<Locale, string>;
   };
 }
 

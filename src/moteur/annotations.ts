@@ -1,4 +1,4 @@
-// src/moteur/annotations.ts - l'attribut data-emdash-ref qu'un billet de la base porte en mode edition, lu sur le proxy `edit` d'EmDash.
+// src/moteur/annotations.ts - l'attribut data-emdash-ref qu'une entree de la base (billet ou section) porte en mode edition, lu sur le proxy `edit` d'EmDash.
 //
 // CE QUE LA BARRE D'EMDASH ATTEND. Pour un editeur connecte, EmDash ajoute a
 // chaque page rendue a la demande sa barre "EmDash | Edit"
@@ -52,3 +52,30 @@ export function annotationDe(edition: unknown, champ?: string): Annotation {
 
 /** Vrai quand le proxy est celui du mode edition : l'entree annotee a au moins sa propre marque. */
 export const estEditable = (edition: unknown): boolean => REF in annotationDe(edition);
+
+// --- Les sections des pages (voir contenu.ts) --------------------------------
+//
+// Un composant lit une phrase du dictionnaire, pas une entree : le proxy d'une
+// section voyage donc a cote des textes, sur la requete
+// (Astro.locals.editions, pose par textes.ts), range sous le slug de la
+// section ("hero", "a-propos-regles"). Hors edition, moteur eteint ou section
+// non publiee, la carte n'a pas la cle : rien n'est ecrit.
+
+/** Les proxys d'edition des sections de la page, par slug. Une carte vide hors edition. */
+export type Editions = ReadonlyMap<string, unknown>;
+
+/** Ce qu'un gabarit recoit pour une section : l'attribut de l'entree, et celui de chacun de ses champs, par son nom dans seed/seed.json. */
+export interface AnnotationsDeLEntree {
+  entree: Annotation;
+  champ(nom: string): Annotation;
+}
+
+/** Une section sans proxy : rien pour elle, rien pour ses champs. */
+export const SANS_ANNOTATION: AnnotationsDeLEntree = { entree: {}, champ: () => ({}) };
+
+/** Les annotations d'une section de la page en cours, lues sur la requete. Une cle inconnue ou une requete hors edition rendent SANS_ANNOTATION. */
+export function annotationsDe(page: { locals?: { editions?: Editions } }, cle: string): AnnotationsDeLEntree {
+  const edition = page.locals?.editions?.get(cle);
+  if (!estEditable(edition)) return SANS_ANNOTATION;
+  return { entree: annotationDe(edition), champ: (nom) => annotationDe(edition, nom) };
+}

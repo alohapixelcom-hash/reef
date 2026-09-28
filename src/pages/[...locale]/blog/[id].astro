@@ -15,6 +15,7 @@ import { cheminsDuBillet } from "@js/adresses";
 import { cheminsArchive, type PropsArchive } from "@js/archive";
 import { propsDeLaPage } from "@moteur/chemins";
 import { MOTEUR } from "@moteur/source";
+import { textesDeLaPage } from "@moteur/textes";
 import type { CollectionEntry } from "astro:content";
 
 // Les chemins vivent dans @js/adresses : le plan de site du moteur les rejoue
@@ -36,6 +37,10 @@ const demande = numero
     )
   : await propsDeLaPage<Props>(Astro, getStaticPaths);
 if (demande instanceof Response) return demande;
+
+// Les textes rediges de la page : ceux de la base moteur allume (docs/moteur.md),
+// poses sur la requete pour ArticlePage et ArchivePage.
+await textesDeLaPage(Astro);
 ---
 
 {numero ? <ArchivePage {...(demande as PropsArchive)} /> : <ArticlePage {...(demande as Props)} />}
