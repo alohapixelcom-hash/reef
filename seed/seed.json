@@ -16,9 +16,9 @@
         {"slug":"description","label":"Chapo","type":"text","required":true,"searchable":true},
         {"slug":"cover","label":"Couverture","type":"image"},
         {"slug":"content","label":"Texte","type":"portableText","searchable":true},
-        {"slug":"topic","label":"Sujet (l'identifiant d'une entrée de Sujets)","type":"select","required":true,"translatable":false,"indexed":true,"validation":{"options":["craft","design","performance","studio","typography"]}},
-        {"slug":"author","label":"Auteur (l'identifiant d'une entrée d'Auteurs)","type":"select","required":true,"translatable":false,"indexed":true,"validation":{"options":["mara-lindqvist","noor-benali","tomas-abaroa"]}},
-        {"slug":"tags","label":"Mots-clés","type":"json"},
+        {"slug":"topic","label":"Sujet","type":"reference","required":true,"translatable":false,"indexed":true,"widget":"aloha-champs:entree","options":{"collection":"sujets","aide":{"fr":"Le sujet range l'article : il s'affiche au-dessus du titre et l'article rejoint la page du sujet. Un nouveau sujet se crée dans « Sujets ».","en":"The topic files the article: it shows above the title and the article joins the topic's page. A new topic is created in \"Topics\"."}}},
+        {"slug":"author","label":"Auteur","type":"reference","required":true,"translatable":false,"indexed":true,"widget":"aloha-champs:entree","options":{"collection":"auteurs","aide":{"fr":"La personne qui signe l'article : son nom et son portrait s'affichent sous le titre, et l'article rejoint sa page. Une nouvelle personne se crée dans « Auteurs ».","en":"The person who signs the article: their name and portrait show under the title, and the article joins their page. A new person is created in \"Authors\"."}}},
+        {"slug":"tags","label":"Anciens mots-clés (remplacés par les étiquettes)","type":"json","widget":"aloha-champs:cache"},
         {"slug":"featured","label":"À la une","type":"boolean","defaultValue":false},
         {"slug":"pub_date","label":"Date affichée","type":"datetime","indexed":true},
         {"slug":"updated_date","label":"Revu le","type":"datetime"}
@@ -134,8 +134,6 @@
     }
   ],
   "taxonomies": [
-    {"id":"taxonomie:category:en","name":"category","label":"Categories","labelSingular":"Category","hierarchical":true,"collections":["posts"],"locale":"en"},
-    {"id":"taxonomie:category:fr","name":"category","label":"Catégories","labelSingular":"Catégorie","hierarchical":true,"collections":["posts"],"locale":"fr","translationOf":"taxonomie:category:en"},
     {"id":"taxonomie:tag:en","name":"tag","label":"Tags","labelSingular":"Tag","hierarchical":false,"collections":["posts"],"locale":"en"},
     {"id":"taxonomie:tag:fr","name":"tag","label":"Étiquettes","labelSingular":"Étiquette","hierarchical":false,"collections":["posts"],"locale":"fr","translationOf":"taxonomie:tag:en"}
   ],

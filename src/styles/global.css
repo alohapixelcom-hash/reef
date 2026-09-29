@@ -14,6 +14,8 @@
  * dictionnaire du back office y fait entrer une utilitaire que le site
  * n'emploie pas, voir rapports/reef.md). */
 @source not "../moteur/PageLibre.astro";
+/* Le champ "une entree choisie par son nom" du back office (socle 1.8.0) : ses classes sont celles de l'administration, pas du site. */
+@source not "../moteur/champs";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

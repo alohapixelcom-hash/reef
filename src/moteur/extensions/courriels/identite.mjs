@@ -26,6 +26,9 @@ export const PAGES = [
   { path: "/reglages", label: "Réglages des courriels", icon: "gear" },
 ];
 
+/** La page de la lettre d'information, posee apres "Courriels" quand le site a une lettre (configuration.ts). */
+export const PAGE_LETTRE = { path: "/lettre", label: "Lettre d'information", icon: "newspaper" };
+
 /**
  * La carte de l'accueil du back office.
  * @type {{ id: string; size: "full" | "half" | "third"; title: string }[]}

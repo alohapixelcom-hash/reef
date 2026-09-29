@@ -270,3 +270,14 @@ html[data-theme][data-mode] [class~="grid"]:has(> * .aloha-carte, > * .aloha-car
 :root {
   --aloha-parametres-lus: posts;
 }
+
+/* Les etiquettes (3.8.3) : Reef lit la taxonomie native "tag" (pages
+ * /tags/<etiquette>/, pied de chaque article). Son ecran revient au rail (le
+ * rail du socle cache toutes les taxonomies), et le panneau Taxonomies de
+ * l'ecran d'un article reste affiche : c'est la qu'on coche les etiquettes. */
+html [data-sidebar="menu-item"]:has(> a[href^="/_emdash/admin/taxonomies/tag"]) {
+  display: list-item;
+}
+:root {
+  --aloha-panneaux-lus: taxonomies;
+}

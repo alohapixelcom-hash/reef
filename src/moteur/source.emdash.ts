@@ -9,7 +9,8 @@ import { type Locale, useTranslations } from "@i18n";
 import { getLocalizedCollection } from "@i18n/content";
 import type { MarkdownHeading } from "astro";
 import type { CollectionEntry } from "astro:content";
-import { getEmDashCollection, getEmDashEntry, getRequestContext, getSiteSettings } from "emdash";
+import { defaultLocale } from "@i18n";
+import { getEmDashCollection, getEmDashEntry, getRequestContext, getSiteSettings, getTaxonomyTerms } from "emdash";
 import GithubSlugger from "github-slugger";
 import { annotationDe, estEditable, type Annotation, type Editions } from "./annotations";
 import type { Cadre, DonneesDesSections } from "./cadre";
@@ -17,6 +18,7 @@ import { lireLeCadre } from "./cadre.emdash";
 import { adresseDeLaCarte, cleDeLaCouverture } from "./carte-du-billet.regles";
 import { type DonneesDeSection, type Textes, textesAvecLaBase } from "./contenu";
 import { type DonneesAuteur, type DonneesSujet, liensDeLAuteur, teinteDuSujet } from "./listes";
+import { adresseDeLaReference, ficheDe, type IndexDesFiches, indexer } from "./references";
 import { MENUS } from "./theme";
 import type { CorpsDeBillet } from "./types";
 // Le texte brut d'un billet (temps de lecture, comme `body` pour un fichier) : jamais d'exception, meme sans texte (socle).
@@ -41,7 +43,9 @@ interface DonneesBillet {
   cover?: { id?: string; src?: string; alt?: string; width?: number; height?: number; meta?: { storageKey?: string } };
   topic: string;
   author: string;
+  /** Avant la 3.8.3 : une liste de mots (champ "Mots-cles"). Depuis : les etiquettes natives, dans `terms`. */
   tags?: unknown;
+  terms?: { tag?: { slug?: string; label?: string; translationGroup?: string | null }[] };
   featured?: boolean;
   pub_date?: Date | string | null;
   updated_date?: Date | string | null;
@@ -68,9 +72,33 @@ interface Entree {
   edit?: unknown;
 }
 
+/** Ce qu'il faut pour relier un billet a son auteur, son sujet et ses etiquettes : lu une fois par requete. */
+interface Liens {
+  auteurs: IndexDesFiches;
+  sujets: IndexDesFiches;
+  /** Groupe de traductions d'une etiquette vers son adresse dans la langue par defaut (l'adresse commune). */
+  etiquettes: Map<string, string>;
+}
+
+/**
+ * Les etiquettes d'un billet : les etiquettes natives d'EmDash (taxonomie
+ * "tag", panneau "Etiquettes" de l'article), a l'adresse commune de leur
+ * groupe ; une base d'avant la 3.8.3 garde sa liste de mots.
+ */
+function etiquettesDe(d: DonneesBillet, adresses: Map<string, string>): { slug: string; label: string }[] | undefined {
+  // EmDash pose `terms` sur chaque billet des que la collection a une
+  // taxonomie : c'est alors la seule source, meme vide (un billet sans
+  // etiquette). La liste de mots d'avant ne sert qu'a un moteur sans `terms`.
+  if (typeof d.terms !== "object" || d.terms === null) return undefined;
+  return (d.terms.tag ?? [])
+    .filter((e) => typeof e.slug === "string" && typeof e.label === "string")
+    .map((e) => ({ slug: (e.translationGroup && adresses.get(e.translationGroup)) || (e.slug as string), label: e.label as string }));
+}
+
 /** Une entree de la base, sous la forme qu'attend tout le theme. */
-function enBillet(entree: Entree, locale: Locale): CollectionEntry<"posts"> {
+function enBillet(entree: Entree, locale: Locale, liens: Liens): CollectionEntry<"posts"> {
   const d = entree.data as DonneesBillet;
+  const etiquettes = etiquettesDe(d, liens.etiquettes);
   const date = d.pub_date ?? d.publishedAt ?? new Date();
   return {
     // Le slug, pas entree.id : l'id d'une traduction porte deja sa langue.
@@ -83,9 +111,12 @@ function enBillet(entree: Entree, locale: Locale): CollectionEntry<"posts"> {
       description: d.description ?? "",
       pubDate: new Date(date),
       updatedDate: d.updated_date ? new Date(d.updated_date) : undefined,
-      author: { collection: "authors", id: `${locale}/${d.author}` },
-      topic: { collection: "topics", id: `${locale}/${d.topic}` },
-      tags: Array.isArray(d.tags) ? d.tags.map(String) : [],
+      // L'auteur et le sujet sont choisis par leur nom dans le back office
+      // (champ "reference", 3.8.3) : la base range l'identifiant de l'entree,
+      // le site le ramene a son adresse. Une base d'avant range l'adresse.
+      author: { collection: "authors", id: `${locale}/${adresseDeLaReference(d.author, locale, liens.auteurs)}` },
+      topic: { collection: "topics", id: `${locale}/${adresseDeLaReference(d.topic, locale, liens.sujets)}` },
+      tags: etiquettes ? etiquettes.map((e) => e.label) : Array.isArray(d.tags) ? d.tags.map(String) : [],
       cover: couverture(d.cover),
       coverAlt: d.cover?.alt,
       featured: d.featured === true,
@@ -93,6 +124,8 @@ function enBillet(entree: Entree, locale: Locale): CollectionEntry<"posts"> {
     },
     // Garde pour corpsDuBillet : les blocs voyagent avec l'entree, hors du schema.
     blocs: d.content ?? [],
+    // Les etiquettes natives, hors du schema (src/js/etiquettes.ts les lit).
+    ...(etiquettes ? { etiquettes } : {}),
     // Le panneau SEO de l'entree (titre, description, image, canonique,
     // noindex), lu par la page du billet et le plan du site ; hors du schema.
     seo: d.seo,
@@ -128,13 +161,36 @@ export async function billetsPublies(locale: Locale): Promise<CollectionEntry<"p
   return [...(await parRequete(`billets:${locale}`, () => lireLesBillets(locale)))];
 }
 
+/** L'index d'une collection referencee (auteurs, sujets) dans une langue, lu une fois par requete. */
+function indexDe(collection: string, locale: Locale): Promise<IndexDesFiches> {
+  return parRequete(`index:${collection}:${locale}`, async () => indexer(((await toutesPubliees(collection, locale)) ?? []).map((e) => ficheDe(e.data, locale))));
+}
+
+/** Les adresses communes des etiquettes : celles de la langue par defaut, par groupe de traductions. */
+function adressesDesEtiquettes(): Promise<Map<string, string>> {
+  return parRequete("etiquettes", async () => {
+    try {
+      const termes = await getTaxonomyTerms("tag", { locale: defaultLocale, includeCounts: false });
+      return new Map(termes.map((t) => [t.translationGroup ?? t.id, t.slug]));
+    } catch {
+      return new Map();
+    }
+  });
+}
+
+async function liensDe(locale: Locale): Promise<Liens> {
+  const [auteurs, sujets, etiquettes] = await Promise.all([indexDe("auteurs", locale), indexDe("sujets", locale), adressesDesEtiquettes()]);
+  return { auteurs, sujets, etiquettes };
+}
+
 async function lireLesBillets(locale: Locale): Promise<CollectionEntry<"posts">[]> {
+  const liens = await liensDe(locale);
   const billets: CollectionEntry<"posts">[] = [];
   let cursor: string | undefined;
   do {
     const page = await getEmDashCollection("posts", { locale, status: "published", limit: 100, cursor });
     if (page.error) throw page.error;
-    for (const entree of page.entries) billets.push(enBillet(entree, locale));
+    for (const entree of page.entries) billets.push(enBillet(entree, locale, liens));
     cursor = page.nextCursor ?? undefined;
   } while (cursor);
   return billets;
@@ -145,7 +201,7 @@ export async function billetParSlug(locale: Locale, slug: string): Promise<Colle
   // Un repli de langue servirait le billet anglais a une adresse francaise :
   // une traduction absente est un 404, pas un contenu dans la mauvaise langue.
   if (!entry || fallbackLocale) return undefined;
-  return enBillet(entry, locale);
+  return enBillet(entry, locale, await liensDe(locale));
 }
 
 /** Toutes les entrees publiees d'une collection dans une langue ; null si la collection n'existe pas (une base d'avant la 3.4.0). */

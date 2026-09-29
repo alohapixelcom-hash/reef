@@ -51,6 +51,15 @@ content touched. Run it before deploying 3.8.1 (the code reads the fields but
 renders the theme as long as they are absent). 3.8.2 adds one field (« Logo pour le mode sombre »):
 `node scripts/base-3.4.0.mjs --remote reef-moteur --sql import-3.8.2-reef.sql`,
 then the same command with `--appliquer`; idempotent, no DELETE, no DROP.
+3.8.3 (after 3.8.1 and 3.8.2): `node scripts/base-3.4.0.mjs --remote reef-moteur
+--sql import-3.8.3-reef.sql`, then `--appliquer`. It turns « Auteur » and
+« Sujet » into references picked by name (existing values become the entry's
+identifier), makes the old keywords native tags (once, a marker in `options`
+prevents a second run from giving back a removed tag), hides the old keywords
+field (its values stay), and creates the two newsletter tables. No column
+added, no DELETE, no DROP; a second pass changes nothing. The code reads both
+the old and the new values, so the order of SQL and deploy does not break the
+site, but run the SQL first: until then the post pages show no tags.
 
 ```bash
 npx wrangler d1 execute reef-moteur --remote --config wrangler.moteur.jsonc --file=import-3.6.0-reef.sql

@@ -140,7 +140,7 @@ Puis « Enregistrer ». « Liens sociaux » : les réseaux du pied de page. « S
 - l'adresse e-mail de contact du pied de page et de la page Contact ;
 - le nom et le lien du crédit du pied de page ;
 - le titre du flux RSS de la langue ;
-- l'adresse d'un service externe pour la lettre d'information, et celle pour le formulaire de contact quand l'écran « Courriels » n'est pas branché (partie 17 bis) ;
+- l'adresse d'un service externe pour la lettre d'information et pour le formulaire de contact, utilisée seulement tant que l'écran « Courriels » n'est pas branché (parties 17 bis et 17 ter) ;
 - « Police du site, pour les titres et le texte » : « Police d'origine du thème » (comme un champ vide), « Police du système, la plus légère », « Classique, à empattements » ou « Titres classiques, texte sans empattements ». Les trois dernières sont déjà installées sur l'ordinateur ou le téléphone du lecteur : rien à télécharger, la page s'affiche plus vite. Le choix vaut pour les deux langues ;
 - « Logo pour le mode sombre » : une version claire de votre logo, montrée quand le lecteur a choisi l'affichage sombre (barre et pied de page) ; vide, le logo des « Paramètres » sert aussi sur fond sombre. Le choix vaut pour les deux langues ;
 - « Couleur de la marque, sur tout le site » : « Couleur d'origine du thème » (le corail du thème, comme un champ vide) ou l'une des cinq couleurs, qui colore les boutons, les liens et le mot en couleur ; chaque couleur garde le texte des boutons lisible (contraste d'au moins 4,5:1, mesuré).
@@ -151,18 +151,20 @@ Les textes de l'en-tête et du pied de page sont des blocs de « Textes des page
 
 1. « Articles », « Ajouter ».
 2. « Titre », « Chapo » (la phrase sous le titre et sur la carte), « Couverture », « Texte ».
-3. « Sujet » : choisissez le sujet dans la liste (elle montre l'identifiant des « Sujets », `Craft`, `Design`...). « Auteur » : de même (`Mara-lindqvist`...).
+3. « Sujet » et « Auteur » : choisissez-les par leur nom dans la liste (« Typography », « Mara Lindqvist »...). La phrase au-dessus de chaque liste dit où il s'affiche. Un sujet ou un auteur créé dans « Sujets » ou « Auteurs » apparaît aussitôt dans la liste.
+   Les étiquettes : dans le panneau « Classement » à droite, « Étiquettes », tapez un mot dans « Ajouter des étiquettes... » puis Entrée (une étiquette qui existe déjà est proposée) ; la croix à côté d'une étiquette la retire. Chaque étiquette a sa page, `/tags/<étiquette>/`, qui liste ses articles, et le pied de l'article y mène.
 4. « Date affichée » (vide : la date de publication), « Revu le » si vous le mettez à jour plus tard, « À la une » pour l'afficher en grand sur l'accueil.
 5. Dans « Adresse web », l'adresse de l'article : `mon-article` donne `/blog/mon-article/`.
 6. « Enregistrer » garde un brouillon, invisible. « Publier » le met en ligne. « Programmer » choisit une date.
 
-L'article paraît aussitôt en tête de « Tous les billets », dans la page de son sujet, dans celle de son auteur, dans le flux RSS et dans le plan du site. Le panneau « SEO » de l'article (titre, description, image, adresse canonique, ne pas indexer) passe avant le titre et le chapô pour Google et les réseaux ; « ne pas indexer » le retire du plan du site.
+L'article paraît aussitôt en tête de « Tous les billets », dans la page de son sujet, dans celle de son auteur, dans celles de ses étiquettes, dans le flux RSS et dans le plan du site. Le panneau « SEO » de l'article (titre, description, image, adresse canonique, ne pas indexer) passe avant le titre et le chapô pour Google et les réseaux ; « ne pas indexer » le retire du plan du site.
 
 ## 12. Les sujets et les auteurs
 
 - **Un sujet** : « Sujets », cliquez le sujet. « Nom du sujet », « Description, en tête de la page du sujet et sur sa carte », « Couleur du sujet » (Corail, Aigue-marine, Encre), « Rang dans les listes (1 en premier) », « Image de partage ». « Enregistrer », puis publiez. Le nom change partout : cartes, bande défilante, page du sujet, pastille des articles.
 - **Un auteur** : « Auteurs », cliquez l'auteur. « Nom », « Rôle, sous le nom », « Biographie courte », « Portrait (vide : les initiales) », « Liens ailleurs (site, réseaux), sur sa page ».
-- **Ajouter** un sujet ou un auteur : « Ajouter », remplissez, publiez. Son **slug** est l'identifiant que les articles choisissent : `photo` donne la page `/topics/photo/`. Pour qu'il soit proposé dans le champ « Sujet » ou « Auteur » des articles, un administrateur ajoute ce slug aux choix du champ : « Types de contenu », « Articles », champ « Sujet », « Options ».
+- **Ajouter** un sujet ou un auteur : « Ajouter », remplissez, publiez. Son « Adresse web » donne sa page : `photo` donne `/topics/photo/`. Il est aussitôt proposé, par son nom, dans les listes « Sujet » et « Auteur » des articles.
+- **Les étiquettes** : « Étiquettes » dans le menu de gauche liste toutes les étiquettes, en anglais et en français. Cliquez une étiquette pour la renommer (son nom change sur chaque article et sur sa page) ; sa traduction se donne dans la même fenêtre. Une étiquette sans article n'a pas de page. L'adresse d'une étiquette est la même dans les deux langues (`/tags/typography/` et `/fr/tags/typography/`), seul son nom se traduit.
 
 ## 13. Ajouter un élément à une liste
 
@@ -192,7 +194,7 @@ Chaque texte existe en anglais et en français. Dans l'écran d'une entrée, le 
 
 « Redirections », « Nouvelle redirection » : « Chemin source » (l'ancienne adresse, qui commence par `/`), « Chemin d'arrivée » (une adresse du site, qui commence aussi par `/`), « Code d'état » (« 301 Permanent » le plus souvent ; 410 pour dire qu'une page a disparu), « Créer ». Changer le slug d'un article ou d'une page crée seul la redirection 301. L'onglet « Erreurs 404 » liste les adresses demandées qui n'existent pas.
 
-## 17 bis. Les courriels du formulaire de contact
+## 17 bis. Les courriels du formulaire de contact et de la lettre
 
 Les messages de la page Contact vous arrivent par courriel dès que l'écran « Courriels » est branché (administrateurs) :
 
@@ -200,11 +202,24 @@ Les messages de la page Contact vous arrivent par courriel dès que l'écran « 
 2. « Réglages des courriels » : l'expéditeur, l'adresse de réponse, le destinataire du formulaire de contact, l'accusé de réception envoyé au lecteur dans sa langue.
 3. « Courriels » : les envois du mois et les échecs ; « Journal des courriels » : chaque envoi, son erreur expliquée, « Renvoyer ».
 
-La lettre d'information, elle, s'envoie à un service externe (partie 10) : sans adresse, son formulaire reste une démonstration.
+La lettre d'information part par le même chemin, sans service externe : voir la partie 17 ter.
 
 **Adresse d'expédition** : une adresse de messagerie (Gmail, Orange, Outlook, Free...) est refusée comme adresse d'expédition, avec une phrase qui dit pourquoi : un site ne peut pas envoyer au nom de ces messageries. Elle reste possible comme destinataire.
 
 **Si un courriel ne part pas** : une carte rouge le dit en haut de « Courriels » et sur la page d'accueil du back office, jusqu'à ce qu'il soit renvoyé avec succès. Dans « Journal des courriels », la colonne « Pourquoi » donne la raison en toutes lettres, et « Renvoyer ce courriel » le fait repartir.
+
+## 17 ter. La lettre d'information
+
+Dès que les courriels sont branchés (adresse d'expédition réglée), le formulaire « S'abonner » de l'accueil et du pied de page inscrit les lecteurs sur votre site, sans service externe :
+
+1. Le lecteur tape son adresse et valide. La page lui dit qu'un courriel est parti : il doit cliquer le lien qu'il contient pour confirmer (double confirmation : personne ne peut inscrire l'adresse d'un autre). Sans confirmation, l'inscription est effacée au bout de 7 jours.
+2. « Lettre d'information » (menu de gauche, sous « Courriels ») : le nombre d'abonnés et d'inscriptions en attente, puis la liste des adresses, leur langue et depuis quand.
+3. **Envoyer un article** : choisissez-le dans « Article à envoyer », puis « Envoyer à N abonnés » et confirmez. Chaque abonné le reçoit dans sa langue (le titre, le chapo, un lien vers l'article). Un article déjà envoyé le dit, avec sa date, avant de repartir.
+4. **Se désinscrire** : chaque courriel porte un lien « Se désinscrire » en bas ; un clic suffit, l'adresse est effacée de la liste. Les messageries qui affichent leur propre bouton « Se désinscrire » passent par le même chemin.
+5. **Retirer une adresse** à la demande d'une personne : « Adresse à retirer », puis « Retirer cette adresse » et confirmez.
+6. « Derniers envois de la lettre » : chaque article envoyé, quand, et combien de courriels sont partis. Un courriel qui n'est pas parti est dans « Journal des courriels », avec « Renvoyer ».
+
+Les envois de la lettre comptent dans le forfait du mois (écran « Courriels ») : un envoi qui dépasserait le plafond du mois est refusé d'avance, avec la marche à suivre. Tant que les courriels ne sont pas branchés, le formulaire poste vers le service externe réglé dans « Réglages par langue » s'il y en a un, sinon il reste une démonstration.
 
 ## 18. Révisions, retour arrière, corbeille
 
@@ -221,7 +236,7 @@ La lettre d'information, elle, s'envoie à un service externe (partie 10) : sans
 | Toutes | Liens de la barre, bouton « S'abonner », menu du téléphone | « Menus » : menu principal, boutons, liens du téléphone |
 | Toutes | Colonnes et liens du pied | « Menus » : « Lire », « Le studio », « Légal » |
 | Toutes | Phrase du pied, mentions, e-mail, crédit | « Textes des pages » (page « Tout le site ») et « Réglages par langue » |
-| Toutes | Lettre d'information | « Textes des pages », bloc « lettre » ; adresse du service dans « Réglages par langue » |
+| Toutes | Lettre d'information | « Textes des pages », bloc « lettre » ; abonnés et envois dans « Lettre d'information » (partie 17 ter) |
 | Toutes | Couleur de la marque | « Réglages par langue », « Couleur de la marque » |
 | Toutes | Police des titres et du texte | « Réglages par langue », « Police du site » |
 | Toutes | Logo sur fond sombre | « Réglages par langue », « Logo pour le mode sombre » |
@@ -232,6 +247,7 @@ La lettre d'information, elle, s'envoie à un service externe (partie 10) : sans
 | Accueil | Ordre des blocs | chaque bloc, « Place du bloc sur l'accueil » (partie 6) |
 | Tous les billets, sujet, auteur | En-tête, fil d'Ariane, nombre d'articles | « Textes des pages » ; « Articles par page » dans « Paramètres » |
 | Article | Tout le contenu, SEO | « Articles » ; « À lire ensuite » dans « Textes des pages », page « Billet » |
+| Article, page d'une étiquette | Étiquettes | panneau « Classement » de l'article ; noms dans « Étiquettes » |
 | À propos | Texte, histoire, règles, signatures, appel | « Textes des pages », page « À propos » |
 | Contact | Formulaire, écrire directement, étapes | « Textes des pages », page « Contact » ; courriels dans « Courriels » |
 | Pages légales | Clauses, sommaire, date | « Textes des pages », pages « Mentions légales », « Confidentialité », « Conditions » |
@@ -243,8 +259,7 @@ La lettre d'information, elle, s'envoie à un service externe (partie 10) : sans
 - l'ordre des blocs d'une autre page que l'accueil, un nouveau type de bloc, la mise en page et le dessin du site ;
 - les textes d'interface génériques (accessibilité, « changer de langue », « ouvrir le menu », « min de lecture », compteurs), le bandeau de cookies ;
 - les adresses des pages du thème et le fichier robots.txt ;
-- une police de caractères qui n'est pas dans la liste « Police du site » ;
-- l'envoi de la lettre d'information par l'écran « Courriels » (il ne reçoit que le formulaire de contact).
+- une police de caractères qui n'est pas dans la liste « Police du site ».
 
 Ce qu'il faut savoir du moteur (EmDash 0.38) :
 

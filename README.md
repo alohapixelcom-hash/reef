@@ -53,14 +53,14 @@ Markdown post, never inside a component.
 ## A blog you run from the back office
 
 What a blogger expects from a sober WordPress, and where it stands in Reef
-3.8.1 with the engine on. "Partly" and "Not yet" are said as they are.
+3.8.3 with the engine on. "Partly" and "Not yet" are said as they are.
 
 | You want to | In Reef | Where, in the back office |
 |---|---|---|
 | Write posts, keep drafts, go back to a revision | Yes | "Articles": title, lead, cover, rich text, date, featured, SEO panel |
 | Add pages | Yes | "Pages": served at `/<address>/`, then added to a menu |
-| Show authors | Partly | "Auteurs": name, role, bio, portrait, links. On a post, the author is picked from a list of identifiers, not of names |
-| Sort posts into categories and tags | Partly | One topic per post ("Sujets": name, description, colour, rank). Tags are a raw list field; EmDash's own taxonomies are not wired |
+| Show authors | Yes (3.8.3) | "Auteurs": name, role, bio, portrait, links. On a post, the author is picked by name (a native EmDash reference) |
+| Sort posts into topics and tags | Yes (3.8.3) | One topic per post, picked by name ("Sujets": name, description, colour, rank); tags are EmDash's native taxonomy, typed in the post's panel, renamed in "Étiquettes", one page per tag at `/tags/<tag>/` |
 | Comments | Not yet | None on the site, on purpose. EmDash 0.38 has a moderation screen, not connected |
 | Edit menus | Yes | "Menus": main bar, phone menu, buttons, three footer columns, per language |
 | Footer widgets | Partly | The footer columns are menus and its texts are editable; EmDash's widget areas are not used |
@@ -73,13 +73,13 @@ What a blogger expects from a sober WordPress, and where it stands in Reef
 | RSS feed | Yes | One per language; its title in "Réglages par langue" |
 | Sitemap | Yes | Rendered on demand; a noindex entry leaves it |
 | Emails | Yes | Contact form messages sent and logged by the house Emails screens (Cloudflare `send_email` binding) |
-| Newsletter | Partly | The signup form posts to an outside service whose address you set; no built-in list or sending |
+| Newsletter | Yes (3.8.3) | Built in, no outside service: double opt-in signup, subscriber list in "Lettre d'information", one-click sending of a published post in each reader's language, one-click unsubscribe (link and `List-Unsubscribe` headers). Sent through the house Emails screens |
 | Redirects | Yes | "Redirections" (EmDash, 301) |
 | Media | Yes | EmDash's media library, stored in R2 |
 | Posts per page | Yes | "Paramètres", general |
 
 An empty field always renders the theme as shipped. `scripts/essai-administrer.mjs`
-replays sixteen of these gestures in a real browser, through the interface
+replays twenty of these gestures in a real browser, through the interface
 only, checks each one as an anonymous visitor, then undoes it. The editor's
 guide is [docs/administrer.md](docs/administrer.md) (French) and
 [docs/administer.md](docs/administer.md) (English).

@@ -26,7 +26,7 @@ import { FR, type Textes } from "../ecrans/textes.fr.ts";
  * Workers API), la meme que le fournisseur livre avec @emdash-cms/cloudflare.
  */
 export interface Liaison {
-  send(message: { to: string[]; from: { email: string; name: string }; subject: string; text: string; html?: string; replyTo?: string }): Promise<unknown>;
+  send(message: { to: string[]; from: { email: string; name: string }; subject: string; text: string; html?: string; replyTo?: string; headers?: Record<string, string> }): Promise<unknown>;
 }
 
 export interface Contexte {
@@ -62,8 +62,13 @@ export interface Options {
   id?: string;
   /** Faux : le contenu n'est pas garde (courriel du back office, porteur d'un jeton). */
   garder?: boolean;
-  /** Faux : les plafonds ne s'appliquent pas (meme courriel du back office). */
-  plafonner?: boolean;
+  /**
+   * Faux : les plafonds ne s'appliquent pas (meme courriel du back office).
+   * "mois" : seul le plafond du mois s'applique (une parution de la lettre,
+   * geste de l'administrateur : les plafonds d'heure, de jour et par adresse
+   * protegent des robots du formulaire, pas d'une liste confirmee).
+   */
+  plafonner?: boolean | "mois";
 }
 
 /** Une livraison : garde-fous, liaison, journal. Ne leve jamais : l'issue dit ce qui s'est passe. */
@@ -81,7 +86,8 @@ export async function envoyer(ctx: Contexte, reglages: Reglages, origine: Origin
   if (!reglages.expediteur) return noter("refuse", "SANS_EXPEDITEUR");
   if (!ctx.liaison) return noter("refuse", "SANS_LIAISON");
 
-  const atteint = options.plafonner === false ? null : plafondAtteint(reglages.plafonds, await comptes(ctx.base, destinataire, quand, reglages.cycle));
+  const plafonds = options.plafonner === "mois" ? { heure: 0, jour: 0, destinataire: 0, mois: reglages.plafonds.mois } : reglages.plafonds;
+  const atteint = options.plafonner === false ? null : plafondAtteint(plafonds, await comptes(ctx.base, destinataire, quand, reglages.cycle));
   if (atteint) return noter("plafonne", `PLAFOND:${atteint}:${reglages.plafonds[atteint]}`);
 
   try {
@@ -92,6 +98,7 @@ export async function envoyer(ctx: Contexte, reglages: Reglages, origine: Origin
       text: message.texte,
       ...(message.html ? { html: message.html } : {}),
       ...(message.reponse ? { replyTo: message.reponse } : {}),
+      ...(message.entetes ? { headers: message.entetes } : {}),
     })) as { messageId?: unknown } | undefined;
     const identifiant = typeof reponse?.messageId === "string" ? reponse.messageId : null;
     await inscrire(ctx.base, { ...ligne, etat: "envoye", fournisseur: "cloudflare", identifiant });

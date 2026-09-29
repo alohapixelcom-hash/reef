@@ -1,4 +1,4 @@
-// src/moteur/extensions/courriels/extension.ts - l'extension EmDash "Courriels" cote serveur : le fournisseur du canal de courriel d'EmDash, son journal, et la route Block Kit des quatre ecrans et de la carte.
+// src/moteur/extensions/courriels/extension.ts - l'extension EmDash "Courriels" cote serveur : le fournisseur du canal de courriel d'EmDash, son journal, et la route Block Kit des ecrans (quatre, cinq avec la lettre d'information) et de la carte.
 //
 // EXTENSION NATIVE. Elle lit la liaison send_email et la base du Worker, ce
 // qu'une extension "sandbox" ne peut pas faire. Elle se branche sur le canal
@@ -25,19 +25,24 @@
 // action_id, prefixe du nom de l'ecran ("journal:renvoyer"). Rien n'est garde
 // entre deux requetes, sauf la vue du journal de chaque personne (KV).
 import { definePlugin, type PluginCapability, type ResolvedPlugin, type RouteContext } from "emdash";
-import { hote, nouvelId } from "./adaptateur.ts";
+import { hote, lettreDuSite, nouvelId, ROUTE_DE_LA_LETTRE } from "./adaptateur.ts";
 import { CONFIGURATION } from "./configuration.ts";
-import { capacites, CARTES, IDENTITE, PAGES } from "./identite.mjs";
-import { bilanDuCycle, derniereModification, echecsEnAttente, ecrireLesReglages, fournisseurChoisi, lignes, lireLesReglages, uneLigne } from "./noyau/base.ts";
-import { type Canal, fournisseur, journaliste, poster } from "./noyau/canal.ts";
+import { capacites, CARTES, IDENTITE, PAGE_LETTRE, PAGES } from "./identite.mjs";
+import { type Base, bilanDuCycle, derniereModification, echecsEnAttente, ecrireLesReglages, fournisseurChoisi, lignes, lireLesReglages, uneLigne } from "./noyau/base.ts";
+import { type Canal, fournisseur, journaliste, type Poster, poster } from "./noyau/canal.ts";
 import { interroger } from "./noyau/dns.ts";
 import { erreurEnClair, essai, renvoyer } from "./noyau/envoi.ts";
-import { debutDuCycle, domaineDe, langueDeLaRequete, lireReglages } from "./noyau/regles.ts";
+import { articlesPublies, compterLesAbonnes, listeDesAbonnes, parutions, retirer } from "./noyau/lettre.ts";
+import { manquesDeLaLettre, publier } from "./noyau/parution.ts";
+import { debutDuCycle, domaineDe, langueDeLaRequete, lireReglages, type Reglages } from "./noyau/regles.ts";
 import type { Bloc, Reponse } from "./ecrans/blocs.ts";
 import { date } from "./ecrans/blocs.ts";
 import { ACTIONS as A_BRANCHER, brancher } from "./ecrans/brancher.ts";
 import { ACTIONS as A_JOURNAL, appliquer, envoisProposes, journal, libellesDesEnvois, lireVue } from "./ecrans/journal.ts";
 import { ACTIONS as A_REGLAGES, erreursEnClair, reglages as ecranReglages, versReglages } from "./ecrans/reglages.ts";
+import { ACTIONS as A_LETTRE, choisir, ecranDeLaLettre, libellesDesArticles, lireVueDeLaLettre } from "./ecrans/lettre.ts";
+import { LETTRE_EN } from "./ecrans/lettre.textes.en.ts";
+import { LETTRE_FR } from "./ecrans/lettre.textes.fr.ts";
 import { carte, tableau } from "./ecrans/tableau.ts";
 import { EN } from "./ecrans/textes.en.ts";
 import { FR, type Textes } from "./ecrans/textes.fr.ts";
@@ -88,6 +93,8 @@ async function page(ctx: RouteContext): Promise<Reponse> {
       const donnees = { reglages: regl, liaison: !!h.liaison, livreur: await fournisseurChoisi(base), bilan: await bilanDuCycle(base, maintenant, regl.cycle), derniers: await lignes(base, { limite: 5 }), echecs: await echecsEnAttente(base, debutDuCycle(maintenant, regl.cycle)), maintenant };
       return ecran === "/" ? tableau(t, donnees) : carte(t, donnees);
     }
+
+    if (ecran === "/lettre") return await ecranLettre(ctx, t, base, envoi, regl, !!h.liaison, maintenant, nomDuSite);
 
     if (ecran === "/journal") {
       let vue = lireVue(await ctx.kv.get(vueDe(ctx)));
@@ -195,6 +202,50 @@ async function page(ctx: RouteContext): Promise<Reponse> {
   }
 }
 
+const vueDeLaLettre = (ctx: RouteContext) => `vue:lettre:${ctx.user?.id ?? "inconnu"}`;
+
+/** L'ecran "Lettre d'information" : un choix, un envoi, un retrait, puis l'ecran rendu a neuf. */
+async function ecranLettre(ctx: RouteContext, t: Textes, base: Base, envoi: Poster, regl: Reglages, liaison: boolean, maintenant: number, nomDuSite: string): Promise<Reponse> {
+  const lettre = lettreDuSite();
+  if (!lettre) return { blocks: [{ type: "banner", variant: "error", description: t.panne("lettre") }] };
+  const l = t === EN ? LETTRE_EN : LETTRE_FR;
+  const i = lireInteraction(ctx.input);
+  let vue = lireVueDeLaLettre(await ctx.kv.get(vueDeLaLettre(ctx)));
+  const livreur = await fournisseurChoisi(base);
+  const manques = manquesDeLaLettre(regl, liaison, livreur === IDENTITE.id);
+  let bandeau: Bloc | undefined;
+  let toast: Reponse["toast"];
+  if (i.action_id === A_LETTRE.envoyer && typeof i.value === "string") {
+    const compte = await compterLesAbonnes(base, maintenant);
+    const reste = regl.plafonds.mois > 0 ? Math.max(regl.plafonds.mois - (await bilanDuCycle(base, maintenant, regl.cycle)).envoyes, 0) : Number.POSITIVE_INFINITY;
+    if (manques.length) toast = { message: l.pasPrete, type: "error" };
+    else if (compte.inscrits > reste) bandeau = { type: "banner", variant: "error", description: l.forfait(compte.inscrits, reste) };
+    else {
+      const bilan = await publier(envoi, {
+        base, options: lettre, groupe: i.value, origine: new URL(ctx.request.url).origin, route: ROUTE_DE_LA_LETTRE, site: regl.nom || nomDuSite,
+        reponse: regl.reponse, catalogues: { fr: LETTRE_FR, en: LETTRE_EN }, maintenant, nouvelId, par: qui(ctx), langue: t === EN ? "en" : "fr",
+      });
+      if (!bilan) bandeau = { type: "banner", variant: "error", description: l.introuvable };
+      else {
+        const texte = bilan.refuses ? l.envoyePartiel(bilan.envoyes, bilan.refuses) : l.envoye(bilan.envoyes);
+        bandeau = { type: "banner", variant: bilan.refuses ? "alert" : "default", description: texte };
+        toast = { message: texte, type: bilan.refuses ? "error" : "success" };
+        vue = { ...vue, article: null };
+      }
+    }
+  } else if (i.action_id === A_LETTRE.retirer && typeof i.value === "string") {
+    const cible = (await listeDesAbonnes(base, 500)).find((a) => a.id === i.value);
+    if (cible && (await retirer(base, cible.id))) toast = { message: l.retire(cible.adresse), type: "success" };
+    vue = { ...vue, abonne: null };
+  } else if (i.action_id) vue = choisir(vue, i.action_id, i.value);
+  const abonnes = await listeDesAbonnes(base, 500);
+  const articles = libellesDesArticles(t, await articlesPublies(base, lettre, 60), t === EN ? "en" : "fr");
+  vue = { ...vue, articles: Object.fromEntries(articles.map((a) => [a.libelle, a.groupe])), abonnes: Object.fromEntries(abonnes.map((a) => [a.adresse, a.id])) };
+  await ctx.kv.set(vueDeLaLettre(ctx), vue);
+  const rendu = ecranDeLaLettre(t, l, { manques, compte: await compterLesAbonnes(base, maintenant), abonnes, articles, parutions: await parutions(base, 10), vue, maintenant, ...(bandeau ? { bandeau } : {}) }, t.tableau.manques);
+  return toast ? { ...rendu, toast } : rendu;
+}
+
 /**
  * Choisit Courriels comme fournisseur du canal. EmDash 0.38 n'a pas d'ecran
  * pour ce choix (seulement sa route d'administration, qui met a jour la base
@@ -260,7 +311,8 @@ export function createPlugin(options: Options = {}): ResolvedPlugin {
     routes: {
       admin: { permission: "settings:manage", handler: page },
     },
-    admin: { pages: PAGES, widgets: CARTES },
+    // La page de la lettre n'existe que pour un site qui a une lettre.
+    admin: { pages: lettreDuSite() ? [PAGES[0], PAGE_LETTRE, ...PAGES.slice(1)] : PAGES, widgets: CARTES },
   });
 }
 

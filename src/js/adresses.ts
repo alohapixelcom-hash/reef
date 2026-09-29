@@ -79,3 +79,26 @@ export const cheminsDeLAuteur = (async () => {
   );
   return groups.flat();
 }) satisfies GetStaticPaths;
+
+/**
+ * L'archive paginee d'une etiquette, par langue (3.8.3). Une page par
+ * etiquette portee par au moins un billet publie de la langue : une etiquette
+ * sans billet n'a pas de page, et son adresse repond 404.
+ */
+export const cheminsDeLEtiquette = (async ({ paginate }) => {
+  const pageSize = await billetsParPage();
+  const groups = await Promise.all(
+    locales.map(async (locale) => {
+      const posts = await getResolvedPosts(locale);
+      const libelles = new Map<string, string>();
+      for (const entry of posts) for (const e of entry.etiquettes) if (!libelles.has(e.slug)) libelles.set(e.slug, e.label);
+      return [...libelles].flatMap(([slug, label]) =>
+        paginate(
+          posts.filter((entry) => entry.etiquettes.some((e) => e.slug === slug)),
+          { pageSize, params: { locale: locale === defaultLocale ? undefined : locale, tag: slug }, props: { etiquette: { slug, label } } },
+        ),
+      );
+    }),
+  );
+  return groups.flat();
+}) satisfies GetStaticPaths;

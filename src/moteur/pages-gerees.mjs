@@ -20,6 +20,7 @@ export const PAGES_GEREES = [
   "src/pages/[...locale]/blog/[...page].astro",
   "src/pages/[...locale]/topics/index.astro",
   "src/pages/[...locale]/topics/[topic]/[...page].astro",
+  "src/pages/[...locale]/tags/[tag]/[...page].astro",
   "src/pages/[...locale]/authors/index.astro",
   "src/pages/[...locale]/authors/[author].astro",
   "src/pages/[...locale]/search.astro",

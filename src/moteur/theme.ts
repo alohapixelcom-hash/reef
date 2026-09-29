@@ -32,7 +32,6 @@ import type { Locale } from "@i18n";
 import { ACTIONS, type MenuDuSite, PRINCIPAL, TIROIR } from "./menus.ts";
 import { identite, type Identite, type RepliDuSite } from "./cadre.ts";
 import type { ParametresDeLEssai } from "./essai.ts";
-import type { ChampsDesBlocs } from "./champs-des-blocs.ts";
 import { garantirLeContraste, type RegleDeContraste } from "./palette.ts";
 import type { VariablesDePolice } from "./typographie.ts";
 
@@ -320,21 +319,6 @@ export const ESSAI_DE_L_ADMINISTRATION: ParametresDeLEssai = {
   seo: { entree: "contact", page: "/contact/" },
 };
 
-// LA CARTE DES CHAMPS DE CHAQUE BLOC (socle 1.7.0, forme : champs-des-blocs.ts). Releve par la sonde de
-// l'univers 3.8.2 (chaque champ change, publie, relu en visiteur) : un champ qui ne change rien sur la page
-// n'est pas cite, et l'ecran du bloc le cache. Un bloc absent de la carte garde tous ses champs.
-const BLOCS_SANS_MEDIA = [
-  "a-la-une", "a-lire-ensuite", "a-propos", "a-propos-appel", "a-propos-histoire", "a-propos-signatures", "archives", "auteurs", "bande-sujets",
-  "conditions", "confidentialite", "contact", "contact-direct", "contact-formulaire", "contact-suite", "dernieres-notes", "en-tete", "introuvable",
-  "lettre-flux", "mentions-legales", "pied-de-page", "recherche", "rubriques", "signatures", "sommaire-legal", "sujet", "sujets"
-];
-export const CHAMPS_DES_BLOCS: ChampsDesBlocs = {
-  surveilles: ["image", "video", "video_poster"],
-  blocs: {
-    ...Object.fromEntries(BLOCS_SANS_MEDIA.map((b) => [b, []])),
-    "a-propos-regles": ["image"],
-    hero: ["image"],
-    lettre: ["image"],
-    studio: ["video", "video_poster"],
-  },
-};
+// LA CARTE DES CHAMPS DE CHAQUE BLOC (socle 1.8.0, 3.8.3) : relevee par la sonde, textes compris,
+// dans champs-des-blocs.site.ts (un champ qui ne change rien sur la page d'un bloc est cache dans son ecran).
+export { CHAMPS_DES_BLOCS } from "./champs-des-blocs.site.ts";

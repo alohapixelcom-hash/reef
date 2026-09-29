@@ -4,6 +4,7 @@
 // ne reecrit que ce fichier (mode d'emploi en tete de ./adaptateur.ts). Aucune
 // adresse ici : les adresses se reglent dans le back office, jamais dans le code.
 import siteData from "../../../config/siteData.json.ts";
+import type { OptionsDeLaLettre } from "./noyau/lettre.ts";
 import type { Formulaire, Langue } from "./noyau/regles.ts";
 
 export interface Configuration {
@@ -25,6 +26,12 @@ export interface Configuration {
   langue: Langue;
   /** La langue par defaut du back office (ALOHA_BO_LANGUE) ; null quand le navigateur decide. */
   langueDuBackOffice: string | null;
+  /**
+   * La lettre d'information (socle 1.8.0) : la collection des articles, leur
+   * adresse par langue, l'accueil de chaque langue. Absente : pas de lettre,
+   * ni page au back office ni formulaire branche.
+   */
+  lettre?: OptionsDeLaLettre;
 }
 
 // Figee au build par moteur.config.mjs ; absente hors build (tests) : le francais.
@@ -40,4 +47,9 @@ export const CONFIGURATION: Configuration = {
   nomDuSite: siteData.name,
   langue: (langueDuBackOffice ?? "fr").startsWith("en") ? "en" : "fr",
   langueDuBackOffice,
+  lettre: {
+    collection: "posts",
+    adresse: { en: "/blog/{slug}/", fr: "/fr/blog/{slug}/" },
+    accueil: { en: "/", fr: "/fr/" },
+  },
 };

@@ -121,6 +121,8 @@ export interface Message {
   texte: string;
   html?: string;
   reponse?: string;
+  /** Des en-tetes de plus (la lettre d'information : List-Unsubscribe, RFC 8058). */
+  entetes?: Record<string, string>;
 }
 
 export interface Ligne {
