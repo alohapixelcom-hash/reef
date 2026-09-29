@@ -7,7 +7,7 @@ license and where it lives. If it is not on this page, it was made for this
 theme. This inventory is what makes Reef safe to ship and to reuse inside your
 own products.
 
-Verified against the repository on 2026-08-30 (packages read from
+Verified against the repository on 2026-09-29 (3.6.1) (packages read from
 node_modules metadata, assets listed with find over public/ and src/).
 
 ## Fonts

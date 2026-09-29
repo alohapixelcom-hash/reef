@@ -74,7 +74,7 @@ with `npx wrangler deploy` (see [DEPLOY.md](DEPLOY.md)).
 - **EmDash's native backgrounds**, white in light mode and black in dark mode.
   The theme only brings its accent colour, fonts, logo and site name.
 - **A dashboard card** (last published content, version served) and a
-  **"Deploy everything"** button that empties the caches and rebuilds the
+  **"Update the site"** button that empties the caches and rebuilds the
   prerendered pages through a Cloudflare Deploy Hook.
 - **The whole site from the back office** (since 3.4.0): menus, site settings,
   posts per page, topics and authors, footer, photos, button addresses, SEO,
@@ -96,22 +96,22 @@ https://alohapixel.app/themes/
 
 ## What is in the box, counted from this repo
 
-Numbers below were counted from the source, not estimated (snapshot
-2026-08-30; `pnpm build` green, `pnpm check` clean).
+Numbers below were counted from the source and the build, not estimated
+(recounted on 2026-09-29 for 3.6.1; `pnpm build` green, `pnpm check` clean).
 
 | What | Count |
 |---|---|
-| Pages emitted by `pnpm build` | 55 |
+| Pages emitted by `pnpm build` | 54 |
 | Plain-text endpoints | robots.txt, llms.txt, per-language rss.xml, sitemap-index.xml |
 | Content collections (zod validated) | 3 (posts, authors, topics) |
 | Demo content entries | 9 posts, 3 authors, 5 topics, in 2 languages |
 | UI primitive families (src/components/ui) | 36, across 63 .astro files |
 | Primitive files that need a script tag | 10 of 63; the rest are pure HTML and CSS |
-| Section components | 24 |
+| Section components | 27 |
 | Original hand-drawn icons | 60 |
 | animate-* utilities (motion catalog + brand tokens) | 55 + 3 |
 | Languages, from one page source each | 2 (English at the root, French under /fr/) |
-| Runtime dependencies | 9, every one listed in THIRD-PARTY.md |
+| Runtime dependencies | 16, 6 of them only for the optional engine (@astrojs/cloudflare, @astrojs/react, react, react-dom, emdash, @emdash-cms/cloudflare); every one listed in THIRD-PARTY.md |
 
 ## Why it feels expensive
 
@@ -143,8 +143,8 @@ Numbers below were counted from the source, not estimated (snapshot
 Astro 7 (static output, no adapter), Tailwind CSS 4 (CSS-first, no config
 file), tailwind-variants, @astrojs/mdx (Markdown and MDX posts) and
 @astrojs/sitemap, self-hosted fonts via Fontsource (Space Grotesk, Instrument
-Sans, both OFL); the accent word of a heading keeps the heading font under a
-turquoise wave underline, so no third font loads. Node >= 22.18 and pnpm. No
+Sans, both OFL); the accent word of a heading keeps the heading font and only
+changes colour, so no third font loads. Node >= 22.18 and pnpm. No
 React, no animation library, no WebGL on the public site. The optional
 publication engine adds the Cloudflare adapter, EmDash and React to ITS build
 only; React carries EmDash's back office and no public page gains an island.
@@ -238,7 +238,8 @@ docs/           the five convention files, one per subsystem
       legal advice.
 - [ ] The demo posts, authors and topics replaced with your own.
 - [ ] The contact form points at your own endpoint, or is removed. It ships
-      with no `action` on purpose (the note is at the top of contact.astro).
+      with no `action` on purpose (the note is at the top of contact.astro). With the engine on, the contact form goes through the back office's
+      Emails screens once they are connected (docs/administer.md).
 - [ ] `pnpm check` and `pnpm build` are green, and the selfchecks pass.
 
 Deploy dist/ to any static host: Cloudflare Pages, Netlify, Vercel, an nginx
@@ -272,6 +273,10 @@ checklist Apple reviewers care about, is in
   motion, seo), each anchored to real files in this repo. They are written to
   be read by a human on day one and by any coding assistant afterwards.
 - wiki/: start at wiki/overview.md; each subsystem has its own anchored page.
+- docs/moteur.md: the optional publication engine: how it is wired, the
+  back office, the online data and what was measured.
+- docs/administrer.md (French) and docs/administer.md (English): the
+  editor's guide, running the whole site from the back office, with no code.
 - THIRD-PARTY.md: the complete honest inventory (two OFL fonts, permissive
   npm packages, and the photographs that ship with the demo).
 

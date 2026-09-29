@@ -4,7 +4,28 @@
 
 Versions describe the features actually shipped in this theme.
 
-Current version: **3.6.0**.
+Current version: **3.6.1**.
+
+## 3.6.1 - 2026-09-29
+
+Docs read again against the code, repositories cleaned. The static build is
+byte-identical to 3.6.0.
+
+- README: 54 pages (not 55), dependencies recounted, the docs list names
+  docs/moteur.md and the admin guides; AGENTS.md says which files come from
+  the shared base.
+- Admin guides: the English guide (`docs/administer.md`) catches up with
+  the French one of 3.6.0 (empty photo field, corrected button address, French
+  menu links, hidden settings, "Update the site", the theme's original colour,
+  what a revision does not restore, emails: this month, mailbox addresses
+  refused as sender, the red card); both guides say a block saves on its own,
+  a new page is created in English then translated, and to replace the demo
+  contact details first.
+- Docs: "Tout déployer" renamed "Mettre le site à jour" wherever the docs
+  name the button; docs/moteur.md and DEPLOY.md give the 3.6.0 step for an
+  online database (`import-3.6.0-reef.sql`); docs/design.md no longer
+  describes a wave under the accent word; the README counts are recounted on
+  the source and the build.
 
 ## 3.6.0 - 2026-09-29
 
@@ -345,49 +366,6 @@ Measured on the seven demos, Lighthouse mobile, served compressed: Kona 92 to
 Accessibility, best practices and SEO stay at 100 on all seven. CLS is at or
 under 0.003 everywhere, against 0.168 on Kona before.
 
-## 1.7.2 - 2026-09-07
+## 1.7.2 and before
 
-Astro 7.3, a render bench that measures translucent colours instead of giving
-up in front of them, and everything it found the hour it learned to.
-
-- The whole family moves to Astro 7.3 (`astro@7.3.1`). Nothing else in the
-  dependency tree moved, and the seven themes are green on types, build,
-  selfchecks, house lint and the render bench.
-- `pnpm verify` COMPOSITES COLOURS. Until this release the contrast check
-  declared a ground unreadable as soon as it was not fully opaque, and skipped
-  any ink under 95 percent opacity. Both describe ordinary house writing: a
-  tinted chip on a card, a note written `text-muted-foreground/80`. The bench
-  was therefore silent on a whole family of surfaces a browser paints
-  perfectly well, while Lighthouse read them and failed them. It now stacks
-  the translucent layers onto the first opaque colour underneath, and blends a
-  translucent ink into the result, exactly as the engine paints it. It still
-  refuses the one case it truly cannot read, text over a photograph, and it
-  finds that case from the rectangle of every image, video and canvas on the
-  page instead of guessing from the ancestors.
-- It also measures every element that paints its OWN text. It used to start
-  from a list of tags and keep only those that contained no other, which
-  missed the commonest shape in this codebase: an element carrying an icon AND
-  a word.
-- What it found here, the same hour: the topic label on the post cards was at
-  3.99 to 1 where AA asks 4.5, and the three footer column labels at 3.70. The
-  label takes a twelfth semantic role, `text-primary-text`, one step darker on
-  the turquoise ramp and pointing back at the primary in dark mode, exactly as
-  `text-accent-text` has done for the coral since 1.6.3. The column labels go
-  back to full ink: an attenuated recessive role is how a theme quietly loses
-  AA.
-- The bench stopped changing its mind: it waits for a condition (fonts in,
-  layout stable, a title box) instead of a 400 ms delay that reported phantom
-  missing h1s under load, and measures five widths (1024 and 1280 added).
-- The stylesheet travels inside the HTML (`build.inlineStylesheets: "always"`).
-  Lighthouse measured 730 ms of render blocking before the first pixel on the
-  demo, from stylesheet requests alone. The trade is written out in
-  `astro.config.mjs`, and one word puts it back.
-- The demo posters are served by the site (`src/assets`, both crops built)
-  instead of the video host, which set two third-party cookies; the video
-  stays remote and loads only on scroll.
-- Measured on the demo, mobile: best practices 77 to 100, accessibility to
-  100, render-blocking stylesheet requests from three to zero.
-
-## 1.7.1 and before
-
-Moved to `CHANGELOG-ARCHIVE-1.x.md` on 28 September 2026 (400-line ceiling of the house).
+Moved to `CHANGELOG-ARCHIVE-1.x.md` on 28 and 29 September 2026 (400-line ceiling of the house).
