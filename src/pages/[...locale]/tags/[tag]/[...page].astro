@@ -16,6 +16,7 @@ import type { Etiquette } from "@js/etiquettes";
 import type { ResolvedPost } from "@js/posts";
 import { breadcrumbList } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { marqueInterface } from "@moteur/cadre";
 import { propsDeLaPage } from "@moteur/chemins";
 import { textesDeLaPage } from "@moteur/textes";
 import type { Page } from "astro";
@@ -34,6 +35,11 @@ const heading = fmt(t.archive.tagTitle, { tag: etiquette.label });
 const title = page.currentPage > 1 ? `${heading}, ${fmt(t.archive.pageSuffix, { n: page.currentPage })}` : heading;
 const count = page.total === 1 ? t.archive.countOne : fmt(t.archive.countLabel, { count: page.total });
 
+// Le nom de l'etiquette se change au back office ("Etiquettes"), pas dans la
+// page : en mode edition, il est marque comme une commande, rien pour un visiteur.
+const iface = marqueInterface(Astro);
+const edition = { entree: {}, champ: (nom: string) => (nom === "accent" ? iface : {}) };
+
 const base = Astro.site ?? Astro.url;
 const crumbs = breadcrumbList([
   { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
@@ -51,11 +57,12 @@ const crumbs = breadcrumbList([
 
   <main id="content">
     <PageHero
+      edition={edition}
       eyebrow={t.post.tagsLabel}
       title={heading}
       accentWord={etiquette.label}
       lede={count}
-      crumbs={[{ label: t.archive.crumb, href: localizePath("/blog/", locale) }, { label: etiquette.label }]}
+      crumbs={[{ label: t.archive.crumb, href: localizePath("/blog/", locale) }, { label: etiquette.label, attributs: iface }]}
     />
 
     <PostGrid

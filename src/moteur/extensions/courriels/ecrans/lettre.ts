@@ -99,7 +99,9 @@ export function ecranDeLaLettre(t: Textes, l: TextesDeLaLettre, d: DonneesDeLaLe
     blocks.push({
       type: "actions",
       block_id: `lettre-article-${choisi?.groupe ?? "aucun"}`,
-      elements: [{ type: "select", action_id: ACTIONS.article, label: l.choisirArticle, options: d.articles.map((a) => ({ label: a.libelle, value: a.libelle })), ...(choisi ? { initial_value: choisi.libelle } : {}) }],
+      // Une premiere ligne "Choisissez un article" : la liste vide d'EmDash
+      // n'affiche rien de lisible, et apres un envoi la liste y revient.
+      elements: [{ type: "select", action_id: ACTIONS.article, label: l.choisirArticle, options: [l.aucunArticleChoisi, ...d.articles.map((a) => a.libelle)].map((x) => ({ label: x, value: x })), initial_value: choisi?.libelle ?? l.aucunArticleChoisi }],
     });
     if (choisi && d.compte.inscrits === 0) blocks.push({ type: "section", text: l.aucunAbonne });
     if (choisi && d.compte.inscrits > 0) {
@@ -153,7 +155,7 @@ export function ecranDeLaLettre(t: Textes, l: TextesDeLaLettre, d: DonneesDeLaLe
       {
         type: "actions",
         block_id: `lettre-abonne-${cible?.id ?? "aucun"}`,
-        elements: [{ type: "select", action_id: ACTIONS.abonne, label: l.choisirAbonne, options: d.abonnes.map((a) => ({ label: a.adresse, value: a.adresse })), ...(cible ? { initial_value: cible.adresse } : {}) }],
+        elements: [{ type: "select", action_id: ACTIONS.abonne, label: l.choisirAbonne, options: [l.aucuneAdresseChoisie, ...d.abonnes.map((a) => a.adresse)].map((x) => ({ label: x, value: x })), initial_value: cible?.adresse ?? l.aucuneAdresseChoisie }],
       },
     );
     if (cible) {

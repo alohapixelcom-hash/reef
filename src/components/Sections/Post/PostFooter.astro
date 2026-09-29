@@ -77,8 +77,10 @@ const chip =
               {/* Chaque etiquette mene a sa page (3.8.3) : les billets qui la
                   portent, dans la langue de la page. Moteur allume, ce sont
                   les etiquettes natives d'EmDash, choisies dans le panneau
-                  "Etiquettes" de l'article. */}
-              <ul class="flex flex-wrap gap-2">
+                  "Etiquettes" de l'article. Elles se changent au back office
+                  (panneau "Classement" de l'article), pas dans la page : en
+                  mode edition, la liste est marquee comme une commande. */}
+              <ul class="flex flex-wrap gap-2" {...marqueInterface(Astro)}>
                 {etiquettes.map((e) => (
                   <li>
                     <a class={chip} href={localizePath(`/tags/${e.slug}/`, locale)}>
