@@ -3,10 +3,10 @@
 // Fichier du site : son export par defaut recoit les outils du script commun
 // et rend une liste de gestes { nom, faire, verifierFait, restaurer,
 // verifierRestaure }. Reef n'a pas de prix : ses reglages propres sont le
-// nombre de billets par page, ses sujets et ses billets, et (3.8.1) la police
-// du site et la place d'un bloc sur l'accueil ; (3.8.3) l'auteur et le sujet
-// d'un article choisis par leur nom, une etiquette, et la lettre d'information
-// du visiteur qui s'inscrit jusqu'a sa desinscription.
+// nombre de billets par page, ses sujets et ses billets, la police du site et
+// la place d'un bloc sur l'accueil, l'auteur et le sujet d'un article choisis
+// par leur nom, une etiquette, et la lettre d'information du visiteur qui
+// s'inscrit jusqu'a sa desinscription.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
@@ -69,7 +69,7 @@ export default async function gestesDeReef(o) {
     await page.locator("#field-name").fill(nom);
     await enregistrerEtPublier();
   };
-  // 3.8.3 : un article existant, son auteur, son sujet, une etiquette.
+  // Un article existant, son auteur, son sujet, une etiquette.
   const billet = await entree("posts", "a-type-scale-you-can-defend");
   const ouvrirBillet = () => ouvrir(`${ADMIN}/content/posts/${billet.id}?locale=en`);
   const nomDe = async (collection, slug) => (await entree(collection, slug)).data.name;
@@ -97,14 +97,27 @@ export default async function gestesDeReef(o) {
     await page.getByRole("button", { name: `Supprimer ${etiquette}` }).click();
     await page.waitForTimeout(1200);
   };
-  // La lettre : un visiteur (sans session) s'inscrit sur /fr/, confirme par le
-  // lien recu, l'administrateur lui envoie un article, il se desinscrit par le
-  // lien du pied du courriel.
+  // La lettre : l'administrateur regle l'adresse d'expedition s'il n'y en a
+  // pas (Reglages des courriels, comme le demande l'ecran de la lettre), un
+  // visiteur (sans session) s'inscrit sur /fr/, confirme par le lien recu,
+  // l'administrateur lui envoie un article, le visiteur suit le lien du pied du
+  // courriel et confirme sa desinscription sur la page qui s'ouvre. L'adresse
+  // d'expedition d'origine est remise ensuite.
   const abonne = `lecteur-${o.suffixe}@reef.test`;
   const visiteur = await page.context().browser().newContext();
   const vue = await visiteur.newPage();
   const lettre = `${ADMIN}/plugins/aloha-courriels/lettre`;
-  const envoye = { lien: null };
+  const envoye = { lien: null, expediteur: null };
+  const reglagesDesCourriels = `${ADMIN}/plugins/aloha-courriels/reglages`;
+  const expediteur = async (valeur) => {
+    await ouvrir(reglagesDesCourriels);
+    const champ = page.getByLabel(/^Adresse d'expédition/);
+    if (envoye.expediteur === null) envoye.expediteur = await champ.inputValue();
+    if ((await champ.inputValue()) === valeur) return;
+    await champ.fill(valeur);
+    await page.getByRole("button", { name: "Enregistrer les réglages" }).click();
+    await page.waitForTimeout(1200);
+  };
   return [
     {
       nom: "Auteur d'un article choisi par son nom",
@@ -134,6 +147,9 @@ export default async function gestesDeReef(o) {
     {
       nom: "Lettre : inscription confirmee, article envoye, desinscription",
       faire: async () => {
+        await ouvrir(reglagesDesCourriels);
+        const actuelle = await page.getByLabel(/^Adresse d'expédition/).inputValue();
+        await expediteur(actuelle || "lettre@reef.test");
         await vue.goto(`${o.url}/fr/`, { waitUntil: "networkidle" });
         await vue.locator("#home-newsletter-email").fill(abonne);
         await vue.locator('form[name="newsletter-home"] button[type="submit"]').click();
@@ -155,6 +171,9 @@ export default async function gestesDeReef(o) {
       restaurer: async () => {
         if (!envoye.lien) throw new Error("lien de desinscription introuvable");
         await vue.goto(envoye.lien, { waitUntil: "networkidle" });
+        await vue.getByRole("button", { name: "Me désinscrire" }).click();
+        await vue.waitForURL(/lettre=desinscrit/);
+        await expediteur(envoye.expediteur ?? "");
       },
       verifierRestaure: async () => {
         const avis = (await vue.locator("#lettre-avis").innerText()).includes("Vous êtes désinscrit");
