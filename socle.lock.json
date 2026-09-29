@@ -1,7 +1,7 @@
 {
   "socle": "aloha-socle",
-  "version": "1.4.0",
-  "commit": "238b0490630f",
+  "version": "1.6.0",
+  "commit": "7219eafd1eb4",
   "depot": "reef",
   "modules": ["outillage","moteur-base","catalogue-bo","habillage-bo","langue-bo","mouvement","plan-du-site","ci","frontal"],
   "extensions": ["deployer","courriels","administrable"],
@@ -17,7 +17,7 @@
     "scripts/house.mjs": {"source":"moteur/scripts/house.mjs","sha256":"20ae443a1d078531b92545e13a43d6d152513d612e0a906819a658794cdab109"},
     "scripts/navigateur.mjs": {"source":"extensions/administrable/scripts/navigateur.mjs","sha256":"67f6fe12318a73a774765335c47e349c3211d426cd791b8fcfb611cfa7b05329"},
     "scripts/poster.mjs": {"source":"moteur/scripts/poster.mjs","sha256":"d777e9dc80a5d71bef1fd606be099dc57177e5720b9e2f1974990beba0abaf6b"},
-    "scripts/socle.mjs": {"source":"scripts/socle.mjs","sha256":"0fc06dc82d8079476c8ddd63b5fdcd45f30144edd8791a2553bf44efbdbf8884"},
+    "scripts/socle.mjs": {"source":"scripts/socle.mjs","sha256":"ee5746182f83a64a797e42f4f2b3355e4b032b41ca12643c246c77b1e64ca812"},
     "scripts/sql-par-difference.mjs": {"source":"extensions/administrable/scripts/sql-par-difference.mjs","sha256":"9e469b5f1059efa9530e97cdd5d15254e53aff2bb8ee653e89a38e9a46db3c91"},
     "scripts/verify.lisibilite.mjs": {"source":"moteur/scripts/verify.lisibilite.mjs","sha256":"2ad1f2a7760ce3516461e9fdfa5d2ab3582c89fe610648f3844d3411b175c348"},
     "scripts/verify.mjs": {"source":"moteur/scripts/verify.mjs","sha256":"a9dc40a14c863edcb271afb98273a3a19bcc8d9ee4803fd7dd5eda234034e1ca"},

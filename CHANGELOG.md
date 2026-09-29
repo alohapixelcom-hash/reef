@@ -28,6 +28,8 @@ field renders the site exactly as before.
   --sql import-3.8.1-reef.sql` shows the plan, `--appliquer` adds the two
   columns then the two fields; idempotent, no DELETE, no DROP, no content
   touched.
+- Shared base 1.6.0 (the two settings above, now on its main line, and
+  `scripts/socle.mjs`, which learns `--seulement`).
 - The guided replay (`scripts/essai-administrer.mjs`) gains the two gestures:
   16 of 16 done through the interface, seen by an anonymous visitor, undone.
 - README: Reef presented as the sober blog CMS for Astro it has become, with a

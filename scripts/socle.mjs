@@ -10,7 +10,7 @@
 // check signale toute retouche faite dans la cible.
 //
 // LES COMMANDES (depuis le depot du socle)
-//   node scripts/socle.mjs sync <cible> [--depot <nom>] [--essai] [--ecraser] [--appliquer]
+//   node scripts/socle.mjs sync <cible> [--depot <nom>] [--essai] [--ecraser] [--appliquer] [--seulement <unite,unite>]
 //   node scripts/socle.mjs check <cible>
 //   node scripts/socle.mjs diff <cible> [chemin]
 //   node scripts/socle.mjs modules
@@ -29,14 +29,15 @@
 // sync, l'adaptateur et les fichiers du site viennent de adaptateurs/<depot>/ ;
 // ensuite ils appartiennent au site et le socle ne les reecrit plus.
 //
-// CE QUE sync NE FAIT JAMAIS
-//   - supprimer un fichier sans --appliquer (seuls les fichiers que le socle a
-//     lui-meme poses, listes dans l'ancien verrou et sortis du socle, peuvent
-//     l'etre, et seulement avec --appliquer) ;
-//   - ecraser une retouche locale d'un fichier du socle sans --ecraser (la
-//     retouche doit d'abord remonter dans le socle) ;
-//   - toucher un fichier du site (adaptateur, habillage.site.ts, site.ts...)
-//     qui existe deja.
+// CE QUE sync NE FAIT JAMAIS : supprimer sans --appliquer (et seulement un
+// fichier qu'il avait pose et que le socle ne porte plus) ; ecraser sans
+// --ecraser une retouche locale (elle remonte d'abord au socle) ; toucher un
+// fichier du site qui existe deja (adaptateur, habillage.site.ts, site.ts...).
+//
+// --seulement <unites> (1.5.0) : poser un module urgent dans un site en retard
+// d'une version sans toute la montee. Seuls ces fichiers sont poses et ajoutes
+// au verrou existant, l'unite est notee dans "partiels" ; version, commit et
+// autres empreintes ne bougent pas. Refus sans verrou (adoption complete).
 //
 // Codes de sortie : 0 tout va bien, 1 derive ou refus, 2 mauvais usage.
 import { createHash } from "node:crypto";
@@ -136,9 +137,9 @@ function plan(adaptateur) {
       if (exclus.has(chemin)) continue;
       const source = join(unite.racine, chemin);
       const vers = cheminCible(chemin, adaptateur.chemins);
-      fichiers.push({ source, cible: vers, contenu: rendu(readFileSync(join(SOCLE, source)), chemin, vers) });
+      fichiers.push({ unite: nom, source, cible: vers, contenu: rendu(readFileSync(join(SOCLE, source)), chemin, vers) });
     }
-    for (const chemin of unite.fichiersDuSite ?? []) duSite.push(cheminCible(chemin, adaptateur.chemins));
+    for (const chemin of unite.fichiersDuSite ?? []) duSite.push({ unite: nom, chemin: cheminCible(chemin, adaptateur.chemins) });
   }
   return { fichiers, duSite };
 }
@@ -158,8 +159,16 @@ function sync(cible, options) {
   const { adaptateur, depot, local } = trouverAdaptateur(cible, options.depot);
   const verrouChemin = join(cible, VERROU);
   const verrou = existsSync(verrouChemin) ? lireJson(verrouChemin) : null;
-  const { fichiers, duSite } = plan(adaptateur);
-
+  const complet = plan(adaptateur);
+  const seulement = options.seulement ? options.seulement.split(",").filter(Boolean) : null;
+  if (seulement) {
+    if (!verrou) arreter("--seulement demande un verrou : une premiere adoption est toujours complete.");
+    const connues = new Set([...complet.fichiers, ...complet.duSite].map((x) => x.unite));
+    for (const u of seulement) if (!connues.has(u)) arreter(`--seulement ${u} : unite absente de l'adaptateur (l'y ajouter d'abord).`);
+  }
+  const garde = (x) => !seulement || seulement.includes(x.unite);
+  const fichiers = complet.fichiers.filter(garde);
+  const duSite = complet.duSite.filter(garde).map((d) => d.chemin);
   const retouches = fichiers.filter((f) => etatDe(cible, f, verrou) === "retouche");
   if (retouches.length > 0 && !options.ecraser) {
     console.error("Refus : ces fichiers du socle ont ete retouches dans la cible depuis le dernier sync.");
@@ -167,28 +176,22 @@ function sync(cible, options) {
     console.error("La correction se fait dans le socle (voir `diff`), puis on synchronise. --ecraser passe outre.");
     process.exit(1);
   }
-
-  // Un fichier du site qui porte le nom d'un fichier nouveau du socle (socle
-  // 1.4.0 : Swell avait son propre src/moteur/adresses.selfcheck.ts, et le
-  // sync l'avait remplace sans rien dire). Il n'est pas au verrou, il existe,
-  // il differe : le sync refuse, sauf --ecraser.
-  const etrangers = verrou
-    ? fichiers.filter((f) => !verrou.fichiers?.[f.cible] && existsSync(join(cible, f.cible)) && etatDe(cible, f, verrou) !== "a-jour")
-    : [];
+  // Un fichier du site au nom d'un fichier nouveau du socle, hors verrou et
+  // different (1.4.0, adresses.selfcheck.ts de Swell) : refus, sauf --ecraser.
+  const etranger = (f) => !verrou.fichiers?.[f.cible] && existsSync(join(cible, f.cible)) && etatDe(cible, f, verrou) !== "a-jour";
+  const etrangers = verrou ? fichiers.filter(etranger) : [];
   if (etrangers.length > 0 && !options.ecraser) {
     console.error("Refus : ces fichiers du site portent le nom d'un fichier du socle, sans avoir ete poses par lui.");
     for (const f of etrangers) console.error(`  ${f.cible}`);
     console.error("Renommer le fichier du socle (ou celui du site), puis synchroniser. --ecraser les remplace.");
     process.exit(1);
   }
-
   const bilan = { ecrits: [], identiques: [], ajoutes: [], duSite: [], orphelins: [], supprimes: [] };
   const ecrire = (chemin, contenu) => {
     if (options.essai) return;
     mkdirSync(dirname(chemin), { recursive: true });
     writeFileSync(chemin, contenu);
   };
-
   if (!local) {
     bilan.duSite.push(ADAPTATEUR);
     ecrire(join(cible, ADAPTATEUR), readFileSync(join(SOCLE, "adaptateurs", depot, ADAPTATEUR)));
@@ -209,16 +212,14 @@ function sync(cible, options) {
     } else bilan.ecrits.push(f.cible);
     ecrire(chemin, f.contenu);
   }
-
   const nouveaux = new Set(fichiers.map((f) => f.cible));
-  for (const ancien of Object.keys(verrou?.fichiers ?? {})) {
+  for (const ancien of seulement ? [] : Object.keys(verrou?.fichiers ?? {})) {
     if (nouveaux.has(ancien) || !existsSync(join(cible, ancien))) continue;
     if (options.appliquer && !options.essai) {
       unlinkSync(join(cible, ancien));
       bilan.supprimes.push(ancien);
     } else bilan.orphelins.push(ancien);
   }
-
   const nouveauVerrou = {
     socle: MANIFESTE.nom,
     version: MANIFESTE.version,
@@ -227,17 +228,24 @@ function sync(cible, options) {
     modules: adaptateur.modules ?? [],
     extensions: adaptateur.extensions ?? [],
     fichiersDuSite: [ADAPTATEUR, ...duSite],
-    fichiers: Object.fromEntries(
-      fichiers
-        .slice()
-        .sort((a, b) => a.cible.localeCompare(b.cible))
-        .map((f) => [f.cible, { source: f.source, sha256: empreinte(f.contenu) }]),
-    ),
+    fichiers: Object.fromEntries(fichiers.map((f) => [f.cible, { source: f.source, sha256: empreinte(f.contenu) }])),
   };
+  if (seulement) {
+    // Le verrou existant, plus les fichiers des unites posees : rien d'autre ne change.
+    nouveauVerrou.version = verrou.version;
+    nouveauVerrou.commit = verrou.commit;
+    nouveauVerrou.fichiersDuSite = [...new Set([...(verrou.fichiersDuSite ?? []), ...nouveauVerrou.fichiersDuSite])];
+    const partiels = { ...(verrou.partiels ?? {}) };
+    for (const u of seulement) partiels[u] = `${MANIFESTE.version} (${commitDuSocle() ?? "hors git"})`;
+    nouveauVerrou.partiels = partiels;
+    nouveauVerrou.fichiers = { ...(verrou.fichiers ?? {}), ...nouveauVerrou.fichiers };
+  }
+  // Une ligne par fichier, dans l'ordre des chemins (une montee complete efface "partiels").
+  const trie = Object.keys(nouveauVerrou.fichiers).sort((a, b) => a.localeCompare(b));
+  nouveauVerrou.fichiers = Object.fromEntries(trie.map((k) => [k, nouveauVerrou.fichiers[k]]));
   if (!options.essai) ecrireVerrou(verrouChemin, nouveauVerrou);
-
   const titre = options.essai ? "Essai (rien n'est ecrit)" : "Synchronise";
-  console.log(`${titre} : socle ${MANIFESTE.version} vers ${cible} (${depot}).`);
+  console.log(`${titre} : socle ${MANIFESTE.version} vers ${cible} (${depot})${seulement ? `, seulement ${seulement.join(", ")}` : ""}.`);
   console.log(`  ${bilan.identiques.length} fichiers deja identiques, ${bilan.ecrits.length} remplaces, ${bilan.ajoutes.length} ajoutes.`);
   for (const [nom, liste] of [
     ["remplaces", bilan.ecrits],
@@ -372,8 +380,9 @@ const valeur = (nom) => {
 };
 switch (commande) {
   case "sync":
-    if (!cible) arreter("usage : socle.mjs sync <cible> [--depot <nom>] [--essai] [--ecraser] [--appliquer]");
-    sync(resolve(cible), { depot: valeur("--depot"), essai: drapeau("--essai"), ecraser: drapeau("--ecraser"), appliquer: drapeau("--appliquer") });
+    if (!cible) arreter("usage : socle.mjs sync <cible> [--depot <nom>] [--essai] [--ecraser] [--appliquer] [--seulement <unite,unite>]");
+    const options = { depot: valeur("--depot"), essai: drapeau("--essai"), ecraser: drapeau("--ecraser"), appliquer: drapeau("--appliquer") };
+    sync(resolve(cible), { ...options, seulement: valeur("--seulement") });
     break;
   case "check":
     if (!cible) arreter("usage : socle.mjs check <cible>");
