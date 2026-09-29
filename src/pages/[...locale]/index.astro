@@ -22,7 +22,8 @@ import { getLocale, localePaths, locales, localizePath } from "@i18n";
 import { getResolvedPosts, getSortedTopics, getSortedAuthors } from "@js/posts";
 import { organization, website } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { blocVisible, imageDePartage } from "@moteur/cadre";
+import { blocVisible, donneesDe, imageDePartage } from "@moteur/cadre";
+import { ordreDesBlocs } from "@moteur/ordre-des-blocs";
 import { propsDeLaPage } from "@moteur/chemins";
 import { adresseDePageLibre } from "@moteur/pages";
 import { textesDeLaPage } from "@moteur/textes";
@@ -78,6 +79,27 @@ const ledger = [posts.length, topics.length, locales.length] as const;
 // en mode edition, un bloc masque reste visible, estompe, avec sa pastille.
 const voir = (slug: string): boolean => blocVisible(Astro, slug);
 
+// L'ordre des blocs : celui du theme, sauf pour un bloc a qui l'editeur a
+// donne une place dans le back office (champ "order" de "Textes des pages",
+// src/moteur/ordre-des-blocs.ts). Moteur eteint, l'ordre du theme, tel quel.
+//
+// L'ordre du theme a ses raisons. La bande defilante mord les deux bords juste
+// sous l'ouverture : c'est elle qui casse la largeur de panneau du premier
+// ecran et lance le rythme de la page ; elle porte les vrais sujets, pas des
+// mots decoratifs. La sequence filmee remplace le bloc "mot du studio" (le
+// composant StudioNote reste dans le theme pour qui prefere un bloc sans
+// video) et vient juste apres le billet a la une, pas en fin de page ou elle
+// avait ete posee d'abord : la, elle donnait trois blocs sombres a la suite
+// (la scene, le panneau d'abonnement, le pied) separes par une bande de 18 px
+// de fond de page, qui se lisaient comme un raccord rate. Au milieu, elle
+// coupe deux grilles de cartes, ce qu'une pleine largeur doit faire. Un
+// editeur qui deplace un bloc passe outre en connaissance de cause : le guide
+// le dit.
+const blocs = ordreDesBlocs(
+  ["hero", "bande-sujets", "a-la-une", "studio", "dernieres-notes", "sujets", "signatures", "lettre"] as const,
+  (slug) => donneesDe(Astro, slug),
+);
+
 const title = t.home.metaTitle;
 const description = t.home.metaDescription;
 
@@ -107,30 +129,30 @@ const schemas = [
   <Navbar />
 
   <main id="content">
-    {voir("hero") && <Hero {ledger} />}
-    {/* La bande defilante mord les deux bords juste sous le hero : c'est elle
-        qui casse la largeur de panneau du premier ecran et lance le rythme de
-        la page. Elle porte les vrais sujets, pas des mots decoratifs. */}
-    {voir("bande-sujets") && <TopicMarquee {topics} counts={topicCounts} />}
-    {featured && voir("a-la-une") && <FeaturedPost entry={featured} />}
-    {/* La sequence filmee remplace le bloc "mot du studio" : c'est le meme
-        message, mais le lecteur le deroule lui-meme. Le composant StudioNote
-        reste dans le theme pour qui prefere un bloc sans video.
-
-        Elle est placee ICI, juste apres le billet a la une, et pas en fin de
-        page ou elle avait ete posee d'abord. La raison est une mesure : en
-        fin de page elle donnait trois blocs sombres a la suite, la scene
-        filmee, le panneau d'abonnement et le pied de page, separes par une
-        bande de 18 px de fond de page. Deux blocs de la meme encre separes
-        par un filet d'une encre voisine ne se lisent pas comme une
-        composition, ils se lisent comme un raccord rate. Au milieu de la
-        page, la sequence coupe au contraire deux grilles de cartes, ce qui
-        est exactement ce qu'une pleine largeur doit faire. */}
-    {voir("studio") && <FilmScene />}
-    {latest.length > 0 && voir("dernieres-notes") && <LatestPosts posts={latest} />}
-    {voir("sujets") && <TopicStrip {topics} counts={topicCounts} />}
-    {voir("signatures") && <WritersStrip {authors} counts={authorCounts} />}
-    {voir("lettre") && <NewsletterInvite />}
+    {/* Chaque bloc a sa place (voir "blocs" plus haut) ; la place du theme :
+        l'ouverture, la bande des sujets, le billet a la une, la sequence
+        filmee, les notes recentes, les sujets, les signatures, la lettre. */}
+    {
+      blocs.map((bloc) =>
+        bloc === "hero" ? (
+          voir("hero") && <Hero {ledger} />
+        ) : bloc === "bande-sujets" ? (
+          voir("bande-sujets") && <TopicMarquee {topics} counts={topicCounts} />
+        ) : bloc === "a-la-une" ? (
+          featured && voir("a-la-une") && <FeaturedPost entry={featured} />
+        ) : bloc === "studio" ? (
+          voir("studio") && <FilmScene />
+        ) : bloc === "dernieres-notes" ? (
+          latest.length > 0 && voir("dernieres-notes") && <LatestPosts posts={latest} />
+        ) : bloc === "sujets" ? (
+          voir("sujets") && <TopicStrip {topics} counts={topicCounts} />
+        ) : bloc === "signatures" ? (
+          voir("signatures") && <WritersStrip {authors} counts={authorCounts} />
+        ) : (
+          voir("lettre") && <NewsletterInvite />
+        ),
+      )
+    }
   </main>
 
   {/* La bande d'inscription de l'accueil porte deja l'ancre et le formulaire :

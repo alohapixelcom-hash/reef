@@ -163,6 +163,15 @@ pnpm build:moteur && bash scripts/deployer-frontal.sh                           
 npx wrangler d1 execute reef-moteur --remote --config wrangler.moteur.jsonc --file=import-3.6.0-reef.sql
 ```
 
+**3.8.1.** Two fields join the schema: `font` in the `site` collection (« Police du site », a closed list: the theme's fonts or one of three system font stacks, `src/moteur/typographie.ts`) and `order` in `sections` (« Place du bloc sur l'accueil », read by the home page through `src/moteur/ordre-des-blocs.ts`). Both are common to the two languages and empty by default, which renders the site as before. A database at 3.6.0 or 3.8.0 receives them through the column script, which adds only the missing columns, then the file, whose two inserts are guarded by `WHERE NOT EXISTS`:
+
+```bash
+node scripts/base-3.4.0.mjs --remote reef-moteur --sql import-3.8.1-reef.sql              # the plan, nothing written
+node scripts/base-3.4.0.mjs --remote reef-moteur --sql import-3.8.1-reef.sql --appliquer  # columns, then the SQL
+```
+
+Proven on a copy of the local database (29 September 2026): plan, application, second plan with nothing to add, second application with no change; the anonymous HTML of 17 addresses byte-identical before the upgrade, after it, and after the 16 gestures of the guided replay.
+
 ## Deploying
 
 `wrangler.moteur.jsonc` describes the Worker: database `DB`, media `MEDIA`, the `IMAGES` binding (on-demand image optimisation, see `ALOHA_IMAGES` in `moteur.config.mjs`), and a cron every minute for scheduled publications. See `DEPLOY.md`, "First deployment of the engine", for the exact commands, from the empty account to the first import.

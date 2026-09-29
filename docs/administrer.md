@@ -77,6 +77,14 @@ Le texte alternatif (ce que lit un lecteur d'écran) se saisit dans la fenêtre 
 
 Les lecteurs ne voient plus le bloc. Vous, en mode édition, le voyez grisé avec sa pastille « Bloc masqué : les visiteurs ne le voient pas », pour pouvoir le réafficher de la même façon. Les huit blocs de l'accueil se masquent ainsi (l'ouverture, la bande des sujets, l'article à la une, le studio, les dernières notes, les sujets, les signatures, la lettre d'information). Masquer la lettre d'information la retire aussi du pied de page.
 
+### Changer l'ordre des blocs de l'accueil
+
+1. Ouvrez le bloc dans « Textes des pages » (page « Accueil »).
+2. Tout en bas, « Place du bloc sur l'accueil » : écrivez un nombre. 1 le met tout en haut, 2 juste après le premier, et ainsi de suite ; laissé vide, le bloc garde la place prévue par le thème.
+3. « Enregistrer », puis « Publier les modifications maintenant ».
+
+Les places des huit blocs, telles que le thème les donne : 1 l'ouverture, 2 la bande des sujets, 3 l'article à la une, 4 le studio, 5 les dernières notes, 6 les sujets, 7 les signatures, 8 la lettre d'information. Un bloc à qui vous donnez une place passe devant celui qui l'occupait. La place vaut pour les deux langues. Pour revenir à l'ordre du thème, videz le champ. L'ordre d'origine a ses raisons (le studio, sombre, coupe deux listes de cartes) : regardez la page après un changement.
+
 ## 7. Changer un menu
 
 « Menus » liste les menus du site. Chacun existe en anglais et en français.
@@ -133,6 +141,7 @@ Puis « Enregistrer ». « Liens sociaux » : les réseaux du pied de page. « S
 - le nom et le lien du crédit du pied de page ;
 - le titre du flux RSS de la langue ;
 - l'adresse d'un service externe pour la lettre d'information, et celle pour le formulaire de contact quand l'écran « Courriels » n'est pas branché (partie 17 bis) ;
+- « Police du site, pour les titres et le texte » : « Police d'origine du thème » (comme un champ vide), « Police du système, la plus légère », « Classique, à empattements » ou « Titres classiques, texte sans empattements ». Les trois dernières sont déjà installées sur l'ordinateur ou le téléphone du lecteur : rien à télécharger, la page s'affiche plus vite. Le choix vaut pour les deux langues ;
 - « Couleur de la marque, sur tout le site » : « Couleur d'origine du thème » (le corail du thème, comme un champ vide) ou l'une des cinq couleurs, qui colore les boutons, les liens et le mot en couleur ; chaque couleur garde le texte des boutons lisible (contraste d'au moins 4,5:1, mesuré).
 
 Les textes de l'en-tête et du pied de page sont des blocs de « Textes des pages » (page « Tout le site »).
@@ -213,10 +222,12 @@ La lettre d'information, elle, s'envoie à un service externe (partie 10) : sans
 | Toutes | Phrase du pied, mentions, e-mail, crédit | « Textes des pages » (page « Tout le site ») et « Réglages par langue » |
 | Toutes | Lettre d'information | « Textes des pages », bloc « lettre » ; adresse du service dans « Réglages par langue » |
 | Toutes | Couleur de la marque | « Réglages par langue », « Couleur de la marque » |
+| Toutes | Police des titres et du texte | « Réglages par langue », « Police du site » |
 | Accueil | Photo, titre, boutons et leurs adresses, chiffres | barre (titre, boutons, pastilles) ou « Textes des pages », bloc de l'ouverture |
 | Accueil | Bande défilante, sujets, signatures | « Sujets », « Auteurs » ; titres des sections dans « Textes des pages », page « Accueil » |
 | Accueil | Article à la une, dernières notes | « Articles » (case « À la une », date) ; titres dans « Textes des pages » |
 | Accueil | Studio : vidéo, affiche, boutons | bloc « studio » : pastilles « Vidéo », « Affiche », adresses |
+| Accueil | Ordre des blocs | chaque bloc, « Place du bloc sur l'accueil » (partie 6) |
 | Tous les billets, sujet, auteur | En-tête, fil d'Ariane, nombre d'articles | « Textes des pages » ; « Articles par page » dans « Paramètres » |
 | Article | Tout le contenu, SEO | « Articles » ; « À lire ensuite » dans « Textes des pages », page « Billet » |
 | À propos | Texte, histoire, règles, signatures, appel | « Textes des pages », page « À propos » |
@@ -227,10 +238,10 @@ La lettre d'information, elle, s'envoie à un service externe (partie 10) : sans
 
 ## 20. Ce qui demande un développeur
 
-- l'ordre des blocs d'une page, un nouveau type de bloc, la mise en page et le dessin du site ;
+- l'ordre des blocs d'une autre page que l'accueil, un nouveau type de bloc, la mise en page et le dessin du site ;
 - les textes d'interface génériques (accessibilité, « changer de langue », « ouvrir le menu », « min de lecture », compteurs), le bandeau de cookies ;
 - les adresses des pages du thème et le fichier robots.txt ;
-- une police de caractères différente de celle du thème ;
+- une police de caractères qui n'est pas dans la liste « Police du site » ;
 - l'envoi de la lettre d'information par l'écran « Courriels » (il ne reçoit que le formulaire de contact).
 
 Ce qu'il faut savoir du moteur (EmDash 0.38) :

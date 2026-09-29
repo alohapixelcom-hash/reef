@@ -7,9 +7,9 @@
 <h1 align="center">Reef</h1>
 
 <p align="center">
-  <b>A free, bilingual blog theme for Astro 7, light by default.</b><br>
-  Reading-first typography, MDX collections, art-directed light and dark modes,<br>
-  owned SEO, and an iOS / Android build from the same source.
+  <b>A sober, bilingual blog for Astro 7 that you run from its back office.</b><br>
+  A static theme with no server by default; with the optional EmDash engine,<br>
+  a blog CMS where posts, pages, menus, fonts, colours and the home page layout are set by the editor.
 </p>
 
 <p align="center">
@@ -32,56 +32,86 @@
 
 ---
 
-Astro 7.3, static output, English + French, built-in EmDash back office, Capacitor setup for a native app project, and an AGENTS.md with five convention files so your AI agent can extend the theme without breaking it.
+Reef is two things from one source, MIT licensed and free.
 
-A blog theme for Astro 7, by Aloha Pixel. One repository gives you the whole
-front of a writing publication: a home that leads with the latest piece, a
-paginated blog, topic and author pages, a reading column with a table of
-contents, and a per-language RSS feed. In English and in French, from the same
-source.
+- **A static blog theme.** `pnpm build` writes plain HTML: a home that leads
+  with the latest piece, a paginated blog, topic and author pages, a reading
+  column with a table of contents, a per-language RSS feed, in English and in
+  French. No server, no adapter, no database.
+- **A blog CMS.** With `ALOHA_MOTEUR=emdash` the same source builds as a
+  Cloudflare Worker on [EmDash](https://github.com/emdash-cms/emdash) 0.38
+  (MIT), the CMS for Astro that runs on Workers, D1 and R2. Posts live in the
+  database, publishing shows on the site with no rebuild, and the whole visible
+  site is set from the back office at `/_emdash/admin`, in French by default
+  (English one setting away). The live demo, `reef.alohapixel.app`, runs this
+  way.
 
 The demo publication is Reef Notes, a fictional three-person web studio's
-notebook: build logs, type specimens, and the unglamorous half of freelancing.
-Every word lives in a typed dictionary or in a Markdown post, never inside a
-component.
+notebook. Every word lives in the back office, in a typed dictionary or in a
+Markdown post, never inside a component.
 
-Reef is built to be read. You get clean, commented, strictly typed source
-with a maintained wiki and agent tooling, not a black box.
+## A blog you run from the back office
+
+What a blogger expects from a sober WordPress, and where it stands in Reef
+3.8.1 with the engine on. "Partly" and "Not yet" are said as they are.
+
+| You want to | In Reef | Where, in the back office |
+|---|---|---|
+| Write posts, keep drafts, go back to a revision | Yes | "Articles": title, lead, cover, rich text, date, featured, SEO panel |
+| Add pages | Yes | "Pages": served at `/<address>/`, then added to a menu |
+| Show authors | Partly | "Auteurs": name, role, bio, portrait, links. On a post, the author is picked from a list of identifiers, not of names |
+| Sort posts into categories and tags | Partly | One topic per post ("Sujets": name, description, colour, rank). Tags are a raw list field; EmDash's own taxonomies are not wired |
+| Comments | Not yet | None on the site, on purpose. EmDash 0.38 has a moderation screen, not connected |
+| Edit menus | Yes | "Menus": main bar, phone menu, buttons, three footer columns, per language |
+| Footer widgets | Partly | The footer columns are menus and its texts are editable; EmDash's widget areas are not used |
+| Site name, logo, favicon, description, share image | Yes | "Paramètres" and "Réglages par langue" |
+| Choose a typeface | Yes (3.8.1) | "Réglages par langue", « Police du site »: the theme's fonts, or one of three system font stacks (nothing to download) |
+| Choose colours | Yes | « Couleur de la marque »: the theme's colour or one of five, each keeping button text at 4.5:1 contrast or more |
+| Arrange the home page | Yes (3.8.1) | Each of the eight blocks can be hidden, and given a place (« Place du bloc sur l'accueil ») |
+| Social links | Yes | "Paramètres", social: X, GitHub, Facebook, Instagram, LinkedIn, YouTube (the list EmDash 0.38 offers), in the footer and the JSON-LD |
+| SEO | Yes | Per entry: title, description, share image, canonical, noindex; site-wide: title separator, Google and Bing verification |
+| RSS feed | Yes | One per language; its title in "Réglages par langue" |
+| Sitemap | Yes | Rendered on demand; a noindex entry leaves it |
+| Emails | Yes | Contact form messages sent and logged by the house Emails screens (Cloudflare `send_email` binding) |
+| Newsletter | Partly | The signup form posts to an outside service whose address you set; no built-in list or sending |
+| Redirects | Yes | "Redirections" (EmDash, 301) |
+| Media | Yes | EmDash's media library, stored in R2 |
+| Posts per page | Yes | "Paramètres", general |
+
+An empty field always renders the theme as shipped. `scripts/essai-administrer.mjs`
+replays sixteen of these gestures in a real browser, through the interface
+only, checks each one as an anonymous visitor, then undoes it. The editor's
+guide is [docs/administrer.md](docs/administrer.md) (French) and
+[docs/administer.md](docs/administer.md) (English).
 
 ## Back office (EmDash)
 
-Reef 3.1 ships an optional publication engine on
-[EmDash](https://github.com/emdash-cms/emdash) 0.38 (MIT), the CMS for Astro
-that runs on Cloudflare Workers, D1 and R2. It is off by default: without
-`ALOHA_MOTEUR=emdash` nothing of it is bundled and the static build is
-unchanged.
+The engine is off by default: without `ALOHA_MOTEUR=emdash` nothing of it is
+bundled and the static build is unchanged (3.8.1 included: its static build is
+byte-identical to 3.8.0's).
 
-With the variable set, the same source builds as a Cloudflare Worker. The live
-demo runs that way: since 22 September 2026, `reef.alohapixel.app` is served by
-the **reef-moteur** Worker (EmDash engine, D1 `reef-moteur`, R2
-`reef-moteur-media`), built with `pnpm build:moteur` and deployed from the Mac
-with `bash scripts/deployer-frontal.sh`, behind a light front Worker that
-serves the pages already kept (3.8.0, see [DEPLOY.md](DEPLOY.md)).
+With the variable set, the demo is served by the **reef-moteur** Worker
+(EmDash engine, D1 `reef-moteur`, R2 `reef-moteur-media`), built with
+`pnpm build:moteur` and deployed with `bash scripts/deployer-frontal.sh`,
+behind a light front Worker that serves the pages already kept (see
+[DEPLOY.md](DEPLOY.md)).
 
 - **A complete back office at `/_emdash/admin`** (and `/secret-spot/` redirects
   there). Posts live in D1, media in R2, and the pages that show a post are
   rendered on demand, so publishing is visible on the site with no rebuild.
-- **French by default, entirely.** EmDash 0.38 still leaves 678 of its 2428
-  French messages in English; the theme's dictionary
-  (`src/moteur/catalogue-bo.fr.ts`) translates the 585 missing ones without
-  forking the package. `ALOHA_BO_LANGUE` changes the default (`en`, or
+- **French by default, entirely.** EmDash 0.38 still leaves part of its French
+  catalogue in English; the theme's dictionary (`src/moteur/catalogue-bo.fr.ts`)
+  fills every message left, without forking the package, and a selfcheck
+  fails if one is missing. `ALOHA_BO_LANGUE` changes the default (`en`, or
   `navigateur` to follow the browser), and each person can override it in
   their settings.
 - **EmDash's native backgrounds**, white in light mode and black in dark mode.
   The theme only brings its accent colour, fonts, logo and site name.
-- **A dashboard card** (last published content, version served) and a
-  **"Update the site"** button that empties the caches and rebuilds the
-  prerendered pages through a Cloudflare Deploy Hook.
-- **The whole site from the back office** (since 3.4.0): menus, site settings,
-  posts per page, topics and authors, footer, photos, button addresses, SEO,
-  free pages, the not-found page, and the contact form's emails (Courriels
-  screens). The editor's guide is [docs/administrer.md](docs/administrer.md)
-  (French) and [docs/administer.md](docs/administer.md) (English).
+- **An edit bar on the site itself**: an editor signed in edits a title or a
+  photo on the page, and the fields a text cannot show (button addresses,
+  hiding a block) sit next to it as small labels.
+- **"Mettre le site à jour"**, a button that empties the caches and rebuilds
+  the prerendered pages through a Cloudflare Deploy Hook.
 
 ```bash
 pnpm dev:moteur                                              # back office at http://localhost:4321/_emdash/admin
@@ -92,21 +122,22 @@ pnpm build:moteur                                            # the Worker build
 How it is wired: [docs/moteur.md](docs/moteur.md). Putting it online, step by
 step: "First deployment of the engine" in [DEPLOY.md](DEPLOY.md).
 
-The six paid themes carry the same EmDash back office since 3.1:
+The six paid themes carry the same EmDash back office:
 https://alohapixel.app/themes/
 
 ## What is in the box, counted from this repo
 
 Numbers below were counted from the source and the build, not estimated
-(recounted on 2026-09-29 for 3.6.1, unchanged in 3.8.0 whose static build is
-byte-identical; `pnpm build` green, `pnpm check` clean).
+(recounted on 2026-09-29 for 3.6.1; the static build of 3.8.0 and 3.8.1 is
+byte-identical to it, 54 HTML pages counted again for 3.8.1; `pnpm build`
+green, `pnpm check` clean).
 
 | What | Count |
 |---|---|
 | Pages emitted by `pnpm build` | 54 |
 | Plain-text endpoints | robots.txt, llms.txt, per-language rss.xml, sitemap-index.xml |
 | Content collections (zod validated) | 3 (posts, authors, topics) |
-| Demo content entries | 9 posts, 3 authors, 5 topics, in 2 languages |
+| Demo content entries | 9 posts (one of them a draft), 3 authors, 5 topics, in 2 languages |
 | UI primitive families (src/components/ui) | 36, across 63 .astro files |
 | Primitive files that need a script tag | 10 of 63; the rest are pure HTML and CSS |
 | Section components | 27 |
@@ -270,10 +301,10 @@ checklist Apple reviewers care about, is in
 ## Documentation
 
 - AGENTS.md: the operating manual (conventions, commands, gotchas), binding
-  for humans and agents alike.
+  for everyone who works in the repository.
 - docs/conventions/: the five convention files (astro, tailwind, typescript,
   motion, seo), each anchored to real files in this repo. They are written to
-  be read by a human on day one and by any coding assistant afterwards.
+  be read on day one and followed by anyone who extends the theme afterwards.
 - wiki/: start at wiki/overview.md; each subsystem has its own anchored page.
 - docs/moteur.md: the optional publication engine: how it is wired, the
   back office, the online data and what was measured.
@@ -298,7 +329,7 @@ Pull requests are welcome all the same.
 
 Reef ships the whole foundation: the UI primitives, the typed bilingual layer
 with its language switcher, the measured dark mode, the owned SEO, the motion,
-the verification scripts and the conventions written for agents. That is
+the verification scripts and the written conventions. That is
 deliberate: it is how you try the house without paying, and for a blog it is
 complete.
 

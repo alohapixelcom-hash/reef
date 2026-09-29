@@ -1,8 +1,30 @@
-<!-- CHANGELOG-ARCHIVE-1.x.md - les entrees anciennes du changelog de Reef, de la 1.7.3 a la 0.2.0, sorties de CHANGELOG.md pour tenir le plafond de 400 lignes. -->
+<!-- CHANGELOG-ARCHIVE-1.x.md - les entrees anciennes du changelog de Reef, de la 1.8.0 a la 0.2.0, sorties de CHANGELOG.md pour tenir le plafond de 400 lignes. -->
 
-# Reef - changelog archive (1.7.3 and before)
+# Reef - changelog archive (1.8.0 and before)
 
-Older entries, moved here on 28 September 2026 (1.7.2 and 1.7.3 on 29 September) so that `CHANGELOG.md` stays under 400 lines. Newer entries live in `CHANGELOG.md`.
+Older entries, moved here on 28 September 2026 (1.7.2, 1.7.3 and 1.8.0 on 29 September) so that `CHANGELOG.md` stays under 400 lines. Newer entries live in `CHANGELOG.md`.
+
+## 1.8.0 - 2026-09-13
+
+Three family-wide changes to what the crawler reads, none visible in a
+browser.
+
+- **The favicon is declared as it is built.** `scripts/favicon.mjs` packs 16,
+  32 and 48 into the ICO and writes `favicon-96.png` at every build, but the
+  head declared the ICO as `sizes="32x32"` and never mentioned the PNG. The
+  ICO link now says `16x16 32x32 48x48`, and a second link declares the 96
+  pixel PNG. Google only shows a favicon it can crawl as a raster image, and
+  `sizes` has to tell the truth about its file.
+- **The sitemap re-reads the hreflang of the built HTML.** `@astrojs/sitemap`
+  paired languages by path identity and wrote no `x-default`, while the head
+  carries one on every page. The `serialize` hook now reads the
+  `<link rel="alternate" hreflang>` tags of each page in `dist/` and writes
+  those, `x-default` included; a page without them keeps the integration's
+  own pairing. On the demo, 54 entries and 54 `x-default`.
+- **A GitHub Actions workflow, `.github/workflows/verifier.yml`,** replays the
+  buyer's path (frozen install, check, build, test, house lint) on every push
+  and pull request. A branch gets the same guard as `main` before it is
+  merged.
 
 ## 1.7.3 - 2026-09-07
 
