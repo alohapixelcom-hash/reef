@@ -117,7 +117,7 @@ Le changement se voit tout de suite sur le site, sans publier. Si un menu est vi
 
 Puis « Enregistrer ». « Liens sociaux » : les réseaux du pied de page. « SEO » : le séparateur des titres (« Titre | Marque »), l'image de partage par défaut, les codes de vérification Google et Bing.
 
-**Sans effet sur ce site** (le thème les ignore volontairement ; « Slogan », « URL du site », « Articles par page », « Format des dates » et « Fuseau horaire » ne s'affichent plus dans « Paramètres ») : « Slogan » (le slogan dépend de la langue : il est dans « Réglages par langue »), « URL du site », « Format des dates », « Fuseau horaire » (les dates suivent la langue de la page), et le « robots.txt » du SEO (il protège le back office et annonce le plan du site : une erreur désindexerait le site).
+**Sans effet sur ce site** (le thème les ignore volontairement ; « Slogan », « URL du site », « Format des dates » et « Fuseau horaire » ne s'affichent plus dans « Paramètres », « Articles par page » reste : il pagine les listes de billets) : « Slogan » (le slogan dépend de la langue : il est dans « Réglages par langue »), « URL du site », « Format des dates », « Fuseau horaire » (les dates suivent la langue de la page), et le « robots.txt » du SEO (il protège le back office et annonce le plan du site : une erreur désindexerait le site).
 
 **Après un changement de logo, de nom du site ou de couleur** : « Mettre le site à jour », dans le menu de gauche, refait les quelques pages qui ne se mettent pas à jour seules (une à trois minutes). Pour tout le reste, ce qui est publié est déjà en ligne : ce bouton ne sert à rien.
 

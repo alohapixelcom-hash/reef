@@ -263,3 +263,10 @@ html[data-theme][data-mode] [class~="grid"]:has(> * .aloha-carte, > * .aloha-car
     transition: none;
   }
 }
+
+/* Les Parametres que Reef lit (socle 1.4.0) : le script des ecrans simples
+ * (habillage.ts) cache ceux qui n'agissent pas sur le site ; « Articles par
+ * page » pagine les listes de billets de Reef, il reste affiche. */
+:root {
+  --aloha-parametres-lus: posts;
+}

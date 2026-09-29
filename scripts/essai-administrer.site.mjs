@@ -36,7 +36,7 @@ export default async function gestesDeReef(o) {
         await page.locator("#field-description").fill("Essai du guide : un billet.");
         await choisir(/^Sujet/, "Craft");
         await choisir(/^Auteur/, "Mara-lindqvist");
-        await page.getByLabel("Slug").fill(`essai-billet-${o.suffixe}`);
+        await page.getByLabel(/^(Adresse web|Slug)$/).fill(`essai-billet-${o.suffixe}`);
         await enregistrerEtPublier();
       },
       verifierFait: async () => (await anonyme(`/blog/essai-billet-${o.suffixe}/`)).statut === 200 && (await anonyme("/blog/")).texte.includes("Essai billet"),
