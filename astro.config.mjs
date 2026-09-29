@@ -155,6 +155,11 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    // La capture du telephone dessine (public/reef-iphone-poster.webp, faite
+    // par `pnpm poster`) existe-t-elle ? Repondu ICI, au build, et fige dans
+    // le code : a la demande, la page tourne dans un Worker sans disque (voir
+    // PhoneShot.astro).
+    define: { __REEF_CAPTURE_DU_TELEPHONE__: JSON.stringify(existsSync(new URL("./public/reef-iphone-poster.webp", import.meta.url))) },
     // Deux sources de billets, une seule forme : l'alias choisit les fichiers
     // ou la base, et aucune page ne sait d'ou vient un billet.
     resolve: { alias: moteur.alias },

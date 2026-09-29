@@ -35,15 +35,19 @@
 // reglage passe par la cascade des variables, ou l'appelant a le dernier mot :
 //
 //   <PhoneShot class="hidden [--phone-width:13rem] lg:block" />
-import { existsSync } from "node:fs";
-import { join } from "node:path";
+
+import type { Media } from "@moteur/cadre";
 
 interface Props {
   /** Classes posees sur le cadre, pour le caler et decider ou il apparait. */
   class?: string;
+  /** Moteur allume : la capture choisie dans le back office (champ image de la section qui porte le telephone). Absente, celle de `pnpm poster`. */
+  capture?: Media | null;
+  /** L'annotation de la barre d'edition (ce champ image), absente hors edition. */
+  annotation?: string;
 }
 
-const { class: className } = Astro.props;
+const { class: className, capture = null, annotation } = Astro.props;
 
 // La capture vit dans public/ : servie par le meme domaine que la page, donc
 // aucune requete vers un tiers et aucune licence a produire, puisqu'il s'agit
@@ -52,14 +56,14 @@ const SHOT = "reef-iphone-poster.webp";
 
 // Si la capture n'a pas encore ete fabriquee, le bloc ne rend RIEN. Un cadre de
 // telephone vide, ou pire une image cassee, est un defaut visible; une absence
-// ne l'est pas. Le controle a lieu au build, sur le disque, donc il ne coute
-// rien au visiteur, et il rend `pnpm poster` facultatif au lieu d'obligatoire.
-//
-// Le chemin part de process.cwd() et NON de import.meta.url : au build, Vite a
-// deja regroupe ce composant dans un paquet, et import.meta.url y designe le
-// paquet, pas ce fichier. Astro resout sa configuration depuis le repertoire
-// courant, donc public/ s'y trouve toujours.
-const hasShot = existsSync(join(process.cwd(), "public", SHOT));
+// ne l'est pas. Le controle a lieu AU BUILD, dans astro.config.mjs, qui fige
+// le resultat dans __REEF_CAPTURE_DU_TELEPHONE__ : il ne coute rien au
+// visiteur, et il rend `pnpm poster` facultatif au lieu d'obligatoire. Il ne
+// se fait plus au rendu avec existsSync : moteur allume, la page se rend a la
+// demande dans un Worker, qui n'a pas le disque du depot (le telephone
+// disparaissait de la page A propos ; regle 7 de house.mjs, socle 1.3.0).
+// Une capture choisie dans le back office passe avant celle de `pnpm poster`.
+const hasShot = capture !== null || __REEF_CAPTURE_DU_TELEPHONE__;
 ---
 
 {/* Decoratif au sens strict : ce que le telephone montre est la page ou se
@@ -71,12 +75,13 @@ const hasShot = existsSync(join(process.cwd(), "public", SHOT));
       <div class="phone__screen">
         <img
           class="phone__shot"
-          src={`/${SHOT}`}
+          src={capture?.src ?? `/${SHOT}`}
           alt=""
-          width="560"
-          height="1213"
+          width={capture?.width ?? "560"}
+          height={capture?.height ?? "1213"}
           loading="lazy"
           decoding="async"
+          data-emdash-ref={annotation}
         />
       </div>
     </div>

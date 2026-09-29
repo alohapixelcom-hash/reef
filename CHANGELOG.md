@@ -4,7 +4,24 @@
 
 Versions describe the features actually shipped in this theme.
 
-Current version: **3.4.0**.
+Current version: **3.5.0**.
+
+## 3.5.0 - 2026-09-29
+
+Shared base (Aloha Pixel socle) 1.3.0. No visible change for a visitor on the
+static build.
+
+- Brand colour: each of the five colours now gives the hue its name says
+  ("Ocean blue" was pink). Only a site with a chosen colour changes.
+- A post published with an empty body no longer takes the pages down.
+- The phone frame on the About page shows again with the engine on (it was
+  checked on a disk the Worker does not have).
+- Free pages: spacing no longer relies on utilities the theme does not ship.
+- Tools: the guide replay (`scripts/essai-administrer.mjs`) is shared, with
+  Reef's own steps in `scripts/essai-administrer.site.mjs`; the edit-bar
+  coverage counts interface text, token phrases and the rich-text editor; the
+  upgrade SQL aligns media and no longer copies extension tables; Tailwind no
+  longer reads `docs/`.
 
 ## 3.4.0 - 2026-09-28
 

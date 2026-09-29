@@ -10,15 +10,26 @@
 //     sur ce qui vient d'un menu ou d'un reglage du site (le panneau "Cadre
 //     du site" y mene) ;
 //   - hors base : un texte de HORS_BASE (src/moteur/contenu.sections.ts),
-//     donc laisse au code avec sa raison ; le nom d'une langue du selecteur
-//     de langue (localeMeta, une commande de l'interface) ; ou un texte sans
-//     lettre (un numero, une annee, une ponctuation), que personne ne redige ;
+//     donc laisse au code avec sa raison, une phrase a jetons comprise
+//     ("{count} posts" vaut pour "8 posts", et chacun de ses morceaux fixes) ;
+//     le nom d'une langue du selecteur de langue (localeMeta, une commande de
+//     l'interface) ; un texte sans lettre (un numero, une annee, une
+//     ponctuation), que personne ne redige ; ou tout ce qui est sous une
+//     commande de l'interface marquee en mode edition : data-aloha-interface
+//     (marqueInterface de cadre.ts), ou data-aloha-cadre="interface" ;
+//   - decor : un texte d'une maquette decorative, sous un element
+//     aria-hidden="true" (le faux ecran d'un produit, une bulle de
+//     demonstration), que le brief laisse au code avec l'habillage ; une
+//     image ou une video n'est jamais du decor : elle se remplace (Aloha) ;
 //   - edition : le libelle d'une pastille (data-aloha-pastilles), qui
 //     n'existe qu'en mode edition et nomme ce qu'elle modifie ;
 //   - orphelin : tout le reste. Le resultat exige est ZERO orphelin.
-// La barre d'EmDash elle-meme (#emdash-toolbar) est ignoree.
+// La barre d'EmDash elle-meme (#emdash-toolbar) est ignoree. Un texte riche
+// (Portable Text) monte par l'editeur integre d'EmDash (l'ilot
+// InlinePortableTextEditor) s'edite seul, dans la page : il compte comme
+// annote.
 //
-//   node scripts/couverture-edition.mjs --url http://localhost:4381 [--session <cookie>] [--json <fichier>]
+//   node scripts/couverture-edition.mjs --url http://localhost:4381 [--session <cookie>] [--json <fichier>] [--adresses /,/fr/]
 //
 // Sans --session, la porte de developpement d'astro dev ouvre la session
 // (voir navigateur.mjs). Le code de sortie vaut 1 des qu'une page a un
@@ -42,7 +53,8 @@ const ADRESSES_DU_MODELE = ["/", "/fr/", "/about/", "/fr/about/", "/contact/", "
 // theme.ts lit ses alias (@config/...) : le crochet de resolution d'abord.
 register("../src/moteur/resolution.node.mjs", import.meta.url);
 const { ADRESSES_DE_COUVERTURE } = await import("../src/moteur/theme.ts");
-export const ADRESSES = Array.isArray(ADRESSES_DE_COUVERTURE) ? ADRESSES_DE_COUVERTURE : ADRESSES_DU_MODELE;
+// --adresses /a/,/b/ : ne parcourt que celles-la (mise au point d'une page).
+export const ADRESSES = nommes.adresses ? nommes.adresses.split(",") : Array.isArray(ADRESSES_DE_COUVERTURE) ? ADRESSES_DE_COUVERTURE : ADRESSES_DU_MODELE;
 
 /** Toutes les phrases sous un chemin du dictionnaire : "nav" donne chaque libelle de la navigation. */
 function phrasesSous(objet) {
@@ -79,6 +91,23 @@ async function textesHorsBase() {
 const normaliser = (texte) => String(texte).replace(/\s+/g, " ").trim();
 
 /**
+ * Les phrases a jetons de HORS_BASE, en expressions : "{count} posts" vaut
+ * pour "8 posts", et chacun de ses morceaux fixes ("posts") pour le cas ou le
+ * gabarit coupe la phrase en deux balises.
+ */
+function gabaritsHorsBase(phrases) {
+  const echapper = (x) => x.replace(/[.*+?^$()|[\]\\]/g, "\\$&");
+  const jeton = /\{[a-zA-Z]+\}/;
+  return [...phrases]
+    .filter((p) => jeton.test(p))
+    .flatMap((p) => {
+      const morceaux = p.split(new RegExp(jeton, "g"));
+      const fixes = morceaux.map((m) => m.trim()).filter((m) => /\p{L}/u.test(m));
+      return [new RegExp(`^${morceaux.map(echapper).join(".+")}$`, "u"), ...fixes.map((m) => new RegExp(`^${echapper(m)}$`, "u"))];
+    });
+}
+
+/**
  * Le releve d'une page, execute dans le navigateur : chaque noeud de texte
  * visible et chaque image, avec sa classe (annote, cadre, ou "a classer") et
  * l'endroit ou il est.
@@ -93,18 +122,26 @@ function releverDansLaPage() {
     }
     return true;
   };
-  const classer = (el) => {
+  const classer = (el, texte) => {
+    let cache = false;
     for (let e = el; e; e = e.parentElement) {
+      // L'editeur integre d'EmDash (texte riche) : il edite son champ en place,
+      // son ilot porte le champ dans ses props, pas en attribut.
+      if (e.tagName === "ASTRO-ISLAND" && e.getAttribute("component-export") === "InlinePortableTextEditor") return "annote";
+      if (e.getAttribute?.("aria-hidden") === "true") cache = true;
       const ref = e.getAttribute?.("data-emdash-ref");
       if (ref) {
         try {
           if (JSON.parse(ref).field) return "annote";
         } catch {}
       }
+      // Une commande de l'interface laissee au code (filtres, tris, compteurs,
+      // fil d'Ariane), marquee en mode edition : rangee avec ce qui reste au code.
+      if (e.hasAttribute?.("data-aloha-interface") || e.getAttribute?.("data-aloha-cadre") === "interface") return "interface";
       if (e.hasAttribute?.("data-aloha-cadre")) return "cadre";
       if (e.hasAttribute?.("data-aloha-pastilles")) return "edition";
     }
-    return "a-classer";
+    return texte && cache ? "decor" : "a-classer";
   };
   const chemin = (el) => {
     const morceaux = [];
@@ -121,14 +158,14 @@ function releverDansLaPage() {
     if (!texte) continue;
     const parent = noeud.parentElement;
     if (!parent || !visible(parent)) continue;
-    releves.push({ sorte: "texte", texte, classe: classer(parent), ou: chemin(parent) });
+    releves.push({ sorte: "texte", texte, classe: classer(parent, true), ou: chemin(parent) });
   }
   for (const img of document.querySelectorAll("img, video, source")) {
     if (!visible(img)) continue;
     const src = img.currentSrc || img.getAttribute("src") || img.getAttribute("srcset") || img.dataset.src || "";
     // Une source d'un <picture> suit l'image qu'elle alimente (l'annotation est sur l'img).
     const cible = img.tagName === "SOURCE" && img.parentElement?.tagName === "PICTURE" ? (img.parentElement.querySelector("img") ?? img) : img;
-    releves.push({ sorte: img.tagName.toLowerCase(), texte: src.slice(0, 80), classe: classer(cible), ou: chemin(img) });
+    releves.push({ sorte: img.tagName.toLowerCase(), texte: src.slice(0, 80), classe: classer(cible, false), ou: chemin(img) });
   }
   const annotations = [...document.querySelectorAll("[data-emdash-ref]")].map((e) => JSON.parse(e.getAttribute("data-emdash-ref")));
   return {
@@ -140,6 +177,8 @@ function releverDansLaPage() {
 }
 
 const horsBase = await textesHorsBase();
+const gabarits = gabaritsHorsBase(horsBase);
+const estHorsBase = (texte) => horsBase.has(texte) || horsBase.has(texte.replace(/[,.;:]$/, "")) || gabarits.some((g) => g.test(texte)) || !/\p{L}/u.test(texte);
 const navigateur = await ouvrirChromium();
 const contexte = await contexteEditeur(navigateur, { url, session: nommes.session });
 const page = await contexte.newPage();
@@ -149,19 +188,21 @@ let orphelinsEnTout = 0;
 for (const adresse of ADRESSES) {
   await page.goto(url + adresse, { waitUntil: "networkidle" });
   const releve = await page.evaluate(releverDansLaPage);
-  const compte = { annote: 0, cadre: 0, edition: 0, horsBase: 0, orphelins: [] };
+  const compte = { annote: 0, cadre: 0, edition: 0, decor: 0, horsBase: 0, orphelins: [] };
   for (const r of releve.releves) {
     if (r.classe === "annote") compte.annote++;
     else if (r.classe === "cadre") compte.cadre++;
     else if (r.classe === "edition") compte.edition++;
-    else if (r.sorte === "texte" && (horsBase.has(r.texte) || horsBase.has(r.texte.replace(/[,.;:]$/, "")) || !/\p{L}/u.test(r.texte))) compte.horsBase++;
+    else if (r.classe === "interface") compte.horsBase++;
+    else if (r.classe === "decor") compte.decor++;
+    else if (r.sorte === "texte" && estHorsBase(r.texte)) compte.horsBase++;
     else compte.orphelins.push(r);
   }
   orphelinsEnTout += compte.orphelins.length;
   rapport.push({ adresse, barre: releve.barre, entrees: releve.entrees, champs: releve.champs, ...compte });
   console.log(
     `${adresse.padEnd(14)} barre=${releve.barre}  entrees=${String(releve.entrees).padStart(3)}  champs=${String(releve.champs).padStart(4)}  ` +
-      `annotes=${String(compte.annote).padStart(4)}  cadre=${String(compte.cadre).padStart(3)}  pastilles=${String(compte.edition).padStart(3)}  hors-base=${String(compte.horsBase).padStart(3)}  orphelins=${compte.orphelins.length}`,
+      `annotes=${String(compte.annote).padStart(4)}  cadre=${String(compte.cadre).padStart(3)}  pastilles=${String(compte.edition).padStart(3)}  decor=${String(compte.decor).padStart(3)}  hors-base=${String(compte.horsBase).padStart(3)}  orphelins=${compte.orphelins.length}`,
   );
   for (const o of compte.orphelins) console.log(`    ! ${o.sorte} "${o.texte.slice(0, 70)}"  (${o.ou})`);
 }

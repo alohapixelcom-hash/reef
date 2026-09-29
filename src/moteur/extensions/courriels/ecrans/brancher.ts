@@ -103,6 +103,7 @@ export function brancher(t: Textes, d: DonneesBrancher): Reponse {
           variant: "alert",
           description: d.livreur ? t.brancher.livreurAutre(d.livreur === "emdash-console-email" ? t.brancher.console : d.livreur) : t.brancher.livreurAucun,
         },
+        { type: "context", text: t.brancher.livreurPourquoi },
         { type: "actions", elements: [{ type: "button", action_id: ACTIONS.choisir, label: t.brancher.choisir, style: "primary" }] },
       );
   } else {

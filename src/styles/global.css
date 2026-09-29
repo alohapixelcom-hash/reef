@@ -1,6 +1,8 @@
 /* src/styles/global.css - la feuille racine de Reef : les imports, la couche de base, les classes maison et le garde-fou de mouvement. */
 
 @import "tailwindcss";
+/* Tailwind ne lit pas les guides : un mot de docs/ fabriquerait une utilitaire (house.mjs, regle 9). */
+@source not "../../docs";
 @import "./tokens.css";
 @import "./prose.css";
 @import "./motion/index.css";

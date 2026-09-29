@@ -19,6 +19,8 @@ import { type DonneesDeSection, type Textes, textesAvecLaBase } from "./contenu"
 import { type DonneesAuteur, type DonneesSujet, liensDeLAuteur, teinteDuSujet } from "./listes";
 import { MENUS } from "./theme";
 import type { CorpsDeBillet } from "./types";
+// Le texte brut d'un billet (temps de lecture, comme `body` pour un fichier) : jamais d'exception, meme sans texte (socle).
+import { texteBrut } from "./texte-brut";
 
 export const MOTEUR = true;
 
@@ -50,8 +52,6 @@ interface DonneesBillet {
 const texteDuBloc = (bloc: Bloc): string =>
   bloc._type === "code" ? (bloc.code ?? "") : (bloc.children ?? []).map((c) => c.text ?? "").join("");
 
-/** Le texte brut d'un billet : sert au temps de lecture, comme `body` pour un fichier. */
-const texteBrut = (blocs: Bloc[] = []): string => blocs.map(texteDuBloc).join("\n\n");
 
 function couverture(cover: DonneesBillet["cover"]) {
   if (!cover) return undefined;
@@ -77,7 +77,7 @@ function enBillet(entree: Entree, locale: Locale): CollectionEntry<"posts"> {
     id: `${locale}/${d.slug}`,
     collection: "posts",
     // Un billet sans texte (content null, un brouillon a peine commence) ne doit pas casser toutes les pages.
-    body: texteBrut(d.content ?? []),
+    body: texteBrut(d.content, texteDuBloc),
     data: {
       title: d.title,
       description: d.description ?? "",

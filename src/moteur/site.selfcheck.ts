@@ -5,7 +5,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { register } from "node:module";
 import { identite, liensDuMenu, type Cadre } from "./cadre.ts";
 import { liensDeLAuteur, seoDe, teinteDuSujet, TEINTES_DES_SUJETS } from "./listes.ts";
-import { COULEURS, feuilleDeLaPalette, teinteDe } from "./palette.ts";
+import { COULEURS, couleursQuiMentent, feuilleDeLaPalette, teinteDe } from "./palette.ts";
 import { entreeDuSite, reglagesDeLaGraine } from "./site.ts";
 
 register("./resolution.node.mjs", import.meta.url);
@@ -93,5 +93,9 @@ for (const nom of Object.keys(COULEURS)) {
 is(feuilleDeLaPalette(undefined, variablesDeLaPalette), null, "vide : aucune feuille, la palette du theme");
 for (const [nom, icone] of Object.entries(ICONES)) assert.ok(icone in icons, `${nom} : l'icone ${icone} n'existe pas`);
 is(iconeChoisie("Enveloppe", "check"), "mail", "un nom francais donne son icone");
+
+// La couleur nommee est celle des liens et des boutons (rampe coral) : "Bleu océan" est un bleu (socle 1.3.0).
+// Le nom de la variable est compose : ecrit en entier, Tailwind le lirait ici et l'ajouterait a la feuille.
+is(couleursQuiMentent(variablesDeLaPalette, `--color-coral-${500}`), [], "une couleur de la liste ne donne pas la teinte que son nom dit");
 
 console.log(`site.selfcheck : ${checks} verifications passees`);

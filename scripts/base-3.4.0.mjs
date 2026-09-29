@@ -172,7 +172,21 @@ for (const m of manquantes) {
 base.fichier(opts.sql);
 console.log(`ecrit : ${opts.sql.replace(RACINE, "")}`);
 const restantes = colonnesManquantes(base, graine);
+// L'index d'usage des medias d'une collection dont le schema a change est
+// marque perime par EmDash : sans effet pour les visiteurs, il se reconstruit
+// seul ; le dire, avec la route qui le reconstruit tout de suite.
+const perimes = (() => {
+  try {
+    return base.lire("SELECT scope_key FROM _emdash_media_usage_index_status WHERE scope_type = 'collection' AND status = 'stale'").map((r) => r.scope_key);
+  } catch {
+    return [];
+  }
+})();
 base.fermer();
+if (perimes.length > 0) {
+  console.log(`Index d'usage des medias a reconstruire (${perimes.join(", ")}) : sans effet visible, EmDash le refait seul ;`);
+  console.log(`  tout de suite : POST /_emdash/api/admin/media-usage/repair avec {"scope":"collection","collection":"<nom>"} (session d'administrateur).`);
+}
 if (restantes.length > 0) {
   console.error(`Colonnes encore absentes apres le passage : ${restantes.map((m) => `${m.table}.${m.colonne}`).join(", ")}`);
   process.exit(1);

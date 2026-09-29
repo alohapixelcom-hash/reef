@@ -22,6 +22,25 @@
 // pas les ajouter sans erreur si elles existent deja. base-3.4.0.mjs les
 // ajoute avant de passer ce fichier.
 //
+// TROIS PIEGES EVITES (socle 1.3.0) :
+//   - les MEDIAS : les deux bases recoivent les memes images par deux imports,
+//     sous des identifiants locaux differents. Avant toute difference, chaque
+//     media de la base suivante est rapproche de celui de la base de depart
+//     (meme empreinte de contenu, sinon meme nom et meme taille) et ses
+//     identifiants (id, cle de stockage) sont remplaces par ceux du depart :
+//     sans cela, le fichier ecrirait des references vers des medias que la
+//     base en ligne n'a pas. Un media sans pendant est signale a relire ;
+//   - le JSON : une valeur n'est ecrite comme JSON dans une revision que si
+//     elle en est vraiment (JSON.parse), jamais parce qu'elle commence par une
+//     accolade ("{rubrique}, the journal" est un texte) ;
+//   - les tables qu'une extension cree a son premier usage (CREATE TABLE IF
+//     NOT EXISTS dans son code : courriels_*, commerce_*) : leur presence
+//     depend de ce que le serveur de developpement a touche, elles ne sont
+//     jamais recopiees (EXTENSIONS_AU_PREMIER_USAGE).
+// Apres le passage en ligne, EmDash marque l'index d'usage des medias d'une
+// collection dont le schema change comme perime ("stale") : sans effet
+// visible, il se reconstruit seul (voir base-3.4.0.mjs, qui le dit).
+//
 //   node scripts/sql-par-difference.mjs --depart a.sqlite --suivante b.sqlite --sortie import-3.4.0-x.sql [--entete fichier.txt]
 //
 // L'en-tete (commentaires du fichier) est lu dans --entete s'il est donne.
@@ -59,7 +78,14 @@ const ecrire = (...lignes) => sortie.push(...lignes);
 // 1. LE SCHEMA : les objets de la base suivante absents de celle de depart.
 // Les tables d'abord (tables ordinaires, puis tables virtuelles de recherche),
 // puis les index ; les declencheurs a la fin du fichier.
-const objets = (db) => new Map(tous(db, "SELECT type, name, tbl_name, sql FROM sqlite_master WHERE sql IS NOT NULL AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%'").map((o) => [o.name, o]));
+// Les tables qu'une extension cree elle-meme a son premier usage : jamais recopiees.
+const EXTENSIONS_AU_PREMIER_USAGE = /^(courriels|commerce)_/;
+const objets = (db) =>
+  new Map(
+    tous(db, "SELECT type, name, tbl_name, sql FROM sqlite_master WHERE sql IS NOT NULL AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%'")
+      .filter((o) => !EXTENSIONS_AU_PREMIER_USAGE.test(o.tbl_name))
+      .map((o) => [o.name, o]),
+  );
 const objetsA = objets(A);
 const objetsB = objets(B);
 const nouveaux = [...objetsB.values()].filter((o) => !objetsA.has(o.name));
@@ -70,7 +96,7 @@ const siAbsent = (o) =>
   o.sql
     .replace(/^CREATE\s+TABLE\s+(?!IF NOT EXISTS)/i, "CREATE TABLE IF NOT EXISTS ")
     .replace(/^CREATE\s+VIRTUAL\s+TABLE\s+(?!IF NOT EXISTS)/i, "CREATE VIRTUAL TABLE IF NOT EXISTS ")
-    .replace(/^CREATE\s+(UNIQUE\s+)?INDEX\s+(?!IF NOT EXISTS)/i, (m, u) => `CREATE ${u ?? ""}INDEX IF NOT EXISTS `)
+    .replace(/^CREATE\s+(UNIQUE\s+)?INDEX\s+(?!IF NOT EXISTS)/i, (_tout, u) => `CREATE ${u ?? ""}INDEX IF NOT EXISTS `)
     .replace(/^CREATE\s+TRIGGER\s+(?!IF NOT EXISTS)/i, "CREATE TRIGGER IF NOT EXISTS ");
 const schema = { table: [], index: [] };
 // LES DECLENCHEURS DE SUIVI DES MEDIAS D'EMDASH (emdash_mu_*) portent en dur
@@ -96,6 +122,40 @@ for (const o of objetsB.values()) {
 if (schema.table.length + schema.index.length > 0) {
   ecrire("", "-- 1. LE SCHEMA : les tables et les index nouveaux, crees seulement s'ils manquent.", "", ...schema.table, ...schema.index);
 }
+
+// ---------------------------------------------------------------------------
+// 1 bis. LES MEDIAS ALIGNES : chaque identifiant d'un media de la base suivante
+// qui a un pendant au depart est remplace par celui du depart, dans toute
+// valeur comparee ou ecrite plus bas.
+const alignement = new Map();
+const mediasSansPendant = [];
+let mediasAlignes = 0;
+if (objetsA.has("media") && objetsB.has("media")) {
+  const cle = (m) => (m.content_hash ? `h:${m.content_hash}` : `n:${m.filename}|${m.size}`);
+  const depart = new Map(tous(A, "SELECT * FROM media").map((m) => [cle(m), m]));
+  for (const m of tous(B, "SELECT * FROM media")) {
+    const pendant = depart.get(cle(m)) ?? depart.get(`n:${m.filename}|${m.size}`);
+    if (!pendant) {
+      mediasSansPendant.push(m);
+      continue;
+    }
+    if (m.id !== pendant.id) mediasAlignes += 1;
+    for (const col of ["id", "storage_key"]) if (m[col] && pendant[col] && m[col] !== pendant[col]) alignement.set(m[col], pendant[col]);
+  }
+}
+const motifAligne = alignement.size > 0 ? new RegExp([...alignement.keys()].map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "g") : null;
+/** Une valeur de la base suivante, ses references de medias ramenees a celles du depart. */
+const aligner = (v) => (motifAligne && typeof v === "string" ? v.replace(motifAligne, (k) => alignement.get(k)) : v);
+/** Vrai si la valeur est du JSON (objet ou liste), et pas un texte qui commence par une accolade. */
+const estJson = (v) => {
+  if (typeof v !== "string" || !/^[[{]/.test(v)) return false;
+  try {
+    const x = JSON.parse(v);
+    return typeof x === "object" && x !== null;
+  } catch {
+    return false;
+  }
+};
 
 // ---------------------------------------------------------------------------
 // 2. LES COLLECTIONS ET LEURS CHAMPS (tables d'EmDash), sur leur identifiant.
@@ -180,7 +240,9 @@ for (const table of tablesDeContenu) {
   const colsA = aExiste ? new Set(colonnes(A, table)) : new Set();
   const lignesA = aExiste ? new Map(tous(A, `SELECT * FROM ${id(table)}`).map((r) => [`${r.slug}/${r.locale}`, r])) : new Map();
   // La langue source d'abord : une traduction se rattache a une entree qui existe.
-  const lignesB = tous(B, `SELECT * FROM ${id(table)} WHERE deleted_at IS NULL ORDER BY (id = translation_group) DESC, slug, locale`);
+  const lignesB = tous(B, `SELECT * FROM ${id(table)} WHERE deleted_at IS NULL ORDER BY (id = translation_group) DESC, slug, locale`).map((r) =>
+    Object.fromEntries(Object.entries(r).map(([k, v]) => [k, TECHNIQUES.has(k) ? v : aligner(v)])),
+  );
   const parId = new Map(lignesB.map((r) => [r.id, r]));
   for (const r of lignesB) {
     const cle = `${r.slug}/${r.locale}`;
@@ -195,7 +257,7 @@ for (const table of tablesDeContenu) {
       if (rev) {
         blocEntrees.push(
           `INSERT INTO revisions (id, collection, entry_id, data, author_id, created_at)`,
-          `  SELECT ${lit(rev.id)}, ${lit(collection)}, ${lit(r.id)}, ${lit(rev.data)}, ${auteur}, ${MAINTENANT}`,
+          `  SELECT ${lit(rev.id)}, ${lit(collection)}, ${lit(r.id)}, ${lit(aligner(rev.data))}, ${auteur}, ${MAINTENANT}`,
           `  WHERE ${absente} AND NOT EXISTS (SELECT 1 FROM revisions WHERE id = ${lit(rev.id)});`,
         );
       }
@@ -222,7 +284,7 @@ for (const table of tablesDeContenu) {
       // La revision en ligne porte la meme valeur : l'editeur du back office la lit.
       if (revA) {
         const chemin = `'$.${k}'`;
-        const valeurJson = typeof r[k] === "number" ? String(r[k]) : r[k] === null ? "NULL" : /^[[{]/.test(String(r[k])) ? `json(${lit(r[k])})` : lit(r[k]);
+        const valeurJson = typeof r[k] === "number" ? String(r[k]) : r[k] === null ? "NULL" : estJson(r[k]) ? `json(${lit(r[k])})` : lit(r[k]);
         blocMaj.push(
           `UPDATE revisions SET data = json_set(data, ${chemin}, ${valeurJson})`,
           `  WHERE id = (SELECT live_revision_id FROM ${id(table)} WHERE ${ou}) AND json_extract(data, ${chemin}) IS ${lit(avant)} AND (SELECT ${id(k)} FROM ${id(table)} WHERE ${ou}) IS ${lit(r[k])};`,
@@ -291,4 +353,10 @@ if (declencheurs.length > 0) ecrire("", "-- 7. LES DECLENCHEURS (index de recher
 const entete = args.entete ? readFileSync(args.entete, "utf8").trimEnd() : "-- SQL etabli par scripts/sql-par-difference.mjs.";
 writeFileSync(args.sortie, `${entete}\n${sortie.join("\n")}\n`);
 console.log(`${args.sortie} : ${sortie.filter((l) => /^(INSERT|UPDATE|CREATE)/.test(l)).length + declencheurs.length} instruction(s).`);
+// Un media de la base suivante sans pendant au depart, et cite par une valeur ecrite : il manquera en ligne.
+const ecrit = sortie.join("\n");
+for (const m of mediasSansPendant) {
+  if (ecrit.includes(m.id)) aRelire.push(`media ${m.filename} (${m.id}) cite par le fichier mais absent de la base de depart : a televerser en ligne d'abord`);
+}
+if (mediasAlignes > 0) console.log(`medias alignes sur la base de depart : ${mediasAlignes}.`);
 for (const r of aRelire) console.error(`a relire : ${r}`);

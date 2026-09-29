@@ -128,7 +128,8 @@ export function lireChamps(brut: Record<string, unknown>): Champs {
   return {
     nom: propre(brut.name, 200).replace(/[\n<>"]/g, " "),
     adresse: propre(brut.email, 254).toLowerCase(),
-    sujet: propre(brut.topic, 200).replace(/\n/g, " "),
+    // "topic" (Koa), ou "subject" (le nom d'origine du champ chez Reef).
+    sujet: propre(brut.topic ?? brut.subject, 200).replace(/\n/g, " "),
     message: propre(brut.message, 5000),
     piege: propre(brut.site_web, 200),
     langue: brut.langue === "fr" ? "fr" : "en",

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// scripts/house.mjs - le linter de la maison : les quatre regles mecaniques d'AGENTS.md, verifiees.
+// scripts/house.mjs - le linter de la maison : les regles mecaniques d'AGENTS.md, verifiees.
 //
 // POURQUOI CE FICHIER EXISTE
 //
@@ -26,7 +26,7 @@
 // C'est la premiere vertu de ce script, avant meme d'attraper une faute :
 // chaque exception vit dans la table EXEMPTIONS avec sa raison. Une exception
 // qu'on ne sait plus justifier est une exception a retirer.
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const ROOT = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
@@ -247,6 +247,59 @@ function checkMergeOrder(file, text) {
   return found;
 }
 
+/**
+ * Regle 7 : aucun composant, aucune mise en page, aucune page ne lit le disque.
+ *
+ * Moteur allume, ces fichiers se rendent dans le Worker, qui n'a pas de
+ * disque : un existsSync au rendu y repond toujours non (PhoneShot de Kona,
+ * 3.4.0 : la capture du telephone disparaissait de l'accueil). Ce qui doit se
+ * savoir du disque se calcule au build (un `define` de la configuration) et
+ * arrive au composant comme une constante.
+ */
+const RENDU = /src\/(components|layouts|pages)\//;
+function checkDisque(file, text) {
+  if (!RENDU.test(file) || !/\.(astro|ts|tsx|mjs|js)$/.test(file)) return [];
+  const found = [];
+  text.split("\n").forEach((line, i) => {
+    if (/\bfrom\s+["'](node:)?fs(\/promises)?["']|\b(import|require)\(\s*["'](node:)?fs(\/promises)?["']/.test(line)) {
+      found.push(`ligne ${i + 1} : lit le disque au rendu (le Worker n'en a pas), calculer au build et passer une constante`);
+    }
+  });
+  return found;
+}
+
+/**
+ * Regle 8 : le plan du site n'importe jamais les pages.
+ *
+ * Une page importee par un module qui n'est pas une page cesse d'etre une
+ * frontiere pour le partage des feuilles de style d'Astro : des que les pages
+ * se rendent a la demande, chacune recoit les feuilles de toutes les autres
+ * (Nalu, 3.4.0 : 359 regles partout). Le plan recalcule ses chemins depuis
+ * @i18n et le catalogue (table CHEMINS, voir plan-du-site.xml.ts du socle).
+ */
+function checkPlan(file, text) {
+  if (!/src\/moteur\/plan-du-site[^/]*\.ts$/.test(file)) return [];
+  const found = [];
+  text.split("\n").forEach((line, i) => {
+    if (/import\.meta\.glob\s*[<(]/.test(line)) found.push(`ligne ${i + 1} : le plan du site importe les pages (import.meta.glob)`);
+  });
+  return found;
+}
+
+/**
+ * Regle 9 : Tailwind ne lit pas docs/.
+ *
+ * Tailwind v4 cherche ses utilitaires dans tout le depot ; un mot d'un guide
+ * qui ressemble a une utilitaire fabrique une regle dans la feuille de chaque
+ * page et change le build statique sans qu'aucun composant ait bouge (Koa,
+ * 3.4.0 ; Reef en portait dix, mesure au socle 1.3.0). La feuille qui importe Tailwind l'exclut donc
+ * explicitement : `@source not "../../docs";`.
+ */
+function checkDocs(file, text) {
+  if (!/\.css$/.test(file) || !/@import\s+["']tailwindcss["']/.test(text) || !existsSync(join(ROOT, "docs"))) return [];
+  return /@source\s+not\s+["'][^"']*docs\/?["']/.test(text) ? [] : ['Tailwind lit docs/ : ajouter @source not "../../docs"; apres @import "tailwindcss"'];
+}
+
 /* ------------------------------------------------------------------ */
 /* Le rapport                                                          */
 /* ------------------------------------------------------------------ */
@@ -257,6 +310,9 @@ const RULES = [
   { key: "dash", label: "aucun tiret cadratin", run: checkDashes },
   { key: "palette", label: "aucune palette dans le markup", run: checkPalette },
   { key: "merge", label: "taille avant couleur dans tv()", run: checkMergeOrder },
+  { key: "disque", label: "aucun disque lu au rendu", run: checkDisque },
+  { key: "plan", label: "plan du site sans import des pages", run: checkPlan },
+  { key: "docs", label: "Tailwind ne lit pas docs/", run: checkDocs },
 ];
 
 const families = paletteFamilies();

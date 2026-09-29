@@ -31,6 +31,13 @@ export interface MenuDuSite {
   nom: string;
   /** Le libelle du menu dans le back office ; pour une colonne du pied, c'est aussi le titre affiche de la colonne. */
   libelle: Chemin;
+  /**
+   * Pour un menu qui ne s'affiche pas sous un titre (libelle vide) : ce que le
+   * back office en dit, en francais, quand le nom commun de LIBELLES_DES_MENUS
+   * ne decrit pas ce theme ("Bouton en haut de chaque page" plutot que
+   * "Boutons en haut à droite de chaque page"). Absent : le nom commun.
+   */
+  nomDansLeBackOffice?: string;
   liens: readonly LienDuMenu[];
 }
 
@@ -89,7 +96,7 @@ export function menusDeLaGraine(
   return menus.map((menu) => ({
     id: `menu:${menu.nom}:${locale}`,
     name: menu.nom,
-    label: menu.libelle ? lire(menu.libelle) : (LIBELLES_DES_MENUS[menu.nom] ?? menu.nom),
+    label: menu.libelle ? lire(menu.libelle) : (menu.nomDansLeBackOffice ?? LIBELLES_DES_MENUS[menu.nom] ?? menu.nom),
     locale,
     ...suffixe(`menu:${menu.nom}`),
     items: menu.liens.map((lien, rang) => ({

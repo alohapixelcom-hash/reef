@@ -118,6 +118,8 @@ export const FR = {
     livreurOk: "Tous les courriels du site partent par ce chemin, ceux du back office compris.",
     livreurAutre: (qui: string) => `Les courriels du site sont confiés à ${qui}, pas à Cloudflare : ils ne partent pas vraiment. Cliquez ci-dessous pour les confier à Courriels.`,
     livreurAucun: "Aucun fournisseur de courriels n'est choisi : rien ne peut partir. Cliquez ci-dessous pour confier les courriels à Courriels.",
+    livreurPourquoi:
+      "Pourquoi ce choix : en ligne, Courriels est le seul fournisseur et se choisit tout seul. Sur l'ordinateur de la personne qui a installé le site, EmDash ajoute une console d'essai qui écrit les courriels dans son journal sans les envoyer : c'est entre les deux qu'il faut choisir, une seule fois.",
     choisir: "Confier les courriels à Courriels",
     choisiOk: "C'est fait : Courriels livre désormais tous les courriels du site.",
     choisiKo: "Le choix n'a pas pu être enregistré. Rechargez la page et réessayez.",

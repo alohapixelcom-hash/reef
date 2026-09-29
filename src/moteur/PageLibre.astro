@@ -57,12 +57,12 @@ const corps = Array.isArray(data.body) && data.body.length > 0 ? data.body : nul
     <PageHero title={titre} lede={texte(data.lede)} crumbs={[{ label: titre }]} edition={edition} />
     {
       (photo || edition.champ("image")["data-emdash-ref"]) && (
-        <div class="container-page mt-10" {...edition.champ("image")}>
+        <div class="container-page" style="margin-top:2.5rem" {...edition.champ("image")}>
           {photo && <PhotoDuMoteur media={photo} class="rounded-card w-full" widths={[720, 1200, 1440, 1920]} sizes="100vw" alt={photo.alt ?? ""} />}
         </div>
       )
     }
-    <div class="container-page py-14 md:py-20">
+    <div class="container-page" style="padding-block:clamp(3.5rem, 8vw, 5rem)">
       <div class="prose">{corps && <TexteRiche value={corps} />}</div>
     </div>
   </main>

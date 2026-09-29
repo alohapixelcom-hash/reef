@@ -55,7 +55,17 @@ const ADAPTATEUR = "socle.adaptateur.json";
 
 const empreinte = (contenu) => createHash("sha256").update(contenu).digest("hex");
 const lireJson = (chemin) => JSON.parse(readFileSync(chemin, "utf8"));
-const ecrireJson = (chemin, valeur) => writeFileSync(chemin, `${JSON.stringify(valeur, null, 2)}\n`);
+/**
+ * Le verrou, compact : une ligne par fichier. Indente en entier, il passait
+ * les 400 lignes des 93 fichiers et `pnpm lint:house` le refusait (Nalu, 3.4.0).
+ * Il reste du JSON ordinaire, lu par n'importe quelle version de l'outil.
+ */
+function ecrireVerrou(chemin, verrou) {
+  const { fichiers, ...tete } = verrou;
+  const lignes = Object.entries(tete).map(([k, v]) => `  ${JSON.stringify(k)}: ${JSON.stringify(v)},`);
+  const entrees = Object.entries(fichiers).map(([k, v], i, t) => `    ${JSON.stringify(k)}: ${JSON.stringify(v)}${i < t.length - 1 ? "," : ""}`);
+  writeFileSync(chemin, `{\n${lignes.join("\n")}\n  "fichiers": {\n${entrees.join("\n")}\n  }\n}\n`);
+}
 
 function arreter(message, code = 2) {
   console.error(message);
@@ -210,7 +220,7 @@ function sync(cible, options) {
         .map((f) => [f.cible, { source: f.source, sha256: empreinte(f.contenu) }]),
     ),
   };
-  if (!options.essai) ecrireJson(verrouChemin, nouveauVerrou);
+  if (!options.essai) ecrireVerrou(verrouChemin, nouveauVerrou);
 
   const titre = options.essai ? "Essai (rien n'est ecrit)" : "Synchronise";
   console.log(`${titre} : socle ${MANIFESTE.version} vers ${cible} (${depot}).`);
