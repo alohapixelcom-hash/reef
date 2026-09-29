@@ -38,7 +38,7 @@ export const EN: Textes = {
     branchement: "Connection",
     branchementPret: "Ready",
     branchementIncomplet: "Incomplete",
-    branchementDetail: (binding: boolean) => (binding ? "Ready to send" : "Not connected to the sending service yet"),
+    branchementDetail: (binding: boolean) => (binding ? "Sending service connected" : "Sending service not connected yet"),
     jauge: (sent: number, included: number) => `This month's allowance: ${count(sent)} of ${count(included)} included emails`,
     pourcent: (p: number) => `${new Intl.NumberFormat("en-GB", { maximumFractionDigits: 1 }).format(p)}%`,
     cycle: (end: string) =>
@@ -149,7 +149,7 @@ export const EN: Textes = {
     heure: "At most this many emails per hour, all forms together (0: no limit)",
     jour: "At most this many emails per day (0: no limit)",
     parDestinataire: "At most this many emails to one address per day: stops a robot from flooding someone with acknowledgements (0: no limit)",
-    mois: "At most this many emails per cycle: 3,000 are included by Cloudflare, beyond that they are billed (0: no limit)",
+    mois: "At most this many emails per month: 3,000 are included in the hosting, beyond that they are billed (0: no limit)",
     cycle: "Day of the month when the counter goes back to zero: the day of your Cloudflare invoice (1 to 28)",
     enregistrer: "Save settings",
     annuler: "Discard changes",

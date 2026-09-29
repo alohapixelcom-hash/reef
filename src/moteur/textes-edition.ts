@@ -108,7 +108,8 @@ export const STYLES = {
   pastilleDefaut: "opacity:.85",
   rangeeEnLigne: "position:relative;z-index:40;display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0",
   etiquette: "opacity:.8;font-weight:500",
-  valeur: "text-decoration:underline dotted;text-underline-offset:3px;cursor:text;min-width:1ch",
+  valeur: "text-decoration:underline dotted;text-underline-offset:3px;cursor:text;min-width:1ch;flex-shrink:0",
+  avis: "display:block;flex-basis:100%;max-width:24rem;margin-left:auto;padding:.35rem .7rem;border-radius:.6rem;background:var(--edition-fond);color:var(--edition-encre);border:1px solid var(--edition-bord);font:500 .72rem/1.35 var(--edition-police),system-ui,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.25);white-space:normal",
   panneau:
     "position:fixed;left:1rem;bottom:4.75rem;z-index:2147483000;width:auto;max-width:min(22rem,calc(100vw - 2rem));padding:.65rem 1rem;border-radius:1rem;background:var(--edition-fond);color:var(--edition-encre);border:1px solid var(--edition-bord);box-shadow:0 12px 40px rgba(0,0,0,.3);font:.85rem/1.45 var(--edition-police),system-ui,sans-serif",
   titre: "margin:0 0 .35rem;font:700 1rem/1.2 var(--edition-police-titre),system-ui,sans-serif",
@@ -132,6 +133,9 @@ export const FEUILLE_D_EDITION =
   "@media (max-width:640px){" +
   "[data-aloha-pastilles]{position:relative!important;top:auto!important;right:auto!important;bottom:auto!important;left:auto!important;justify-content:flex-start!important;max-width:none!important;margin:.5rem .75rem!important}" +
   "[data-aloha-pastilles]>span{max-width:100%!important;white-space:normal!important}" +
+  // La rangee du premier ecran (posee en bas du bloc sur grand ecran) passe
+  // sous la barre de navigation fixe, pas derriere.
+  '[data-aloha-pastilles][style*="bottom:.75rem"]{margin-top:6rem!important}' +
   "[data-aloha-cadre=panneau]{left:.5rem!important;bottom:4.5rem!important;max-width:calc(100vw - 1rem)!important;padding:.45rem .8rem!important;font-size:.8rem!important}" +
   "[data-aloha-cadre=panneau][open]{max-height:60vh;overflow:auto}" +
   "}" +
@@ -148,7 +152,7 @@ export const FEUILLE_D_EDITION =
  * et la phrase dit pourquoi.
  */
 export function scriptDesAdresses(regle: string, mots: { adresseCorrigee: string; adresseRefusee: string }): string {
-  return `(function(){var corriger=(${regle});var M=${JSON.stringify(mots)};function avis(el,t){var p=el.parentNode;if(!p)return;var n=p.querySelector("[data-aloha-avis]");if(!n){n=document.createElement("span");n.setAttribute("data-aloha-avis","");p.appendChild(n);}n.textContent=t;}function avant(e){var el=e.target;if(!el||!el.getAttribute||el.getAttribute("data-aloha-adresse")===null||!el.isContentEditable)return;if(e.type==="keydown"&&!(e.key==="Enter"&&!e.shiftKey))return;var v=(el.textContent||"").trim();if(v===""||v===el.getAttribute("data-aloha-adresse"))return;var r=corriger(v);if(r.refus){el.textContent=el.getAttribute("data-aloha-adresse");avis(el,M.adresseRefusee);}else if(r.corrigee){el.textContent=r.adresse;avis(el,M.adresseCorrigee.replace("{a}",r.adresse));}}document.addEventListener("keydown",avant,true);document.addEventListener("blur",avant,true);})();`;
+  return `(function(){var corriger=(${regle});var M=${JSON.stringify(mots)};var S=${JSON.stringify(STYLES.avis)};function avis(el,t,corrigee){var p=el.parentNode;if(!p||!p.parentNode)return;if(corrigee){var d=p.querySelector("[data-aloha-defaut]");if(d)d.style.display="none";}var n=p.nextElementSibling;if(!n||n.getAttribute("data-aloha-avis")===null){n=document.createElement("span");n.setAttribute("data-aloha-avis","");n.setAttribute("style",S);n.setAttribute("role","status");p.parentNode.insertBefore(n,p.nextSibling);}n.textContent=t;}function avant(e){var el=e.target;if(!el||!el.getAttribute||el.getAttribute("data-aloha-adresse")===null||!el.isContentEditable)return;if(e.type==="keydown"&&!(e.key==="Enter"&&!e.shiftKey))return;var v=(el.textContent||"").trim();if(v===""||v===el.getAttribute("data-aloha-adresse"))return;var r=corriger(v);if(r.refus){el.textContent=el.getAttribute("data-aloha-adresse");avis(el,M.adresseRefusee,false);}else if(r.corrigee){el.textContent=r.adresse;avis(el,M.adresseCorrigee.replace("{a}",r.adresse),true);}}document.addEventListener("keydown",avant,true);document.addEventListener("blur",avant,true);})();`;
 }
 
 /**

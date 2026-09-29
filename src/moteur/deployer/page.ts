@@ -212,7 +212,9 @@ export function composer(etat: Etat, clic?: Resultat): Reponse {
     { type: "header", text: TEXTES.titre },
     { type: "section", text: TEXTES.intro },
     ...(bandeau ? [bandeau.bloc] : []),
-    ...hook.client,
+    // Le clic vient de dire que le bouton n'est pas relie : l'avertissement
+    // permanent le redirait juste dessous.
+    ...(clic && (clic.passage.build === "sans-hook" || clic.passage.build === "hook-invalide") ? [] : hook.client),
     {
       type: "actions",
       elements: [

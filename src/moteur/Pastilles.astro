@@ -72,7 +72,7 @@ const pastille = (defaut: boolean) => `${STYLES.pastille}${defaut ? `;${STYLES.p
           <span style={pastille(!valeur)}>
             <span style={STYLES.etiquette}>{libelle ?? (champ.includes("secondary") ? mots.lienSecondaire : mots.lien)}</span>
             <span style={STYLES.valeur} {...entree.champ(champ)} data-aloha-adresse={valeur ?? defaut}>{valeur ?? defaut}</span>
-            {!valeur && <span style={STYLES.etiquette}>{mots.lienDefaut}</span>}
+            {!valeur && <span style={STYLES.etiquette} data-aloha-defaut>{mots.lienDefaut}</span>}
             {valeur && lue.corrigee && <span style={STYLES.etiquette}>({mots.ouvre} {lue.adresse})</span>}
             {valeur && lue.refus && <span style={STYLES.etiquette} data-aloha-avis>{mots.adresseRefusee}</span>}
           </span>

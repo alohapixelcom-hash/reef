@@ -45,7 +45,7 @@ export const FR = {
     branchement: "Branchement",
     branchementPret: "Prêt",
     branchementIncomplet: "Incomplet",
-    branchementDetail: (liaison: boolean): string => (liaison ? "Prêt à envoyer" : "Pas encore relié au service d'envoi"),
+    branchementDetail: (liaison: boolean): string => (liaison ? "Service d'envoi relié" : "Service d'envoi pas encore relié"),
     jauge: (envoyes: number, inclus: number) => `Forfait du mois : ${nombre(envoyes)} envoi${envoyes > 1 ? "s" : ""} sur ${nombre(inclus)} inclus`,
     pourcent: (p: number) => `${new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1 }).format(p)} %`,
     cycle: (fin: string) =>
@@ -157,7 +157,7 @@ export const FR = {
     heure: "Envois au plus par heure, tous formulaires confondus (0 : sans limite)",
     jour: "Envois au plus par jour (0 : sans limite)",
     parDestinataire: "Envois au plus vers une même adresse par jour : empêche un robot de noyer quelqu'un d'accusés de réception (0 : sans limite)",
-    mois: "Envois au plus par cycle : 3 000 sont inclus chez Cloudflare, au-delà ils sont facturés (0 : sans limite)",
+    mois: "Envois au plus par mois : 3 000 sont compris dans l'hébergement, au-delà ils sont facturés (0 : sans limite)",
     cycle: "Jour du mois où le compteur repart à zéro : celui de votre facture Cloudflare (de 1 à 28)",
     enregistrer: "Enregistrer les réglages",
     annuler: "Annuler les modifications",

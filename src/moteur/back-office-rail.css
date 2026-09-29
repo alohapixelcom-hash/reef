@@ -47,3 +47,14 @@ html:not([lang^="fr"]) [id^="field-"]:has(> button > span > div > svg + span)::a
   font-size: 0.85rem;
   color: var(--color-kumo-subtle, inherit);
 }
+
+/* Le bandeau d'avertissement d'EmDash 0.38 (Courriels, Mettre le site a jour) :
+ * texte jaune sur fond jaune pale, 1,9:1 (mesure dans Chrome, socle 1.4.0),
+ * illisible pour le client. Le texte passe au brun, 6:1 et plus ; le fond et
+ * l'icone gardent leur jaune. */
+.bg-kumo-banner-warning.text-kumo-warning {
+  color: #6b4a00;
+}
+[data-mode="dark"] .bg-kumo-banner-warning.text-kumo-warning {
+  color: #f3d77e;
+}
