@@ -157,7 +157,7 @@ node scripts/base-3.4.0.mjs --remote reef-moteur --appliquer                    
 pnpm build:moteur && npx wrangler deploy                                                  # then check the pages
 ```
 
-**3.6.0.** A database already at 3.4.0 or 3.5.0 receives `import-3.6.0-reef.sql`, once, and nothing else: it adds « Couleur d'origine du thème » to the list of brand colours (the theme's own colour, like an empty field). The field is changed only while it still carries the 3.5.0 list; no `DELETE`, no `DROP`, no content touched, the colour an editor chose stays. 3.6.1 does not change the database.
+**3.6.0.** A database already at 3.4.0 or 3.5.0 receives `import-3.6.0-reef.sql`, once, and nothing else: it adds « Couleur d'origine du thème » to the list of brand colours (the theme's own colour, like an empty field). The field is changed only while it still carries the 3.5.0 list; no `DELETE`, no `DROP`, no content touched, the colour an editor chose stays. 3.6.1 and 3.6.2 do not change the database.
 
 ```bash
 npx wrangler d1 execute reef-moteur --remote --config wrangler.moteur.jsonc --file=import-3.6.0-reef.sql

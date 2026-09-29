@@ -1,7 +1,7 @@
 {
   "socle": "aloha-socle",
   "version": "1.4.0",
-  "commit": "3a8475c4b31b",
+  "commit": "09881e1e9b9e",
   "depot": "reef",
   "modules": ["outillage","moteur-base","catalogue-bo","habillage-bo","langue-bo","mouvement","plan-du-site","ci"],
   "extensions": ["deployer","courriels","administrable"],

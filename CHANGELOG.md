@@ -4,7 +4,22 @@
 
 Versions describe the features actually shipped in this theme.
 
-Current version: **3.6.1**.
+Current version: **3.6.2**.
+
+## 3.6.2 - 2026-09-29
+
+The brand colour now paints buttons too. A colour chosen in the admin
+(« Bleu océan »...) coloured only the accent (links, highlighted word), while
+the filled buttons took the theme's second ramp, turned 181 degrees: « Bleu
+océan » gave orange buttons. The reef ramp now takes the named hue, in light and
+dark, and every button keeps its text at 4.5:1 or more (measured in Chrome on
+every covered page, five colours, light and dark). With no colour chosen
+(« Couleur d'origine du thème » or empty) nothing changes: the static build and
+the anonymous HTML are identical to 3.6.1.
+
+- `src/moteur/theme.ts`: the button ramp on the named hue, no rotation.
+- `src/moteur/site.selfcheck.ts`: the button colours are checked against the colour name, light and dark.
+- Admin guides: the colour sentence says it paints the buttons, the links and the highlighted word.
 
 ## 3.6.1 - 2026-09-29
 
