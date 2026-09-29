@@ -40,6 +40,10 @@ if (!P) {
   process.exit(2);
 }
 const IMAGE = fileURLToPath(new URL(`../${P.image}`, import.meta.url));
+// La langue servie a la racine du site (socle 1.7.0) : "en" pour les themes, "fr" pour alohapixel.com. Les
+// entrees et les ecrans du back office s'ouvrent dans cette langue, sinon un site francais a la racine
+// ouvrirait la version anglaise d'un bloc et le geste ne se verrait pas sur la page.
+const LANGUE = P.langue ?? "en";
 
 const navigateur = await ouvrirChromium();
 const contexte = await contexteEditeur(navigateur, { url, session: nommes.session, largeur: 1440 });
@@ -66,7 +70,7 @@ async function lire(chemin) {
 }
 
 /** L'entree d'une collection par son identifiant et sa langue. */
-async function entree(collection, slug, locale = "en") {
+async function entree(collection, slug, locale = LANGUE) {
   const liste = await lire(`/content/${collection}?locale=${locale}&limit=100`);
   const trouvee = (liste.items ?? liste).find((e) => e.slug === slug);
   if (!trouvee) throw new Error(`${collection}/${slug} (${locale}) introuvable`);
@@ -122,7 +126,7 @@ async function publierParLaBarre() {
 }
 
 /** L'ecran d'une entree de `sections` dans le back office. */
-async function ouvrirSection(slug, locale = "en") {
+async function ouvrirSection(slug, locale = LANGUE) {
   const e = await entree("sections", slug, locale);
   await ouvrir(`${ADMIN}/content/sections/${e.id}?locale=${locale}`);
 }
@@ -159,7 +163,7 @@ async function reglageGeneral(libelle, valeur) {
 }
 
 /** Deplacer une entree vers la corbeille, depuis son ecran. */
-async function corbeille(collection, slug, locale = "en") {
+async function corbeille(collection, slug, locale = LANGUE) {
   const e = await entree(collection, slug, locale);
   await ouvrir(`${ADMIN}/content/${collection}/${e.id}?locale=${locale}`);
   await page.getByRole("button", { name: "Déplacer vers la corbeille" }).click();
@@ -211,7 +215,7 @@ async function geste({ nom, faire, verifierFait, restaurer, verifierRestaure }) 
 const suffixe = Date.now().toString(36);
 const outils = {
   page, url, ADMIN, IMAGE, nommes, suffixe, anonyme, lire, entree, ouvrir, capture, enregistrerEtPublier, editerDansLaPage, publierParLaBarre,
-  ouvrirSection, renommerLien, ajouterLien, retirerDernierLien, reglageGeneral, corbeille, choisir, bientot,
+  ouvrirSection, renommerLien, ajouterLien, retirerDernierLien, reglageGeneral, corbeille, choisir, bientot, langue: LANGUE,
 };
 const { gestesCommuns, gestesDeFin } = await import("./essai-administrer.gestes.mjs");
 for (const g of await gestesCommuns(P, outils)) await geste(g);

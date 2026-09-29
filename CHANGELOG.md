@@ -22,6 +22,11 @@ a logo for dark mode (Reef already had the first two since 3.8.1).
 - Static build unchanged; anonymous HTML unchanged while the field is empty.
 - Shared base: branch `univers-3.8.2-essai` of `aloha-socle` (logo for dark
   mode read by `identite()`, two shared steps in the replayed guide).
+- The back office shows, on each block screen, only the photo and video
+  fields that change that block (the others are hidden, nothing is removed),
+  says what an empty dark mode logo or sharing image does, names an empty
+  list « Réglage d'origine du thème » and no longer shows « 0 » in an emptied
+  « Place du bloc ». Shared base 1.7.0.
 
 ## 3.8.1 - 2026-09-29
 

@@ -195,7 +195,7 @@ export async function gestesDeFin(P, o) {
     const pages = P.police.pages ?? ["/"];
     const site = await entree("site", "site");
     const police = async (nom) => {
-      await ouvrir(`${ADMIN}/content/site/${site.id}?locale=en`);
+      await ouvrir(`${ADMIN}/content/site/${site.id}?locale=${o.langue ?? "en"}`);
       await o.choisir(/^Police du site/, nom);
       await enregistrerEtPublier();
     };

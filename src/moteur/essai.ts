@@ -10,6 +10,8 @@ type Adresse = string;
 export interface ParametresDeLEssai {
   /** Une image livree avec le theme, pour les gestes de photo et de logo (chemin depuis la racine du depot). */
   image: string;
+  /** La langue servie a la racine du site ("en" si absent ; "fr" pour un site francais a la racine) : les gestes ouvrent les entrees dans cette langue (socle 1.7.0). */
+  langue?: string;
   /** Un titre edite dans la page par la barre : l'entree de `sections`, le selecteur du titre, son champ. */
   titre?: { entree: string; selecteur: string; champ?: string; page?: Adresse };
   /** Le bloc de tete de l'accueil, ou vivent les pastilles de la photo et du bouton ("section[aria-labelledby=\"hero-title\"]"). */

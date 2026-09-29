@@ -119,4 +119,11 @@ is(champ("site", "font").translatable, false, "la police vaut pour les deux lang
 // 10. La place d'un bloc sur l'accueil (3.8.1) : un entier commun aux deux langues.
 is([champ("sections", "order").type, champ("sections", "order").translatable], ["integer", false], "la place d'un bloc est un entier commun aux deux langues");
 
+// La carte des champs de chaque bloc (3.8.2) : chaque champ cite existe dans la graine, le libelle d'un sous-champ est le sien.
+{
+  const { defautsDeLaCarte } = await import("./champs-des-blocs.ts");
+  const { CHAMPS_DES_BLOCS } = await import("./theme.ts");
+  is(defautsDeLaCarte(CHAMPS_DES_BLOCS, JSON.parse(readFileSync(new URL("../../seed/seed.json", import.meta.url), "utf8"))), [], "la carte des champs de chaque bloc suit la graine");
+}
+
 console.log(`site.selfcheck : ${checks} verifications passees`);

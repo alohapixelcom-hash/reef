@@ -215,13 +215,16 @@ export interface LienRendu {
  * Les liens d'un menu natif de la langue, ou le repli des fichiers (navData)
  * quand le menu n'existe pas, est vide ou vient d'une autre langue. Un lien
  * porte la classe "bouton" (posee par la graine) quand il se rend en bouton.
+ * `defaut` est la langue servie sans prefixe (univers 3.8.2) : "en" pour les
+ * themes, "fr" pour un site francais a la racine (alohapixel.com), dont les
+ * menus francais ne doivent pas recevoir "/fr" (adresse introuvable).
  */
-export function liensDuMenu(page: Page, nom: string, locale: string, repli: readonly LienRendu[]): LienRendu[] {
+export function liensDuMenu(page: Page, nom: string, locale: string, repli: readonly LienRendu[], defaut = "en"): LienRendu[] {
   const menu = menuDe(page, nom, locale);
   if (!menu) return [...repli];
   return menu.items.map((item) => ({
     text: item.label,
-    href: cheminDansLaLangue(item.url, locale),
+    href: cheminDansLaLangue(item.url, locale, defaut),
     ...((item.cssClasses ?? "").split(/\s+/).includes("bouton") ? { bouton: true } : {}),
     ...(item.target ? { target: item.target } : {}),
   }));

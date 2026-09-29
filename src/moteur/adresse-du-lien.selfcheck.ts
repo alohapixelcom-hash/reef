@@ -45,5 +45,7 @@ for (const garde of ["/fr/about/", "/fr", "/llms.txt", "/_emdash/admin", "https:
 is(cheminDansLaLangue("/contact", "en"), "/contact", "la langue par defaut n'a pas de prefixe");
 const cadre: Cadre = { menus: new Map([["principal", { name: "principal", label: "x", locale: "fr", items: [{ label: "Nos horaires", url: "/nos-horaires", children: [] }] }]]) };
 is(liensDuMenu({ locals: { cadre } }, "principal", "fr", []), [{ text: "Nos horaires", href: "/fr/nos-horaires" }], "le menu francais rend /fr/nos-horaires");
+is(liensDuMenu({ locals: { cadre } }, "principal", "fr", [], "fr"), [{ text: "Nos horaires", href: "/nos-horaires" }], "un site francais a la racine : son menu francais garde /nos-horaires (univers 3.8.2)");
+is(cheminDansLaLangue("/contact/", "en-us", "fr"), "/en-us/contact/", "sur ce site, l'anglais recoit /en-us");
 
 console.log(`adresse-du-lien.selfcheck : ${checks} verifications passees`);
