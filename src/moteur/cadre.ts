@@ -58,6 +58,8 @@ export interface DonneesDuSite {
   credit_name?: string;
   credit_link?: string;
   brand_color?: string;
+  /** Le logo pour le mode sombre (socle 1.7.0) : une image de la mediatheque, commune aux deux langues. */
+  logo_dark?: unknown;
 }
 
 /** Un lien d'un menu natif, resolu par le moteur. */
@@ -134,6 +136,12 @@ export interface Identite {
   description: string;
   /** Le logo choisi dans les reglages, ou null : le theme dessine alors son pictogramme. */
   logo: MediaDesReglages | null;
+  /**
+   * Le logo pour le mode sombre (entree "site", champ "logo_dark"), ou null :
+   * le logo des reglages sert alors aussi sur fond sombre. Le theme rend les
+   * deux images et n'en montre qu'une selon le mode (clair ou sombre).
+   */
+  logoSombre: MediaDesReglages | null;
   /** Le favicon choisi dans les reglages, ou null : les favicons fabriques au build. */
   favicon: MediaDesReglages | null;
   /** L'image de partage par defaut et son texte alternatif. */
@@ -167,10 +175,12 @@ export function identite(page: Page, repli: RepliDuSite): Identite {
   const credit = texte(site.credit_name) ?? repli.credit;
   const email = texte(site.email) ?? repli.email;
   const imageDesReglages = reglages.seo?.defaultOgImage;
+  const sombre = media(site.logo_dark);
   return {
     nom: texte(reglages.title) ?? repli.nom,
     description: texte(site.description) ?? repli.description,
     logo: reglages.logo?.url ? reglages.logo : null,
+    logoSombre: sombre?.src ? { url: sombre.src, alt: sombre.alt, width: sombre.width, height: sombre.height } : null,
     favicon: reglages.favicon?.url ? reglages.favicon : null,
     image: {
       src: imageDesReglages?.url ?? repli.image.src,

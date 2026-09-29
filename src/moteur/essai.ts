@@ -30,4 +30,8 @@ export interface ParametresDeLEssai {
   redirection?: { vers: Adresse };
   /** Le titre SEO d'une entree de `sections`, et la page qui le porte. */
   seo?: { entree: string; page: Adresse; champ?: string };
+  /** La police du site choisie ("Classique, à empattements") puis rendue a l'origine (univers 3.8.2) : les pages ou lire la feuille posee. */
+  police?: { pages?: Adresse[] };
+  /** Un bloc de l'accueil mis a la place 1 puis rendu a sa place (univers 3.8.2) : son entree, un morceau du HTML qui n'est que dans ce bloc, un morceau du HTML qui n'est que dans le bloc de tete. */
+  ordre?: { entree: string; marqueBloc: string; marqueTete: string; pages?: Adresse[] };
 }

@@ -142,6 +142,7 @@ Puis « Enregistrer ». « Liens sociaux » : les réseaux du pied de page. « S
 - le titre du flux RSS de la langue ;
 - l'adresse d'un service externe pour la lettre d'information, et celle pour le formulaire de contact quand l'écran « Courriels » n'est pas branché (partie 17 bis) ;
 - « Police du site, pour les titres et le texte » : « Police d'origine du thème » (comme un champ vide), « Police du système, la plus légère », « Classique, à empattements » ou « Titres classiques, texte sans empattements ». Les trois dernières sont déjà installées sur l'ordinateur ou le téléphone du lecteur : rien à télécharger, la page s'affiche plus vite. Le choix vaut pour les deux langues ;
+- « Logo pour le mode sombre » : une version claire de votre logo, montrée quand le lecteur a choisi l'affichage sombre (barre et pied de page) ; vide, le logo des « Paramètres » sert aussi sur fond sombre. Le choix vaut pour les deux langues ;
 - « Couleur de la marque, sur tout le site » : « Couleur d'origine du thème » (le corail du thème, comme un champ vide) ou l'une des cinq couleurs, qui colore les boutons, les liens et le mot en couleur ; chaque couleur garde le texte des boutons lisible (contraste d'au moins 4,5:1, mesuré).
 
 Les textes de l'en-tête et du pied de page sont des blocs de « Textes des pages » (page « Tout le site »).
@@ -223,6 +224,7 @@ La lettre d'information, elle, s'envoie à un service externe (partie 10) : sans
 | Toutes | Lettre d'information | « Textes des pages », bloc « lettre » ; adresse du service dans « Réglages par langue » |
 | Toutes | Couleur de la marque | « Réglages par langue », « Couleur de la marque » |
 | Toutes | Police des titres et du texte | « Réglages par langue », « Police du site » |
+| Toutes | Logo sur fond sombre | « Réglages par langue », « Logo pour le mode sombre » |
 | Accueil | Photo, titre, boutons et leurs adresses, chiffres | barre (titre, boutons, pastilles) ou « Textes des pages », bloc de l'ouverture |
 | Accueil | Bande défilante, sujets, signatures | « Sujets », « Auteurs » ; titres des sections dans « Textes des pages », page « Accueil » |
 | Accueil | Article à la une, dernières notes | « Articles » (case « À la une », date) ; titres dans « Textes des pages » |
