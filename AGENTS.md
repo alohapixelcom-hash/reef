@@ -79,6 +79,12 @@ must be reachable there, with an empty field rendering the theme as before;
 `scripts/couverture-edition.mjs` must stay at zero orphan and
 `docs/administrer.md` (the editor's guide) must stay true.
 
+Shared files: every file listed in `socle.lock.json` comes byte for byte from
+the house base (aloha-socle 1.4.0), and `pnpm test` ends with `node
+scripts/socle.mjs check`, which fails on any change to one of them. Change
+them in aloha-socle, then sync; what belongs to this theme alone goes in
+`src/moteur/theme.ts` and `socle.adaptateur.json`.
+
 ## Structure
 
 ```text
@@ -99,7 +105,7 @@ src/
   moteur/       the optional publication engine: two post sources behind one
                 alias, the page texts (collection `sections`, laid over the
                 dictionary by contenu.ts), managed pages, on-demand sitemap,
-                back office skin, and the "Tout deployer" extension
+                back office skin, and the "Mettre le site à jour" extension
 scripts/        og.mjs (share cards), rebrand.mjs (repaint), app.mjs (Capacitor),
                 moteur-import.mjs (pours src/data/posts into the engine, once),
                 graine-sections.mjs (copies the page texts into the seed)

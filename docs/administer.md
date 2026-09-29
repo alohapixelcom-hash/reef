@@ -6,11 +6,13 @@ This guide is written for someone who has never opened the code. Everything your
 
 Labels in quotes are the exact screen labels of the back office in English. The back office of the theme opens in French by default: each person can switch it to English in their own settings. Three things stay in French whatever the interface language, because they are the names the theme gives them: the collections (« Textes des pages », « Sujets », « Auteurs », « Pages », « Réglages par langue », « Articles »), their fields, and the names of the menus. The French guide is [administrer.md](administrer.md).
 
+**First thing to do**: the site ships with demo contact details. In « Réglages par langue », replace `hello@example.com` with your address and « Example Studio » with your name, in the « EN » entry and in the « FR » entry (part 10).
+
 ## 1. Signing in
 
 1. Open your site address followed by `/_emdash/admin` (or `/secret-spot/`, which leads there too).
 2. Sign in with your passkey (fingerprint, face or device code).
-3. You land on the "Dashboard". The left rail shows everything that acts on the site: "Content" (the six collections above, then "Media"), "Manage" ("Menus", "Redirects"), for administrators "Content Types", "Users", "Plugins", "Settings", and the email screens (« Courriels », « Journal des courriels », « Brancher les courriels », « Réglages des courriels »).
+3. You land on the "Dashboard". The left rail shows everything that acts on the site: "Content" (the six collections above, then "Media"), "Manage" ("Menus", "Redirects"), for administrators "Content Types", "Users", "Plugins" ("Update the site"), "Settings", and the email screens (« Courriels », « Journal des courriels », « Brancher les courriels », « Réglages des courriels »).
 
 Two roles matter: an **editor** changes content, menus and redirects; an **administrator** also changes the "Settings" (site name, logo, social links, posts per page), the emails and the users.
 
@@ -36,7 +38,7 @@ Bottom left, the **"Site frame"** panel links straight to what the bar cannot re
 ## 3. Changing a text
 
 - **In the page**: bar, "Edit", click the text, type, Enter, then "Publish".
-- **In the back office**: « Textes des pages », click the block (the column « Page où se trouve ce bloc » tells which page it is on), change the field, "Save", then "Publish changes" and "Publish changes now".
+- **In the back office**: « Textes des pages », click the block (the column « Page où se trouve ce bloc » tells which page it is on), change the field: it saves on its own ("Saved" top right), then "Publish changes" and "Publish changes now". The list opens on the English texts: pick "FR" next to the « Textes des pages » title to see the French ones, and "Next page" at the bottom if the block is not on the first page.
 
 Each field carries a sentence that says what it changes. The coloured word of a heading must repeat a word of the heading, spelt the same. The heading of a topic page is a template: `{topic}` becomes the topic name.
 
@@ -45,7 +47,7 @@ Each field carries a sentence that says what it changes. The coloured word of a 
 ## 4. Changing an image or the video
 
 - **In the page**: bar, "Edit", click the block's "Photo" tag. In the "Image" window, "Upload" sends a photo from your computer, "Replace" picks one in the media library. Then "Publish".
-- **In the back office**: in the block, the photo field, "Select Image", then "Select". "Save", then publish.
+- **In the back office**: in the block, the photo field, "Select Image", "Upload files" for a photo from your computer, then "Select". It saves on its own; "Publish changes", then "Publish changes now".
 - **The video of the studio block** (home page): the video address field (an `https://...` video file) and the poster field.
 - **A post's cover**: the post's « Couverture » field.
 
@@ -53,11 +55,15 @@ The alternative text (what a screen reader says) is typed in the image window. T
 
 **Back to the theme's photo**: empty the field (in the bar's "Image" window, "Remove"), then publish.
 
+**An empty photo field** says so in plain words: "No photo chosen: the site shows the photo delivered with the theme". It is not an error: choose a photo to replace it.
+
 ## 5. Changing a button
 
 - **Its text**: click the button in edit mode, type, Enter, "Publish".
 - **Its address**: click the address in its "Button address:" tag, type the new address (a page of the site such as `/contact/`, an anchor such as `#newsletter`, or a full `https://...` address), Enter, "Publish". An emptied tag gives back the theme's address.
 - **Hiding it**: hide the block (part 6), or empty the button's text.
+
+**A mistyped address**: an address typed without `https://` (`www.example.com`) is corrected on its own to `https://www.example.com`, and a sentence under the tag says so; an address with a space is refused, and the button keeps its own.
 
 ## 6. Hiding or showing a block
 
@@ -72,7 +78,7 @@ Readers no longer see the block. You, in edit mode, see it greyed out with its "
 "Menus" lists the menus of the site, each in English and French: « Menu principal, en haut de chaque page » (the navigation bar), « Liens ajoutés au menu sur téléphone » (added to the phone menu: Authors, Search), « Boutons en haut à droite de chaque page » (the "Subscribe" button; a link with the class `bouton` is drawn as a solid button), and « Lire », « Le studio », « Légal » (the three footer columns; the menu name is the column title).
 
 - **Rename a link or change its address**: "Edit" on the row, "Label" and "URL" fields, "Save".
-- **Add a link**: "Add Custom Link", "Label", "URL", "Add". "Add Content" offers a page, post, topic or author of the back office.
+- **Add a link**: "Add Custom Link", "Label", "URL", "Add". "Add Content" offers a page, post, topic or author of the back office. In the French menu, a page address typed without `/fr/` (`/contact/`) still leads to the French page: the site adds `/fr/` on its own.
 - **Reorder**: "Move up" and "Move down".
 - **Remove**: "Delete" (bin). **Warning: deletion is immediate, with no confirmation.**
 - **Submenu**: "Edit", then "Parent".
@@ -90,11 +96,13 @@ The change shows on the site at once, with nothing to publish. If a menu is empt
 
 "Settings" (administrators), then "General": "Site Title" (the brand name everywhere: bar, footer, tab titles, social sharing, RSS feed, back office), "Select Logo" (the bar logo; empty, the theme's mark), "Select Favicon" (the tab icon; empty, the theme's), "Posts Per Page" (the number of posts on each page of the post list, of a topic and of an author; 9 originally). Then "Save". "Social Links": the footer's social links. "SEO": the title separator, the default share image, the Google and Bing verification codes.
 
-**No effect on this site** (the theme ignores them on purpose): "Tagline" (it depends on the language: it lives in « Réglages par langue »), "Site URL", "Date Format", "Timezone" (dates follow the language of the page), and the SEO robots.txt (it protects the back office and points to the sitemap: a mistake would deindex the site).
+**No effect on this site** (the theme ignores them on purpose; "Tagline", "Site URL", "Date Format" and "Timezone" no longer show in "Settings", "Posts Per Page" stays: it pages the post lists): "Tagline" (it depends on the language: it lives in « Réglages par langue »), "Site URL", "Date Format", "Timezone" (dates follow the language of the page), and the SEO robots.txt (it protects the back office and points to the sitemap: a mistake would deindex the site).
+
+**After changing the logo, the site name or the colour**: "Update the site", in the left menu, rebuilds the few pages that do not update on their own (one to three minutes). For everything else, what is published is already online: that button is of no use.
 
 ## 10. Contact details, email, colour and shared texts
 
-« Réglages par langue » holds one entry per language: the site description, the share image's text for blind people, the contact email of the footer and contact page, the name and link of the footer credit, the RSS feed title of the language, the address of an outside service for the newsletter, the address of an outside service for the contact form when the email screen is not connected (part 17 b), and « Couleur de la marque, sur tout le site », a choice among five colours (empty: the theme's coral).
+« Réglages par langue » holds one entry per language: the site description, the share image's text for blind people, the contact email of the footer and contact page (set in each language: change it in the « EN » entry and in the « FR » entry), the name and link of the footer credit, the RSS feed title of the language, the address of an outside service for the newsletter, the address of an outside service for the contact form when the email screen is not connected (part 17 b), and « Couleur de la marque, sur tout le site », « Couleur d'origine du thème » (the theme's coral, like an empty field) or one of the five colours; every colour keeps button text readable (contrast of at least 4.5:1, measured).
 
 ## 11. Writing and publishing a post
 
@@ -121,8 +129,9 @@ The elements of a block (the figures of the opening, the rules of the about page
 
 1. « Pages », "Add New". Title, introduction, text, photo if you like.
 2. In "Slug", the page address: `colophon` gives `/colophon/`.
-3. "Save", "Publish".
-4. "Menus", the menu you want, "Add Custom Link", URL `/colophon/`, "Add".
+3. "Save", then "Publish" and "Publish now". The page is created in English ("Content language: EN").
+4. For the French version: "Translations" panel, row "FR", "Translate", change the texts, then "Publish" and "Publish now".
+5. "Menus", "FR" at the top of the list, the menu you want, "Add Custom Link", URL `/fr/colophon/`, "Add". Do the same in the English menu with `/colophon/`.
 
 A page named like a theme page (`blog`, `topics`, `authors`, `about`, `contact`, `search`, `legal`) or a language (`fr`) does not show.
 
@@ -144,10 +153,14 @@ Every text exists in English and French. In an entry, the "Translations" panel s
 
 Messages from the contact page reach you by email as soon as the email screen is connected (administrators): « Brancher les courriels » (sending address and its domain, checked on screen), « Réglages des courriels » (sender, reply address, recipient of the contact form, acknowledgement sent to the reader in their language), « Courriels » (this month's sends and failures) and « Journal des courriels » (each send, its error explained, "Resend"). The newsletter goes to an outside service (part 10): with no address, its form stays a demonstration.
 
+**Sender address**: a mailbox address (Gmail, Orange, Outlook, Free...) is refused as the sender address, with a sentence that says why: a site cannot send on behalf of those mailboxes. It stays possible as a recipient.
+
+**If an email does not leave**: a red card says so at the top of « Courriels » and on the back office home page, until it is sent again successfully. In « Journal des courriels », the "Why" column gives the reason in plain words, and "Send this email again" sends it again.
+
 ## 18. Revisions, going back, trash
 
 - **Before publishing**: "Discard changes" returns to the live version.
-- **After**: "Revisions" lists the versions; restore one, then publish.
+- **After**: "Revisions" lists the versions; restore one, then publish. **Careful: a revision restores the texts, not the photo, the button addresses or the « Masquer ce bloc » box** (they hold for both languages): put them back by hand. The confirmation window says so.
 - **Delete**: "Move to Trash", then confirm. The "Trash" tab of the list restores.
 - **Take off the site without deleting**: unpublish. For a block of « Textes des pages », the theme's original text comes back; to make a block disappear, hide it (part 6). An unpublished topic or author gives back the theme's original card.
 

@@ -6,6 +6,8 @@ Ce guide est écrit pour quelqu'un qui n'a jamais ouvert le code. Tout ce que vo
 
 Les libellés cités entre guillemets sont exactement ceux de l'écran. La version anglaise de ce guide est [administer.md](administer.md).
 
+**À faire en premier** : le site est livré avec des coordonnées de démonstration. Dans « Réglages par langue », remplacez `hello@example.com` par votre adresse et « Example Studio » par votre nom, dans l'entrée « EN » puis dans l'entrée « FR » (partie 10).
+
 ## 1. Se connecter
 
 1. Ouvrez l'adresse de votre site suivie de `/_emdash/admin` (ou `/secret-spot/`, qui y mène aussi).
@@ -40,7 +42,7 @@ En bas à gauche, le panneau **« Cadre du site »** donne les liens directs ver
 ## 3. Changer un texte
 
 - **Dans la page** : barre, « Modifier », cliquez le texte, tapez, Entrée, puis « Publier ».
-- **Dans le back office** : « Textes des pages », cliquez le bloc (la colonne « Page où se trouve ce bloc » dit sur quelle page il est), changez le champ, « Enregistrer », puis « Publier les modifications » et « Publier les modifications maintenant ».
+- **Dans le back office** : « Textes des pages », cliquez le bloc (la colonne « Page où se trouve ce bloc » dit sur quelle page il est), changez le champ : il s'enregistre tout seul (« Enregistré » en haut à droite), puis « Publier les modifications » et « Publier les modifications maintenant ». La liste s'ouvre sur les textes anglais : choisissez « FR » à côté du titre « Textes des pages » pour voir les textes français, et « Page suivante » en bas si le bloc n'est pas sur la première page.
 
 Chaque champ porte une phrase qui dit ce qu'il change. Le « Mot du titre écrit en couleur » doit reprendre un mot du titre, écrit pareil. Le titre de la page d'un sujet est un modèle : `{topic}` y devient le nom du sujet.
 
@@ -49,7 +51,7 @@ Chaque champ porte une phrase qui dit ce qu'il change. Le « Mot du titre écrit
 ## 4. Changer une image ou la vidéo
 
 - **Dans la page** : barre, « Modifier », cliquez la pastille « Photo » du bloc. Dans la fenêtre « Photo », « Envoyer une photo » envoie une photo de votre ordinateur, « Choisir une autre photo » en choisit une dans la médiathèque. Puis « Publier ».
-- **Dans le back office** : dans le bloc, le champ « Photo du bloc (vide : la photo livrée avec le thème) » : « Sélectionner une image », puis « Choisir ». « Enregistrer », puis publiez.
+- **Dans le back office** : dans le bloc, le champ « Photo du bloc (vide : la photo livrée avec le thème) » : « Sélectionner une image », « Envoyer des fichiers » pour une photo de votre ordinateur, puis « Choisir ». Elle s'enregistre toute seule ; « Publier les modifications », puis « Publier les modifications maintenant ».
 - **La vidéo du bloc studio** (accueil) : « Adresse de la vidéo du bloc » (une adresse `https://...` de fichier vidéo) et « Image montrée avant la vidéo ».
 - **La couverture d'un article** : champ « Couverture » de l'article.
 
@@ -160,8 +162,9 @@ Les éléments d'un bloc (les chiffres de l'ouverture, les règles de la page À
 
 1. « Pages », « Ajouter ». « Titre de la page », « Texte d'introduction », « Texte de la page », photo si vous voulez.
 2. Dans « Adresse web », l'adresse de la page : `colophon` donne `/colophon/`.
-3. « Enregistrer », « Publier ».
-4. « Menus », le menu voulu, « Ajouter un lien personnalisé », URL `/colophon/`, « Ajouter ».
+3. « Enregistrer », puis « Publier » et « Publier maintenant ». La page est créée en anglais (« Langue du contenu : EN »).
+4. Pour la version française : panneau « Traductions », ligne « FR », « Traduire », changez les textes, puis « Publier » et « Publier maintenant ».
+5. « Menus », « FR » en haut de la liste, le menu voulu, « Ajouter un lien personnalisé », URL `/fr/colophon/`, « Ajouter ». Faites de même dans le menu anglais avec `/colophon/`.
 
 Une page qui porte le nom d'une page du thème (`blog`, `topics`, `authors`, `about`, `contact`, `search`, `legal`) ou d'une langue (`fr`) ne s'affiche pas.
 

@@ -74,9 +74,8 @@ italic serif.
 
 The italic-serif accent word is the most common ornament on the web right now,
 it appears in every generated landing page, and it says nothing. Ours says
-something: the accent word is underlined by a hand-drawn wave, because the
-Aloha Pixel logo is a wave. The mark and the typography say the same thing.
-That is what a signature is.
+something with less: the accent word only changes colour, so the title keeps
+one voice and the eye still lands on the word that matters.
 
 One accent word per title; two is a decoration. The rule lives in
 `.accent-script` in `src/styles/global.css`: same font as the title, primary
