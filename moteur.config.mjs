@@ -12,6 +12,7 @@ import { fileURLToPath } from "node:url";
 import { IDENTITE as ACCUEIL } from "./src/moteur/accueil/identite.mjs";
 import { catalogueDuBackOffice } from "./src/moteur/catalogue-bo.config.mjs";
 import { IDENTITE as DEPLOYER } from "./src/moteur/deployer/identite.mjs";
+import { IDENTITE as CHAMPS } from "./src/moteur/champs/identite.mjs";
 import { capacites, IDENTITE as COURRIELS } from "./src/moteur/extensions/courriels/identite.mjs";
 import { PAGES_EN_CACHE, PAGES_GEREES } from "./src/moteur/pages-gerees.mjs";
 import { routesDuCache } from "./src/moteur/routes-du-cache.mjs";
@@ -132,6 +133,9 @@ function partageDesPages() {
         // Le formulaire de contact poste ici quand les courriels sont
         // branches (src/moteur/extensions/courriels/reception.ts).
         injectRoute({ pattern: "/_emdash/courriels/envoyer", entrypoint: ici("./src/moteur/extensions/courriels/reception.ts"), prerender: false });
+        // La lettre d'information (socle 1.8.0) : inscription, confirmation et
+        // desinscription (src/moteur/extensions/courriels/inscription.ts).
+        injectRoute({ pattern: "/_emdash/courriels/lettre/[geste]", entrypoint: ici("./src/moteur/extensions/courriels/inscription.ts"), prerender: false });
         // La carte de partage d'un billet : sa couverture de la mediatheque,
         // recadree en JPEG 1200x630 (voir src/moteur/carte-du-billet.regles.ts).
         injectRoute({ pattern: "/og/billet/[cle].jpg", entrypoint: ici("./src/moteur/carte-du-billet.ts"), prerender: false });
@@ -244,6 +248,10 @@ async function allume() {
         plugins: [
           { ...DEPLOYER, entrypoint: ici("./src/moteur/deployer/extension.ts") },
           { ...COURRIELS, entrypoint: ici("./src/moteur/extensions/courriels/extension.ts"), options: { livrer: LIAISON_COURRIELS }, capabilities: capacites(LIAISON_COURRIELS) },
+          // Le champ "une entree choisie par son nom" (auteur et sujet d'un
+          // article, socle 1.8.0) : une extension React, sans route ni base,
+          // dont le composant est importe par le paquet de l'administration.
+          { ...CHAMPS, entrypoint: ici("./src/moteur/champs/extension.ts"), adminEntry: ici("./src/moteur/champs/admin.ts") },
           // La carte du site sur le tableau de bord : une extension React, son
           // composant est importe par le paquet de l'administration.
           {

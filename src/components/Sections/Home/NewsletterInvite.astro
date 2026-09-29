@@ -16,9 +16,10 @@
 // que la page porte cette bande : deux formulaires identiques a deux ecrans
 // d'ecart, c'est une page qui bafouille.
 //
-// Le formulaire est une DEMONSTRATION : il n'envoie rien et n'a volontairement
-// pas d'action. Voir le commentaire du meme bloc dans Sections/Global/Footer.astro
-// pour le brancher sur un prestataire.
+// Le formulaire poste vers la lettre d'information du back office quand elle
+// est branchee (moteur allume, extension Courriels : inscription avec double
+// confirmation, 3.8.3) ; sinon vers l'adresse externe reglee dans l'entree
+// "site" ; sinon nulle part (DEMONSTRATION : build statique, rien ne part).
 import { Icon } from "@components/svg/icons";
 import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
@@ -28,6 +29,7 @@ import { annotationsDe, styleDuBloc } from "@moteur/annotations";
 import { imageDe, lienDe } from "@moteur/cadre";
 import Pastilles from "@moteur/Pastilles.astro";
 import PhotoDuMoteur from "@moteur/PhotoDuMoteur.astro";
+import { envoiDeLaLettre } from "@moteur/courriels";
 import { identiteDuSite } from "@moteur/theme";
 import { Image } from "astro:assets";
 import heroVague from "../../../assets/reef-hero-vague.webp";
@@ -44,7 +46,8 @@ const routes = getSiteRoutes(locale);
 const photo = imageDe(Astro, "lettre");
 const lienDuFlux = lienDe(Astro, "lettre-flux", "cta_link") ?? routes.rss;
 const envoi = identiteDuSite(Astro, locale).formulaires.newsletter;
-const attributsDuFormulaire = envoi ? { action: envoi, method: "post" } : {};
+const envoiDeLettre = await envoiDeLaLettre(Astro);
+const attributsDuFormulaire = envoiDeLettre?.attributs ?? (envoi ? { action: envoi, method: "post" } : {});
 
 const title = t.newsletter.title;
 const accent = t.newsletter.accent;
@@ -134,7 +137,22 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
         </h2>
         <p class="text-muted-foreground measure-wide text-lg leading-relaxed" {...ed.champ("lede")}>{t.newsletter.lede}</p>
 
+        {envoiDeLettre?.avis && (
+          <p id="lettre-avis" role="status" class="border-border bg-background rounded-card text-foreground flex items-start gap-2 border p-5 text-sm leading-relaxed">
+            <Icon name={envoiDeLettre.avis.ton === "succes" ? "check-circle" : "info"} size={17} class="mt-0.5 shrink-0" />
+            {envoiDeLettre.avis.texte}
+          </p>
+        )}
         <form class="mt-2 flex flex-col gap-3 sm:max-w-xl sm:flex-row" name="newsletter-home" {...attributsDuFormulaire}>
+          {envoiDeLettre && (
+            <Fragment>
+              <input type="hidden" name="retour" value={envoiDeLettre.caches.retour} />
+              <input type="hidden" name="langue" value={envoiDeLettre.caches.langue} />
+              <div class="sr-only" aria-hidden="true">
+                <input type="text" name={envoiDeLettre.caches.piege} tabindex="-1" autocomplete="off" />
+              </div>
+            </Fragment>
+          )}
           <label class="sr-only" for="home-newsletter-email">{t.newsletter.emailLabel}</label>
           <Input
             id="home-newsletter-email"

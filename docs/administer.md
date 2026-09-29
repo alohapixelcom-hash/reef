@@ -110,24 +110,26 @@ The change shows on the site at once, with nothing to publish. If a menu is empt
 
 ## 10. Contact details, email, colour and shared texts
 
-« Réglages par langue » holds one entry per language: the site description, the share image's text for blind people, the contact email of the footer and contact page (set in each language: change it in the « EN » entry and in the « FR » entry), the name and link of the footer credit, the RSS feed title of the language, the address of an outside service for the newsletter, the address of an outside service for the contact form when the email screen is not connected (part 17 b), « Police du site, pour les titres et le texte » (« Police d'origine du thème », like an empty field, « Police du système, la plus légère », « Classique, à empattements » or « Titres classiques, texte sans empattements »: the last three are already installed on the reader's computer or phone, nothing to download, and the choice applies to both languages), « Logo pour le mode sombre » (a light version of your logo, shown when the reader uses the dark display, in the bar and the footer; empty, the logo of the « Paramètres » is used on both; it applies to both languages), and « Couleur de la marque, sur tout le site », « Couleur d'origine du thème » (the theme's coral, like an empty field) or one of the five colours, which paints the buttons, the links and the highlighted word; every colour keeps button text readable (contrast of at least 4.5:1, measured).
+« Réglages par langue » holds one entry per language: the site description, the share image's text for blind people, the contact email of the footer and contact page (set in each language: change it in the « EN » entry and in the « FR » entry), the name and link of the footer credit, the RSS feed title of the language, the address of an outside service for the newsletter and for the contact form, used only while the email screen is not connected (parts 17 b and 17 c), « Police du site, pour les titres et le texte » (« Police d'origine du thème », like an empty field, « Police du système, la plus légère », « Classique, à empattements » or « Titres classiques, texte sans empattements »: the last three are already installed on the reader's computer or phone, nothing to download, and the choice applies to both languages), « Logo pour le mode sombre » (a light version of your logo, shown when the reader uses the dark display, in the bar and the footer; empty, the logo of the « Paramètres » is used on both; it applies to both languages), and « Couleur de la marque, sur tout le site », « Couleur d'origine du thème » (the theme's coral, like an empty field) or one of the five colours, which paints the buttons, the links and the highlighted word; every colour keeps button text readable (contrast of at least 4.5:1, measured).
 
 ## 11. Writing and publishing a post
 
 1. « Articles », "Add New".
 2. Title, standfirst (« Chapo », under the title and on the card), cover, text.
-3. « Sujet »: pick the topic in the list (it shows the identifiers of « Sujets », `Craft`, `Design`...). « Auteur »: the same (`Mara-lindqvist`...).
+3. « Sujet » and « Auteur »: pick them by name in the list ("Typography", "Mara Lindqvist"...). The sentence above each list says where it shows. A topic or an author created in « Sujets » or « Auteurs » appears in the list at once.
+   Tags: in the « Classement » panel on the right, « Étiquettes », type a word in « Ajouter des étiquettes... » then Enter (an existing tag is suggested); the cross next to a tag removes it. Each tag has its page, `/tags/<tag>/`, listing its posts, and the post footer leads to it.
 4. « Date affichée » (empty: the publication date), « Revu le » when you update it later, « À la une » to show it large on the home page.
 5. In "Slug", the post address: `my-post` gives `/blog/my-post/`.
 6. "Save" keeps an invisible draft. "Publish" puts it online; "Schedule" picks a date.
 
-The post shows at once at the top of the post list, on its topic page, on its author page, in the RSS feed and in the sitemap. The post's "SEO" panel (title, description, image, canonical address, no index) wins over the title and standfirst for search engines and social networks; "no index" takes it out of the sitemap.
+The post shows at once at the top of the post list, on its topic page, on its author page, on its tag pages, in the RSS feed and in the sitemap. The post's "SEO" panel (title, description, image, canonical address, no index) wins over the title and standfirst for search engines and social networks; "no index" takes it out of the sitemap.
 
 ## 12. Topics and authors
 
 - **A topic**: « Sujets », click the topic. Name, description (top of the topic page and on its card), colour (Corail, Aigue-marine, Encre), rank (1 first), share image. "Save", then publish. The name changes everywhere: cards, scrolling band, topic page, post labels.
 - **An author**: « Auteurs », click the author. Name, role, short bio, portrait (empty: the initials), links elsewhere.
-- **Adding** a topic or an author: "Add New", fill in, publish. Its **slug** is the identifier posts pick: `photo` gives the page `/topics/photo/`. For it to be offered in the « Sujet » or « Auteur » field of posts, an administrator adds this slug to the field's choices: "Content Types", « Articles », field « Sujet », "Options".
+- **Adding** a topic or an author: "Add New", fill in, publish. Its slug gives its page: `photo` gives `/topics/photo/`. It is offered at once, by name, in the « Sujet » and « Auteur » lists of posts.
+- **Tags**: « Étiquettes » in the left menu lists every tag, in English and French. Click a tag to rename it (its name changes on every post and on its page); its translation is given in the same window. A tag without posts has no page. A tag's address is the same in both languages (`/tags/typography/` and `/fr/tags/typography/`), only its name is translated.
 
 ## 13. Adding an element to a list
 
@@ -157,13 +159,26 @@ Every text exists in English and French. In an entry, the "Translations" panel s
 
 "Redirects", "New Redirect": "Source path" (the old address, starting with `/`), "Destination path" (an address of the site, starting with `/` too), "Status code" (301 permanent most of the time; 410 to say a page is gone), "Create". Changing a post's or page's slug creates the 301 by itself. The "404 Errors" tab lists addresses asked for that do not exist.
 
-## 17 b. Emails of the contact form
+## 17 b. Emails of the contact form and the newsletter
 
-Messages from the contact page reach you by email as soon as the email screen is connected (administrators): « Brancher les courriels » (sending address and its domain, checked on screen), « Réglages des courriels » (sender, reply address, recipient of the contact form, acknowledgement sent to the reader in their language), « Courriels » (this month's sends and failures) and « Journal des courriels » (each send, its error explained, "Resend"). The newsletter goes to an outside service (part 10): with no address, its form stays a demonstration.
+Messages from the contact page reach you by email as soon as the email screen is connected (administrators): « Brancher les courriels » (sending address and its domain, checked on screen), « Réglages des courriels » (sender, reply address, recipient of the contact form, acknowledgement sent to the reader in their language), « Courriels » (this month's sends and failures) and « Journal des courriels » (each send, its error explained, "Resend"). The newsletter goes out the same way, with no outside service: see part 17 c.
 
 **Sender address**: a mailbox address (Gmail, Orange, Outlook, Free...) is refused as the sender address, with a sentence that says why: a site cannot send on behalf of those mailboxes. It stays possible as a recipient.
 
 **If an email does not leave**: a red card says so at the top of « Courriels » and on the back office home page, until it is sent again successfully. In « Journal des courriels », the "Why" column gives the reason in plain words, and "Send this email again" sends it again.
+
+## 17 c. The newsletter
+
+As soon as emails are connected (sending address set), the "Subscribe" form of the home page and the footer signs readers up on your own site, with no outside service:
+
+1. The reader types their address and sends. The page says an email is on its way: they click the link inside to confirm (double opt-in: nobody can sign up someone else's address). Without confirmation, the sign-up is erased after 7 days.
+2. « Lettre d'information » (left menu, under « Courriels »): the number of subscribers and pending sign-ups, then the list of addresses, their language and since when.
+3. **Sending a post**: pick it in « Article à envoyer », then « Envoyer à N abonnés » and confirm. Each subscriber receives it in their language (title, standfirst, a link to the post). A post already sent says so, with its date, before going out again.
+4. **Unsubscribing**: every email carries an "Unsubscribe" link at the bottom; one click is enough, the address is erased from the list. Mail apps that show their own "Unsubscribe" button go through the same path.
+5. **Removing an address** at someone's request: « Adresse à retirer », then « Retirer cette adresse » and confirm.
+6. « Derniers envois de la lettre »: each post sent, when, and how many emails went out. An email that did not go out is in « Journal des courriels », with "Resend".
+
+Newsletter sends count in the month's allowance (« Courriels » screen): a send that would go over the monthly limit is refused beforehand, with what to do. While emails are not connected, the form posts to the outside service set in « Réglages par langue » if there is one, otherwise it stays a demonstration.
 
 ## 18. Revisions, going back, trash
 
@@ -174,14 +189,13 @@ Messages from the contact page reach you by email as soon as the email screen is
 
 ## 19. Site map: where each area is changed
 
-The table of the French guide ([administrer.md](administrer.md), part 19) holds for both languages: brand, logo, favicon and posts per page in "Settings"; the typeface and the brand colour in « Réglages par langue »; the order of the home page blocks in each block's « Place du bloc sur l'accueil »; navigation, the "Subscribe" button and footer columns in "Menus"; footer texts in « Textes des pages » (page « Tout le site ») and « Réglages par langue »; every block of every page in « Textes des pages », filtered by its page; posts, topics and authors in their collections; added pages in « Pages »; contact form emails in the email screens.
+The table of the French guide ([administrer.md](administrer.md), part 19) holds for both languages: brand, logo, favicon and posts per page in "Settings"; the typeface and the brand colour in « Réglages par langue »; the order of the home page blocks in each block's « Place du bloc sur l'accueil »; navigation, the "Subscribe" button and footer columns in "Menus"; footer texts in « Textes des pages » (page « Tout le site ») and « Réglages par langue »; every block of every page in « Textes des pages », filtered by its page; posts, topics and authors in their collections; tags in each post's « Classement » panel and their names in « Étiquettes »; subscribers and sends in « Lettre d'information »; added pages in « Pages »; contact form emails in the email screens.
 
 ## 20. What needs a developer
 
 - the order of the blocks of a page other than the home page, a new kind of block, the layout and drawing of the site;
 - generic interface texts (accessibility, "change language", "open menu", "min read", counters), the cookie banner;
 - the addresses of the theme's pages and the robots.txt file;
-- a typeface that is not in the « Police du site » list;
-- sending the newsletter through the email screen (it only receives the contact form).
+- a typeface that is not in the « Police du site » list.
 
 What to know about the engine (EmDash 0.38): a menu link to a draft or trashed page stays visible (remove it from the menu); an image's alternative text is copied into the field when chosen (changing it later in "Media" does not change fields already filled); cropping an image in "Media" creates a new file; the engine's own "Sections" (reusable blocks, hidden from the rail) have nothing to do with « Textes des pages »; the edit bar speaks English.

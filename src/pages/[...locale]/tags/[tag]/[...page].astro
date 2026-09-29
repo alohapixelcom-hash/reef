@@ -1,0 +1,77 @@
+---
+// src/pages/[...locale]/tags/[tag]/[...page].astro - l'archive d'une etiquette, paginee comme celle d'un sujet (3.8.3).
+//
+// L'adresse est commune aux langues (/tags/typography/ et /fr/tags/typography/,
+// voir src/js/etiquettes.ts), le libelle est celui de la page. Moteur allume,
+// les etiquettes sont celles du panneau "Etiquettes" de chaque article, et la
+// page se rend a la demande (pages-gerees.mjs) : une etiquette ajoutee se voit
+// a la visite suivante, sans build.
+import PostGrid from "@components/Sections/Archive/PostGrid.astro";
+import Footer from "@components/Sections/Global/Footer.astro";
+import Navbar from "@components/Sections/Global/Navbar.astro";
+import PageHero from "@components/Sections/Global/PageHero.astro";
+import { fmt, getLocale, localizePath } from "@i18n";
+import { cheminsDeLEtiquette } from "@js/adresses";
+import type { Etiquette } from "@js/etiquettes";
+import type { ResolvedPost } from "@js/posts";
+import { breadcrumbList } from "@js/schema";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { propsDeLaPage } from "@moteur/chemins";
+import { textesDeLaPage } from "@moteur/textes";
+import type { Page } from "astro";
+
+export const getStaticPaths = cheminsDeLEtiquette;
+
+type Props = { page: Page<ResolvedPost>; etiquette: Etiquette };
+
+const props = await propsDeLaPage<Props>(Astro, getStaticPaths);
+if (props instanceof Response) return props;
+const { page, etiquette } = props;
+const locale = getLocale(Astro);
+const t = await textesDeLaPage(Astro);
+
+const heading = fmt(t.archive.tagTitle, { tag: etiquette.label });
+const title = page.currentPage > 1 ? `${heading}, ${fmt(t.archive.pageSuffix, { n: page.currentPage })}` : heading;
+const count = page.total === 1 ? t.archive.countOne : fmt(t.archive.countLabel, { count: page.total });
+
+const base = Astro.site ?? Astro.url;
+const crumbs = breadcrumbList([
+  { name: t.common.home, url: new URL(localizePath("/", locale), base).href },
+  { name: t.archive.crumb, url: new URL(localizePath("/blog/", locale), base).href },
+  { name: etiquette.label, url: new URL(localizePath(`/tags/${etiquette.slug}/`, locale), base).href },
+]);
+---
+
+<BaseLayout title={title} description={`${heading}. ${count}.`} noindex={page.currentPage > 1}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(crumbs)} />
+  </Fragment>
+
+  <Navbar />
+
+  <main id="content">
+    <PageHero
+      eyebrow={t.post.tagsLabel}
+      title={heading}
+      accentWord={etiquette.label}
+      lede={count}
+      crumbs={[{ label: t.archive.crumb, href: localizePath("/blog/", locale) }, { label: etiquette.label }]}
+    />
+
+    <PostGrid
+      posts={page.data}
+      {locale}
+      basePath={localizePath(`/tags/${etiquette.slug}`, locale)}
+      currentPage={page.currentPage}
+      totalPages={page.lastPage}
+      total={page.total}
+      headingLevel="h2"
+      emptyTitle={t.archive.emptyTitle}
+      emptyDescription={t.archive.emptyLede}
+      emptyCtaLabel={t.archive.emptyCta}
+      emptyCtaHref={localizePath("/blog/", locale)}
+    />
+  </main>
+
+  <Footer />
+</BaseLayout>

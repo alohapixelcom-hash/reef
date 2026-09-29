@@ -9,9 +9,10 @@
 // va chercher son auteur elle-meme force chaque grille a attendre neuf allers
 // et retours au lieu d'un seul.
 
-import type { Locale } from "@i18n";
+import { defaultLocale, type Locale } from "@i18n";
 import { entrySlug } from "@i18n/content";
 import { auteursPublies, billetsPublies, MOTEUR, sujetsPublies } from "@moteur/source";
+import { type Etiquette, etiquettesDuBillet, versionsParDefaut } from "@js/etiquettes";
 import { readingTime } from "@js/textUtils";
 import { getEntry, type CollectionEntry } from "astro:content";
 
@@ -27,6 +28,8 @@ export interface ResolvedPost {
   authorSlug: string;
   /** Temps de lecture en minutes, calcule sur le corps du billet. */
   minutes: number;
+  /** Les etiquettes : libelle de la langue, adresse commune (voir etiquettes.ts). */
+  etiquettes: Etiquette[];
 }
 
 /**
@@ -45,6 +48,8 @@ export async function getResolvedPosts(locale: Locale): Promise<ResolvedPost[]> 
   const posts = (await billetsPublies(locale)).sort(
     (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
   );
+  // Les adresses des etiquettes viennent de la version par defaut de chaque billet.
+  const parDefaut = versionsParDefaut(locale, locale === defaultLocale ? [] : await billetsPublies(defaultLocale));
 
   return Promise.all(
     posts.map(async (post) => {
@@ -57,6 +62,7 @@ export async function getResolvedPosts(locale: Locale): Promise<ResolvedPost[]> 
         topicSlug: entrySlug(topic.id),
         authorSlug: entrySlug(author.id),
         minutes: readingTime(post.body ?? "").minutes,
+        etiquettes: etiquettesDuBillet(post, parDefaut.get(entrySlug(post.id))),
       };
     }),
   );
@@ -104,4 +110,12 @@ export async function getSortedTopics(locale: Locale): Promise<CollectionEntry<"
   return topics.sort(
     (a, b) => a.data.order - b.data.order || a.data.name.localeCompare(b.data.name),
   );
+}
+
+/** Les etiquettes d'un seul billet (la page du billet), avec les adresses de sa version par defaut. */
+export async function etiquettesDe(post: CollectionEntry<"posts">): Promise<Etiquette[]> {
+  const locale = post.id.split("/")[0] as Locale;
+  if (locale === defaultLocale) return etiquettesDuBillet(post);
+  const slug = entrySlug(post.id);
+  return etiquettesDuBillet(post, (await billetsPublies(defaultLocale)).find((p) => entrySlug(p.id) === slug));
 }

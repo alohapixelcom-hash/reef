@@ -18,6 +18,7 @@ import { fmt, getLocale, localePrefix, useTranslations } from "@i18n";
 import { annotationsDe, enEdition, styleDuBloc } from "@moteur/annotations";
 import { blocVisible, marqueCadre, marqueInterface, menuDe } from "@moteur/cadre";
 import Pastilles from "@moteur/Pastilles.astro";
+import { envoiDeLaLettre } from "@moteur/courriels";
 import { COLONNES_DU_PIED, identiteDuSite } from "@moteur/theme";
 
 type Props = {
@@ -61,7 +62,10 @@ const columns = getFooterData(locale).map((repli, rang) => {
 const cible = (target?: string) => (target ? { target, rel: target === "_blank" ? "noopener" : undefined } : {});
 // L'adresse du service qui recoit les inscriptions (entree "site") : vide, le
 // formulaire reste une demonstration sans action, comme les fichiers le livrent.
-const envoiLettre = marque.formulaires.newsletter ? { action: marque.formulaires.newsletter, method: "post" } : {};
+// La lettre d'information du back office quand elle est branchee (3.8.3),
+// sinon l'adresse externe de l'entree "site", sinon rien (demonstration).
+const envoiDeLettre = newsletter ? await envoiDeLaLettre(Astro) : null;
+const envoiLettre = envoiDeLettre?.attributs ?? (marque.formulaires.newsletter ? { action: marque.formulaires.newsletter, method: "post" } : {});
 
 // L'annee est calculee au build : le theme n'embarque pas une date qui vieillit
 // dans un fichier de config.
@@ -147,13 +151,12 @@ const columnLink =
         </p>
 
         {/* --- Inscription a la lettre ------------------------------------
-            Formulaire de DEMONSTRATION : il n'envoie rien. Il n'a ni action ni
-            point d'arrivee, volontairement, parce que le theme ne choisit pas
-            de prestataire d'emailing a la place de son utilisateur. Pour le
-            brancher : poser action="..." et method="post" vers l'URL de
-            formulaire de votre fournisseur (Buttondown, Listmonk, EmailOctopus,
-            Mailchimp), et verifier le nom attendu pour le champ email. Le
-            balisage, les libelles et les etats de reponse sont deja ecrits. */}
+            Moteur allume, la lettre d'information du back office (extension
+            Courriels, 3.8.3) : inscription avec double confirmation, liste des
+            abonnes, envoi d'un article, desinscription en un clic, sans
+            service externe. Sinon l'adresse d'un fournisseur reglee dans
+            l'entree "site" (Buttondown, Listmonk...). Build statique : un
+            formulaire de DEMONSTRATION, qui n'envoie rien. */}
         {
           newsletter && (
             <section class="flex flex-col gap-3" id="newsletter" aria-labelledby="newsletter-title" {...lettre.entree} style={styleDuBloc(Astro, "lettre")}>
@@ -170,7 +173,22 @@ const columnLink =
                 )}
               </h2>
               <p class="text-muted-foreground text-sm leading-relaxed" {...lettre.champ("lede")}>{t.newsletter.lede}</p>
+              {envoiDeLettre?.avis && (
+                <p id="lettre-avis" role="status" class="border-border bg-background rounded-card text-foreground flex items-start gap-2 border p-5 text-sm leading-relaxed">
+                  <Icon name={envoiDeLettre.avis.ton === "succes" ? "check-circle" : "info"} size={17} class="mt-0.5 shrink-0" />
+                  {envoiDeLettre.avis.texte}
+                </p>
+              )}
               <form class="mt-1 flex flex-col gap-3 sm:flex-row" name="newsletter" {...envoiLettre}>
+                {envoiDeLettre && (
+                              <Fragment>
+                                <input type="hidden" name="retour" value={envoiDeLettre.caches.retour} />
+                                <input type="hidden" name="langue" value={envoiDeLettre.caches.langue} />
+                                <div class="sr-only" aria-hidden="true">
+                                  <input type="text" name={envoiDeLettre.caches.piege} tabindex="-1" autocomplete="off" />
+                                </div>
+                              </Fragment>
+                            )}
                 <label class="sr-only" for="footer-newsletter-email">
                   {t.newsletter.emailLabel}
                 </label>

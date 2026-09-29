@@ -55,6 +55,10 @@ interface Supplement {
   reponse?: string;
   renvoiDe: string | null;
   issue?: Issue;
+  /** Les en-tetes de plus du message (lettre d'information). */
+  entetes?: Record<string, string>;
+  /** "mois" : seul le plafond du mois s'applique (parution de la lettre). */
+  plafonner?: "mois";
 }
 
 // UNE SEULE COPIE PAR ISOLAT, rangee sur globalThis. Le formulaire (route
@@ -113,12 +117,13 @@ export function fournisseur(charger: () => Promise<Dependances>) {
       texte: evenement.message.text,
       ...(evenement.message.html ? { html: evenement.message.html } : {}),
       ...(s?.reponse ? { reponse: s.reponse } : reglages.reponse ? { reponse: reglages.reponse } : {}),
+      ...(s?.entetes ? { entetes: s.entetes } : {}),
     };
     const issue = await envoyer(ctx, reglages, origine, message, {
       renvoiDe: s?.renvoiDe ?? null,
       ...(s ? { id: s.id } : {}),
       garder: !systeme,
-      plafonner: !systeme,
+      plafonner: systeme ? false : (s?.plafonner ?? true),
     });
     livres.set(evenement.message, issue);
     if (s) s.issue = issue;
@@ -174,6 +179,8 @@ export interface Passage {
   origine: Origine;
   reponse?: string;
   renvoiDe?: string | null;
+  /** "mois" : seul le plafond du mois (parution de la lettre, voir envoi.ts). */
+  plafonner?: "mois";
 }
 
 /** Ce que les usages du site (formulaire, essai, renvoi) appellent : une issue, jamais une exception. */
@@ -187,7 +194,14 @@ export type Poster = (message: Message, passage: Passage) => Promise<Issue>;
  */
 export function poster(ctx: Omit<Contexte, "liaison">, canal: Canal | null): Poster {
   return async (message, passage) => {
-    const s: Supplement = { id: ctx.nouvelId(), origine: passage.origine, renvoiDe: passage.renvoiDe ?? null, ...(passage.reponse ? { reponse: passage.reponse } : {}) };
+    const s: Supplement = {
+      id: ctx.nouvelId(),
+      origine: passage.origine,
+      renvoiDe: passage.renvoiDe ?? null,
+      ...(passage.reponse ? { reponse: passage.reponse } : {}),
+      ...(message.entetes ? { entetes: message.entetes } : {}),
+      ...(passage.plafonner ? { plafonner: passage.plafonner } : {}),
+    };
     const noter = async (etat: Issue["etat"], code: string | null, fournisseur: string): Promise<Issue> => {
       await inscrire(ctx.base, {
         id: s.id,

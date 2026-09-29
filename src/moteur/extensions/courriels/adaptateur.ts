@@ -45,6 +45,7 @@
 // Rien d'autre : ni dependance, ni secret, ni adresse dans le code.
 import type { Base } from "./noyau/base.ts";
 import type { Liaison } from "./noyau/envoi.ts";
+import type { OptionsDeLaLettre } from "./noyau/lettre.ts";
 import { CONFIGURATION } from "./configuration.ts";
 
 export interface Hote {
@@ -54,6 +55,21 @@ export interface Hote {
 
 /** L'adresse ou le formulaire poste : sous /_emdash, que les Workers de la maison ne redirigent jamais. */
 export const ROUTE_DU_FORMULAIRE = "/_emdash/courriels/envoyer";
+
+/** La route de la lettre d'information : /inscrire (formulaire), /confirmer et /desinscrire (liens des courriels). */
+export const ROUTE_DE_LA_LETTRE = "/_emdash/courriels/lettre";
+
+/**
+ * La lettre d'information du site : le champ `lettre` de configuration.ts,
+ * ou null. Lu sans le type du site, que les sites d'avant la lettre n'ont
+ * pas : leur configuration.ts reste valable tel quel.
+ */
+export function lettreDuSite(): OptionsDeLaLettre | null {
+  const brut = (CONFIGURATION as { lettre?: unknown }).lettre;
+  if (typeof brut !== "object" || brut === null) return null;
+  const o = brut as OptionsDeLaLettre;
+  return typeof o.collection === "string" && typeof o.adresse === "object" && o.adresse !== null ? o : null;
+}
 
 /** La forme d'une base D1, reduite a ce que ce fichier appelle. */
 interface D1 {

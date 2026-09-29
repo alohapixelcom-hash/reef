@@ -13,6 +13,11 @@
  * Leurs pages restent joignables par leur adresse : rien n'est casse, elles
  * disparaissent seulement du rail. Menus et Redirections restent, ce sont des
  * ecrans du site.
+ *
+ * Un site qui lit une taxonomie (Reef 3.8.3 : ses etiquettes) la rend au rail
+ * dans SA feuille, par une regle plus precise que celle-ci :
+ *   html [data-sidebar="menu-item"]:has(> a[href^="/_emdash/admin/taxonomies/tag"]) { display: list-item; }
+ * et pose --aloha-panneaux-lus: taxonomies pour garder le panneau de l'article.
  */
 [data-sidebar="menu-item"]:has(
     > a[href="/_emdash/admin/comments"],

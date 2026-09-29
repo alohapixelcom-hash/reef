@@ -17,7 +17,7 @@
 // chemins vivent donc dans des modules partages (@i18n, @js/archive,
 // @js/adresses), que la page et ce plan importent chacun de leur cote.
 import { defaultLocale, localePaths, localePrefix, locales } from "@i18n";
-import { cheminsDeLAuteur, cheminsDuBillet, cheminsDuSujet } from "@js/adresses";
+import { cheminsDeLAuteur, cheminsDeLEtiquette, cheminsDuBillet, cheminsDuSujet } from "@js/adresses";
 import { cheminsArchive } from "@js/archive";
 import { pagesLibres } from "@moteur/cadre-base";
 import type { APIRoute, GetStaticPaths } from "astro";
@@ -44,6 +44,7 @@ const CHEMINS: Record<string, GetStaticPaths | null> = {
   "src/pages/[...locale]/blog/[...page].astro": cheminsArchive,
   "src/pages/[...locale]/topics/index.astro": localePaths,
   "src/pages/[...locale]/topics/[topic]/[...page].astro": cheminsDuSujet,
+  "src/pages/[...locale]/tags/[tag]/[...page].astro": cheminsDeLEtiquette,
   "src/pages/[...locale]/authors/index.astro": localePaths,
   "src/pages/[...locale]/authors/[author].astro": cheminsDeLAuteur,
   "src/pages/[...locale]/search.astro": localePaths,

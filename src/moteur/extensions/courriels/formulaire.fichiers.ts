@@ -1,4 +1,4 @@
-// src/moteur/extensions/courriels/formulaire.fichiers.ts - moteur eteint : aucun envoi, le formulaire de contact reste tel qu'il est livre.
+// src/moteur/extensions/courriels/formulaire.fichiers.ts - moteur eteint : aucun envoi, les formulaires de contact et de la lettre restent tels qu'ils sont livres.
 //
 // L'alias @moteur/courriels pointe ici tant qu'ALOHA_MOTEUR n'est pas pose
 // (moteur.config.mjs) : le composant du formulaire recoit null, n'ajoute rien,
@@ -15,5 +15,9 @@ export interface Envoi {
 }
 
 export async function envoiDuFormulaire(_page: { url: URL; currentLocale?: string | undefined }): Promise<Envoi | null> {
+  return null;
+}
+
+export async function envoiDeLaLettre(_page: { url: URL; currentLocale?: string | undefined }): Promise<Envoi | null> {
   return null;
 }
