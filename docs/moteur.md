@@ -15,7 +15,7 @@ Engine off, the build is identical to a Reef without an engine: the 63 HTML, XML
 
 The engine is [EmDash](https://github.com/emdash-cms/emdash) 0.38 (MIT licence), a CMS made for Astro and Cloudflare. Reef does not rewrite it: it plugs into it.
 
-The live demo runs with the engine on: `reef.alohapixel.app` has been served since 22 September 2026 by the Worker `reef-moteur` (D1 `reef-moteur`, R2 `reef-moteur-media`), built with `pnpm build:moteur` and deployed from the Mac with `npx wrangler deploy` (DEPLOY.md). The checks below were first run on a local build.
+The live demo runs with the engine on: `reef.alohapixel.app` has been served since 22 September 2026 by the Worker `reef-moteur` (D1 `reef-moteur`, R2 `reef-moteur-media`), built with `pnpm build:moteur` and deployed from the Mac with `bash scripts/deployer-frontal.sh` (DEPLOY.md). Since 3.8.0 the domain is on `reef-frontal`, a light Worker that serves the pages already kept and wakes the engine only when it must (see "Deploying"). The checks below were first run on a local build.
 
 ## Running the engine locally
 
@@ -154,10 +154,10 @@ npx wrangler d1 time-travel info reef-moteur                                    
 npx wrangler d1 export reef-moteur --remote --output=avant-3.4.0.sql                     # full backup
 node scripts/base-3.4.0.mjs --remote reef-moteur                                          # the plan, nothing written
 node scripts/base-3.4.0.mjs --remote reef-moteur --appliquer                              # columns, then the SQL
-pnpm build:moteur && npx wrangler deploy                                                  # then check the pages
+pnpm build:moteur && bash scripts/deployer-frontal.sh                                     # then check the pages
 ```
 
-**3.6.0.** A database already at 3.4.0 or 3.5.0 receives `import-3.6.0-reef.sql`, once, and nothing else: it adds « Couleur d'origine du thème » to the list of brand colours (the theme's own colour, like an empty field). The field is changed only while it still carries the 3.5.0 list; no `DELETE`, no `DROP`, no content touched, the colour an editor chose stays. 3.6.1 and 3.6.2 do not change the database.
+**3.6.0.** A database already at 3.4.0 or 3.5.0 receives `import-3.6.0-reef.sql`, once, and nothing else: it adds « Couleur d'origine du thème » to the list of brand colours (the theme's own colour, like an empty field). The field is changed only while it still carries the 3.5.0 list; no `DELETE`, no `DROP`, no content touched, the colour an editor chose stays. 3.6.1, 3.6.2 and 3.8.0 do not change the database.
 
 ```bash
 npx wrangler d1 execute reef-moteur --remote --config wrangler.moteur.jsonc --file=import-3.6.0-reef.sql
@@ -167,10 +167,16 @@ npx wrangler d1 execute reef-moteur --remote --config wrangler.moteur.jsonc --fi
 
 `wrangler.moteur.jsonc` describes the Worker: database `DB`, media `MEDIA`, the `IMAGES` binding (on-demand image optimisation, see `ALOHA_IMAGES` in `moteur.config.mjs`), and a cron every minute for scheduled publications. See `DEPLOY.md`, "First deployment of the engine", for the exact commands, from the empty account to the first import.
 
+Since 3.8.0 the domain is on a second, light Worker, `reef-frontal` (`wrangler.frontal.jsonc`, entry `src/worker.frontal.ts`, shared base module `frontal` in `src/frontal/`). It serves the files of `dist/client`, the address rules below (sitemaps, trailing slash, language) and the pages already kept in the Cache API; it wakes `reef-moteur`, through the `MOTEUR` binding, only for a page not kept yet, the back office, the API and any request with a session. The cache key carries the content version read in the database (read only), so a publication is seen by the next visitor without a purge: measured locally, about one second. An editor is never served a kept page. The `x-aloha-cache` header says what happened.
+
 ```bash
 pnpm build:moteur
-npx wrangler deploy --domain blog.example.com   # never --config: see DEPLOY.md
+bash scripts/deployer-frontal.sh --a-sec   # dry run: both bundles built, nothing sent
+bash scripts/deployer-frontal.sh           # the engine without a domain, then reef-frontal with the domain
+bash scripts/deployer-frontal.sh --retour  # roll back: the domain back on the engine
 ```
+
+Every release deploys both Workers. Never deploy the engine with `--domain`: the domain would go back to it. Locally, `npx wrangler dev -c wrangler.frontal.jsonc -c dist/server/wrangler.json` runs both Workers in one process on the same local database.
 
 With the engine on, `/secret-spot/`, `/fr/secret-spot/` and `/_emdash/secret-spot/` answer a 302 to `/_emdash/admin` (`src/worker.moteur.ts`): one back office per site, EmDash's, at the same address as every other back office of the house. The Git-based editor of 2.3 was removed in 3.3.0.
 

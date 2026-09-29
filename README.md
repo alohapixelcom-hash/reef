@@ -60,7 +60,8 @@ With the variable set, the same source builds as a Cloudflare Worker. The live
 demo runs that way: since 22 September 2026, `reef.alohapixel.app` is served by
 the **reef-moteur** Worker (EmDash engine, D1 `reef-moteur`, R2
 `reef-moteur-media`), built with `pnpm build:moteur` and deployed from the Mac
-with `npx wrangler deploy` (see [DEPLOY.md](DEPLOY.md)).
+with `bash scripts/deployer-frontal.sh`, behind a light front Worker that
+serves the pages already kept (3.8.0, see [DEPLOY.md](DEPLOY.md)).
 
 - **A complete back office at `/_emdash/admin`** (and `/secret-spot/` redirects
   there). Posts live in D1, media in R2, and the pages that show a post are
@@ -97,7 +98,8 @@ https://alohapixel.app/themes/
 ## What is in the box, counted from this repo
 
 Numbers below were counted from the source and the build, not estimated
-(recounted on 2026-09-29 for 3.6.1; `pnpm build` green, `pnpm check` clean).
+(recounted on 2026-09-29 for 3.6.1, unchanged in 3.8.0 whose static build is
+byte-identical; `pnpm build` green, `pnpm check` clean).
 
 | What | Count |
 |---|---|

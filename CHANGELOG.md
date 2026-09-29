@@ -4,7 +4,29 @@
 
 Versions describe the features actually shipped in this theme.
 
-Current version: **3.6.2**.
+Current version: **3.8.0**.
+
+## 3.8.0 - 2026-09-29
+
+Pages served from a light front Worker with a versioned cache: no more slow
+wake-ups. The family moves to 3.8.0 together (there is no 3.7). The static
+build is byte-identical to 3.6.2.
+
+- Online, the domain now points to `reef-frontal`, a small Worker (shared base
+  module `frontal`) that serves the files, the redirects and the pages already
+  kept, and wakes the engine only for a page not kept yet, the admin and the
+  API. An editor, or any session, always goes to the engine and is never
+  cached; a publication changes the content version, so the cache key.
+- Deploy and roll back: `bash scripts/deployer-frontal.sh` (the engine without
+  a domain, then the front Worker with the domain) and `--retour` (the domain
+  back on the engine). Every release deploys both Workers; the engine is never
+  deployed with `--domain` again.
+- Docs: DEPLOY.md and docs/moteur.md describe the two Workers, the first
+  deployment (engine without a domain, then the front Worker) and the roll
+  back; DEPLOY.md names the "Update the site" button by its name. The base
+  adapter carries its front Worker note once instead of three times; the
+  1.7.3 entry joins the archive (400-line ceiling); the wiki lists the home
+  sections the page really shows. The database does not change.
 
 ## 3.6.2 - 2026-09-29
 
@@ -349,38 +371,6 @@ browser.
   and pull request. A branch gets the same guard as `main` before it is
   merged.
 
-## 1.7.3 - 2026-09-07
+## 1.7.3 and before
 
-Two family-wide image and font defects, both found by measurement and both
-invisible in the code.
-
-- **The hero srcset gained an 800 breakpoint.** The list ran
-  `[720, 1200, 1920, 2560]` with `sizes="100vw"`. A 412-point phone at 1.75
-  device pixels per point asks for **721** pixels: one more than 720, so the
-  browser climbed to the 1200 candidate and paid over a hundred kilobytes for
-  a single pixel. The same arithmetic hits a 390-point phone at 2x, which asks
-  for 780. An 800 breakpoint catches both and costs the others nothing.
-- **The hero is served as AVIF, with WebP as the fallback.** A first-screen
-  photograph carries grain and detail, which WebP encodes badly: on Nalu the
-  same image went from **186 KB to 42 KB** at identical quality. The
-  `<picture>` keeps WebP for browsers that do not read AVIF, so nobody loses.
-  `fallbackFormat="webp"` is MANDATORY here: without it Astro builds a PNG
-  fallback per breakpoint, close to twenty megabytes of files nobody will ever
-  download but that ship on every deploy.
-- **Both font files are preloaded.** The `@font-face` rules travel in the
-  inlined stylesheet, so the browser only discovers the woff2 after reading
-  the CSS: it paints with the fallback face, then swaps. On Kona that swap
-  moved the first screen by **0.168 of CLS**, over the 0.1 threshold, because
-  its `h1` is bounded in `ch` (a unit that depends on the active font) inside
-  a block centred with `my-auto`. Preloading removes the whole class of
-  defect, not just the instance of the day. `crossorigin` is mandatory on a
-  font preload, or the file is fetched twice.
-
-Measured on the seven demos, Lighthouse mobile, served compressed: Kona 92 to
-99, Nalu 93 to 99, Swell 97 to 98, the others unchanged at 98 or 99.
-Accessibility, best practices and SEO stay at 100 on all seven. CLS is at or
-under 0.003 everywhere, against 0.168 on Kona before.
-
-## 1.7.2 and before
-
-Moved to `CHANGELOG-ARCHIVE-1.x.md` on 28 and 29 September 2026 (400-line ceiling of the house).
+Moved to `CHANGELOG-ARCHIVE-1.x.md` on 28 and 29 September 2026 (400-line ceiling of the house; 1.7.3 for 3.8.0).
