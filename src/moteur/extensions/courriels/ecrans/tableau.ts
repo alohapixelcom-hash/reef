@@ -16,7 +16,17 @@ export interface DonneesTableau {
   livreur: string | null;
   bilan: Bilan;
   derniers: Ligne[];
+  /** Les envois refuses du mois qu'aucun renvoi n'a rattrapes (echecsEnAttente). */
+  echecs?: Ligne[];
   maintenant: number;
+}
+
+/** La carte rouge d'un courriel qui n'est pas parti ; celle d'une commande le dit en premier. */
+function alerteDesEchecs(t: Textes, d: DonneesTableau): Bloc[] {
+  const echecs = d.echecs ?? [];
+  if (echecs.length === 0) return [];
+  const commande = echecs.some((l) => l.formulaire === "commande");
+  return [{ type: "banner", variant: "error", title: t.tableau.echecsTitre(echecs.length), description: commande ? t.tableau.echecCommande : t.tableau.echecAutre }];
 }
 
 const manquesDe = (d: DonneesTableau) => manques(d.reglages, d.liaison, d.livreur === IDENTITE.id);
@@ -42,6 +52,7 @@ export function tableau(t: Textes, d: DonneesTableau): Reponse {
   const blocks: Bloc[] = [
     { type: "header", text: t.pages.tableau },
     { type: "section", text: t.tableau.intro },
+    ...alerteDesEchecs(t, d),
     etatDuBranchement(t, d),
     // Deux rangees de deux tuiles : sur un telephone, quatre tuiles cote a
     // cote ne laisseraient pas la place a un chiffre.
@@ -84,6 +95,7 @@ export function tableau(t: Textes, d: DonneesTableau): Reponse {
 export function carte(t: Textes, d: DonneesTableau): Reponse {
   return {
     blocks: [
+      ...alerteDesEchecs(t, d),
       jauge(t, d.bilan.envoyes),
       { type: "context", text: t.tableau.carte(depuis(t, d.bilan.dernierEnvoye?.quand ?? null, d.maintenant), manquesDe(d).length ? t.tableau.incompletTitre : t.tableau.pretTitre) },
     ],

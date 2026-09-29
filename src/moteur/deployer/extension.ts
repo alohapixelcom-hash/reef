@@ -1,4 +1,4 @@
-// src/moteur/deployer/extension.ts - l'extension EmDash "Tout deployer" : une page du back office, un bouton, une preuve.
+// src/moteur/deployer/extension.ts - l extension EmDash "Mettre le site a jour" (ancien "Tout deployer") : une page du back office, un bouton, une preuve.
 //
 // EXTENSION NATIVE, RANGEE DANS LE DEPOT. Une extension "sandbox" tourne dans
 // un isolat sans acces a l'hote : elle ne peut ni appeler les fonctions

@@ -220,6 +220,21 @@ export async function lignes(base: Base, filtre: Filtre): Promise<Ligne[]> {
   return brut.map(versLigne);
 }
 
+/**
+ * Les envois refuses depuis `depuis` qu'aucun renvoi reussi n'a rattrapes, du
+ * plus recent au plus ancien (socle 1.4.0) : de quoi mettre une carte rouge
+ * au tableau de bord tant qu'un courriel n'est pas parti, et l'oter des qu'il
+ * l'est.
+ */
+export async function echecsEnAttente(base: Base, depuis: number, limite = 20): Promise<Ligne[]> {
+  await preparer(base);
+  const brut = await base.lire(
+    "SELECT * FROM courriels_journal j WHERE j.etat = 'refuse' AND j.quand >= ? AND NOT EXISTS (SELECT 1 FROM courriels_journal r WHERE r.renvoi_de = j.id AND r.etat = 'envoye') ORDER BY j.quand DESC, j.id DESC LIMIT ?",
+    [depuis, limite],
+  );
+  return brut.map(versLigne);
+}
+
 const compter = async (base: Base, sql: string, valeurs: unknown[]): Promise<number> => {
   const [ligne] = await base.lire<{ n: number }>(sql, valeurs);
   return Number(ligne?.n ?? 0);

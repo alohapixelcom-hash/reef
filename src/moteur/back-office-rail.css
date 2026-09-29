@@ -25,3 +25,25 @@
   ) {
   display: none;
 }
+
+/* Les ecrans simples (socle 1.4.0) : ce drapeau dit au script du back office
+ * (ECRANS_SIMPLES, habillage.ts) que ce site ne lit ni le slogan, ni l'URL,
+ * ni le format des dates des Parametres, ni le slug d'un bloc, ni les
+ * panneaux Responsabilite, Collaborateurs et Taxonomies : il les cache. */
+:root {
+  --aloha-ecrans-simples: 1;
+}
+
+/* Une photo non choisie : le champ le dit en toutes lettres. La page affiche
+ * alors la photo livree avec le theme ; le champ vide ne montrait qu'un cadre
+ * gris, et le client croyait n'avoir aucune photo (releve du testeur). */
+html[lang^="fr"] [id^="field-"]:has(> button > span > div > svg + span)::after {
+  content: "Aucune photo choisie : le site affiche la photo livrée avec le thème. Choisissez-en une pour la remplacer.";
+  font-size: 0.85rem;
+  color: var(--color-kumo-subtle, inherit);
+}
+html:not([lang^="fr"]) [id^="field-"]:has(> button > span > div > svg + span)::after {
+  content: "No photo chosen: the site shows the photo delivered with the theme. Choose one to replace it.";
+  font-size: 0.85rem;
+  color: var(--color-kumo-subtle, inherit);
+}

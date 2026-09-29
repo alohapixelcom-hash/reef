@@ -81,6 +81,7 @@ export function colonnes(t: Textes, complet = true): { key: string; label: strin
     { key: "formulaire", label: t.colonnes.formulaire },
     ...(complet ? [{ key: "destinataire", label: t.colonnes.destinataire }, { key: "sujet", label: t.colonnes.sujet }] : []),
     { key: "etat", label: t.colonnes.etat, format: "badge" as const },
+    ...(complet ? [{ key: "motif", label: t.colonnes.motif }] : []),
   ];
 }
 
@@ -91,6 +92,8 @@ export function rangee(t: Textes, l: Ligne, maintenant: number): Record<string, 
     destinataire: l.destinataire === "-" ? "-" : masquer(l.destinataire),
     sujet: l.sujet.length > 60 ? `${l.sujet.slice(0, 57)}...` : l.sujet,
     etat: t.etats[l.etat] ?? l.etat,
+    // La raison d'un refus en toutes lettres, dans la ligne meme (socle 1.4.0).
+    motif: l.etat === "envoye" ? "" : (erreurEnClair(t, l.code) ?? l.erreur ?? ""),
   };
 }
 

@@ -4,12 +4,13 @@ import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { bilanDuCycle, lignes, preparer, SQL_IDEMPOTENT, type Base } from "./noyau/base.ts";
+import { bilanDuCycle, echecsEnAttente, lignes, preparer, SQL_IDEMPOTENT, type Base } from "./noyau/base.ts";
 import { analyser, interroger, valeursDe } from "./noyau/dns.ts";
 import { type Canal, type Evenement, fournisseur, journaliste, poster } from "./noyau/canal.ts";
 import { type Contexte, erreurEnClair, essai, manques, recevoirContact, renvoyer } from "./noyau/envoi.ts";
 import { cheminDeRetour, debutDuCycle, origineDeLaSource, finDuCycle, langueDeLaRequete, lireReglages, masquer, plafondAtteint, reglagesParDefaut, type Reglages } from "./noyau/regles.ts";
-import { appliquer, VUE_PAR_DEFAUT } from "./ecrans/journal.ts";
+import { appliquer, rangee, VUE_PAR_DEFAUT } from "./ecrans/journal.ts";
+import { carte } from "./ecrans/tableau.ts";
 import { versReglages } from "./ecrans/reglages.ts";
 import { EN } from "./ecrans/textes.en.ts";
 import { FR } from "./ecrans/textes.fr.ts";
@@ -34,6 +35,11 @@ is(lu.erreurs, [], "des reglages propres passent");
 is([lu.reglages.expediteur, lu.reglages.destinataires.contact, lu.reglages.plafonds.heure, lu.reglages.cycle], ["contact@exemple.test", "a@x.test, b@x.test", 12, 15], "adresses rognees, en minuscules, sans doublon");
 const refus = lireReglages({ expediteur: "pas bon", destinataires: { contact: "a@x.test,b@x.test,c@x.test,d@x.test" }, plafonds: { jour: -1 }, cycle: 31 });
 is(refus.erreurs.map((e) => e.champ), ["expediteur", "contact", "plafonds", "cycle"], "chaque champ refuse est nomme");
+// Une messagerie grand public ne peut pas servir d'expediteur (socle 1.4.0) ; un destinataire, si.
+const gmail = lireReglages({ expediteur: "patron@gmail.com", destinataires: { contact: "patron@gmail.com" } });
+is([gmail.erreurs, gmail.reglages.expediteur, gmail.reglages.destinataires.contact], [[{ champ: "expediteur", raison: "messagerie" }], "", "patron@gmail.com"], "gmail refuse comme expediteur, accepte comme destinataire");
+is(lireReglages({ expediteur: "Contact@Orange.fr" }).erreurs, [{ champ: "expediteur", raison: "messagerie" }], "orange.fr refuse, casse ignoree");
+is(lireReglages({ expediteur: "contact@mon-site.fr" }).erreurs, [], "une adresse de son domaine passe");
 is(refus.reglages.expediteur, "", "un champ refuse garde sa valeur precedente");
 is(lireReglages({ accuse: { sujet: { fr: "" } } }).reglages.accuse.sujet.fr, defaut.accuse.sujet.fr, "un sujet vide reprend le texte livre");
 is([lireReglages({ nom: "Vela\r\nBcc: x@y.test" }).reglages.nom, lireReglages({ accuse: { sujet: { fr: "Merci\nBcc: x" } } }).reglages.accuse.sujet.fr], ["Vela Bcc: x@y.test", "Merci Bcc: x"], "aucun saut de ligne dans un nom ou un sujet (pas d'injection d'en-tete)");
@@ -188,6 +194,19 @@ if (sqlite) {
   const moisSuivant = await bilanDuCycle(base, Date.UTC(2026, 9, 2), reglages.cycle);
   is(moisSuivant.envoyes, 0, "le compteur repart a zero au cycle suivant");
   is(manques(reglages, true, false), ["fournisseur"], "une liaison sans fournisseur choisi se signale");
+  // La carte rouge du tableau de bord (socle 1.4.0) : un echec sans renvoi reussi reste signale, un echec rattrape ne l'est plus.
+  const enAttente = await echecsEnAttente(base, 0);
+  is(enAttente.some((l) => l.id === refuse.id), false, "un refus rattrape par un renvoi reussi n'est plus en attente");
+  horloge += 2 * 3_600_000;
+  panne = Object.assign(new Error("boite pleine"), { code: "E_DELIVERY_FAILED" });
+  const commandeRatee = await envoi({ ...message, a: ["client@exemple.test"] }, { origine: "commande" });
+  panne = null;
+  const attente2 = await echecsEnAttente(base, 0);
+  is(attente2[0]?.id, commandeRatee.id, "la commande dont le courriel n'est pas parti est en attente");
+  const donnees = { reglages, liaison: true, livreur: "aloha-courriels", bilan: await bilanDuCycle(base, horloge, reglages.cycle), derniers: [], echecs: attente2, maintenant: horloge };
+  const rouge = carte(FR, donnees).blocks[0] as { type: string; variant?: string; description?: string };
+  is([rouge.type, rouge.variant, rouge.description?.startsWith("Le courriel d'une commande")], ["banner", "error", true], "carte rouge au tableau de bord, qui nomme la commande");
+  is(rangee(FR, attente2[0]!, horloge).motif.startsWith("Le serveur du destinataire"), true, "la raison du refus est dans la ligne du journal");
 
   // Deux copies du module du canal (le formulaire et l'extension importes par
   // deux chemins) : toujours une seule ligne, sous la bonne origine.

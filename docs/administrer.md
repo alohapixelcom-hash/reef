@@ -14,7 +14,7 @@ Les libellés cités entre guillemets sont exactement ceux de l'écran. La versi
    - « Contenu » : « Textes des pages », « Sujets », « Auteurs », « Pages », « Réglages par langue », « Articles », « Médias » ;
    - « Gérer » : « Menus », « Redirections » ;
    - « Administration » (administrateurs seulement) : « Types de contenu », « Utilisateurs », « Modules d'extension », « Paramètres » ;
-   - « Modules d'extension » : « Tout déployer », « Courriels », « Journal des courriels », « Brancher les courriels », « Réglages des courriels ».
+   - « Modules d'extension » : « Mettre le site à jour », « Courriels », « Journal des courriels », « Brancher les courriels », « Réglages des courriels ».
 
 Deux rôles comptent : un **éditeur** change les contenus, les menus et les redirections ; un **administrateur** change en plus les « Paramètres » (nom du site, logo, réseaux, articles par page), les courriels et les utilisateurs.
 
@@ -22,9 +22,9 @@ Deux rôles comptent : un **éditeur** change les contenus, les menus et les red
 
 Connecté, ouvrez n'importe quelle page du site (« Voir le site », en haut à droite du back office). Une petite barre apparaît en bas de l'écran. Ses mots viennent du moteur et restent en anglais.
 
-1. Basculez « Edit ». Les zones modifiables s'entourent au survol.
+1. Basculez « Modifier ». Les zones modifiables s'entourent au survol.
 2. Cliquez un texte court (un titre, un bouton, le nom d'un sujet) : il devient modifiable dans la page. Tapez, puis Entrée. La barre affiche « Saved » : c'est enregistré en brouillon, **les lecteurs ne voient encore rien**.
-3. Cliquez « Publish » dans la barre : c'est en ligne, la page se recharge.
+3. Cliquez « Publier » dans la barre : c'est en ligne, la page se recharge.
 4. Un texte long, une liste, une date ou une case à cocher ouvre le back office au bon champ, dans un nouvel onglet.
 
 Sur une page d'article, le titre, le chapô, la couverture, le nom du sujet et celui de l'auteur se cliquent de la même façon : chacun ouvre l'article, le sujet ou l'auteur qu'il affiche.
@@ -39,7 +39,7 @@ En bas à gauche, le panneau **« Cadre du site »** donne les liens directs ver
 
 ## 3. Changer un texte
 
-- **Dans la page** : barre, « Edit », cliquez le texte, tapez, Entrée, puis « Publish ».
+- **Dans la page** : barre, « Modifier », cliquez le texte, tapez, Entrée, puis « Publier ».
 - **Dans le back office** : « Textes des pages », cliquez le bloc (la colonne « Page où se trouve ce bloc » dit sur quelle page il est), changez le champ, « Enregistrer », puis « Publier les modifications » et « Publier les modifications maintenant ».
 
 Chaque champ porte une phrase qui dit ce qu'il change. Le « Mot du titre écrit en couleur » doit reprendre un mot du titre, écrit pareil. Le titre de la page d'un sujet est un modèle : `{topic}` y devient le nom du sujet.
@@ -48,20 +48,24 @@ Chaque champ porte une phrase qui dit ce qu'il change. Le « Mot du titre écrit
 
 ## 4. Changer une image ou la vidéo
 
-- **Dans la page** : barre, « Edit », cliquez la pastille « Photo » du bloc. Dans la fenêtre « Image », « Upload » envoie une photo de votre ordinateur, « Replace » en choisit une dans la médiathèque. Puis « Publish ».
+- **Dans la page** : barre, « Modifier », cliquez la pastille « Photo » du bloc. Dans la fenêtre « Photo », « Envoyer une photo » envoie une photo de votre ordinateur, « Choisir une autre photo » en choisit une dans la médiathèque. Puis « Publier ».
 - **Dans le back office** : dans le bloc, le champ « Photo du bloc (vide : la photo livrée avec le thème) » : « Sélectionner une image », puis « Choisir ». « Enregistrer », puis publiez.
 - **La vidéo du bloc studio** (accueil) : « Adresse de la vidéo du bloc » (une adresse `https://...` de fichier vidéo) et « Image montrée avant la vidéo ».
 - **La couverture d'un article** : champ « Couverture » de l'article.
 
 Le texte alternatif (ce que lit un lecteur d'écran) se saisit dans la fenêtre de l'image. Le point d'intérêt se règle dans « Médias » : la photo reste cadrée autour de lui sur tous les écrans.
 
-**Revenir à la photo du thème** : videz le champ (dans la fenêtre « Image » de la barre, « Remove »), puis publiez.
+**Revenir à la photo du thème** : videz le champ (dans la fenêtre « Photo » de la barre, « Retirer »), puis publiez.
+
+**Un champ photo vide** le dit en toutes lettres : « Aucune photo choisie : le site affiche la photo livrée avec le thème ». Ce n'est pas une erreur : choisissez une photo pour la remplacer.
 
 ## 5. Changer un bouton
 
-- **Son texte** : cliquez le bouton en mode édition, tapez, Entrée, « Publish ».
-- **Son adresse** : cliquez l'adresse dans sa pastille « Adresse du bouton : », tapez la nouvelle adresse (une page du site comme `/contact/`, une ancre comme `#newsletter`, ou une adresse complète `https://...`), Entrée, « Publish ». Une pastille vidée rend l'adresse prévue par le thème.
+- **Son texte** : cliquez le bouton en mode édition, tapez, Entrée, « Publier ».
+- **Son adresse** : cliquez l'adresse dans sa pastille « Adresse du bouton : », tapez la nouvelle adresse (une page du site comme `/contact/`, une ancre comme `#newsletter`, ou une adresse complète `https://...`), Entrée, « Publier ». Une pastille vidée rend l'adresse prévue par le thème.
 - **Le masquer** : masquez le bloc (partie 6), ou videz le texte du bouton.
+
+**Adresse mal tapée** : une adresse tapée sans `https://` (`www.exemple.fr`) est corrigée toute seule en `https://www.exemple.fr`, et une phrase sous la pastille le dit ; une adresse avec une espace est refusée, et le bouton garde la sienne.
 
 ## 6. Masquer ou réafficher un bloc
 
@@ -91,6 +95,8 @@ Les lecteurs ne voient plus le bloc. Vous, en mode édition, le voyez grisé ave
 
 Le changement se voit tout de suite sur le site, sans publier. Si un menu est vide ou absent dans une langue, le site montre les liens d'origine du thème.
 
+**Le menu français** : dans le menu français, une adresse de page tapée sans `/fr/` (`/contact/`) mène quand même à la page française : le site ajoute `/fr/` tout seul.
+
 ## 8. Changer un lien ou une colonne du pied de page
 
 - **Les liens des colonnes** : ce sont les menus « Lire », « Le studio » et « Légal » (partie 7).
@@ -111,7 +117,9 @@ Le changement se voit tout de suite sur le site, sans publier. Si un menu est vi
 
 Puis « Enregistrer ». « Liens sociaux » : les réseaux du pied de page. « SEO » : le séparateur des titres (« Titre | Marque »), l'image de partage par défaut, les codes de vérification Google et Bing.
 
-**Sans effet sur ce site** (le thème les ignore volontairement) : « Slogan » (le slogan dépend de la langue : il est dans « Réglages par langue »), « URL du site », « Format des dates », « Fuseau horaire » (les dates suivent la langue de la page), et le « robots.txt » du SEO (il protège le back office et annonce le plan du site : une erreur désindexerait le site).
+**Sans effet sur ce site** (le thème les ignore volontairement ; « Slogan », « URL du site », « Articles par page », « Format des dates » et « Fuseau horaire » ne s'affichent plus dans « Paramètres ») : « Slogan » (le slogan dépend de la langue : il est dans « Réglages par langue »), « URL du site », « Format des dates », « Fuseau horaire » (les dates suivent la langue de la page), et le « robots.txt » du SEO (il protège le back office et annonce le plan du site : une erreur désindexerait le site).
+
+**Après un changement de logo, de nom du site ou de couleur** : « Mettre le site à jour », dans le menu de gauche, refait les quelques pages qui ne se mettent pas à jour seules (une à trois minutes). Pour tout le reste, ce qui est publié est déjà en ligne : ce bouton ne sert à rien.
 
 ## 10. Coordonnées, e-mail, couleur et textes communs
 
@@ -123,7 +131,7 @@ Puis « Enregistrer ». « Liens sociaux » : les réseaux du pied de page. « S
 - le nom et le lien du crédit du pied de page ;
 - le titre du flux RSS de la langue ;
 - l'adresse d'un service externe pour la lettre d'information, et celle pour le formulaire de contact quand l'écran « Courriels » n'est pas branché (partie 17 bis) ;
-- « Couleur de la marque, sur tout le site » : un choix parmi cinq couleurs ; vide, le corail du thème.
+- « Couleur de la marque, sur tout le site » : « Couleur d'origine du thème » (le corail du thème, comme un champ vide) ou l'une des cinq couleurs ; chaque couleur garde le texte des boutons lisible (contraste d'au moins 4,5:1, mesuré).
 
 Les textes de l'en-tête et du pied de page sont des blocs de « Textes des pages » (page « Tout le site »).
 
@@ -133,7 +141,7 @@ Les textes de l'en-tête et du pied de page sont des blocs de « Textes des page
 2. « Titre », « Chapo » (la phrase sous le titre et sur la carte), « Couverture », « Texte ».
 3. « Sujet » : choisissez le sujet dans la liste (elle montre l'identifiant des « Sujets », `Craft`, `Design`...). « Auteur » : de même (`Mara-lindqvist`...).
 4. « Date affichée » (vide : la date de publication), « Revu le » si vous le mettez à jour plus tard, « À la une » pour l'afficher en grand sur l'accueil.
-5. Dans « Slug », l'adresse de l'article : `mon-article` donne `/blog/mon-article/`.
+5. Dans « Adresse web », l'adresse de l'article : `mon-article` donne `/blog/mon-article/`.
 6. « Enregistrer » garde un brouillon, invisible. « Publier » le met en ligne. « Programmer » choisit une date.
 
 L'article paraît aussitôt en tête de « Tous les billets », dans la page de son sujet, dans celle de son auteur, dans le flux RSS et dans le plan du site. Le panneau « SEO » de l'article (titre, description, image, adresse canonique, ne pas indexer) passe avant le titre et le chapô pour Google et les réseaux ; « ne pas indexer » le retire du plan du site.
@@ -151,7 +159,7 @@ Les éléments d'un bloc (les chiffres de l'ouverture, les règles de la page À
 ## 14. Ajouter une page, puis la mettre au menu
 
 1. « Pages », « Ajouter ». « Titre de la page », « Texte d'introduction », « Texte de la page », photo si vous voulez.
-2. Dans « Slug », l'adresse de la page : `colophon` donne `/colophon/`.
+2. Dans « Adresse web », l'adresse de la page : `colophon` donne `/colophon/`.
 3. « Enregistrer », « Publier ».
 4. « Menus », le menu voulu, « Ajouter un lien personnalisé », URL `/colophon/`, « Ajouter ».
 
@@ -181,10 +189,14 @@ Les messages de la page Contact vous arrivent par courriel dès que l'écran « 
 
 La lettre d'information, elle, s'envoie à un service externe (partie 10) : sans adresse, son formulaire reste une démonstration.
 
+**Adresse d'expédition** : une adresse de messagerie (Gmail, Orange, Outlook, Free...) est refusée comme adresse d'expédition, avec une phrase qui dit pourquoi : un site ne peut pas envoyer au nom de ces messageries. Elle reste possible comme destinataire.
+
+**Si un courriel ne part pas** : une carte rouge le dit en haut de « Courriels » et sur la page d'accueil du back office, jusqu'à ce qu'il soit renvoyé avec succès. Dans « Journal des courriels », la colonne « Pourquoi » donne la raison en toutes lettres, et « Renvoyer ce courriel » le fait repartir.
+
 ## 18. Révisions, retour arrière, corbeille
 
 - **Avant publication** : « Ignorer les modifications » revient à la version en ligne.
-- **Après** : « Révisions » liste les versions ; restaurez-en une, puis publiez.
+- **Après** : « Révisions » liste les versions ; restaurez-en une, puis publiez. **Attention : une révision remet les textes, pas la photo, les adresses des boutons ni la case « Masquer ce bloc »** (elles valent pour les deux langues) : remettez-les à la main. La fenêtre de confirmation le rappelle.
 - **Supprimer** : « Déplacer vers la corbeille », puis confirmer. L'onglet « Corbeille » de la liste permet de restaurer.
 - **Retirer du site sans supprimer** : « Annuler la publication ». Pour un bloc de « Textes des pages », le texte d'origine du thème revient ; pour faire disparaître un bloc, masquez-le (partie 6). Un sujet ou un auteur dépublié rend la fiche d'origine du thème.
 

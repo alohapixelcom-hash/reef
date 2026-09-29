@@ -36,29 +36,33 @@ export const FR = {
       expediteur: "l'adresse d'expédition (Réglages des courriels)",
       destinataire: "le destinataire du formulaire de contact (Réglages des courriels)",
     },
-    envoyes: "Envoyés ce cycle",
+    envoyes: "Envoyés ce mois-ci",
     surInclus: (inclus: number) => `sur ${nombre(inclus)} inclus chez Cloudflare`,
-    echecs: "Échecs ce cycle",
+    echecs: "Échecs ce mois-ci",
     echecsDetail: (n: number, plafonnes: number) =>
       n + plafonnes === 0 ? "aucun, tout est parti" : `${nombre(n)} refusé${n > 1 ? "s" : ""}, ${nombre(plafonnes)} bloqué${plafonnes > 1 ? "s" : ""} : à relire dans le Journal`,
     dernier: "Dernier envoi",
     branchement: "Branchement",
     branchementPret: "Prêt",
     branchementIncomplet: "Incomplet",
-    branchementDetail: (liaison: boolean): string => (liaison ? "liaison d'envoi posée" : "liaison d'envoi absente"),
+    branchementDetail: (liaison: boolean): string => (liaison ? "Prêt à envoyer" : "Pas encore relié au service d'envoi"),
     jauge: (envoyes: number, inclus: number) => `Forfait du mois : ${nombre(envoyes)} envoi${envoyes > 1 ? "s" : ""} sur ${nombre(inclus)} inclus`,
     pourcent: (p: number) => `${new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1 }).format(p)} %`,
     cycle: (fin: string) =>
-      `Le compteur repart à zéro le ${fin}. Il compte les envois de ce site ; les 3 000 envois inclus par mois sont partagés par tous les sites du même compte Cloudflare (offre Workers Paid). Au-delà : 0,35 dollar les 1 000 envois (tarif lu dans la documentation Cloudflare le 16 septembre 2026).`,
-    depasse: (auDela: number, dollars: string) => `Ce site a dépassé les envois inclus de ${nombre(auDela)} : environ ${dollars} dollars facturés par Cloudflare ce mois-ci s'il est seul sur le compte.`,
+      `Le compteur repart à zéro le ${fin}. 3 000 envois par mois sont compris dans votre abonnement d'hébergement (partagés entre vos sites s'il y en a plusieurs) ; au-delà, chaque millier d'envois coûte environ 0,35 dollar américain (tarif lu le 16 septembre 2026).`,
+    depasse: (auDela: number, dollars: string) => `Ce site a dépassé de ${nombre(auDela)} les envois compris : environ ${dollars} dollars américains de plus ce mois-ci s'il est seul sur l'abonnement.`,
     plafonnesTitre: "Des envois ont été bloqués par vos plafonds",
-    plafonnes: (n: number) => `${nombre(n)} envoi${n > 1 ? "s" : ""} bloqué${n > 1 ? "s" : ""} ce cycle. Rien n'est perdu : chaque message est gardé dans le Journal, avec un bouton « Renvoyer ». Si c'était un vrai visiteur, relevez le plafond dans Réglages des courriels.`,
+    plafonnes: (n: number) => `${nombre(n)} envoi${n > 1 ? "s" : ""} bloqué${n > 1 ? "s" : ""} ce mois-ci. Rien n'est perdu : chaque message est gardé dans le Journal, avec un bouton « Renvoyer ». Si c'était un vrai visiteur, relevez le plafond dans Réglages des courriels.`,
     derniers: "Derniers envois",
     vide: "Aucun courriel envoyé pour l'instant. Le premier message du formulaire de contact apparaîtra ici.",
     carte: (quand: string, etat: string) => `Dernier envoi : ${quand}. ${etat}.`,
+    echecsTitre: (n: number) => (n > 1 ? `${nombre(n)} courriels ne sont pas partis` : "Un courriel n'est pas parti"),
+    echecCommande:
+      "Le courriel d'une commande n'est pas parti : votre client n'a peut-être pas reçu sa confirmation. Ouvrez « Journal des courriels », lisez la raison en face de l'envoi, corrigez ce qu'elle dit, puis cliquez « Renvoyer ce courriel ».",
+    echecAutre: "Ouvrez « Journal des courriels » : la raison est écrite en face de chaque envoi, avec ce qu'il faut faire, et un bouton « Renvoyer ce courriel ».",
   },
 
-  colonnes: { quand: "Quand", formulaire: "Formulaire", destinataire: "Destinataire", sujet: "Sujet", etat: "État" },
+  colonnes: { quand: "Quand", formulaire: "Formulaire", destinataire: "Destinataire", sujet: "Sujet", etat: "État", motif: "Pourquoi" },
 
   journal: {
     intro: "Tous les envois, du plus récent au plus ancien. Les adresses sont masquées. Choisissez un envoi dans la liste « Voir un envoi » pour lire le détail, comprendre une erreur et le renvoyer.",
@@ -162,6 +166,8 @@ export const FR = {
     refuseBref: "Rien n'a été enregistré : le bandeau rouge dit quoi corriger.",
     erreurs: {
       expediteur: "l'adresse d'expédition n'est pas une adresse valable (exemple : contact@votre-domaine.fr)",
+      messagerie:
+        "l'adresse d'expédition est chez une messagerie (Gmail, Orange, Outlook...) : un site ne peut pas envoyer en son nom. Choisissez une adresse de votre domaine, par exemple contact@votre-domaine.fr (celle qui finit comme l'adresse de votre site).",
       reponse: "l'adresse de réponse n'est pas une adresse valable",
       adresse: (formulaire: string) => `une adresse de « ${formulaire} » n'est pas valable`,
       trop: (formulaire: string) => `« ${formulaire} » a plus de trois adresses`,
