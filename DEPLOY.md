@@ -4,15 +4,28 @@
 
 `reef.alohapixel.app` has been served since 22 September 2026 by the
 **reef-moteur** Worker (EmDash engine, D1 `reef-moteur`, R2
-`reef-moteur-media`), described by `wrangler.moteur.jsonc`. The static
-`reef-demo` Worker no longer carries the domain.
+`reef-moteur-media`), described by `wrangler.moteur.jsonc`. Since 3.8.0 the
+domain is on **reef-frontal**, a light Worker in front of the engine (see
+"The front Worker" below). The static `reef-demo` Worker no longer carries the
+domain.
 
 | Setting | Value |
 |---|---|
-| Worker | `reef-moteur` (`wrangler.moteur.jsonc`) |
+| Workers | `reef-frontal` on the domain (`wrangler.frontal.jsonc`, entry `src/worker.frontal.ts`), in front of `reef-moteur` (`wrangler.moteur.jsonc`, no domain) |
 | Build command | `pnpm build:moteur` (sets `ALOHA_MOTEUR=emdash` itself) |
-| Deploy command | `npx wrangler deploy`, from the Mac, after the build |
-| Check | `https://reef.alohapixel.app/version.json` answers `{"version":"3.6.2",...,"moteur":"emdash"}` |
+| Deploy command | `bash scripts/deployer-frontal.sh`, from the Mac, after the build (both Workers) |
+| Check | `https://reef.alohapixel.app/version.json` answers `{"version":"3.8.0",...,"moteur":"emdash"}`; a public page carries `x-aloha-cache` (`MISS`, then `HIT`) |
+
+```bash
+pnpm build:moteur
+bash scripts/deployer-frontal.sh --a-sec   # dry run: both bundles are built, nothing is sent
+bash scripts/deployer-frontal.sh           # the engine without a domain, then the front Worker with the domain, then an online check
+```
+
+Every release deploys BOTH Workers: the front Worker serves the files of
+`dist/client`, so a new engine behind an old front Worker would serve old
+files. To put the domain back on the engine (same build, already online):
+`bash scripts/deployer-frontal.sh --retour`.
 
 A release whose texts also live in the database ships a SQL file to run once
 after the deployment. For 3.3.0, `seed/import-3.3.0-reef.sql` (the page texts,
@@ -29,14 +42,30 @@ through `node scripts/base-3.4.0.mjs --remote reef-moteur` (the plan, nothing
 written) then the same command with `--appliquer` (the columns, then
 `import-3.4.0-reef.sql`), see docs/moteur.md; 3.6.0 through a single file,
 `import-3.6.0-reef.sql` (« Couleur d'origine du thème » in the list of brand
-colours), idempotent, with no DELETE and no DROP. 3.6.1 and 3.6.2 do not change
-the database.
+colours), idempotent, with no DELETE and no DROP. 3.6.1, 3.6.2 and 3.8.0 do not
+change the database.
 
 ```bash
 npx wrangler d1 execute reef-moteur --remote --config wrangler.moteur.jsonc --file=import-3.6.0-reef.sql
 ```
 
-## Three things not to break
+## The front Worker (3.8.0)
+
+`reef-frontal` (`src/worker.frontal.ts`, shared base module `frontal`)
+receives every request of the domain. It serves the files, the redirects and
+the pages already kept, and wakes `reef-moteur` (through the `MOTEUR` binding)
+only for a page not kept yet, the back office and the API. An editor, or any
+session, always goes to the engine and is never kept; a publication changes
+the content version, so the cache key: the visitor sees it about one second
+later (measured locally). The `x-aloha-cache` header says what happened
+(`HIT`, `MISS`, `MOTEUR`, `PRIVEE`, `FIGEE`...). The engine keeps its cron and
+has no public route.
+
+## Four things not to break
+
+**Never deploy the engine with `--domain` again.** The domain would go back to
+`reef-moteur` and the front Worker would be bypassed. `scripts/deployer-frontal.sh`
+deploys the engine without a domain, then the front Worker with it.
 
 **`packageManager: pnpm@11.22.0` in package.json.** Otherwise the Cloudflare CI
 starts on pnpm 10, which does not read the `allowBuilds` key of
@@ -86,12 +115,12 @@ ones the demo went through in September 2026.
    The names are the ones in `wrangler.moteur.jsonc` (`database_name`,
    `bucket_name`). Nothing else to edit: the bindings are found by name.
 
-2. **Build and deploy the Worker.**
+2. **Build and deploy the Worker, without a domain.**
 
    ```bash
    pnpm install --frozen-lockfile
    pnpm build:moteur
-   npx wrangler deploy --domain blog.example.com
+   npx wrangler deploy
    ```
 
    Run `wrangler deploy` WITHOUT `--config`: the build writes the real Worker
@@ -101,10 +130,21 @@ ones the demo went through in September 2026.
    wrangler.moteur.jsonc` it bundles the raw source instead and fails on
    `@emdash-cms/cloudflare/worker` (measured on 22 September 2026). The first
    deploy creates the D1 database, the R2 bucket and the sessions KV namespace
-   on its own. `--domain` attaches the Worker to a hostname of a zone of the
-   same Cloudflare account, DNS record and certificate included; without it
-   the Worker answers on its `workers.dev` address, which browsers may flag
-   while it is brand new.
+   on its own. The engine gets no domain: the front Worker takes it.
+
+   Then put the front Worker on the domain. Copy the database id
+   (`npx wrangler d1 list`) into the `d1_databases` entry of
+   `wrangler.frontal.jsonc`, then deploy both Workers:
+
+   ```bash
+   DOMAINE=blog.example.com bash scripts/deployer-frontal.sh --a-sec   # dry run, nothing sent
+   DOMAINE=blog.example.com bash scripts/deployer-frontal.sh
+   ```
+
+   The script attaches the domain to `reef-frontal` (a hostname of a zone of
+   the same Cloudflare account, DNS record and certificate included), then
+   checks that the domain answers through it. Every later release runs the
+   same command; `--retour` puts the domain back on the engine.
 
    Optional variables at build time: `ALOHA_BO_LANGUE` (default language of
    the back office, French without it; a language code changes it,
@@ -114,8 +154,8 @@ ones the demo went through in September 2026.
    binding added to the Wrangler file), `ALOHA_CACHE_ROUTES=cloudflare` (with
    `"cache": { "enabled": true }` added to the Wrangler file). None is needed.
 
-3. **Secrets, if any.** The engine needs no secret to run. The "Deploy
-   everything" button needs the address of a Deploy Hook (Cloudflare, the
+3. **Secrets, if any.** The engine needs no secret to run. The "Update the
+   site" button (« Mettre le site à jour ») needs the address of a Deploy Hook (Cloudflare, the
    Worker's settings, Builds) to restart the build of the prerendered pages:
 
    ```bash
@@ -171,4 +211,6 @@ ones the demo went through in September 2026.
    command and `npx wrangler deploy` as the
    deploy command. Then create the Deploy Hook of step 3. From then on, the
    "Update the site" button restarts that build, and `/version.json` proves
-   when the new build is online.
+   when the new build is online. That build deploys the engine only: the
+   front Worker keeps the files of its last deployment until
+   `scripts/deployer-frontal.sh` runs again (not proven online).

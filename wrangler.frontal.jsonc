@@ -1,0 +1,21 @@
+// wrangler.frontal.jsonc - le Worker frontal de Reef (module frontal du socle) : il recoit toutes les requetes du domaine et ne reveille le Worker du moteur que pour une page absente du cache, le back office et l'API.
+//
+// Deploiement : scripts/deployer-frontal.sh (le moteur d'abord, puis celui-ci,
+// puis le domaine sur le frontal ; --retour remet le domaine sur le moteur).
+// Le moteur n'a plus de route publique, il n'est joint que par la liaison
+// MOTEUR (et garde son cron).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "reef-frontal",
+  "main": "./src/worker.frontal.ts",
+  "compatibility_date": "2026-08-14",
+  // Les memes fichiers que le moteur : servis ici sans le reveiller.
+  "assets": { "directory": "./dist/client", "binding": "ASSETS", "run_worker_first": true },
+  // La base du moteur, lue seulement : la version du contenu entre dans la cle du cache.
+  // database_id : la base en ligne, la meme que celle du moteur. preview_database_id :
+  // en local, wrangler dev range une base sans identifiant sous le nom de sa
+  // liaison (DB, cas du moteur) ; le frontal prend le meme nom, les deux
+  // Workers lisent donc la meme base locale.
+  "d1_databases": [{ "binding": "DB", "database_name": "reef-moteur", "database_id": "0aba3246-db4f-4188-97c9-e4586a6e62ba", "preview_database_id": "DB" }],
+  "services": [{ "binding": "MOTEUR", "service": "reef-moteur" }]
+}
