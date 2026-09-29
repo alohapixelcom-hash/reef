@@ -1,8 +1,14 @@
-<!-- CHANGELOG-ARCHIVE-1.x.md - les entrees anciennes du changelog de Reef, de la 1.8.0 a la 0.2.0, sorties de CHANGELOG.md pour tenir le plafond de 400 lignes. -->
+<!-- CHANGELOG-ARCHIVE-1.x.md - les entrees anciennes du changelog de Reef, de la 1.9.0 a la 0.2.0, sorties de CHANGELOG.md pour tenir le plafond de 400 lignes. -->
 
-# Reef - changelog archive (1.8.0 and before)
+# Reef - changelog archive (1.9.0 and before)
 
-Older entries, moved here on 28 September 2026 (1.7.2, 1.7.3 and 1.8.0 on 29 September) so that `CHANGELOG.md` stays under 400 lines. Newer entries live in `CHANGELOG.md`.
+Older entries, moved here on 28 September 2026 (1.7.2, 1.7.3, 1.8.0 and 1.9.0 on 29 September) so that `CHANGELOG.md` stays under 400 lines. Newer entries live in `CHANGELOG.md`.
+
+## 1.9.0 - 2026-09-15
+
+- A malformed language cookie no longer interrupts the demo Worker. It falls back to the browser language.
+- Languages explicitly refused with quality zero, or invalid quality values, no longer trigger a redirect.
+- A network-free regression check covers cookies, language priority, assets, existing language paths and cache headers.
 
 ## 1.8.0 - 2026-09-13
 

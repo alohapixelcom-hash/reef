@@ -48,7 +48,9 @@ sur l'accueil »): `node scripts/base-3.4.0.mjs --remote reef-moteur --sql
 import-3.8.1-reef.sql` shows the plan, the same command with `--appliquer` adds
 the two columns then passes the file; idempotent, no DELETE, no DROP, no
 content touched. Run it before deploying 3.8.1 (the code reads the fields but
-renders the theme as long as they are absent).
+renders the theme as long as they are absent). 3.8.2 adds one field (« Logo pour le mode sombre »):
+`node scripts/base-3.4.0.mjs --remote reef-moteur --sql import-3.8.2-reef.sql`,
+then the same command with `--appliquer`; idempotent, no DELETE, no DROP.
 
 ```bash
 npx wrangler d1 execute reef-moteur --remote --config wrangler.moteur.jsonc --file=import-3.6.0-reef.sql
