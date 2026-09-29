@@ -172,7 +172,7 @@ export async function gestesCommuns(P, o) {
       faire: async () => {
         await ouvrir(`${ADMIN}/content/pages/new`);
         await page.locator("#field-title").fill("Essai page");
-        await page.getByLabel("Slug").fill(slug);
+        await page.getByLabel(/^(Adresse web|Slug)$/).fill(slug);
         await enregistrerEtPublier();
         await o.ajouterLien(menu, "Essai page", `/${slug}/`);
       },

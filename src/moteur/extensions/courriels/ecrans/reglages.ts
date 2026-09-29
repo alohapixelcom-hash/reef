@@ -52,7 +52,8 @@ function champs(t: Textes, r: Reglages, formulaires: readonly Formulaire[], sais
 export function erreursEnClair(t: Textes, erreurs: ErreurDeReglage[]): string[] {
   const vues = new Set<string>();
   for (const e of erreurs) {
-    if (e.champ === "expediteur" || e.champ === "reponse" || e.champ === "plafonds" || e.champ === "cycle") vues.add(t.reglages.erreurs[e.champ]);
+    if (e.champ === "expediteur" && e.raison === "messagerie") vues.add(t.reglages.erreurs.messagerie);
+    else if (e.champ === "expediteur" || e.champ === "reponse" || e.champ === "plafonds" || e.champ === "cycle") vues.add(t.reglages.erreurs[e.champ]);
     else vues.add(e.raison === "trop" ? t.reglages.erreurs.trop(t.origines[e.champ]) : t.reglages.erreurs.adresse(t.origines[e.champ]));
   }
   return [...vues];

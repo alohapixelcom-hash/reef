@@ -11,9 +11,9 @@
 // HORS EDITION, RIEN : ni balise, ni style. Le HTML anonyme ne change pas.
 import { getLocale } from "@i18n";
 import { annotationsDe, enEdition, REF } from "./annotations";
-import { menuDe } from "./cadre";
+import { adresseDuLien, menuDe } from "./cadre";
 import { LIBELLES_DES_MENUS } from "./menus";
-import { CORRECTIF_DE_LA_BARRE, langueDuBackOffice, MOTS, STYLES } from "./textes-edition";
+import { CORRECTIF_DE_LA_BARRE, FEUILLE_D_EDITION, langueDuBackOffice, MOTS, scriptDesAdresses, STYLES, traductionDeLaBarre } from "./textes-edition";
 import { ADMIN_EXTERNE, MENUS, VARIABLES_D_EDITION } from "./theme";
 
 const locale = getLocale(Astro);
@@ -48,7 +48,13 @@ function adresseDeLEntree(cle: string, collection = "sections"): string {
 {/* Un Fragment et non une balise style : le compilateur d'Astro range toute
     balise style, meme en ligne, dans les feuilles de la page, ce qui decalait
     l'ordre de leurs regles dans le HTML anonyme (mesure du 28 septembre). */}
-{actif && <Fragment set:html={`<style>${variables}</style><script>${CORRECTIF_DE_LA_BARRE}</script>`} />}
+{
+  actif && (
+    <Fragment
+      set:html={`<style>${variables}${FEUILLE_D_EDITION}</style><script>${CORRECTIF_DE_LA_BARRE}${scriptDesAdresses(adresseDuLien.toString(), { adresseCorrigee: mots.adresseCorrigee, adresseRefusee: mots.adresseRefusee })}${langue === "fr" ? traductionDeLaBarre() : ""}</script>`}
+    />
+  )
+}
 {
   actif && (
     <details style={STYLES.panneau} data-aloha-cadre="panneau">

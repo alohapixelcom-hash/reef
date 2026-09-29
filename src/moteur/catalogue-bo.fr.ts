@@ -1272,6 +1272,21 @@ const IDENTIQUES: string[] = [
  * "Item added" et "Item updated" : traduits "Article ajoute" et "Article mis
  * a jour", alors qu'ils saluent l'ajout d'un lien de menu (le meme ecran dit
  * "Element supprime" a la suppression) : "Element", comme la suppression.
+ *
+ * Releve du testeur (29 septembre 2026, socle 1.4.0), le client ne comprend
+ * pas ou lit une faute :
+ *   - "Nouveau {x}" et "Aucun {x} disponible" accordent au masculin un nom
+ *     qui ne l'est pas ("Nouveau Page", "Aucun catégories disponible") : des
+ *     tournures sans accord ;
+ *   - "Image OG", "URL canonique", "Saisissez du contenu Markdown" : du
+ *     vocabulaire de metier, dit en mots de client ;
+ *   - "Bienvenue sur EmDash" : le nom du moteur, que le client ne connait pas ;
+ *   - "Annuler la publication de Bloc" : le mot de ce que fait le bouton ;
+ *   - la restauration d'une revision : EmDash 0.38 ne remet que les champs
+ *     propres a la langue (textes), pas ceux communs aux deux langues (photo,
+ *     adresses des boutons, "Masquer ce bloc", mesure du testeur) ; la
+ *     confirmation et l'avis le disent, pour que personne ne croie avoir tout
+ *     annule.
  */
 const MAISON_SIMPLES: Record<string, string> = {
   Select: "Choisir",
@@ -1318,6 +1333,14 @@ const MAISON_SIMPLES: Record<string, string> = {
   "This will delete the widget area and all its widgets. This action cannot be undone.":
     "Cela supprimera la zone d'encarts et tous ses encarts. Cette action est définitive.",
   "Manage content widgets in your widget areas": "Gérer les encarts de contenu dans vos zones d'encarts",
+  Slug: "Adresse web",
+  "Enter markdown content...": "Écrivez ici...",
+  "OG Image": "Image de partage (quand la page est partagée sur les réseaux sociaux)",
+  "Select OG image": "Choisir l'image de partage",
+  "Canonical URL": "Adresse officielle de la page (facultatif, laissez vide en cas de doute)",
+  "Welcome to EmDash!": "Bienvenue !",
+  "Content has been updated to the selected revision.":
+    "Les textes sont revenus à cette version. La photo, les adresses des boutons et « Masquer ce bloc » ne changent pas : vérifiez-les, puis publiez.",
   "Plugin widget error": "Erreur de composant de module d'extension",
   "The plugin field widget failed to render.": "Le composant de champ du module d'extension n'a pas pu s'afficher.",
 };
@@ -1339,6 +1362,20 @@ const MAISON_COMPOSES_SOURCE: [unknown, unknown][] = [
   [[["label"], " \u2014 view translation"], [["label"], " : voir la traduction"]],
   [[["label"], " \u2014 no translation"], [["label"], " : aucune traduction"]],
   [["Delete ", ["0"], " widget area"], ["Supprimer la zone d'encarts ", ["0"]]],
+  [["New ", ["0"]], ["Nouvel élément : ", ["0"]]],
+  [["New ", ["itemLabel"]], ["Nouvel élément : ", ["itemLabel"]]],
+  [["No ", ["0"], " available."], ["Rien pour l'instant (", ["0"], ")."]],
+  [["Add new ", ["0"]], ["Ajouter (", ["0"], ")"]],
+  [["Unpublish ", ["itemLabel"]], ["Retirer du site (", ["itemLabel"], ")"]],
+  [["Welcome to EmDash, ", ["firstName"], "!"], ["Bienvenue, ", ["firstName"], " !"]],
+  [
+    ["Restore this version from ", ["0"], "? This will update the current content to this revision's data."],
+    [
+      "Revenir à la version du ",
+      ["0"],
+      " ? Les textes reviennent à cette version. Attention : la photo, les adresses des boutons et « Masquer ce bloc » ne reviennent pas ; vérifiez-les après.",
+    ],
+  ],
   [
     ["Unsupported widget element type: ", ["0"]],
     ["Type d'élément d'encart non pris en charge : ", ["0"]],

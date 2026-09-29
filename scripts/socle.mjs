@@ -168,6 +168,20 @@ function sync(cible, options) {
     process.exit(1);
   }
 
+  // Un fichier du site qui porte le nom d'un fichier nouveau du socle (socle
+  // 1.4.0 : Swell avait son propre src/moteur/adresses.selfcheck.ts, et le
+  // sync l'avait remplace sans rien dire). Il n'est pas au verrou, il existe,
+  // il differe : le sync refuse, sauf --ecraser.
+  const etrangers = verrou
+    ? fichiers.filter((f) => !verrou.fichiers?.[f.cible] && existsSync(join(cible, f.cible)) && etatDe(cible, f, verrou) !== "a-jour")
+    : [];
+  if (etrangers.length > 0 && !options.ecraser) {
+    console.error("Refus : ces fichiers du site portent le nom d'un fichier du socle, sans avoir ete poses par lui.");
+    for (const f of etrangers) console.error(`  ${f.cible}`);
+    console.error("Renommer le fichier du socle (ou celui du site), puis synchroniser. --ecraser les remplace.");
+    process.exit(1);
+  }
+
   const bilan = { ecrits: [], identiques: [], ajoutes: [], duSite: [], orphelins: [], supprimes: [] };
   const ecrire = (chemin, contenu) => {
     if (options.essai) return;

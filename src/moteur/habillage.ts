@@ -21,7 +21,8 @@
 // reconnait sa feuille publique. Ce fichier-ci est le meme partout : il
 // reunit les trois corrections que les depots avaient faites chacun de leur
 // cote (commentaires retires, pont des polices, feuille du site retiree),
-// et le correctif de l'ecran Parametres d'EmDash 0.38 trouve par Swell.
+// le correctif de l'ecran Parametres d'EmDash 0.38 trouve par Swell, et
+// (socle 1.4.0) les ecrans en mots de client, ECRANS_SIMPLES ci-dessous.
 import { defineMiddleware } from "astro:middleware";
 import { sansLaFeuilleDuSite } from "./feuille";
 import { FEUILLES, JETONS, MARQUE_DU_SITE, POLICES } from "./habillage.site";
@@ -59,13 +60,35 @@ const FEUILLE = `<style data-aloha-back-office>${POLICES}\n${pont}\n${jetons}\n$
 // d'adresse, rend alors l'image du theme (cadre.ts, identite).
 const CORRECTIF_PARAMETRES = `<script data-aloha-back-office>(function(){var f=window.fetch;window.fetch=function(i,o){try{var u=typeof i==="string"?i:(i&&i.url)||"";if(/\\/_emdash\\/api\\/settings$/.test(u)&&o&&(o.method||"").toUpperCase()==="POST"&&typeof o.body==="string"){var b=JSON.parse(o.body);if("title" in b||"tagline" in b){["logo","favicon"].forEach(function(k){if(!(k in b))b[k]={mediaId:""};});}if(b.seo&&typeof b.seo==="object"&&!("defaultOgImage" in b.seo))b.seo.defaultOgImage={mediaId:""};o=Object.assign({},o,{body:JSON.stringify(b)});}}catch(e){}return f.call(this,i,o);};})();</script>`;
 
+// LES ECRANS D'EMDASH 0.38 EN MOTS DE CLIENT (socle 1.4.0). Ce que le
+// catalogue ne peut pas traduire, parce que le moteur l'ecrit en dur :
+//   - "(optional)" apres chaque libelle (composant Label de kumo) ;
+//   - les dates relatives ("15 mins ago", "9 hours ago", "just now") ;
+//   - l'exemple "my-post-slug" sous l'adresse d'une page ;
+//   - la version du moteur au bas du rail ("Onda v0.38.0 (8975a850)").
+// Et, quand le site pose la feuille du rail (extension administrable, qui y
+// ecrit --aloha-ecrans-simples), ce qui n'agit pas sur le site :
+//   - dans Parametres, Slogan, URL du site, Articles par page, Format des
+//     dates et Fuseau horaire, sauf ceux que le site dit lire dans sa feuille
+//     (--aloha-parametres-lus : slogan, url, posts, dates, fuseau ; Reef lit
+//     "posts", la pagination de ses billets) ;
+//   - dans l'ecran d'un bloc ou des reglages de la langue (collections
+//     "sections" et "site"), le slug : c'est ce qui relie le bloc a sa place
+//     dans la page, le changer le detache du site ;
+//   - dans chaque ecran de contenu, les panneaux Responsabilite,
+//     Collaborateurs et Taxonomies, que le site ne lit pas.
+// Rien n'est retire de la page : les elements sont caches, et reviennent le
+// jour ou le moteur les rend utiles. Le script ne touche qu'aux textes et
+// libelles qu'il connait, et ne fait rien d'autre.
+const ECRANS_SIMPLES = `<script data-aloha-back-office>(function(){var fr=function(){return (document.documentElement.lang||"").slice(0,2)==="fr";};var P={"(optional)":"(facultatif)","just now":"à l'instant"};var PARAMETRES={slogan:["Slogan","Tagline"],url:["URL du site","Site URL"],posts:["Articles par page","Posts per page"],dates:["Format des dates","Date format"],fuseau:["Fuseau horaire","Timezone"]};var PANNEAUX=["Responsabilité","Ownership","Collaborateurs","Bylines","Taxonomies"];function relatif(t){var m=/^(\\d+) (min|hour|day)s? ago$/.exec(t);if(!m)return null;var n=m[1];return m[2]==="min"?"il y a "+n+" min":m[2]==="hour"?"il y a "+n+" h":"il y a "+n+" jour"+(n==="1"?"":"s");}function textes(r){var w=document.createTreeWalker(r,4);var n;while((n=w.nextNode())){var v=n.nodeValue,t=v.trim();if(!t||t.length>40)continue;var f=P[t]||relatif(t);if(f)n.nodeValue=v.replace(t,f);}r.querySelectorAll("input[placeholder=\\"my-post-slug\\"]").forEach(function(e){e.placeholder="adresse-de-la-page";});}function nu(l){return (l.textContent||"").trim().replace(/\\((optional|facultatif)\\)$/,"").trim();}function cacher(e){if(e&&e.style.display!=="none")e.style.display="none";}function ligne(l){var g=l.parentElement,r=g&&g.parentElement;var c=r&&/\\bpx-4\\b/.test(r.className)?r:g;cacher(c);var carte=c&&c.parentElement;if(carte&&Array.prototype.every.call(carte.children,function(x){return x.style.display==="none";})){cacher(carte);var t=carte.previousElementSibling;if(t&&t.querySelector&&t.querySelector("h2,h3"))cacher(t);}}function simples(){var chemin=location.pathname;document.querySelectorAll("p").forEach(function(e){if(/ v\\d+\\.\\d+\\.\\d+ \\([0-9a-f]+\\)$/.test(e.textContent||"")&&e.children.length===0)cacher(e);});if(!getComputedStyle(document.documentElement).getPropertyValue("--aloha-ecrans-simples").trim())return;var labels=document.querySelectorAll("label");if(/\\/_emdash\\/admin\\/settings(\\/general)?\\/?$/.test(chemin)){var lus=getComputedStyle(document.documentElement).getPropertyValue("--aloha-parametres-lus");var caches=[];Object.keys(PARAMETRES).forEach(function(k){if(lus.indexOf(k)===-1)caches=caches.concat(PARAMETRES[k]);});labels.forEach(function(l){if(caches.indexOf(nu(l))!==-1)ligne(l);});}if(/\\/_emdash\\/admin\\/content\\/(sections|site)\\/[^/]+/.test(chemin))labels.forEach(function(l){var t=nu(l);if(t==="Slug"||t==="Adresse web")cacher(l.parentElement);});if(/\\/_emdash\\/admin\\/content\\/[^/]+\\/[^/]+/.test(chemin))document.querySelectorAll("h3").forEach(function(h){if(PANNEAUX.indexOf((h.textContent||"").trim())!==-1)cacher(h.closest("section"));});}var prevu=false;function passer(){prevu=false;if(fr())textes(document.body);simples();}function plus_tard(){if(!prevu){prevu=true;requestAnimationFrame(passer);}}new MutationObserver(plus_tard).observe(document.documentElement,{subtree:true,childList:true,characterData:true});if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",passer);else passer();})();</script>`;
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const reponse = await next();
   if (!context.url.pathname.startsWith("/_emdash/admin")) return reponse;
   if (!(reponse.headers.get("content-type") ?? "").includes("text/html")) return reponse;
   const html = await reponse.text();
   // La feuille du site sort d'abord (voir feuille.ts), l'habillage entre ensuite.
-  return new Response(sansLaFeuilleDuSite(html, MARQUE_DU_SITE).replace("</head>", `${FEUILLE}${CORRECTIF_PARAMETRES}</head>`), {
+  return new Response(sansLaFeuilleDuSite(html, MARQUE_DU_SITE).replace("</head>", `${FEUILLE}${CORRECTIF_PARAMETRES}${ECRANS_SIMPLES}</head>`), {
     status: reponse.status,
     headers: reponse.headers,
   });

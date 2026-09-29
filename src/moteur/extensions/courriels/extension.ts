@@ -28,11 +28,11 @@ import { definePlugin, type PluginCapability, type ResolvedPlugin, type RouteCon
 import { hote, nouvelId } from "./adaptateur.ts";
 import { CONFIGURATION } from "./configuration.ts";
 import { capacites, CARTES, IDENTITE, PAGES } from "./identite.mjs";
-import { bilanDuCycle, derniereModification, ecrireLesReglages, fournisseurChoisi, lignes, lireLesReglages, uneLigne } from "./noyau/base.ts";
+import { bilanDuCycle, derniereModification, echecsEnAttente, ecrireLesReglages, fournisseurChoisi, lignes, lireLesReglages, uneLigne } from "./noyau/base.ts";
 import { type Canal, fournisseur, journaliste, poster } from "./noyau/canal.ts";
 import { interroger } from "./noyau/dns.ts";
 import { erreurEnClair, essai, renvoyer } from "./noyau/envoi.ts";
-import { domaineDe, langueDeLaRequete, lireReglages } from "./noyau/regles.ts";
+import { debutDuCycle, domaineDe, langueDeLaRequete, lireReglages } from "./noyau/regles.ts";
 import type { Bloc, Reponse } from "./ecrans/blocs.ts";
 import { date } from "./ecrans/blocs.ts";
 import { ACTIONS as A_BRANCHER, brancher } from "./ecrans/brancher.ts";
@@ -85,7 +85,7 @@ async function page(ctx: RouteContext): Promise<Reponse> {
     const nomDuSite = ctx.site?.name || CONFIGURATION.nomDuSite;
 
     if (ecran === "widget:courriels" || ecran === "/") {
-      const donnees = { reglages: regl, liaison: !!h.liaison, livreur: await fournisseurChoisi(base), bilan: await bilanDuCycle(base, maintenant, regl.cycle), derniers: await lignes(base, { limite: 5 }), maintenant };
+      const donnees = { reglages: regl, liaison: !!h.liaison, livreur: await fournisseurChoisi(base), bilan: await bilanDuCycle(base, maintenant, regl.cycle), derniers: await lignes(base, { limite: 5 }), echecs: await echecsEnAttente(base, debutDuCycle(maintenant, regl.cycle)), maintenant };
       return ecran === "/" ? tableau(t, donnees) : carte(t, donnees);
     }
 

@@ -1,7 +1,7 @@
 {
   "name": "reef",
   "type": "module",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "description": "Reef, a bilingual Astro blog theme with an optional EmDash back office.",
   "license": "MIT",
   "author": "Aloha Pixel (https://alohapixel.app)",

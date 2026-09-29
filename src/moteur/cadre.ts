@@ -211,7 +211,7 @@ export function liensDuMenu(page: Page, nom: string, locale: string, repli: read
   if (!menu) return [...repli];
   return menu.items.map((item) => ({
     text: item.label,
-    href: item.url,
+    href: cheminDansLaLangue(item.url, locale),
     ...((item.cssClasses ?? "").split(/\s+/).includes("bouton") ? { bouton: true } : {}),
     ...(item.target ? { target: item.target } : {}),
   }));
@@ -257,9 +257,61 @@ export function imageDePartage(page: Page, slug: string): { src: string; alt: st
   return m?.src ? { src: m.src, alt: m.alt ?? "" } : undefined;
 }
 
-/** L'adresse saisie par l'editeur pour un champ de lien (cta_link, video...), ou null : la route calculee par le code. */
+/**
+ * CE QU'UN EDITEUR TAPE COMME ADRESSE, RENDU SUR (socle 1.4.0). Un client tape
+ * "www.exemple.fr" ou "contact" : publie tel quel, le navigateur en fait un
+ * chemin relatif (/fr/www.exemple.fr), une page introuvable, sans que rien ne
+ * le dise. La regle, la meme a la saisie (script des pastilles) et au rendu :
+ *   - "/...", "#...", "?...", "https://...", "http://...", "mailto:", "tel:" :
+ *     gardes tels quels ;
+ *   - une adresse de courriel (nom@domaine.fr) : "mailto:" devant ;
+ *   - un nom de domaine ("www.exemple.fr", "exemple.fr/page") : "https://"
+ *     devant ;
+ *   - un mot sans point ("contact", "fr/tarifs") : "/" devant, une page du
+ *     site ;
+ *   - refusees (le bouton garde l'adresse prevue par le theme) : une adresse
+ *     avec une espace, ou un autre protocole ("javascript:", "ftp:").
+ */
+export type AdresseLue =
+  | { adresse: string; corrigee: boolean; refus: null }
+  | { adresse: null; corrigee: false; refus: "vide" | "espace" | "protocole" };
+
+// Autonome (aucune constante du module) : CadreDuSite.astro recopie son code
+// dans le script des pastilles, pour que la saisie suive la meme regle.
+export function adresseDuLien(saisie: unknown): AdresseLue {
+  const brute = typeof saisie === "string" ? saisie.trim() : "";
+  if (brute === "") return { adresse: null, corrigee: false, refus: "vide" };
+  if (/\s/.test(brute)) return { adresse: null, corrigee: false, refus: "espace" };
+  if (/^[/#?]/.test(brute) || /^(https?:\/\/|mailto:|tel:)/i.test(brute)) return { adresse: brute, corrigee: false, refus: null };
+  const domaine = /^(www\.)?[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,}(?::\d+)?(?:[/?#].*)?$/i.test(brute);
+  if (/^[a-z][a-z0-9+.-]*:/i.test(brute) && !domaine) return { adresse: null, corrigee: false, refus: "protocole" };
+  if (/^[^\s@/]+@[^\s@/]+\.[a-z]{2,}$/i.test(brute)) return { adresse: `mailto:${brute}`, corrigee: true, refus: null };
+  // "tarifs.html" est un fichier du site, pas un domaine : l'extension le dit.
+  const fichier = /\.(html?|php|pdf|xml|txt|jpe?g|png|webp|svg|gif)(?:[?#].*)?$/i.test(brute.split("/")[0] ?? "");
+  if (domaine && !fichier) return { adresse: `https://${brute}`, corrigee: true, refus: null };
+  return { adresse: `/${brute}`, corrigee: true, refus: null };
+}
+
+/** L'adresse saisie par l'editeur pour un champ de lien (cta_link, video...), rendue sure (adresseDuLien), ou null : la route calculee par le code. */
 export function lienDe(page: Page, slug: string, champ: string): string | null {
-  return texte(donneesDe(page, slug)[champ]);
+  return adresseDuLien(donneesDe(page, slug)[champ]).adresse;
+}
+
+/**
+ * Un chemin du site dans la langue d'un menu (socle 1.4.0) : un lien "/contact"
+ * ajoute au menu francais menait a la page anglaise. Pour une langue autre que
+ * la langue par defaut, un chemin interne sans prefixe de langue recoit
+ * "/<langue>" ; restent tels quels les adresses completes, les ancres de la
+ * page, les chemins deja prefixes, ceux du moteur ("/_emdash") et les fichiers
+ * ("/llms.txt", "/rss.xml" a la racine).
+ */
+export function cheminDansLaLangue(url: string, locale: string, defaut = "en"): string {
+  if (locale === defaut || !url.startsWith("/") || url.startsWith("//") || url.startsWith("/_")) return url;
+  const prefixe = `/${locale}`;
+  if (url === prefixe || url.startsWith(`${prefixe}/`) || url.startsWith(`${prefixe}#`) || url.startsWith(`${prefixe}?`)) return url;
+  const chemin = url.split(/[?#]/)[0] ?? "";
+  if (/\.[a-z0-9]{2,5}$/i.test(chemin)) return url;
+  return `${prefixe}${url}`;
 }
 
 /** La ligne de rang donne du champ "arguments" d'une section, pour ses sous-champs icon, anchor, image, link. */

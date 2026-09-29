@@ -30,6 +30,7 @@ import type { Locale } from "@i18n";
 import { ACTIONS, type MenuDuSite, PRINCIPAL, TIROIR } from "./menus.ts";
 import { identite, type Identite, type RepliDuSite } from "./cadre.ts";
 import type { ParametresDeLEssai } from "./essai.ts";
+import { garantirLeContraste, type RegleDeContraste } from "./palette.ts";
 
 /** Les menus de Reef, dans l'ordre du back office : la barre, le tiroir, le bouton S'abonner, les trois colonnes du pied. */
 export const MENUS: readonly MenuDuSite[] = [
@@ -265,7 +266,7 @@ function teinteAncrage(h: number): number {
 }
 
 /** Les variables des quatre rampes de tokens.css pour la teinte visible nommee (palette.ts). */
-export function variablesDeLaPalette(h: number): Record<string, string> {
+function rampesDeLaPalette(h: number): Record<string, string> {
   const vars: Record<string, string> = {};
   // L'accent est pose sur la luminosite du palier 400 : pas de decalage de courbe.
   for (const [pas, l, sat] of CORAL) vars[`--color-coral-${pas}`] = hslVersHex(h, Math.min(1, sat), l);
@@ -274,6 +275,25 @@ export function variablesDeLaPalette(h: number): Record<string, string> {
   for (const [pas, l, s] of PAPER) vars[`--color-paper-${pas}`] = hslVersHex(base, s, l);
   for (const [pas, l, s] of REEF) vars[`--color-reef-${pas}`] = hslVersHex(h + ROTATION_REEF, s, l);
   return vars;
+}
+
+// LE CONTRASTE DES BOUTONS (socle 1.4.0) : le fond des boutons pleins et
+// l'encre qui s'y ecrit, en clair (palier 600, texte blanc) et en sombre
+// (palier 400, texte du fond le plus sombre), releves dans le Chrome du Mac
+// sur le build (rapport socle 1.4.0). garantirLeContraste (palette.ts)
+// pousse ces fonds jusqu'a 4,5:1 au moins pour chaque couleur de la marque.
+// Les noms des variables sont composes : ecrits en entier, Tailwind les
+// lirait ici et les ajouterait a la feuille.
+const NEUTRE = "--color-ink";
+const RAMPE = "--color-reef";
+export const CONTRASTE_DES_BOUTONS: RegleDeContraste[] = [
+  { fond: `${RAMPE}-600`, encre: "#ffffff" },
+  { fond: `${RAMPE}-400`, encre: `${NEUTRE}-950` },
+];
+
+/** Les variables de tokens.css pour la teinte visible nommee (palette.ts), chaque bouton lisible (CONTRASTE_DES_BOUTONS). */
+export function variablesDeLaPalette(teinte: number): Record<string, string> {
+  return garantirLeContraste(rampesDeLaPalette(teinte), CONTRASTE_DES_BOUTONS);
 }
 
 /** Les gestes communs du guide rejoue (scripts/essai-administrer.mjs) ; les reglages, sujets et billets sont dans scripts/essai-administrer.site.mjs. */

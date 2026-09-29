@@ -17,7 +17,7 @@
 // est hors du scan de Tailwind, et le HTML anonyme ne change pas.
 import { getLocale } from "@i18n";
 import { annotationsDe } from "./annotations";
-import { donneesDe, media } from "./cadre";
+import { adresseDuLien, donneesDe, media } from "./cadre";
 import { langueDuBackOffice, MOTS, STYLES } from "./textes-edition";
 
 type Sorte = "photo" | "affiche" | "partage" | "avatar" | "capture";
@@ -65,11 +65,16 @@ const pastille = (defaut: boolean) => `${STYLES.pastille}${defaut ? `;${STYLES.p
     <div style={rangee} data-aloha-pastilles>
       {liens.map(([champ, defaut, libelle]) => {
         const valeur = texte(donnees[champ]);
+        // Une adresse enregistree avant la 1.4.0 ("www.exemple.fr") : la page
+        // la rend corrigee (lienDe), la pastille dit ce que le bouton ouvre.
+        const lue = adresseDuLien(valeur);
         return (
           <span style={pastille(!valeur)}>
             <span style={STYLES.etiquette}>{libelle ?? (champ.includes("secondary") ? mots.lienSecondaire : mots.lien)}</span>
-            <span style={STYLES.valeur} {...entree.champ(champ)}>{valeur ?? defaut}</span>
-            {!valeur && <span style={STYLES.etiquette}>{mots.lienDefaut}</span>}
+            <span style={STYLES.valeur} {...entree.champ(champ)} data-aloha-adresse={valeur ?? defaut}>{valeur ?? defaut}</span>
+            {!valeur && <span style={STYLES.etiquette} data-aloha-defaut>{mots.lienDefaut}</span>}
+            {valeur && lue.corrigee && <span style={STYLES.etiquette}>({mots.ouvre} {lue.adresse})</span>}
+            {valeur && lue.refus && <span style={STYLES.etiquette} data-aloha-avis>{mots.adresseRefusee}</span>}
           </span>
         );
       })}

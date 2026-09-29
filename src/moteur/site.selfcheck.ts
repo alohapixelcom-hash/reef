@@ -1,11 +1,11 @@
 // src/moteur/site.selfcheck.ts - self-check du cadre et des listes : les reglages, l'entree "site", les sujets et les auteurs de la graine rendent ce que les fichiers affichent, un reglage vide rend le theme, et la couleur de marque repeint les jetons de Reef.
 // Lancer : node src/moteur/site.selfcheck.ts
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { register } from "node:module";
 import { identite, liensDuMenu, type Cadre } from "./cadre.ts";
 import { liensDeLAuteur, seoDe, teinteDuSujet, TEINTES_DES_SUJETS } from "./listes.ts";
-import { COULEURS, couleursQuiMentent, feuilleDeLaPalette, teinteDe } from "./palette.ts";
+import { CHOIX_DE_COULEUR, COULEURS, couleursIllisibles, couleursQuiMentent, feuilleDeLaPalette, teinteDe } from "./palette.ts";
 import { entreeDuSite, reglagesDeLaGraine } from "./site.ts";
 
 register("./resolution.node.mjs", import.meta.url);
@@ -83,7 +83,7 @@ is(liensDeLAuteur([{ label: "Site", href: "https://a.b" }, { label: "", href: "h
 is(seoDe({ title: " ", description: "D", image: "abc.webp", noIndex: true }, { title: "T", description: "d" }), { title: "T", description: "D", image: "/_emdash/api/media/file/abc.webp", canonical: undefined, noindex: true }, "le panneau SEO passe avant les champs, un vide ne compte pas");
 
 // 8. La couleur de la marque repeint les quatre rampes de Reef ; les icones proposees existent.
-is(champ("site", "brand_color").validation?.options, Object.keys(COULEURS), "la graine propose les couleurs de marque de la table");
+is(champ("site", "brand_color").validation?.options, [...CHOIX_DE_COULEUR], "la graine propose les couleurs de marque de la table");
 for (const nom of Object.keys(COULEURS)) {
   const vars = variablesDeLaPalette(teinteDe(nom)!);
   is(Object.keys(vars).length, 29, `${nom} : 29 variables (10 corail, 11 encre, 3 papier, 5 recif)`);
@@ -97,5 +97,10 @@ is(iconeChoisie("Enveloppe", "check"), "mail", "un nom francais donne son icone"
 // La couleur nommee est celle des liens et des boutons (rampe coral) : "Bleu océan" est un bleu (socle 1.3.0).
 // Le nom de la variable est compose : ecrit en entier, Tailwind le lirait ici et l'ajouterait a la feuille.
 is(couleursQuiMentent(variablesDeLaPalette, `--color-coral-${500}`), [], "une couleur de la liste ne donne pas la teinte que son nom dit");
+// Le texte des boutons reste lisible pour chaque couleur (socle 1.4.0, 4,5:1 au moins).
+{
+  const { CONTRASTE_DES_BOUTONS, variablesDeLaPalette: variables } = await import("./theme.ts");
+  is(couleursIllisibles(variables, CONTRASTE_DES_BOUTONS), [], "une couleur de la liste laisse un bouton illisible");
+}
 
 console.log(`site.selfcheck : ${checks} verifications passees`);

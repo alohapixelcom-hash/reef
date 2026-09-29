@@ -112,6 +112,24 @@ export function listeDAdresses(valeur: string): string[] {
   return [...vues];
 }
 
+/**
+ * Les messageries grand public (socle 1.4.0). Cloudflare n'envoie que depuis
+ * un domaine qu'il gere : une adresse d'expedition en gmail.com ou orange.fr
+ * est acceptee par l'ecran puis refusee a chaque envoi, sans que le client
+ * comprenne pourquoi (releve du testeur). L'ecran la refuse tout de suite, en
+ * disant quoi faire. Les destinataires, eux, peuvent etre n'importe ou.
+ */
+export const MESSAGERIES = [
+  "gmail.com", "googlemail.com", "outlook.com", "outlook.fr", "hotmail.com", "hotmail.fr", "live.com", "live.fr", "msn.com",
+  "yahoo.com", "yahoo.fr", "icloud.com", "me.com", "mac.com", "aol.com", "gmx.fr", "gmx.com", "proton.me", "protonmail.com",
+  "orange.fr", "wanadoo.fr", "free.fr", "sfr.fr", "neuf.fr", "bbox.fr", "laposte.net", "numericable.fr",
+] as const;
+
+/** Vrai quand l'adresse est chez une messagerie grand public : elle ne peut pas servir d'expediteur. */
+export function adresseDeMessagerie(adresse: string): boolean {
+  return (MESSAGERIES as readonly string[]).includes(domaineDe(adresse));
+}
+
 /** Le domaine d'une adresse, en minuscules ; "" si l'adresse n'en a pas. */
 export function domaineDe(adresse: string): string {
   const at = adresse.lastIndexOf("@");
@@ -139,6 +157,7 @@ export function masquer(adresse: string): string {
 
 export type ErreurDeReglage =
   | { champ: "expediteur" | "reponse"; raison: "adresse" }
+  | { champ: "expediteur"; raison: "messagerie" }
   | { champ: Formulaire; raison: "adresse" | "trop" }
   | { champ: "plafonds"; raison: "nombre" }
   | { champ: "cycle"; raison: "nombre" };
@@ -167,7 +186,8 @@ export function lireReglages(brut: unknown, avant: Reglages = reglagesParDefaut(
   for (const champ of ["expediteur", "reponse"] as const) {
     if (!(champ in src)) continue;
     const valeur = texte(src[champ], 254).toLowerCase();
-    if (valeur === "" || adresseValide(valeur)) r[champ] = valeur;
+    if (champ === "expediteur" && valeur !== "" && adresseValide(valeur) && adresseDeMessagerie(valeur)) erreurs.push({ champ, raison: "messagerie" });
+    else if (valeur === "" || adresseValide(valeur)) r[champ] = valeur;
     else erreurs.push({ champ, raison: "adresse" });
   }
   if ("nom" in src) r.nom = enTete(src.nom, 80).replace(/["<>]/g, "");

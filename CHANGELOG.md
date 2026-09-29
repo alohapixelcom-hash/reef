@@ -4,7 +4,22 @@
 
 Versions describe the features actually shipped in this theme.
 
-Current version: **3.5.0**.
+Current version: **3.6.0**.
+
+## 3.6.0 - 2026-09-29
+
+What a client could not do alone in the admin (UX test of 3.5.0), fixed in the
+shared base 1.4.0. The static build is byte-identical to 3.5.0.
+
+- "Update the site" (was "Deploy everything") speaks to the client; the
+  technical details fold under "For the person who installed the site".
+- A button address typed as `www.example.com` is corrected to `https://...`;
+  a French menu link typed without `/fr/` leads to the French page.
+- Brand colour: every colour keeps button text readable (4.5:1, measured), and
+  "Couleur d'origine du thème" returns to the theme's colour
+  (`import-3.6.0-reef.sql` for an online database).
+- Admin in plain French: the editing bar and its photo window, "(facultatif)",
+  relative dates, useless settings hidden, what a revision restores.
 
 ## 3.5.0 - 2026-09-29
 
