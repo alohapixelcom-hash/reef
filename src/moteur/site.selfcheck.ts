@@ -7,10 +7,11 @@ import { identite, liensDuMenu, type Cadre } from "./cadre.ts";
 import { liensDeLAuteur, seoDe, teinteDuSujet, TEINTES_DES_SUJETS } from "./listes.ts";
 import { CHOIX_DE_COULEUR, COULEURS, couleursIllisibles, couleursQuiMentent, feuilleDeLaPalette, teinteDe } from "./palette.ts";
 import { entreeDuSite, reglagesDeLaGraine } from "./site.ts";
+import { CHOIX_DE_POLICE, feuilleDeLaTypographie } from "./typographie.ts";
 
 register("./resolution.node.mjs", import.meta.url);
 const { default: siteData } = await import("../config/siteData.json.ts");
-const { repliDuSite, variablesDeLaPalette, ICONES } = await import("./theme.ts");
+const { repliDuSite, variablesDeLaPalette, ICONES, VARIABLES_DE_POLICE } = await import("./theme.ts");
 const { useTranslations } = await import("../i18n/index.ts");
 const { icons } = await import("../components/svg/icons/icons.ts");
 const { iconeChoisie } = await import("./icones.ts");
@@ -21,7 +22,7 @@ function is(actual: unknown, expected: unknown, message: string): void {
   checks += 1;
 }
 
-type Champ = { slug: string; validation?: { options?: string[] } };
+type Champ = { slug: string; type?: string; translatable?: boolean; validation?: { options?: string[] } };
 type Entree = { slug: string; locale: string; data: Record<string, unknown> };
 const graine = JSON.parse(readFileSync(new URL("../../seed/seed.json", import.meta.url), "utf8")) as {
   settings: { title: string; postsPerPage?: number };
@@ -105,5 +106,17 @@ is(couleursQuiMentent(variablesDeLaPalette, `--color-reef-${400}`), [], "une cou
   const { CONTRASTE_DES_BOUTONS, variablesDeLaPalette: variables } = await import("./theme.ts");
   is(couleursIllisibles(variables, CONTRASTE_DES_BOUTONS), [], "une couleur de la liste laisse un bouton illisible");
 }
+
+// 9. La police du site (3.8.1) : la graine propose les choix de la table, la feuille repeint les deux jetons de police de tokens.css.
+is(champ("site", "font").validation?.options, [...CHOIX_DE_POLICE], "la graine propose les polices de la table");
+is(champ("site", "font").translatable, false, "la police vaut pour les deux langues");
+{
+  const jetons = readFileSync(new URL("../styles/tokens.css", import.meta.url), "utf8");
+  for (const v of [...VARIABLES_DE_POLICE.texte, ...VARIABLES_DE_POLICE.titre]) assert.ok(jetons.includes(`${v}:`), `${v} n'est pas un jeton de tokens.css`);
+  is(feuilleDeLaTypographie(CHOIX_DE_POLICE[0], VARIABLES_DE_POLICE), null, "l'origine : aucune feuille, les polices du theme");
+  assert.ok(feuilleDeLaTypographie(CHOIX_DE_POLICE[2], VARIABLES_DE_POLICE)?.startsWith(":root{"), "une police choisie : une feuille posee a la racine");
+}
+// 10. La place d'un bloc sur l'accueil (3.8.1) : un entier commun aux deux langues.
+is([champ("sections", "order").type, champ("sections", "order").translatable], ["integer", false], "la place d'un bloc est un entier commun aux deux langues");
 
 console.log(`site.selfcheck : ${checks} verifications passees`);

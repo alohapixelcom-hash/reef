@@ -28,7 +28,8 @@ import policeTexte from "@fontsource-variable/instrument-sans/files/instrument-s
 import siteSettings from "@config/siteSettings.json";
 import { defaultLocale, getAlternates, getLocale, localeMeta, localizePath } from "@i18n";
 import { feuilleDeLaPalette } from "@moteur/palette";
-import { identiteDuSite, variablesDeLaPalette } from "@moteur/theme";
+import { identiteDuSite, VARIABLES_DE_POLICE, variablesDeLaPalette } from "@moteur/theme";
+import { feuilleDeLaTypographie, policesDuTheme } from "@moteur/typographie";
 import tokensRaw from "@styles/tokens.css?raw";
 import { ClientRouter } from "astro:transitions";
 
@@ -54,6 +55,13 @@ export interface Props {
 const locale = getLocale(Astro);
 const marque = identiteDuSite(Astro, locale);
 const palette = feuilleDeLaPalette(Astro.locals.cadre?.site?.brand_color, variablesDeLaPalette);
+// La police choisie dans le back office (entree "site", champ "font") : une
+// pile du systeme, rien a telecharger. Choisie, les deux fichiers du theme ne
+// sont plus precharges (ils ne serviraient plus). Moteur eteint, rien n'est
+// pose : les polices du theme et leurs prechargements, comme avant.
+const choixDePolice = (Astro.locals.cadre?.site as { font?: unknown } | undefined)?.font;
+const typographie = feuilleDeLaTypographie(choixDePolice, VARIABLES_DE_POLICE);
+const prechargerLesPolices = policesDuTheme(choixDePolice);
 
 const {
   title,
@@ -154,8 +162,8 @@ const groundLight = resolveToken("color-background", lightBlock);
 {/* crossorigin est OBLIGATOIRE sur un preload de police : sans lui le
     navigateur telecharge le fichier deux fois, une fois en anonyme pour
     le prechargement et une fois pour @font-face. */}
-<link rel="preload" href={policeAffichage} as="font" type="font/woff2" crossorigin />
-<link rel="preload" href={policeTexte} as="font" type="font/woff2" crossorigin />
+{prechargerLesPolices && <link rel="preload" href={policeAffichage} as="font" type="font/woff2" crossorigin />}
+{prechargerLesPolices && <link rel="preload" href={policeTexte} as="font" type="font/woff2" crossorigin />}
 
 <title>{fullTitle}</title>
 {marque.verification.google && <meta name="google-site-verification" content={marque.verification.google} />}
@@ -238,3 +246,5 @@ const groundLight = resolveToken("color-background", lightBlock);
 {siteSettings.useViewTransitions && <ClientRouter />}
 {/* La couleur de marque choisie dans le back office (entree "site") : les rampes de tokens.css, recalculees. Absente, aucune balise. */}
 {palette && <style is:inline set:html={palette} />}
+{/* La police choisie dans le back office (entree "site") : les jetons de police de tokens.css, repeints. Absente, aucune balise. */}
+{typographie && <style is:inline set:html={typographie} />}

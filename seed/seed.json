@@ -54,7 +54,8 @@
         {"slug":"meta_title","label":"Titre de la page dans les résultats de recherche","type":"string"},
         {"slug":"meta_description","label":"Description de la page dans les résultats de recherche","type":"text"},
         {"slug":"meta_image","label":"Image de partage de la page sur les réseaux (vide : celle du site)","type":"image","translatable":false},
-        {"slug":"revised","label":"Date de dernière mise à jour (pages légales)","type":"datetime"}
+        {"slug":"revised","label":"Date de dernière mise à jour (pages légales)","type":"datetime"},
+        {"slug":"order","label":"Place du bloc sur l'accueil, de haut en bas (1 : tout en haut ; vide : la place prévue par le thème ; sans effet sur les autres pages)","type":"integer","translatable":false}
       ]
     },
     {
@@ -126,7 +127,8 @@
         {"slug":"feed_title","label":"Titre du flux RSS de cette langue (vide : celui du thème)","type":"string"},
         {"slug":"form_newsletter","label":"Adresse d'un service externe qui reçoit les inscriptions à la lettre (vide : le formulaire reste une démonstration et n'envoie rien)","type":"string"},
         {"slug":"form_contact","label":"Adresse d'un service externe qui reçoit les messages de la page Contact, quand l'écran Courriels n'est pas branché (sans l'un ni l'autre, le formulaire n'envoie rien)","type":"string"},
-        {"slug":"brand_color","label":"Couleur de la marque, sur tout le site (« Couleur d'origine du thème » ou vide : le corail du thème)","type":"select","translatable":false,"validation":{"options":["Couleur d'origine du thème","Bleu océan","Bleu nuit","Vert émeraude","Rouge framboise","Orange soleil"]}}
+        {"slug":"brand_color","label":"Couleur de la marque, sur tout le site (« Couleur d'origine du thème » ou vide : le corail du thème)","type":"select","translatable":false,"validation":{"options":["Couleur d'origine du thème","Bleu océan","Bleu nuit","Vert émeraude","Rouge framboise","Orange soleil"]}},
+        {"slug":"font","label":"Police du site, pour les titres et le texte (« Police d'origine du thème » ou vide : celle du thème ; les autres sont déjà installées sur chaque appareil, rien à télécharger)","type":"select","translatable":false,"validation":{"options":["Police d'origine du thème","Police du système, la plus légère","Classique, à empattements","Titres classiques, texte sans empattements"]}}
       ]
     }
   ],

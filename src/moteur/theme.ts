@@ -13,6 +13,8 @@
 //   - variablesDeLaPalette(teinte) : ses jetons de couleur pour la teinte
 //     VISIBLE que le nom de la couleur dit (palette.ts, socle 1.3.0), par la
 //     recette de son `pnpm rebrand` ;
+//   - VARIABLES_DE_POLICE : ses jetons de police (texte et titres), que la
+//     police choisie dans le back office repeint (typographie.ts, socle) ;
 //   - VARIABLES_D_EDITION : ses jetons, pour les pastilles et le panneau du
 //     mode edition ;
 //   - ROUTES_DU_THEME : les segments d'adresse que ses pages fixes prennent
@@ -31,6 +33,7 @@ import { ACTIONS, type MenuDuSite, PRINCIPAL, TIROIR } from "./menus.ts";
 import { identite, type Identite, type RepliDuSite } from "./cadre.ts";
 import type { ParametresDeLEssai } from "./essai.ts";
 import { garantirLeContraste, type RegleDeContraste } from "./palette.ts";
+import type { VariablesDePolice } from "./typographie.ts";
 
 /** Les menus de Reef, dans l'ordre du back office : la barre, le tiroir, le bouton S'abonner, les trois colonnes du pied. */
 export const MENUS: readonly MenuDuSite[] = [
@@ -113,6 +116,9 @@ export function repliDuSite(locale: "en" | "fr"): RepliDuSite {
 export function identiteDuSite(page: Parameters<typeof identite>[0], locale: "en" | "fr"): Identite {
   return identite(page, repliDuSite(locale));
 }
+
+/** Les jetons de police de Reef (tokens.css) : Instrument Sans pour le texte, Space Grotesk pour les titres. */
+export const VARIABLES_DE_POLICE: VariablesDePolice = { texte: ["--font-sans"], titre: ["--font-display"] };
 
 /** Les jetons de Reef pour les pastilles et le panneau "Cadre du site" (voir STYLES dans textes-edition.ts). */
 export const VARIABLES_D_EDITION: Record<string, string> = {
