@@ -223,9 +223,11 @@ export const ADRESSES_DE_COUVERTURE = [
 export const ADMIN_EXTERNE: { libelle: string; url: string } | null = null;
 
 // LA COULEUR DE LA MARQUE, par la recette de scripts/rebrand.mjs : l'accent
-// (rampe coral, la couleur visible de Reef : liens, boutons) sur la teinte
-// nommee, telle quelle (palette.ts, socle 1.3.0 : "Bleu océan" est un bleu), les deux neutres (ink et paper) sur une
-// teinte froide d'ancrage, le second accent (rampe reef) tourne de 181 degres.
+// (rampe coral : liens, mot en script) sur la teinte nommee, telle quelle
+// (palette.ts, socle 1.3.0 : "Bleu océan" est un bleu), les deux neutres (ink
+// et paper) sur une teinte froide d'ancrage. Les boutons pleins (rampe reef)
+// prennent AUSSI la teinte nommee (3.6.2) : `pnpm rebrand` tourne cette rampe
+// de 181 degres, ce qui rendait "Bleu océan" en boutons orange.
 function hslVersHex(h: number, s: number, l: number): string {
   const t = ((h % 360) + 360) % 360;
   const f = (n: number): string => {
@@ -255,7 +257,6 @@ const REEF: [number, number, number][] = [
   [300, 0.72, 0.78], [400, 0.56, 0.72], [500, 0.44, 0.77], [600, 0.35, 0.78], [700, 0.28, 0.78],
 ];
 const ROTATION_INK = 205;
-const ROTATION_REEF = 181;
 const estFroid = (h: number): boolean => h >= 150 && h <= 280;
 
 function teinteAncrage(h: number): number {
@@ -273,7 +274,8 @@ function rampesDeLaPalette(h: number): Record<string, string> {
   const base = teinteAncrage(h);
   for (const [pas, l, s] of INK) vars[`--color-ink-${pas}`] = hslVersHex(base, s, l);
   for (const [pas, l, s] of PAPER) vars[`--color-paper-${pas}`] = hslVersHex(base, s, l);
-  for (const [pas, l, s] of REEF) vars[`--color-reef-${pas}`] = hslVersHex(h + ROTATION_REEF, s, l);
+  // Les boutons disent le nom de la couleur : meme teinte que l'accent, sans rotation.
+  for (const [pas, l, s] of REEF) vars[`--color-reef-${pas}`] = hslVersHex(h, s, l);
   return vars;
 }
 

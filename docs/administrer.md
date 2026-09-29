@@ -133,7 +133,7 @@ Puis « Enregistrer ». « Liens sociaux » : les réseaux du pied de page. « S
 - le nom et le lien du crédit du pied de page ;
 - le titre du flux RSS de la langue ;
 - l'adresse d'un service externe pour la lettre d'information, et celle pour le formulaire de contact quand l'écran « Courriels » n'est pas branché (partie 17 bis) ;
-- « Couleur de la marque, sur tout le site » : « Couleur d'origine du thème » (le corail du thème, comme un champ vide) ou l'une des cinq couleurs ; chaque couleur garde le texte des boutons lisible (contraste d'au moins 4,5:1, mesuré).
+- « Couleur de la marque, sur tout le site » : « Couleur d'origine du thème » (le corail du thème, comme un champ vide) ou l'une des cinq couleurs, qui colore les boutons, les liens et le mot en couleur ; chaque couleur garde le texte des boutons lisible (contraste d'au moins 4,5:1, mesuré).
 
 Les textes de l'en-tête et du pied de page sont des blocs de « Textes des pages » (page « Tout le site »).
 

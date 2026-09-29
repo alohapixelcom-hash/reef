@@ -97,6 +97,9 @@ is(iconeChoisie("Enveloppe", "check"), "mail", "un nom francais donne son icone"
 // La couleur nommee est celle des liens et des boutons (rampe coral) : "Bleu océan" est un bleu (socle 1.3.0).
 // Le nom de la variable est compose : ecrit en entier, Tailwind le lirait ici et l'ajouterait a la feuille.
 is(couleursQuiMentent(variablesDeLaPalette, `--color-coral-${500}`), [], "une couleur de la liste ne donne pas la teinte que son nom dit");
+// Les boutons pleins aussi (3.6.2) : "Bleu océan" les rendait orange.
+is(couleursQuiMentent(variablesDeLaPalette, `--color-reef-${600}`), [], "une couleur de la liste ne donne pas aux boutons (clair) la teinte que son nom dit");
+is(couleursQuiMentent(variablesDeLaPalette, `--color-reef-${400}`), [], "une couleur de la liste ne donne pas aux boutons (sombre) la teinte que son nom dit");
 // Le texte des boutons reste lisible pour chaque couleur (socle 1.4.0, 4,5:1 au moins).
 {
   const { CONTRASTE_DES_BOUTONS, variablesDeLaPalette: variables } = await import("./theme.ts");

@@ -102,7 +102,7 @@ The change shows on the site at once, with nothing to publish. If a menu is empt
 
 ## 10. Contact details, email, colour and shared texts
 
-« Réglages par langue » holds one entry per language: the site description, the share image's text for blind people, the contact email of the footer and contact page (set in each language: change it in the « EN » entry and in the « FR » entry), the name and link of the footer credit, the RSS feed title of the language, the address of an outside service for the newsletter, the address of an outside service for the contact form when the email screen is not connected (part 17 b), and « Couleur de la marque, sur tout le site », « Couleur d'origine du thème » (the theme's coral, like an empty field) or one of the five colours; every colour keeps button text readable (contrast of at least 4.5:1, measured).
+« Réglages par langue » holds one entry per language: the site description, the share image's text for blind people, the contact email of the footer and contact page (set in each language: change it in the « EN » entry and in the « FR » entry), the name and link of the footer credit, the RSS feed title of the language, the address of an outside service for the newsletter, the address of an outside service for the contact form when the email screen is not connected (part 17 b), and « Couleur de la marque, sur tout le site », « Couleur d'origine du thème » (the theme's coral, like an empty field) or one of the five colours, which paints the buttons, the links and the highlighted word; every colour keeps button text readable (contrast of at least 4.5:1, measured).
 
 ## 11. Writing and publishing a post
 

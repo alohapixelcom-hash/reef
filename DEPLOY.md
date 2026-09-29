@@ -12,7 +12,7 @@
 | Worker | `reef-moteur` (`wrangler.moteur.jsonc`) |
 | Build command | `pnpm build:moteur` (sets `ALOHA_MOTEUR=emdash` itself) |
 | Deploy command | `npx wrangler deploy`, from the Mac, after the build |
-| Check | `https://reef.alohapixel.app/version.json` answers `{"version":"3.6.1",...,"moteur":"emdash"}` |
+| Check | `https://reef.alohapixel.app/version.json` answers `{"version":"3.6.2",...,"moteur":"emdash"}` |
 
 A release whose texts also live in the database ships a SQL file to run once
 after the deployment. For 3.3.0, `seed/import-3.3.0-reef.sql` (the page texts,
@@ -29,8 +29,8 @@ through `node scripts/base-3.4.0.mjs --remote reef-moteur` (the plan, nothing
 written) then the same command with `--appliquer` (the columns, then
 `import-3.4.0-reef.sql`), see docs/moteur.md; 3.6.0 through a single file,
 `import-3.6.0-reef.sql` (« Couleur d'origine du thème » in the list of brand
-colours), idempotent, with no DELETE and no DROP. 3.6.1 does not change the
-database.
+colours), idempotent, with no DELETE and no DROP. 3.6.1 and 3.6.2 do not change
+the database.
 
 ```bash
 npx wrangler d1 execute reef-moteur --remote --config wrangler.moteur.jsonc --file=import-3.6.0-reef.sql
