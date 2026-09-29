@@ -99,6 +99,8 @@ const blocs = ordreDesBlocs(
   ["hero", "bande-sujets", "a-la-une", "studio", "dernieres-notes", "sujets", "signatures", "lettre"] as const,
   (slug) => donneesDe(Astro, slug),
 );
+// Le premier bloc que le visiteur voit.
+const premier = blocs.find((bloc) => voir(bloc));
 
 const title = t.home.metaTitle;
 const description = t.home.metaDescription;
@@ -132,6 +134,11 @@ const schemas = [
     {/* Chaque bloc a sa place (voir "blocs" plus haut) ; la place du theme :
         l'ouverture, la bande des sujets, le billet a la une, la sequence
         filmee, les notes recentes, les sujets, les signatures, la lettre. */}
+    {/* Un autre bloc que l'ouverture en tete (place choisie, ou ouverture
+        masquee) : une marge pour qu'il ne passe pas sous la barre flottante,
+        que l'ouverture prevoit seule. En style, pas en classe : la feuille du
+        theme ne change pas. */}
+    {premier !== undefined && premier !== "hero" && <div aria-hidden="true" style="height:3rem"></div>}
     {
       blocs.map((bloc) =>
         bloc === "hero" ? (

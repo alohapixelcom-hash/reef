@@ -113,7 +113,16 @@ const navLink = [
         {...marqueCadre(Astro, "reglages")}
       >
         {
-          marque.logo ? (
+          marque.logoSombre ? (
+            <>
+              {marque.logo ? (
+                <img src={marque.logo.url} alt="" width={marque.logo.width} height={marque.logo.height} class="dark:hidden" style="height:1.5rem;width:auto" />
+              ) : (
+                <Icon name="wave" size={20} class="text-primary dark:hidden" />
+              )}
+              <img src={marque.logoSombre.url} alt="" width={marque.logoSombre.width} height={marque.logoSombre.height} class="hidden dark:block" style="height:1.5rem;width:auto" />
+            </>
+          ) : marque.logo ? (
             <img src={marque.logo.url} alt="" width={marque.logo.width} height={marque.logo.height} style="height:1.5rem;width:auto" />
           ) : (
             <Icon name="wave" size={20} class="text-primary" />
@@ -181,7 +190,16 @@ const navLink = [
   <SheetHeader>
     <SheetTitle id="mobile-nav-title" class="flex items-center gap-2">
       {
-        marque.logo ? (
+        marque.logoSombre ? (
+          <>
+            {marque.logo ? (
+              <img src={marque.logo.url} alt="" width={marque.logo.width} height={marque.logo.height} class="dark:hidden" style="height:1.5rem;width:auto" />
+            ) : (
+              <Icon name="wave" size={20} class="text-primary dark:hidden" />
+            )}
+            <img src={marque.logoSombre.url} alt="" width={marque.logoSombre.width} height={marque.logoSombre.height} class="hidden dark:block" style="height:1.5rem;width:auto" />
+          </>
+        ) : marque.logo ? (
           <img src={marque.logo.url} alt="" width={marque.logo.width} height={marque.logo.height} style="height:1.5rem;width:auto" />
         ) : (
           <Icon name="wave" size={20} class="text-primary" />

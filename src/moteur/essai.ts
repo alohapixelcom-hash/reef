@@ -10,6 +10,8 @@ type Adresse = string;
 export interface ParametresDeLEssai {
   /** Une image livree avec le theme, pour les gestes de photo et de logo (chemin depuis la racine du depot). */
   image: string;
+  /** La langue servie a la racine du site ("en" si absent ; "fr" pour un site francais a la racine) : les gestes ouvrent les entrees dans cette langue (socle 1.7.0). */
+  langue?: string;
   /** Un titre edite dans la page par la barre : l'entree de `sections`, le selecteur du titre, son champ. */
   titre?: { entree: string; selecteur: string; champ?: string; page?: Adresse };
   /** Le bloc de tete de l'accueil, ou vivent les pastilles de la photo et du bouton ("section[aria-labelledby=\"hero-title\"]"). */
@@ -30,4 +32,8 @@ export interface ParametresDeLEssai {
   redirection?: { vers: Adresse };
   /** Le titre SEO d'une entree de `sections`, et la page qui le porte. */
   seo?: { entree: string; page: Adresse; champ?: string };
+  /** La police du site choisie ("Classique, à empattements") puis rendue a l'origine (univers 3.8.2) : les pages ou lire la feuille posee. */
+  police?: { pages?: Adresse[] };
+  /** Un bloc de l'accueil mis a la place 1 puis rendu a sa place (univers 3.8.2) : son entree, un morceau du HTML qui n'est que dans ce bloc, un morceau du HTML qui n'est que dans le bloc de tete. */
+  ordre?: { entree: string; marqueBloc: string; marqueTete: string; pages?: Adresse[] };
 }

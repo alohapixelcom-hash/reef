@@ -37,15 +37,45 @@
 /* Une photo non choisie : le champ le dit en toutes lettres. La page affiche
  * alors la photo livree avec le theme ; le champ vide ne montrait qu'un cadre
  * gris, et le client croyait n'avoir aucune photo (releve du testeur). */
-html[lang^="fr"] [id^="field-"]:has(> button > span > div > svg + span)::after {
-  content: "Aucune photo choisie : le site affiche la photo livrée avec le thème. Choisissez-en une pour la remplacer.";
+[id^="field-"]:has(> button > span > div > svg + span)::after {
   font-size: 0.85rem;
   color: var(--color-kumo-subtle, inherit);
 }
+html[lang^="fr"] [id^="field-"]:has(> button > span > div > svg + span)::after {
+  content: "Aucune photo choisie : le site affiche la photo livrée avec le thème. Choisissez-en une pour la remplacer.";
+}
 html:not([lang^="fr"]) [id^="field-"]:has(> button > span > div > svg + span)::after {
   content: "No photo chosen: the site shows the photo delivered with the theme. Choose one to replace it.";
-  font-size: 0.85rem;
+}
+/* Deux champs image disent autre chose quand ils sont vides (socle 1.7.0) :
+ * le logo du mode sombre (vide : le logo clair reste affiche en mode sombre,
+ * identite() de cadre.ts) et l'image de partage d'une page (vide : celle du
+ * site). La phrase generique y etait fausse. */
+html[lang^="fr"] #field-logo_dark:has(> button > span > div > svg + span)::after {
+  content: "Aucun logo choisi : en mode sombre, le site garde le logo du mode clair. Choisissez-en un pour le remplacer.";
+}
+html:not([lang^="fr"]) #field-logo_dark:has(> button > span > div > svg + span)::after {
+  content: "No logo chosen: in dark mode the site keeps the light logo. Choose one to replace it.";
+}
+html[lang^="fr"] #field-meta_image:has(> button > span > div > svg + span)::after {
+  content: "Aucune image choisie : la page est partagée avec l'image de partage du site. Choisissez-en une pour cette page.";
+}
+html:not([lang^="fr"]) #field-meta_image:has(> button > span > div > svg + span)::after {
+  content: "No image chosen: the page is shared with the site's sharing image. Choose one for this page.";
+}
+
+/* Une liste de choix vide (socle 1.7.0) : EmDash 0.38 laisse le bouton sans
+ * aucun texte (couleur de la marque, police du site). Vide veut dire, dans
+ * chaque liste des sites de la maison, le reglage d'origine du theme : le
+ * bouton le dit. */
+[data-kumo-component="Select"][data-kumo-part="trigger"] > span[data-placeholder]:empty::before {
   color: var(--color-kumo-subtle, inherit);
+}
+html[lang^="fr"] [data-kumo-component="Select"][data-kumo-part="trigger"] > span[data-placeholder]:empty::before {
+  content: "Réglage d'origine du thème";
+}
+html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] > span[data-placeholder]:empty::before {
+  content: "Theme default";
 }
 
 /* Le bandeau d'avertissement d'EmDash 0.38 (Courriels, Mettre le site a jour) :

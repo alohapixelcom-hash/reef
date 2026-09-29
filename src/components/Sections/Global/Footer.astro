@@ -125,7 +125,16 @@ const columnLink =
       <div class="flex flex-col gap-6 lg:col-span-4">
         <a href={routes.home} class="flex min-h-11 items-center gap-2" aria-label={t.nav.brandHome} {...marqueCadre(Astro, "reglages")}>
           {
-            marque.logo ? (
+            marque.logoSombre ? (
+              <>
+                {marque.logo ? (
+                  <img src={marque.logo.url} alt="" width={marque.logo.width} height={marque.logo.height} class="dark:hidden" style="height:1.6rem;width:auto" />
+                ) : (
+                  <Icon name="wave" size={22} class="text-primary dark:hidden" />
+                )}
+                <img src={marque.logoSombre.url} alt="" width={marque.logoSombre.width} height={marque.logoSombre.height} class="hidden dark:block" style="height:1.6rem;width:auto" />
+              </>
+            ) : marque.logo ? (
               <img src={marque.logo.url} alt="" width={marque.logo.width} height={marque.logo.height} style="height:1.6rem;width:auto" />
             ) : (
               <Icon name="wave" size={22} class="text-primary" />

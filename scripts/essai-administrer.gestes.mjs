@@ -187,10 +187,59 @@ export async function gestesCommuns(P, o) {
   return gestes;
 }
 
-/** Les deux derniers gestes du guide : une redirection, un titre SEO. */
+/** Les deux derniers gestes du guide : une redirection, un titre SEO ; puis (univers 3.8.2) la police du site et la place d'un bloc de l'accueil. */
 export async function gestesDeFin(P, o) {
   const { page, ADMIN, anonyme, entree, ouvrir, ouvrirSection, enregistrerEtPublier } = o;
   const gestes = [];
+  if (P.police) {
+    const pages = P.police.pages ?? ["/"];
+    const site = await entree("site", "site");
+    const police = async (nom) => {
+      await ouvrir(`${ADMIN}/content/site/${site.id}?locale=${o.langue ?? "en"}`);
+      await o.choisir(/^Police du site/, nom);
+      await enregistrerEtPublier();
+    };
+    // La police choisie : la feuille de typographie.ts posee en tete (pile a empattements), sans prechargement de police du theme.
+    const classique = (html) => /<style>:root\{--[\w-]+:ui-serif/.test(html) && !/rel="preload"[^>]*woff2/.test(html);
+    const origine = (html) => !/<style>:root\{--[\w-]+:ui-serif/.test(html);
+    const partout = async (test) => {
+      for (const ou of pages) if (!test((await anonyme(ou)).html)) return false;
+      return true;
+    };
+    gestes.push({
+      nom: "Police du site choisie",
+      faire: () => police("Classique, à empattements"),
+      verifierFait: async () => (await o.bientot(() => partout(classique))),
+      restaurer: () => police("Police d'origine du thème"),
+      verifierRestaure: async () => (await o.bientot(() => partout(origine))),
+    });
+  }
+  if (P.ordre) {
+    const { entree: slug, marqueBloc, marqueTete } = P.ordre;
+    const pages = P.ordre.pages ?? ["/"];
+    const place = async (valeur) => {
+      await ouvrirSection(slug);
+      await page.locator("#field-order").fill(valeur);
+      await enregistrerEtPublier();
+    };
+    const enTete = async (ou) => {
+      const { html } = await anonyme(ou);
+      const bloc = html.indexOf(marqueBloc);
+      const tete = html.indexOf(marqueTete);
+      return bloc !== -1 && tete !== -1 && bloc < tete;
+    };
+    const partout = async (attendu) => {
+      for (const ou of pages) if ((await enTete(ou)) !== attendu) return false;
+      return true;
+    };
+    gestes.push({
+      nom: `Bloc ${slug} place en tete de l'accueil`,
+      faire: () => place("1"),
+      verifierFait: async () => (await o.bientot(() => partout(true))),
+      restaurer: () => place(""),
+      verifierRestaure: async () => (await o.bientot(() => partout(false))),
+    });
+  }
   if (P.redirection) {
     const { vers } = P.redirection;
     gestes.push({

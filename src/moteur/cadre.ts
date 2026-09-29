@@ -58,6 +58,8 @@ export interface DonneesDuSite {
   credit_name?: string;
   credit_link?: string;
   brand_color?: string;
+  /** Le logo pour le mode sombre (socle 1.7.0) : une image de la mediatheque, commune aux deux langues. */
+  logo_dark?: unknown;
 }
 
 /** Un lien d'un menu natif, resolu par le moteur. */
@@ -134,6 +136,12 @@ export interface Identite {
   description: string;
   /** Le logo choisi dans les reglages, ou null : le theme dessine alors son pictogramme. */
   logo: MediaDesReglages | null;
+  /**
+   * Le logo pour le mode sombre (entree "site", champ "logo_dark"), ou null :
+   * le logo des reglages sert alors aussi sur fond sombre. Le theme rend les
+   * deux images et n'en montre qu'une selon le mode (clair ou sombre).
+   */
+  logoSombre: MediaDesReglages | null;
   /** Le favicon choisi dans les reglages, ou null : les favicons fabriques au build. */
   favicon: MediaDesReglages | null;
   /** L'image de partage par defaut et son texte alternatif. */
@@ -167,10 +175,12 @@ export function identite(page: Page, repli: RepliDuSite): Identite {
   const credit = texte(site.credit_name) ?? repli.credit;
   const email = texte(site.email) ?? repli.email;
   const imageDesReglages = reglages.seo?.defaultOgImage;
+  const sombre = media(site.logo_dark);
   return {
     nom: texte(reglages.title) ?? repli.nom,
     description: texte(site.description) ?? repli.description,
     logo: reglages.logo?.url ? reglages.logo : null,
+    logoSombre: sombre?.src ? { url: sombre.src, alt: sombre.alt, width: sombre.width, height: sombre.height } : null,
     favicon: reglages.favicon?.url ? reglages.favicon : null,
     image: {
       src: imageDesReglages?.url ?? repli.image.src,
@@ -205,13 +215,16 @@ export interface LienRendu {
  * Les liens d'un menu natif de la langue, ou le repli des fichiers (navData)
  * quand le menu n'existe pas, est vide ou vient d'une autre langue. Un lien
  * porte la classe "bouton" (posee par la graine) quand il se rend en bouton.
+ * `defaut` est la langue servie sans prefixe (univers 3.8.2) : "en" pour les
+ * themes, "fr" pour un site francais a la racine (alohapixel.com), dont les
+ * menus francais ne doivent pas recevoir "/fr" (adresse introuvable).
  */
-export function liensDuMenu(page: Page, nom: string, locale: string, repli: readonly LienRendu[]): LienRendu[] {
+export function liensDuMenu(page: Page, nom: string, locale: string, repli: readonly LienRendu[], defaut = "en"): LienRendu[] {
   const menu = menuDe(page, nom, locale);
   if (!menu) return [...repli];
   return menu.items.map((item) => ({
     text: item.label,
-    href: cheminDansLaLangue(item.url, locale),
+    href: cheminDansLaLangue(item.url, locale, defaut),
     ...((item.cssClasses ?? "").split(/\s+/).includes("bouton") ? { bouton: true } : {}),
     ...(item.target ? { target: item.target } : {}),
   }));

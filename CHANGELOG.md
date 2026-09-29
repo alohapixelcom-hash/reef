@@ -4,7 +4,29 @@
 
 Versions describe the features actually shipped in this theme.
 
-Current version: **3.8.1**.
+Current version: **3.8.2**.
+
+## 3.8.2 - 2026-09-29
+
+The family moves to 3.8.2 together: every theme now lets the client choose,
+from the back office, the site font, the position of each home page block and
+a logo for dark mode (Reef already had the first two since 3.8.1).
+
+- « Logo pour le mode sombre », in « Réglages par langue » (one image for both
+  languages): shown instead of the logo when the reader uses the dark display,
+  in the bar and the footer; empty, the logo of the « Paramètres » is used on
+  both, as before.
+- Database: `import-3.8.2-reef.sql` adds the field (plan with `node
+  scripts/base-3.4.0.mjs --remote reef-moteur --sql import-3.8.2-reef.sql`,
+  then `--appliquer`); idempotent, no DELETE, no DROP.
+- Static build unchanged; anonymous HTML unchanged while the field is empty.
+- Shared base: branch `univers-3.8.2-essai` of `aloha-socle` (logo for dark
+  mode read by `identite()`, two shared steps in the replayed guide).
+- The back office shows, on each block screen, only the photo and video
+  fields that change that block (the others are hidden, nothing is removed),
+  says what an empty dark mode logo or sharing image does, names an empty
+  list « Réglage d'origine du thème » and no longer shows « 0 » in an emptied
+  « Place du bloc ». Shared base 1.7.0.
 
 ## 3.8.1 - 2026-09-29
 
@@ -373,12 +395,6 @@ one with the previous release. See `docs/moteur.md`.
 
 - Family release number aligned with the Kona variant-price correction. No runtime change in this theme.
 
-## 1.9.0 - 2026-09-15
-
-- A malformed language cookie no longer interrupts the demo Worker. It falls back to the browser language.
-- Languages explicitly refused with quality zero, or invalid quality values, no longer trigger a redirect.
-- A network-free regression check covers cookies, language priority, assets, existing language paths and cache headers.
-
-## 1.8.0 and before
+## 1.9.0 and before
 
 Moved to `CHANGELOG-ARCHIVE-1.x.md` on 28 and 29 September 2026 (400-line ceiling of the house; 1.7.3 for 3.8.0, 1.8.0 for 3.8.1).
