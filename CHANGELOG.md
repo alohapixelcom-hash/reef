@@ -4,7 +4,35 @@
 
 Versions describe the features actually shipped in this theme.
 
-Current version: **3.8.0**.
+Current version: **3.8.1**.
+
+## 3.8.1 - 2026-09-29
+
+Two more settings in the back office, so that a blogger runs the look of the
+site without code. The static build is byte-identical to 3.8.0, and an empty
+field renders the site exactly as before.
+
+- « Police du site » (in « Réglages par langue », for both languages): the
+  theme's fonts, « Police du système, la plus légère », « Classique, à
+  empattements » or « Titres classiques, texte sans empattements ». The three
+  choices are system font stacks already installed on the reader's device:
+  nothing to download, and the theme's two font preloads are dropped when one
+  is chosen.
+- « Place du bloc sur l'accueil » (each block of « Textes des pages »): a number
+  moves the block, 1 at the very top; empty keeps the theme's order. Hiding a
+  block works as before.
+- Both come from the shared base (extension `administrable`: `typographie.ts`,
+  `ordre-des-blocs.ts`, with their selfchecks); `theme.ts` names Reef's font
+  tokens (`VARIABLES_DE_POLICE`).
+- Database: two new fields. `node scripts/base-3.4.0.mjs --remote reef-moteur
+  --sql import-3.8.1-reef.sql` shows the plan, `--appliquer` adds the two
+  columns then the two fields; idempotent, no DELETE, no DROP, no content
+  touched.
+- The guided replay (`scripts/essai-administrer.mjs`) gains the two gestures:
+  16 of 16 done through the interface, seen by an anonymous visitor, undone.
+- README: Reef presented as the sober blog CMS for Astro it has become, with a
+  table of what a blogger can and cannot do yet from the back office. Guides
+  (docs/administrer.md, docs/administer.md) updated.
 
 ## 3.8.0 - 2026-09-29
 
@@ -349,28 +377,6 @@ one with the previous release. See `docs/moteur.md`.
 - Languages explicitly refused with quality zero, or invalid quality values, no longer trigger a redirect.
 - A network-free regression check covers cookies, language priority, assets, existing language paths and cache headers.
 
-## 1.8.0 - 2026-09-13
+## 1.8.0 and before
 
-Three family-wide changes to what the crawler reads, none visible in a
-browser.
-
-- **The favicon is declared as it is built.** `scripts/favicon.mjs` packs 16,
-  32 and 48 into the ICO and writes `favicon-96.png` at every build, but the
-  head declared the ICO as `sizes="32x32"` and never mentioned the PNG. The
-  ICO link now says `16x16 32x32 48x48`, and a second link declares the 96
-  pixel PNG. Google only shows a favicon it can crawl as a raster image, and
-  `sizes` has to tell the truth about its file.
-- **The sitemap re-reads the hreflang of the built HTML.** `@astrojs/sitemap`
-  paired languages by path identity and wrote no `x-default`, while the head
-  carries one on every page. The `serialize` hook now reads the
-  `<link rel="alternate" hreflang>` tags of each page in `dist/` and writes
-  those, `x-default` included; a page without them keeps the integration's
-  own pairing. On the demo, 54 entries and 54 `x-default`.
-- **A GitHub Actions workflow, `.github/workflows/verifier.yml`,** replays the
-  buyer's path (frozen install, check, build, test, house lint) on every push
-  and pull request. A branch gets the same guard as `main` before it is
-  merged.
-
-## 1.7.3 and before
-
-Moved to `CHANGELOG-ARCHIVE-1.x.md` on 28 and 29 September 2026 (400-line ceiling of the house; 1.7.3 for 3.8.0).
+Moved to `CHANGELOG-ARCHIVE-1.x.md` on 28 and 29 September 2026 (400-line ceiling of the house; 1.7.3 for 3.8.0, 1.8.0 for 3.8.1).

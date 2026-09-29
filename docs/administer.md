@@ -73,6 +73,14 @@ The alternative text (what a screen reader says) is typed in the image window. T
 
 Readers no longer see the block. You, in edit mode, see it greyed out with its "Hidden block: visitors do not see it" tag, to show it again the same way. The eight blocks of the home page hide this way (opening, topic band, featured post, studio, latest notes, topics, writers, newsletter). Hiding the newsletter also removes it from the footer.
 
+### Changing the order of the home page blocks
+
+1. Open the block in « Textes des pages » (page « Accueil »).
+2. At the bottom, « Place du bloc sur l'accueil »: write a number. 1 puts it at the very top, 2 right after the first one, and so on; left empty, the block keeps the place the theme gives it.
+3. "Save", then "Publish changes now".
+
+The places of the eight blocks as the theme gives them: 1 opening, 2 topic band, 3 featured post, 4 studio, 5 latest notes, 6 topics, 7 writers, 8 newsletter. A block you give a place to goes before the one that held it. The place applies to both languages. To go back to the theme's order, empty the field. The original order has its reasons (the dark studio block splits two lists of cards): look at the page after a change.
+
 ## 7. Changing a menu
 
 "Menus" lists the menus of the site, each in English and French: « Menu principal, en haut de chaque page » (the navigation bar), « Liens ajoutés au menu sur téléphone » (added to the phone menu: Authors, Search), « Boutons en haut à droite de chaque page » (the "Subscribe" button; a link with the class `bouton` is drawn as a solid button), and « Lire », « Le studio », « Légal » (the three footer columns; the menu name is the column title).
@@ -102,7 +110,7 @@ The change shows on the site at once, with nothing to publish. If a menu is empt
 
 ## 10. Contact details, email, colour and shared texts
 
-« Réglages par langue » holds one entry per language: the site description, the share image's text for blind people, the contact email of the footer and contact page (set in each language: change it in the « EN » entry and in the « FR » entry), the name and link of the footer credit, the RSS feed title of the language, the address of an outside service for the newsletter, the address of an outside service for the contact form when the email screen is not connected (part 17 b), and « Couleur de la marque, sur tout le site », « Couleur d'origine du thème » (the theme's coral, like an empty field) or one of the five colours, which paints the buttons, the links and the highlighted word; every colour keeps button text readable (contrast of at least 4.5:1, measured).
+« Réglages par langue » holds one entry per language: the site description, the share image's text for blind people, the contact email of the footer and contact page (set in each language: change it in the « EN » entry and in the « FR » entry), the name and link of the footer credit, the RSS feed title of the language, the address of an outside service for the newsletter, the address of an outside service for the contact form when the email screen is not connected (part 17 b), « Police du site, pour les titres et le texte » (« Police d'origine du thème », like an empty field, « Police du système, la plus légère », « Classique, à empattements » or « Titres classiques, texte sans empattements »: the last three are already installed on the reader's computer or phone, nothing to download, and the choice applies to both languages), and « Couleur de la marque, sur tout le site », « Couleur d'origine du thème » (the theme's coral, like an empty field) or one of the five colours, which paints the buttons, the links and the highlighted word; every colour keeps button text readable (contrast of at least 4.5:1, measured).
 
 ## 11. Writing and publishing a post
 
@@ -166,14 +174,14 @@ Messages from the contact page reach you by email as soon as the email screen is
 
 ## 19. Site map: where each area is changed
 
-The table of the French guide ([administrer.md](administrer.md), part 19) holds for both languages: brand, logo, favicon and posts per page in "Settings"; navigation, the "Subscribe" button and footer columns in "Menus"; footer texts in « Textes des pages » (page « Tout le site ») and « Réglages par langue »; every block of every page in « Textes des pages », filtered by its page; posts, topics and authors in their collections; added pages in « Pages »; contact form emails in the email screens.
+The table of the French guide ([administrer.md](administrer.md), part 19) holds for both languages: brand, logo, favicon and posts per page in "Settings"; the typeface and the brand colour in « Réglages par langue »; the order of the home page blocks in each block's « Place du bloc sur l'accueil »; navigation, the "Subscribe" button and footer columns in "Menus"; footer texts in « Textes des pages » (page « Tout le site ») and « Réglages par langue »; every block of every page in « Textes des pages », filtered by its page; posts, topics and authors in their collections; added pages in « Pages »; contact form emails in the email screens.
 
 ## 20. What needs a developer
 
-- the order of the blocks of a page, a new kind of block, the layout and drawing of the site;
+- the order of the blocks of a page other than the home page, a new kind of block, the layout and drawing of the site;
 - generic interface texts (accessibility, "change language", "open menu", "min read", counters), the cookie banner;
 - the addresses of the theme's pages and the robots.txt file;
-- a typeface other than the theme's;
+- a typeface that is not in the « Police du site » list;
 - sending the newsletter through the email screen (it only receives the contact form).
 
 What to know about the engine (EmDash 0.38): a menu link to a draft or trashed page stays visible (remove it from the menu); an image's alternative text is copied into the field when chosen (changing it later in "Media" does not change fields already filled); cropping an image in "Media" creates a new file; the engine's own "Sections" (reusable blocks, hidden from the rail) have nothing to do with « Textes des pages »; the edit bar speaks English.

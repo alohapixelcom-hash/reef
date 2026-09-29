@@ -43,7 +43,12 @@ written) then the same command with `--appliquer` (the columns, then
 `import-3.4.0-reef.sql`), see docs/moteur.md; 3.6.0 through a single file,
 `import-3.6.0-reef.sql` (« Couleur d'origine du thème » in the list of brand
 colours), idempotent, with no DELETE and no DROP. 3.6.1, 3.6.2 and 3.8.0 do not
-change the database.
+change the database. 3.8.1 adds two fields (« Police du site », « Place du bloc
+sur l'accueil »): `node scripts/base-3.4.0.mjs --remote reef-moteur --sql
+import-3.8.1-reef.sql` shows the plan, the same command with `--appliquer` adds
+the two columns then passes the file; idempotent, no DELETE, no DROP, no
+content touched. Run it before deploying 3.8.1 (the code reads the fields but
+renders the theme as long as they are absent).
 
 ```bash
 npx wrangler d1 execute reef-moteur --remote --config wrangler.moteur.jsonc --file=import-3.6.0-reef.sql
