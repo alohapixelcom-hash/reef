@@ -14,8 +14,8 @@ import { entrySlug } from "@i18n/content";
 import { getResolvedPosts, getSortedAuthors } from "@js/posts";
 import { breadcrumbList, organization } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { imageDePartage } from "@moteur/cadre";
-import { annotationsDe } from "@moteur/annotations";
+import { imageDe, imageDePartage } from "@moteur/cadre";
+import { annotationsDe, REF } from "@moteur/annotations";
 import { propsDeLaPage } from "@moteur/chemins";
 import { textesDeLaPage } from "@moteur/textes";
 import { identiteDuSite } from "@moteur/theme";
@@ -148,7 +148,7 @@ const schemas = [
             }
           </ol>
 
-          <PhoneShot class="hidden lg:block" />
+          <PhoneShot class="hidden lg:block" capture={imageDe(Astro, "a-propos-regles")} annotation={regles.champ("image")[REF]} />
         </div>
       </div>
     </section>

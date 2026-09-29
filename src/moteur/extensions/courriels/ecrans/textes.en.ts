@@ -111,6 +111,8 @@ export const EN: Textes = {
     livreurOk: "Every email of the site goes out this way, the back office's own included.",
     livreurAutre: (who: string) => `The site's emails are handed to ${who}, not to Cloudflare: they do not really go out. Click below to hand them to Emails.`,
     livreurAucun: "No email provider is chosen: nothing can go out. Click below to hand the emails to Emails.",
+    livreurPourquoi:
+      "Why this choice: online, Emails is the only provider and is chosen on its own. On the computer of the person who installed the site, EmDash adds a test console that writes the emails to its log without sending them: that is the choice to make, once.",
     choisir: "Hand the emails to Emails",
     choisiOk: "Done: Emails now delivers every email of the site.",
     choisiKo: "The choice could not be saved. Reload the page and try again.",

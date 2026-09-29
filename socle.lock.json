@@ -1,395 +1,109 @@
 {
   "socle": "aloha-socle",
-  "version": "1.2.0",
-  "commit": "d63573f517e7",
+  "version": "1.3.0",
+  "commit": "b3b90df325e0",
   "depot": "reef",
-  "modules": [
-    "outillage",
-    "moteur-base",
-    "catalogue-bo",
-    "habillage-bo",
-    "langue-bo",
-    "mouvement",
-    "plan-du-site",
-    "ci"
-  ],
-  "extensions": [
-    "deployer",
-    "courriels",
-    "administrable"
-  ],
-  "fichiersDuSite": [
-    "socle.adaptateur.json",
-    "src/moteur/habillage.site.ts",
-    "src/moteur/deployer/site.ts",
-    "src/moteur/extensions/courriels/configuration.ts",
-    "src/moteur/theme.ts",
-    "src/moteur/PageLibre.astro"
-  ],
+  "modules": ["outillage","moteur-base","catalogue-bo","habillage-bo","langue-bo","mouvement","plan-du-site","ci"],
+  "extensions": ["deployer","courriels","administrable"],
+  "fichiersDuSite": ["socle.adaptateur.json","src/moteur/habillage.site.ts","src/moteur/deployer/site.ts","src/moteur/extensions/courriels/configuration.ts","src/moteur/theme.ts","src/moteur/PageLibre.astro"],
   "fichiers": {
-    ".github/workflows/verifier.yml": {
-      "source": "moteur/.github/workflows/verifier.yml",
-      "sha256": "78fc714b0b53f4ab2ec01b52d31f4e9b40d5cbc5ecf584095216f1785ba840e1"
-    },
-    "scripts/app.mjs": {
-      "source": "moteur/scripts/app.mjs",
-      "sha256": "fefb8252fd62c4a4391b42ea2e2cb836c46f68f4f43ae13127397e577df9fe77"
-    },
-    "scripts/base-3.4.0.mjs": {
-      "source": "extensions/administrable/scripts/base-3.4.0.mjs",
-      "sha256": "d2048bd322601b226e8e814b0cada148a0d0c55a301ec800913c72cc8293a6b1"
-    },
-    "scripts/checks.mjs": {
-      "source": "moteur/scripts/checks.mjs",
-      "sha256": "014338982d65c1174371f834243d1ab15fabddcaaf16d49b31179171a41f17de"
-    },
-    "scripts/couverture-edition.mjs": {
-      "source": "extensions/administrable/scripts/couverture-edition.mjs",
-      "sha256": "70e044b2b13300f165547d32d87851dd6507bdeccba612a6c346f037a42d918f"
-    },
-    "scripts/house.mjs": {
-      "source": "moteur/scripts/house.mjs",
-      "sha256": "278e36d72f336a6aa2a4f0b2a12578c25ed52d45f9940e7005bea399a6988482"
-    },
-    "scripts/navigateur.mjs": {
-      "source": "extensions/administrable/scripts/navigateur.mjs",
-      "sha256": "67f6fe12318a73a774765335c47e349c3211d426cd791b8fcfb611cfa7b05329"
-    },
-    "scripts/poster.mjs": {
-      "source": "moteur/scripts/poster.mjs",
-      "sha256": "d777e9dc80a5d71bef1fd606be099dc57177e5720b9e2f1974990beba0abaf6b"
-    },
-    "scripts/socle.mjs": {
-      "source": "scripts/socle.mjs",
-      "sha256": "4315c7fcc1255e31c25727cdc1ee379fbb6a36d9f5e3e7c857d4d30eb30626e1"
-    },
-    "scripts/sql-par-difference.mjs": {
-      "source": "extensions/administrable/scripts/sql-par-difference.mjs",
-      "sha256": "03461c9ca2931b127b8428292ab303f337f023cba30213942395ee5d1b3fb9b5"
-    },
-    "scripts/verify.lisibilite.mjs": {
-      "source": "moteur/scripts/verify.lisibilite.mjs",
-      "sha256": "2ad1f2a7760ce3516461e9fdfa5d2ab3582c89fe610648f3844d3411b175c348"
-    },
-    "scripts/verify.mjs": {
-      "source": "moteur/scripts/verify.mjs",
-      "sha256": "a9dc40a14c863edcb271afb98273a3a19bcc8d9ee4803fd7dd5eda234034e1ca"
-    },
-    "scripts/verify.probe.mjs": {
-      "source": "moteur/scripts/verify.probe.mjs",
-      "sha256": "968c513074ec5984d84b9fe2a3fcc01455a3bcf2390e64164d283c4fd133e4ae"
-    },
-    "src/moteur/annotations.ts": {
-      "source": "extensions/administrable/src/moteur/annotations.ts",
-      "sha256": "341c5676081da19a92fab7950c48b092a6780ec33071081a988190766dd37a17"
-    },
-    "src/moteur/back-office-rail.css": {
-      "source": "extensions/administrable/src/moteur/back-office-rail.css",
-      "sha256": "7fb9c1578ea40ca6907c4dc8be30300d31f3aff9698f10c2c9096dd8a04ba443"
-    },
-    "src/moteur/cadre.emdash.ts": {
-      "source": "extensions/administrable/src/moteur/cadre.emdash.ts",
-      "sha256": "a574bf347828ef535b95639931a1cb0b8da82899f68218d3eae204b66adbbda1"
-    },
-    "src/moteur/cadre.fichiers.ts": {
-      "source": "extensions/administrable/src/moteur/cadre.fichiers.ts",
-      "sha256": "4ff7f374290edb588896b0a6483a0b9e731d436fbc0b0712bfe66baadc99e326"
-    },
-    "src/moteur/cadre.ts": {
-      "source": "extensions/administrable/src/moteur/cadre.ts",
-      "sha256": "053110a666f86fe0e64663b16d5efeaa914dcebc44bb37f1c43a8c6539b4f775"
-    },
-    "src/moteur/CadreDuSite.astro": {
-      "source": "extensions/administrable/src/moteur/CadreDuSite.astro",
-      "sha256": "111d142f0acaa2619ab09b339c324c6408e5de16c4f7fd50cf2d3478be703ca7"
-    },
-    "src/moteur/catalogue-bo.config.mjs": {
-      "source": "moteur/src/moteur/catalogue-bo.config.mjs",
-      "sha256": "b9b98e18bb9da9acd371b3789a32fd8acf66da2ce88411bbbac30939b40376cd"
-    },
-    "src/moteur/catalogue-bo.fr.ts": {
-      "source": "moteur/src/moteur/catalogue-bo.fr.ts",
-      "sha256": "abf9ed1614ce9769e85e061fcae86ec0040a0586b23f52c9b0bd9cb27b0f2a6e"
-    },
-    "src/moteur/catalogue-bo.regles.ts": {
-      "source": "moteur/src/moteur/catalogue-bo.regles.ts",
-      "sha256": "1b23598c90d70aff73ff23eb3c9f71d3543eeaf7bddbcf875becf825f2665742"
-    },
-    "src/moteur/catalogue-bo.selfcheck.ts": {
-      "source": "moteur/src/moteur/catalogue-bo.selfcheck.ts",
-      "sha256": "c86f0d8ad6ebde575e6cd400fac13dff0c76e908c11968f4bfc0270804a78691"
-    },
-    "src/moteur/catalogue-bo.ts": {
-      "source": "moteur/src/moteur/catalogue-bo.ts",
-      "sha256": "b574ef6fa1da1a2415da1094ff8b55f206b501ae489a8e4e5eafe97d1bc439cf"
-    },
-    "src/moteur/catalogue-emdash.d.ts": {
-      "source": "moteur/src/moteur/catalogue-emdash.d.ts",
-      "sha256": "c71fb258fc3c3232026ed96b51db5ea4d314893617ac106279f5114234ab3365"
-    },
-    "src/moteur/chemins.ts": {
-      "source": "moteur/src/moteur/chemins.ts",
-      "sha256": "b5eb52ba69bf4c82842d6bca54f17bcd9ecae52c49be1eca8c5d4e541dd2a787"
-    },
-    "src/moteur/constantes.d.ts": {
-      "source": "moteur/src/moteur/constantes.d.ts",
-      "sha256": "8266ae58db7718e987a89054eaac7ec206f9f199c27be7bb7293a32f0b8c1738"
-    },
-    "src/moteur/deployer/action.ts": {
-      "source": "extensions/deployer/src/moteur/deployer/action.ts",
-      "sha256": "7bd50c97f1ab2588e103ded293461e7181e4c686c5abc005ad63487d5a16e36d"
-    },
-    "src/moteur/deployer/caches.ts": {
-      "source": "extensions/deployer/src/moteur/deployer/caches.ts",
-      "sha256": "8237259121160ab334fad1d4bee50723632d32143e5fbec97d3a33d1cbdee302"
-    },
-    "src/moteur/deployer/extension.ts": {
-      "source": "extensions/deployer/src/moteur/deployer/extension.ts",
-      "sha256": "d6eb25f439fb6de16b4e810437de143cfafeb3ee800582fb4240e8550edb821c"
-    },
-    "src/moteur/deployer/identite.mjs": {
-      "source": "extensions/deployer/src/moteur/deployer/identite.mjs",
-      "sha256": "cb502bda7ab2113e3e85cb17c7d95711dc99a0f81759a6048ee84e05846be5d4"
-    },
-    "src/moteur/deployer/journal.ts": {
-      "source": "extensions/deployer/src/moteur/deployer/journal.ts",
-      "sha256": "cb23d464c8265197bb471edf3b0c54f5a327eda4644684e65f8ee0aabee38646"
-    },
-    "src/moteur/deployer/page.ts": {
-      "source": "extensions/deployer/src/moteur/deployer/page.ts",
-      "sha256": "d9aa138b72b0462c2d545db904615952bf52225abcae204919a062b12d064dd2"
-    },
-    "src/moteur/deployer/regles.selfcheck.ts": {
-      "source": "extensions/deployer/src/moteur/deployer/regles.selfcheck.ts",
-      "sha256": "9da8131ccf9147e63ce192513c5746d083e1002961228830260b317acea0d7cc"
-    },
-    "src/moteur/deployer/regles.ts": {
-      "source": "extensions/deployer/src/moteur/deployer/regles.ts",
-      "sha256": "f3ef8b27a740781be325ed9962751ae08fc027a9ffb1db533648d8c0e295682f"
-    },
-    "src/moteur/deployer/textes.en.ts": {
-      "source": "extensions/deployer/src/moteur/deployer/textes.en.ts",
-      "sha256": "cec24a3ac3837ddaf1e6c616d08d087055ed482ed18552894c126fef77f3a9ce"
-    },
-    "src/moteur/deployer/textes.fr.ts": {
-      "source": "extensions/deployer/src/moteur/deployer/textes.fr.ts",
-      "sha256": "5e31521a29e2c1b4899a3ca3ef290dd2cc5ab713cf7e5588d48e57ae959dbe46"
-    },
-    "src/moteur/deployer/textes.ts": {
-      "source": "extensions/deployer/src/moteur/deployer/textes.ts",
-      "sha256": "738d20c43562a2bc2a12a0314e5ec07df42f9b760fe387685fc96ea52c051ea3"
-    },
-    "src/moteur/extensions/courriels/adaptateur.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/adaptateur.ts",
-      "sha256": "b0d4177cd6a2fc5ca7f0e13a412e455be0aa301fe532d1ed684dcc755751e3c1"
-    },
-    "src/moteur/extensions/courriels/courriels.selfcheck.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/courriels.selfcheck.ts",
-      "sha256": "83489620bafd9e372e7e403224e24dd49ac2aeb0b621bfa8cf607c56a3100a34"
-    },
-    "src/moteur/extensions/courriels/ecrans/blocs.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/ecrans/blocs.ts",
-      "sha256": "6dfefd875c3ed7aad7dc43454986f77ee49709de1aa0f1526bc733e06c4ac3f3"
-    },
-    "src/moteur/extensions/courriels/ecrans/brancher.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/ecrans/brancher.ts",
-      "sha256": "2ff744b6dfa9cb427d62441aba3c4b3f7537557391cc1d591056dc7349e1df4c"
-    },
-    "src/moteur/extensions/courriels/ecrans/journal.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/ecrans/journal.ts",
-      "sha256": "9b1c6a052861b73f9ee8312983d89d6c9e3b670fec459afde55c69c52b513f90"
-    },
-    "src/moteur/extensions/courriels/ecrans/reglages.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/ecrans/reglages.ts",
-      "sha256": "596d6f3dab6e052190fdfc30d63f50f99242cf2410eaa930b81bfee4904aa699"
-    },
-    "src/moteur/extensions/courriels/ecrans/tableau.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/ecrans/tableau.ts",
-      "sha256": "7425cd9938571d990c0f17e724d1af60635e5280eb47521fbea33a2f0fccf70f"
-    },
-    "src/moteur/extensions/courriels/ecrans/textes.en.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/ecrans/textes.en.ts",
-      "sha256": "3d8b45c0186752f7cae365ac3fc34e9d690c54b82057aa819289584577011d36"
-    },
-    "src/moteur/extensions/courriels/ecrans/textes.fr.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/ecrans/textes.fr.ts",
-      "sha256": "d71f75e0ecbc6c6c9fee47e830d23058ac162f2744a82be6fbbc73b31099fee0"
-    },
-    "src/moteur/extensions/courriels/extension.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/extension.ts",
-      "sha256": "c44c2870f26a3b498aa3d456dab61f07b29b61bd494b7d46de56b1725f5a5489"
-    },
-    "src/moteur/extensions/courriels/formulaire.emdash.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/formulaire.emdash.ts",
-      "sha256": "52ee433fbad084303cd1b8739cdf12585a074dcf8a95a99a5a3d61734e08844b"
-    },
-    "src/moteur/extensions/courriels/formulaire.fichiers.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/formulaire.fichiers.ts",
-      "sha256": "26755570885005b39d1fa197e7c8944790d6552af3d32c31dfbd469f69b03183"
-    },
-    "src/moteur/extensions/courriels/identite.mjs": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/identite.mjs",
-      "sha256": "a78ed2577fe7d6fbed4b37ffad8b771d61617cd22e779a7e0c93dc5335402868"
-    },
-    "src/moteur/extensions/courriels/noyau/base.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/noyau/base.ts",
-      "sha256": "bababadd35eb59a359916c4ad79b7e29f4c2f9105db66ca6256312ea97ffb538"
-    },
-    "src/moteur/extensions/courriels/noyau/canal.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/noyau/canal.ts",
-      "sha256": "18aeee8ef495c5ad52bed55db49f94bf327bab48f709586436b2c6862e9ff0fd"
-    },
-    "src/moteur/extensions/courriels/noyau/dns.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/noyau/dns.ts",
-      "sha256": "798c9dedc6fee1d6e92bd156877063d9ce78371f7b8db5a8fcb0b2a80227a125"
-    },
-    "src/moteur/extensions/courriels/noyau/envoi.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/noyau/envoi.ts",
-      "sha256": "72b0008f99bdae06c6c743e3199c69cf4b5898c3cd68b28707ad33569cd8e061"
-    },
-    "src/moteur/extensions/courriels/noyau/regles.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/noyau/regles.ts",
-      "sha256": "0fee35dbaec3990c95c207bd80674c8767ef6fce70579b1dc55dde07adb5515f"
-    },
-    "src/moteur/extensions/courriels/reception.ts": {
-      "source": "extensions/courriels/src/moteur/extensions/courriels/reception.ts",
-      "sha256": "2a8c8a54e432ed5c6f81a4783ffaeab56860f0af0bd168bcd73b99c2394d89c8"
-    },
-    "src/moteur/feuille.selfcheck.ts": {
-      "source": "moteur/src/moteur/feuille.selfcheck.ts",
-      "sha256": "64783a808f87f71403329e91da7937abc51f494b38dfb5730228d390966f8a25"
-    },
-    "src/moteur/feuille.ts": {
-      "source": "moteur/src/moteur/feuille.ts",
-      "sha256": "71ee7c01531cb9173d5315eec36a43b21f42071f4602bafbb14983e7d514f546"
-    },
-    "src/moteur/habillage.ts": {
-      "source": "moteur/src/moteur/habillage.ts",
-      "sha256": "f208911b1e83123ba9b9ea41416bc18abe4f0baa8da02ebf243fbeaa4cca9caa"
-    },
-    "src/moteur/icones.ts": {
-      "source": "extensions/administrable/src/moteur/icones.ts",
-      "sha256": "4ce6d40b402e0e52c0b06c0089da92725fd277339922b4ed7d61c7114876dce4"
-    },
-    "src/moteur/langue-bo.regles.ts": {
-      "source": "moteur/src/moteur/langue-bo.regles.ts",
-      "sha256": "3ee6ebbb001f9362fa07b5f4b4379118b972372601af0f51b3fff8c671266298"
-    },
-    "src/moteur/langue-bo.selfcheck.ts": {
-      "source": "moteur/src/moteur/langue-bo.selfcheck.ts",
-      "sha256": "d57fb3dec8db38ed56330a92533535c3d074908c84aacbff08728010b3c5b459"
-    },
-    "src/moteur/langue-bo.ts": {
-      "source": "moteur/src/moteur/langue-bo.ts",
-      "sha256": "312b16a31372793169bcd4c01f17263786078d466d6bdb181a84f63df5cc58e0"
-    },
-    "src/moteur/live.emdash.ts": {
-      "source": "moteur/src/moteur/live.emdash.ts",
-      "sha256": "48cf4d4f3d6084f2678d6bf792349493f22a572ca550987c611e0f7808ebd89b"
-    },
-    "src/moteur/live.fichiers.ts": {
-      "source": "moteur/src/moteur/live.fichiers.ts",
-      "sha256": "d281443e407217bcea47049a2b8acd27b338949a919dc0b1857cf735785ea900"
-    },
-    "src/moteur/menus.ts": {
-      "source": "extensions/administrable/src/moteur/menus.ts",
-      "sha256": "de4223a98f3ff53fcef3f6fd05a6a590ac39ea1c99593349d38d9895be5d70d4"
-    },
-    "src/moteur/pages.ts": {
-      "source": "extensions/administrable/src/moteur/pages.ts",
-      "sha256": "b52a0e9beea5a4045168d62203d55eb873e46bdebe2546beeca3bfafdaac4ca9"
-    },
-    "src/moteur/palette.ts": {
-      "source": "extensions/administrable/src/moteur/palette.ts",
-      "sha256": "5f8ddcbec56847253703f15d0506aeb008aa0097a2f8d8f4149ba9a479c3ab7a"
-    },
-    "src/moteur/Pastilles.astro": {
-      "source": "extensions/administrable/src/moteur/Pastilles.astro",
-      "sha256": "6736e3b0c1e9ccc474c02be31060880ec6f7a42b9fe784cfcac2e45a3f85b195"
-    },
-    "src/moteur/PhotoDuMoteur.astro": {
-      "source": "extensions/administrable/src/moteur/PhotoDuMoteur.astro",
-      "sha256": "6a7e41c5637fcfa7baf0cab34cf3a03524084797c328eb44e1226342fb6ad812"
-    },
-    "src/moteur/plan-du-site.index.ts": {
-      "source": "moteur/src/moteur/plan-du-site.index.ts",
-      "sha256": "f9cc3b835e695cb854c8eba82f5c89af5b52ced7587ad64f71862ca8941b224c"
-    },
-    "src/moteur/qualite-image.selfcheck.ts": {
-      "source": "moteur/src/moteur/qualite-image.selfcheck.ts",
-      "sha256": "b71f9905016ebfda2d13381a2041d3c437324544b7b185abeee9e506eee0f2d8"
-    },
-    "src/moteur/qualite-image.ts": {
-      "source": "moteur/src/moteur/qualite-image.ts",
-      "sha256": "b68167e00766bc7debb2d9d7b676ca6664b5563bba1788aa990da47138549015"
-    },
-    "src/moteur/resolution.node.mjs": {
-      "source": "moteur/src/moteur/resolution.node.mjs",
-      "sha256": "4d6172c9ff51da0cd516f342581e02a799c380a3dceb4cb4b2c88b3c0b07f67f"
-    },
-    "src/moteur/service-image.ts": {
-      "source": "moteur/src/moteur/service-image.ts",
-      "sha256": "dce57384d071d79f43d62b1b4f00bb7278fa3f8df9bcf3115238837026c84bd8"
-    },
-    "src/moteur/site.ts": {
-      "source": "extensions/administrable/src/moteur/site.ts",
-      "sha256": "0c8675de351c890d901da5f881fefac09613c9dcb518cfa5761714fcdc54c914"
-    },
-    "src/moteur/texte-riche.emdash.astro": {
-      "source": "extensions/administrable/src/moteur/texte-riche.emdash.astro",
-      "sha256": "cd69528d0c339fe0ec24abdd22e0b8e65c734bdda082813e8f416f391d098ac3"
-    },
-    "src/moteur/texte-riche.fichiers.astro": {
-      "source": "extensions/administrable/src/moteur/texte-riche.fichiers.astro",
-      "sha256": "3e673b0b6b803e23eb272cf331693b90e92e46111f282bc332b6e5f1c230aae0"
-    },
-    "src/moteur/TexteRiche.fichiers.astro": {
-      "source": "moteur/src/moteur/TexteRiche.fichiers.astro",
-      "sha256": "9db28437e928a2bead890bff17f16cfde7aa11342781cf986a8dcd7a64f3eec3"
-    },
-    "src/moteur/textes-edition.ts": {
-      "source": "extensions/administrable/src/moteur/textes-edition.ts",
-      "sha256": "fab020ef347f94d382ff30367b511ee3cd89f0849ddc69525abd411a3c835074"
-    },
-    "src/moteur/version.ts": {
-      "source": "moteur/src/moteur/version.ts",
-      "sha256": "9ff7d16323a76fd09f2b5f2cfd0fefdebae27779372cf46b4d302eda8b5822bd"
-    },
-    "src/pages/[...locale]/404-introuvable.astro": {
-      "source": "extensions/administrable/src/pages/[...locale]/404-introuvable.astro",
-      "sha256": "e3750175e302dc9451506952b29b4d7fb0dbc31589e920b0eb857bffd0268e17"
-    },
-    "src/pages/[...locale]/page-libre.astro": {
-      "source": "extensions/administrable/src/pages/[...locale]/page-libre.astro",
-      "sha256": "4a3619be4c5b94d814526fe2201a3562f9dfae549fdbc0627d132098dd2e35b9"
-    },
-    "src/styles/motion/attention.css": {
-      "source": "moteur/src/styles/motion/attention.css",
-      "sha256": "0fc99cf586e4dfe84882c50fef16fbaeffcc5849a6acbd3309b575cff3778857"
-    },
-    "src/styles/motion/fades.css": {
-      "source": "moteur/src/styles/motion/fades.css",
-      "sha256": "51b498633d8c2aef1450ea09f02ac22d7b29da99fc6f7a566e326db0fec5a503"
-    },
-    "src/styles/motion/index.css": {
-      "source": "moteur/src/styles/motion/index.css",
-      "sha256": "39b200a5aad8da2cb530148c9149306c74a4155cfc731b97aaf6243844f4bdb1"
-    },
-    "src/styles/motion/materials.css": {
-      "source": "moteur/src/styles/motion/materials.css",
-      "sha256": "5125faeadf123f70555a898aac4b47c8a7e25440884a373d9cd85aaa97592466"
-    },
-    "src/styles/motion/scroll.css": {
-      "source": "moteur/src/styles/motion/scroll.css",
-      "sha256": "c625199a84668ac4c63ff292025bc1b34ae8bcc3b1c2ff0c39cb6f46c3bdf904"
-    },
-    "src/styles/motion/slides.css": {
-      "source": "moteur/src/styles/motion/slides.css",
-      "sha256": "69268bf85c2c0e5e336eb6bbbc39ecd6e3986e8421bd249d44096f7a92bc008f"
-    },
-    "src/styles/motion/zooms.css": {
-      "source": "moteur/src/styles/motion/zooms.css",
-      "sha256": "261a29b9f43f6e892c70854810dde8de668f2977b20bd492114b46f15b44c484"
-    }
+    ".github/workflows/verifier.yml": {"source":"moteur/.github/workflows/verifier.yml","sha256":"78fc714b0b53f4ab2ec01b52d31f4e9b40d5cbc5ecf584095216f1785ba840e1"},
+    "scripts/app.mjs": {"source":"moteur/scripts/app.mjs","sha256":"fefb8252fd62c4a4391b42ea2e2cb836c46f68f4f43ae13127397e577df9fe77"},
+    "scripts/base-3.4.0.mjs": {"source":"extensions/administrable/scripts/base-3.4.0.mjs","sha256":"cad4ca522b53991d3feb2f876596beab4adac75f68cfe49e4f407d1cb7c7bd75"},
+    "scripts/checks.mjs": {"source":"moteur/scripts/checks.mjs","sha256":"014338982d65c1174371f834243d1ab15fabddcaaf16d49b31179171a41f17de"},
+    "scripts/couverture-edition.mjs": {"source":"extensions/administrable/scripts/couverture-edition.mjs","sha256":"cc7b6424ba3edfed8de690aeea23208663db8d6fa06dc568a91947bfa39b2b46"},
+    "scripts/essai-administrer.gestes.mjs": {"source":"extensions/administrable/scripts/essai-administrer.gestes.mjs","sha256":"37a3a40c898289fff19e8e553f15861b333901907e5875e5cf617e5133fc2398"},
+    "scripts/essai-administrer.mjs": {"source":"extensions/administrable/scripts/essai-administrer.mjs","sha256":"3ffe28004bcf03933df25a0d21261b722deffb90882ef19c3542e8ba72eea59f"},
+    "scripts/house.mjs": {"source":"moteur/scripts/house.mjs","sha256":"20ae443a1d078531b92545e13a43d6d152513d612e0a906819a658794cdab109"},
+    "scripts/navigateur.mjs": {"source":"extensions/administrable/scripts/navigateur.mjs","sha256":"67f6fe12318a73a774765335c47e349c3211d426cd791b8fcfb611cfa7b05329"},
+    "scripts/poster.mjs": {"source":"moteur/scripts/poster.mjs","sha256":"d777e9dc80a5d71bef1fd606be099dc57177e5720b9e2f1974990beba0abaf6b"},
+    "scripts/socle.mjs": {"source":"scripts/socle.mjs","sha256":"27b2c07df12226153bdab2dac6b198813ae914caebedeb2d57abd0108a9b1b6a"},
+    "scripts/sql-par-difference.mjs": {"source":"extensions/administrable/scripts/sql-par-difference.mjs","sha256":"9e469b5f1059efa9530e97cdd5d15254e53aff2bb8ee653e89a38e9a46db3c91"},
+    "scripts/verify.lisibilite.mjs": {"source":"moteur/scripts/verify.lisibilite.mjs","sha256":"2ad1f2a7760ce3516461e9fdfa5d2ab3582c89fe610648f3844d3411b175c348"},
+    "scripts/verify.mjs": {"source":"moteur/scripts/verify.mjs","sha256":"a9dc40a14c863edcb271afb98273a3a19bcc8d9ee4803fd7dd5eda234034e1ca"},
+    "scripts/verify.probe.mjs": {"source":"moteur/scripts/verify.probe.mjs","sha256":"968c513074ec5984d84b9fe2a3fcc01455a3bcf2390e64164d283c4fd133e4ae"},
+    "src/moteur/annotations.ts": {"source":"extensions/administrable/src/moteur/annotations.ts","sha256":"341c5676081da19a92fab7950c48b092a6780ec33071081a988190766dd37a17"},
+    "src/moteur/back-office-rail.css": {"source":"extensions/administrable/src/moteur/back-office-rail.css","sha256":"7fb9c1578ea40ca6907c4dc8be30300d31f3aff9698f10c2c9096dd8a04ba443"},
+    "src/moteur/cadre.emdash.ts": {"source":"extensions/administrable/src/moteur/cadre.emdash.ts","sha256":"a574bf347828ef535b95639931a1cb0b8da82899f68218d3eae204b66adbbda1"},
+    "src/moteur/cadre.fichiers.ts": {"source":"extensions/administrable/src/moteur/cadre.fichiers.ts","sha256":"4ff7f374290edb588896b0a6483a0b9e731d436fbc0b0712bfe66baadc99e326"},
+    "src/moteur/cadre.ts": {"source":"extensions/administrable/src/moteur/cadre.ts","sha256":"053110a666f86fe0e64663b16d5efeaa914dcebc44bb37f1c43a8c6539b4f775"},
+    "src/moteur/CadreDuSite.astro": {"source":"extensions/administrable/src/moteur/CadreDuSite.astro","sha256":"195a34bb0eff3f24f0311750610e1965b9f8761cd79335e06ab97370ed85b223"},
+    "src/moteur/catalogue-bo.config.mjs": {"source":"moteur/src/moteur/catalogue-bo.config.mjs","sha256":"b9b98e18bb9da9acd371b3789a32fd8acf66da2ce88411bbbac30939b40376cd"},
+    "src/moteur/catalogue-bo.fr.ts": {"source":"moteur/src/moteur/catalogue-bo.fr.ts","sha256":"abf9ed1614ce9769e85e061fcae86ec0040a0586b23f52c9b0bd9cb27b0f2a6e"},
+    "src/moteur/catalogue-bo.regles.ts": {"source":"moteur/src/moteur/catalogue-bo.regles.ts","sha256":"1b23598c90d70aff73ff23eb3c9f71d3543eeaf7bddbcf875becf825f2665742"},
+    "src/moteur/catalogue-bo.selfcheck.ts": {"source":"moteur/src/moteur/catalogue-bo.selfcheck.ts","sha256":"c86f0d8ad6ebde575e6cd400fac13dff0c76e908c11968f4bfc0270804a78691"},
+    "src/moteur/catalogue-bo.ts": {"source":"moteur/src/moteur/catalogue-bo.ts","sha256":"b574ef6fa1da1a2415da1094ff8b55f206b501ae489a8e4e5eafe97d1bc439cf"},
+    "src/moteur/catalogue-emdash.d.ts": {"source":"moteur/src/moteur/catalogue-emdash.d.ts","sha256":"c71fb258fc3c3232026ed96b51db5ea4d314893617ac106279f5114234ab3365"},
+    "src/moteur/chemins.ts": {"source":"moteur/src/moteur/chemins.ts","sha256":"b5eb52ba69bf4c82842d6bca54f17bcd9ecae52c49be1eca8c5d4e541dd2a787"},
+    "src/moteur/constantes.d.ts": {"source":"moteur/src/moteur/constantes.d.ts","sha256":"8266ae58db7718e987a89054eaac7ec206f9f199c27be7bb7293a32f0b8c1738"},
+    "src/moteur/deployer/action.ts": {"source":"extensions/deployer/src/moteur/deployer/action.ts","sha256":"7bd50c97f1ab2588e103ded293461e7181e4c686c5abc005ad63487d5a16e36d"},
+    "src/moteur/deployer/caches.ts": {"source":"extensions/deployer/src/moteur/deployer/caches.ts","sha256":"8237259121160ab334fad1d4bee50723632d32143e5fbec97d3a33d1cbdee302"},
+    "src/moteur/deployer/extension.ts": {"source":"extensions/deployer/src/moteur/deployer/extension.ts","sha256":"d6eb25f439fb6de16b4e810437de143cfafeb3ee800582fb4240e8550edb821c"},
+    "src/moteur/deployer/identite.mjs": {"source":"extensions/deployer/src/moteur/deployer/identite.mjs","sha256":"cb502bda7ab2113e3e85cb17c7d95711dc99a0f81759a6048ee84e05846be5d4"},
+    "src/moteur/deployer/journal.ts": {"source":"extensions/deployer/src/moteur/deployer/journal.ts","sha256":"cb23d464c8265197bb471edf3b0c54f5a327eda4644684e65f8ee0aabee38646"},
+    "src/moteur/deployer/page.ts": {"source":"extensions/deployer/src/moteur/deployer/page.ts","sha256":"d9aa138b72b0462c2d545db904615952bf52225abcae204919a062b12d064dd2"},
+    "src/moteur/deployer/regles.selfcheck.ts": {"source":"extensions/deployer/src/moteur/deployer/regles.selfcheck.ts","sha256":"9da8131ccf9147e63ce192513c5746d083e1002961228830260b317acea0d7cc"},
+    "src/moteur/deployer/regles.ts": {"source":"extensions/deployer/src/moteur/deployer/regles.ts","sha256":"f3ef8b27a740781be325ed9962751ae08fc027a9ffb1db533648d8c0e295682f"},
+    "src/moteur/deployer/textes.en.ts": {"source":"extensions/deployer/src/moteur/deployer/textes.en.ts","sha256":"cec24a3ac3837ddaf1e6c616d08d087055ed482ed18552894c126fef77f3a9ce"},
+    "src/moteur/deployer/textes.fr.ts": {"source":"extensions/deployer/src/moteur/deployer/textes.fr.ts","sha256":"5e31521a29e2c1b4899a3ca3ef290dd2cc5ab713cf7e5588d48e57ae959dbe46"},
+    "src/moteur/deployer/textes.ts": {"source":"extensions/deployer/src/moteur/deployer/textes.ts","sha256":"738d20c43562a2bc2a12a0314e5ec07df42f9b760fe387685fc96ea52c051ea3"},
+    "src/moteur/essai.ts": {"source":"extensions/administrable/src/moteur/essai.ts","sha256":"ada7f6b71b46e485f8b754b7926ad83797eec9db6eb9b4c7a2d29aa44547ea1b"},
+    "src/moteur/extensions/courriels/adaptateur.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/adaptateur.ts","sha256":"b0d4177cd6a2fc5ca7f0e13a412e455be0aa301fe532d1ed684dcc755751e3c1"},
+    "src/moteur/extensions/courriels/courriels.selfcheck.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/courriels.selfcheck.ts","sha256":"b2b0dc6715b9fc97065d94f9fbb22108c4045f4fc88faa6bd08325fabf5c045f"},
+    "src/moteur/extensions/courriels/ecrans/blocs.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/ecrans/blocs.ts","sha256":"6dfefd875c3ed7aad7dc43454986f77ee49709de1aa0f1526bc733e06c4ac3f3"},
+    "src/moteur/extensions/courriels/ecrans/brancher.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/ecrans/brancher.ts","sha256":"c9fd3e7efa76afb915da393996a566933c75a0cf078b775ebe47cd9d5f31e851"},
+    "src/moteur/extensions/courriels/ecrans/journal.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/ecrans/journal.ts","sha256":"9b1c6a052861b73f9ee8312983d89d6c9e3b670fec459afde55c69c52b513f90"},
+    "src/moteur/extensions/courriels/ecrans/reglages.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/ecrans/reglages.ts","sha256":"596d6f3dab6e052190fdfc30d63f50f99242cf2410eaa930b81bfee4904aa699"},
+    "src/moteur/extensions/courriels/ecrans/tableau.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/ecrans/tableau.ts","sha256":"7425cd9938571d990c0f17e724d1af60635e5280eb47521fbea33a2f0fccf70f"},
+    "src/moteur/extensions/courriels/ecrans/textes.en.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/ecrans/textes.en.ts","sha256":"f5feea94a28f22bd1461c887dbd54d48dea6f10223a266639f850d714cf6fee4"},
+    "src/moteur/extensions/courriels/ecrans/textes.fr.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/ecrans/textes.fr.ts","sha256":"db56442a021989ab1fef6f2e3ca7f30502094191d91eff1f66f4732af7ded810"},
+    "src/moteur/extensions/courriels/extension.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/extension.ts","sha256":"c44c2870f26a3b498aa3d456dab61f07b29b61bd494b7d46de56b1725f5a5489"},
+    "src/moteur/extensions/courriels/formulaire.emdash.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/formulaire.emdash.ts","sha256":"52ee433fbad084303cd1b8739cdf12585a074dcf8a95a99a5a3d61734e08844b"},
+    "src/moteur/extensions/courriels/formulaire.fichiers.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/formulaire.fichiers.ts","sha256":"26755570885005b39d1fa197e7c8944790d6552af3d32c31dfbd469f69b03183"},
+    "src/moteur/extensions/courriels/identite.mjs": {"source":"extensions/courriels/src/moteur/extensions/courriels/identite.mjs","sha256":"a78ed2577fe7d6fbed4b37ffad8b771d61617cd22e779a7e0c93dc5335402868"},
+    "src/moteur/extensions/courriels/noyau/base.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/noyau/base.ts","sha256":"bababadd35eb59a359916c4ad79b7e29f4c2f9105db66ca6256312ea97ffb538"},
+    "src/moteur/extensions/courriels/noyau/canal.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/noyau/canal.ts","sha256":"18aeee8ef495c5ad52bed55db49f94bf327bab48f709586436b2c6862e9ff0fd"},
+    "src/moteur/extensions/courriels/noyau/dns.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/noyau/dns.ts","sha256":"798c9dedc6fee1d6e92bd156877063d9ce78371f7b8db5a8fcb0b2a80227a125"},
+    "src/moteur/extensions/courriels/noyau/envoi.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/noyau/envoi.ts","sha256":"a2d0222412b5131811b2bedf14f5c8482f12f2cecd02a5c2b224b4ffa94544d6"},
+    "src/moteur/extensions/courriels/noyau/regles.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/noyau/regles.ts","sha256":"0fee35dbaec3990c95c207bd80674c8767ef6fce70579b1dc55dde07adb5515f"},
+    "src/moteur/extensions/courriels/reception.ts": {"source":"extensions/courriels/src/moteur/extensions/courriels/reception.ts","sha256":"2a8c8a54e432ed5c6f81a4783ffaeab56860f0af0bd168bcd73b99c2394d89c8"},
+    "src/moteur/feuille.selfcheck.ts": {"source":"moteur/src/moteur/feuille.selfcheck.ts","sha256":"64783a808f87f71403329e91da7937abc51f494b38dfb5730228d390966f8a25"},
+    "src/moteur/feuille.ts": {"source":"moteur/src/moteur/feuille.ts","sha256":"71ee7c01531cb9173d5315eec36a43b21f42071f4602bafbb14983e7d514f546"},
+    "src/moteur/habillage.ts": {"source":"moteur/src/moteur/habillage.ts","sha256":"f208911b1e83123ba9b9ea41416bc18abe4f0baa8da02ebf243fbeaa4cca9caa"},
+    "src/moteur/icones.ts": {"source":"extensions/administrable/src/moteur/icones.ts","sha256":"4ce6d40b402e0e52c0b06c0089da92725fd277339922b4ed7d61c7114876dce4"},
+    "src/moteur/langue-bo.regles.ts": {"source":"moteur/src/moteur/langue-bo.regles.ts","sha256":"3ee6ebbb001f9362fa07b5f4b4379118b972372601af0f51b3fff8c671266298"},
+    "src/moteur/langue-bo.selfcheck.ts": {"source":"moteur/src/moteur/langue-bo.selfcheck.ts","sha256":"d57fb3dec8db38ed56330a92533535c3d074908c84aacbff08728010b3c5b459"},
+    "src/moteur/live.emdash.ts": {"source":"moteur/src/moteur/live.emdash.ts","sha256":"48cf4d4f3d6084f2678d6bf792349493f22a572ca550987c611e0f7808ebd89b"},
+    "src/moteur/live.fichiers.ts": {"source":"moteur/src/moteur/live.fichiers.ts","sha256":"d281443e407217bcea47049a2b8acd27b338949a919dc0b1857cf735785ea900"},
+    "src/moteur/menus.ts": {"source":"extensions/administrable/src/moteur/menus.ts","sha256":"91832f9ac2e4ee8a650c58c8f08814a25fc526751f7309e4e1e15cbd4c2145a3"},
+    "src/moteur/pages.ts": {"source":"extensions/administrable/src/moteur/pages.ts","sha256":"b52a0e9beea5a4045168d62203d55eb873e46bdebe2546beeca3bfafdaac4ca9"},
+    "src/moteur/palette.selfcheck.ts": {"source":"extensions/administrable/src/moteur/palette.selfcheck.ts","sha256":"bcecd3323792cd263be0927e057884552eccff3bf97f6ccadae7d50e1f79166e"},
+    "src/moteur/palette.ts": {"source":"extensions/administrable/src/moteur/palette.ts","sha256":"e32a8ab52ba9c118cdef7052c56048dffa19a6bb3d5a32e138f2c5d712034db1"},
+    "src/moteur/Pastilles.astro": {"source":"extensions/administrable/src/moteur/Pastilles.astro","sha256":"6736e3b0c1e9ccc474c02be31060880ec6f7a42b9fe784cfcac2e45a3f85b195"},
+    "src/moteur/PhotoDuMoteur.astro": {"source":"extensions/administrable/src/moteur/PhotoDuMoteur.astro","sha256":"6a7e41c5637fcfa7baf0cab34cf3a03524084797c328eb44e1226342fb6ad812"},
+    "src/moteur/plan-du-site.index.ts": {"source":"moteur/src/moteur/plan-du-site.index.ts","sha256":"f9cc3b835e695cb854c8eba82f5c89af5b52ced7587ad64f71862ca8941b224c"},
+    "src/moteur/plan-du-site.xml.ts": {"source":"extensions/administrable/src/moteur/plan-du-site.xml.ts","sha256":"1204ac17e9ca665acb45677fa3c8f5afe10feb91b3cf2fab43380295d9c2534d"},
+    "src/moteur/qualite-image.selfcheck.ts": {"source":"moteur/src/moteur/qualite-image.selfcheck.ts","sha256":"b71f9905016ebfda2d13381a2041d3c437324544b7b185abeee9e506eee0f2d8"},
+    "src/moteur/qualite-image.ts": {"source":"moteur/src/moteur/qualite-image.ts","sha256":"b68167e00766bc7debb2d9d7b676ca6664b5563bba1788aa990da47138549015"},
+    "src/moteur/resolution.node.mjs": {"source":"moteur/src/moteur/resolution.node.mjs","sha256":"4d6172c9ff51da0cd516f342581e02a799c380a3dceb4cb4b2c88b3c0b07f67f"},
+    "src/moteur/seo.emdash.ts": {"source":"extensions/administrable/src/moteur/seo.emdash.ts","sha256":"95db1469640bf1c43c585e8cc4a21af47154f3634456f796ebf31a3eb767a6fa"},
+    "src/moteur/service-image.ts": {"source":"moteur/src/moteur/service-image.ts","sha256":"dce57384d071d79f43d62b1b4f00bb7278fa3f8df9bcf3115238837026c84bd8"},
+    "src/moteur/site.ts": {"source":"extensions/administrable/src/moteur/site.ts","sha256":"0c8675de351c890d901da5f881fefac09613c9dcb518cfa5761714fcdc54c914"},
+    "src/moteur/texte-brut.selfcheck.ts": {"source":"extensions/administrable/src/moteur/texte-brut.selfcheck.ts","sha256":"66b30f608b8b3f0bf38c8e6bc5f590ab1782a5c03b8d00b2917dd58cdd414950"},
+    "src/moteur/texte-brut.ts": {"source":"extensions/administrable/src/moteur/texte-brut.ts","sha256":"a7f0caa634662569b2044046da24a8f7b65f0b20f955d504ac3799e762ede37e"},
+    "src/moteur/texte-riche.emdash.astro": {"source":"extensions/administrable/src/moteur/texte-riche.emdash.astro","sha256":"cd69528d0c339fe0ec24abdd22e0b8e65c734bdda082813e8f416f391d098ac3"},
+    "src/moteur/texte-riche.fichiers.astro": {"source":"extensions/administrable/src/moteur/texte-riche.fichiers.astro","sha256":"3e673b0b6b803e23eb272cf331693b90e92e46111f282bc332b6e5f1c230aae0"},
+    "src/moteur/TexteRiche.fichiers.astro": {"source":"moteur/src/moteur/TexteRiche.fichiers.astro","sha256":"9db28437e928a2bead890bff17f16cfde7aa11342781cf986a8dcd7a64f3eec3"},
+    "src/moteur/textes-edition.ts": {"source":"extensions/administrable/src/moteur/textes-edition.ts","sha256":"fab020ef347f94d382ff30367b511ee3cd89f0849ddc69525abd411a3c835074"},
+    "src/moteur/version.ts": {"source":"moteur/src/moteur/version.ts","sha256":"9ff7d16323a76fd09f2b5f2cfd0fefdebae27779372cf46b4d302eda8b5822bd"},
+    "src/pages/[...locale]/404-introuvable.astro": {"source":"extensions/administrable/src/pages/[...locale]/404-introuvable.astro","sha256":"e3750175e302dc9451506952b29b4d7fb0dbc31589e920b0eb857bffd0268e17"},
+    "src/pages/[...locale]/page-libre.astro": {"source":"extensions/administrable/src/pages/[...locale]/page-libre.astro","sha256":"4a3619be4c5b94d814526fe2201a3562f9dfae549fdbc0627d132098dd2e35b9"},
+    "src/styles/motion/attention.css": {"source":"moteur/src/styles/motion/attention.css","sha256":"0fc99cf586e4dfe84882c50fef16fbaeffcc5849a6acbd3309b575cff3778857"},
+    "src/styles/motion/fades.css": {"source":"moteur/src/styles/motion/fades.css","sha256":"51b498633d8c2aef1450ea09f02ac22d7b29da99fc6f7a566e326db0fec5a503"},
+    "src/styles/motion/index.css": {"source":"moteur/src/styles/motion/index.css","sha256":"39b200a5aad8da2cb530148c9149306c74a4155cfc731b97aaf6243844f4bdb1"},
+    "src/styles/motion/materials.css": {"source":"moteur/src/styles/motion/materials.css","sha256":"5125faeadf123f70555a898aac4b47c8a7e25440884a373d9cd85aaa97592466"},
+    "src/styles/motion/scroll.css": {"source":"moteur/src/styles/motion/scroll.css","sha256":"c625199a84668ac4c63ff292025bc1b34ae8bcc3b1c2ff0c39cb6f46c3bdf904"},
+    "src/styles/motion/slides.css": {"source":"moteur/src/styles/motion/slides.css","sha256":"69268bf85c2c0e5e336eb6bbbc39ecd6e3986e8421bd249d44096f7a92bc008f"},
+    "src/styles/motion/zooms.css": {"source":"moteur/src/styles/motion/zooms.css","sha256":"261a29b9f43f6e892c70854810dde8de668f2977b20bd492114b46f15b44c484"}
   }
 }

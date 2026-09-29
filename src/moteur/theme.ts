@@ -10,8 +10,9 @@
 //   - routesDesMenus(locale) : les adresses que ses menus ouvrent ;
 //   - repliDuSite(locale) et identiteDuSite(page, locale) : son identite
 //     livree, rendue quand les reglages du back office sont vides ;
-//   - variablesDeLaPalette(teinte) : ses jetons de couleur pour une teinte
-//     d'accent, par la recette de son `pnpm rebrand` ;
+//   - variablesDeLaPalette(teinte) : ses jetons de couleur pour la teinte
+//     VISIBLE que le nom de la couleur dit (palette.ts, socle 1.3.0), par la
+//     recette de son `pnpm rebrand` ;
 //   - VARIABLES_D_EDITION : ses jetons, pour les pastilles et le panneau du
 //     mode edition ;
 //   - ROUTES_DU_THEME : les segments d'adresse que ses pages fixes prennent
@@ -19,13 +20,16 @@
 //   - ICONES : les noms francais des icones qu'un editeur choisit ;
 //   - ADMIN_EXTERNE : le back office d'un catalogue externe ; null ici ;
 //   - ADRESSES_DE_COUVERTURE : les pages que scripts/couverture-edition.mjs
-//     parcourt (un exemplaire de chaque gabarit, dans les deux langues).
+//     parcourt (un exemplaire de chaque gabarit, dans les deux langues) ;
+//   - ESSAI_DE_L_ADMINISTRATION : les parametres des gestes communs du guide
+//     rejoue (essai-administrer.mjs ; forme : essai.ts).
 import type { IconName } from "@components/svg/icons";
 import { getSiteRoutes } from "@config/navData.json.ts";
 import siteData from "@config/siteData.json";
 import type { Locale } from "@i18n";
 import { ACTIONS, type MenuDuSite, PRINCIPAL, TIROIR } from "./menus.ts";
 import { identite, type Identite, type RepliDuSite } from "./cadre.ts";
+import type { ParametresDeLEssai } from "./essai.ts";
 
 /** Les menus de Reef, dans l'ordre du back office : la barre, le tiroir, le bouton S'abonner, les trois colonnes du pied. */
 export const MENUS: readonly MenuDuSite[] = [
@@ -218,7 +222,8 @@ export const ADRESSES_DE_COUVERTURE = [
 export const ADMIN_EXTERNE: { libelle: string; url: string } | null = null;
 
 // LA COULEUR DE LA MARQUE, par la recette de scripts/rebrand.mjs : l'accent
-// (rampe coral) sur la teinte choisie, les deux neutres (ink et paper) sur une
+// (rampe coral, la couleur visible de Reef : liens, boutons) sur la teinte
+// nommee, telle quelle (palette.ts, socle 1.3.0 : "Bleu océan" est un bleu), les deux neutres (ink et paper) sur une
 // teinte froide d'ancrage, le second accent (rampe reef) tourne de 181 degres.
 function hslVersHex(h: number, s: number, l: number): string {
   const t = ((h % 360) + 360) % 360;
@@ -259,7 +264,7 @@ function teinteAncrage(h: number): number {
   return Math.abs(tournee - 150) <= Math.abs(tournee - 280) ? 150 : 280;
 }
 
-/** Les variables des quatre rampes de tokens.css pour une teinte d'accent. */
+/** Les variables des quatre rampes de tokens.css pour la teinte visible nommee (palette.ts). */
 export function variablesDeLaPalette(h: number): Record<string, string> {
   const vars: Record<string, string> = {};
   // L'accent est pose sur la luminosite du palier 400 : pas de decalage de courbe.
@@ -270,3 +275,18 @@ export function variablesDeLaPalette(h: number): Record<string, string> {
   for (const [pas, l, s] of REEF) vars[`--color-reef-${pas}`] = hslVersHex(h + ROTATION_REEF, s, l);
   return vars;
 }
+
+/** Les gestes communs du guide rejoue (scripts/essai-administrer.mjs) ; les reglages, sujets et billets sont dans scripts/essai-administrer.site.mjs. */
+export const ESSAI_DE_L_ADMINISTRATION: ParametresDeLEssai = {
+  image: "public/reef-iphone-poster.webp",
+  titre: { entree: "hero", selecteur: "#hero-title" },
+  bandeau: { selecteur: '[data-slot="home-hero"]' },
+  masquer: { entree: "signatures", marqueur: 'aria-labelledby="writers-title"' },
+  menu: { nom: "principal", rang: 0, libelle: "Posts" },
+  pied: { menu: "pied-studio", page: "/about/" },
+  nomDuSite: { valeur: "Reef", page: "/about/" },
+  logo: { motif: 'style="height:1\\.5rem;width:auto"' },
+  pageLibre: { menu: "principal" },
+  redirection: { vers: "/about/" },
+  seo: { entree: "contact", page: "/contact/" },
+};

@@ -30,7 +30,8 @@ const variables = `:root{${Object.entries(VARIABLES_D_EDITION)
   .join(";")}}`;
 
 /** Le libelle d'un menu tel que le back office le montre : celui de la base, sinon celui de la graine dans la langue du back office, sinon son nom (les colonnes du pied). */
-const libelleDuMenu = (nom: string): string => menuDe(Astro, nom, locale)?.label ?? LIBELLES_DES_MENUS[nom] ?? nom;
+const libelleDuMenu = (nom: string): string =>
+  menuDe(Astro, nom, locale)?.label ?? MENUS.find((m) => m.nom === nom)?.nomDansLeBackOffice ?? LIBELLES_DES_MENUS[nom] ?? nom;
 
 /** L'adresse d'une entree de `sections` dans le back office, lue sur son annotation ; la liste de la collection si l'entree n'est pas publiee. */
 function adresseDeLEntree(cle: string, collection = "sections"): string {

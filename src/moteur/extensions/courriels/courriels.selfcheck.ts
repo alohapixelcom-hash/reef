@@ -230,9 +230,17 @@ if (sqlite) {
 // l'ecran, sur des domaines qui n'existent pas.
 const ici = fileURLToPath(new URL(".", import.meta.url));
 const fichiers = readdirSync(ici, { recursive: true }).map(String).filter((f) => /\.(ts|mjs)$/.test(f) && !f.endsWith(".selfcheck.ts"));
-const composant = fileURLToPath(new URL("../../../components/Sections/Contact/ContactForm.astro", import.meta.url));
+// Les formulaires du site qui envoient par Courriels (ceux qui importent
+// @moteur/courriels), ou qu'ils soient : le chemin d'un formulaire est propre
+// au theme (ContactForm.astro chez Koa, un autre nom ailleurs).
+const src = fileURLToPath(new URL("../../../", import.meta.url));
+const formulaires = readdirSync(src, { recursive: true })
+  .map(String)
+  .filter((f) => f.endsWith(".astro") && !f.startsWith("moteur/"))
+  .map((f) => join(src, f))
+  .filter((f) => readFileSync(f, "utf8").includes("@moteur/courriels"));
 const EXEMPLES = new Set(["votre-domaine.fr", "your-domain.com"]);
-for (const chemin of [...fichiers.map((f) => join(ici, f)), composant]) {
+for (const chemin of [...fichiers.map((f) => join(ici, f)), ...formulaires]) {
   for (const [adresse, domaine] of readFileSync(chemin, "utf8").matchAll(/[A-Za-z0-9._%+-]+@([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)/g)) {
     assert.ok(EXEMPLES.has(domaine!), `adresse en dur dans ${chemin} : ${adresse}`);
   }
