@@ -48,6 +48,13 @@ export const LETTRE_FR = {
   parutions: "Derniers envois de la lettre",
   colonnesParutions: { quand: "Quand", article: "Article", envoyes: "Partis", refuses: "Pas partis" },
   aucuneParution: "Aucun article envoyé pour l'instant.",
+  /* La page de confirmation de la desinscription (lien du pied d'un courriel). */
+  desinscription: {
+    titre: "Se désinscrire de la lettre",
+    phrase: (site: string, adresse: string) => `L'adresse ${adresse} ne recevra plus la lettre de ${site}. Vous pourrez vous réinscrire à tout moment depuis le site.`,
+    bouton: "Me désinscrire",
+    garder: "Garder mon abonnement",
+  },
   /* Ce que lit le visiteur en revenant sur le site. */
   visiteur: {
     attente: "Presque fini : un courriel vient de partir vers votre adresse. Cliquez sur le lien qu'il contient pour confirmer votre inscription.",

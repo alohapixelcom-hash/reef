@@ -24,7 +24,7 @@ built in, with no outside service.
 - Newsletter (shared base 1.8.0, Emails extension): the "Subscribe" forms sign
   readers up with double opt-in, a « Lettre d'information » screen lists the
   subscribers and sends a published post to all of them in their language, in
-  one click, and every email carries a one-click unsubscribe link and the
+  one click, and every email carries an unsubscribe link and the
   `List-Unsubscribe` headers. No outside service; sends count in the monthly
   email allowance. Until emails are connected, the forms behave as before.
 - Database: `import-3.8.3-reef.sql` (plan with `node scripts/base-3.4.0.mjs
@@ -33,6 +33,14 @@ built in, with no outside service.
   keywords (once), newsletter tables. Idempotent, no DELETE, no DROP.
 - Static build: identical to 3.8.2 except what was added on purpose (the tag
   pages, the tag links of each post, the sitemap).
+- Newsletter unsubscribe: the link at the bottom of each email now opens a
+  confirmation page (« Me désinscrire », « Garder mon abonnement », French
+  and English), so a mail scanner that opens links no longer unsubscribes
+  anyone. The unsubscribe button of mail apps (RFC 8058) stays one click.
+- Block screens (shared base 1.8.0): each block screen now also hides the
+  text fields and the list of items that do not change that block (measured
+  field by field on the published pages; nothing is removed, and a block
+  that is not on the map keeps all its fields).
 
 ## 3.8.2 - 2026-09-29
 

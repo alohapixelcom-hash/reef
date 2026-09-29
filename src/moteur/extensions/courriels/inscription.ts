@@ -8,7 +8,8 @@
 //
 //   POST /_emdash/courriels/lettre/inscrire     email, langue, retour, site_web (piege)
 //   GET  /_emdash/courriels/lettre/confirmer?jeton=...
-//   GET  /_emdash/courriels/lettre/desinscrire?jeton=...  (le lien du pied)
+//   GET  /_emdash/courriels/lettre/desinscrire?jeton=...  (le lien du pied : la page de confirmation, 3.8.3)
+//   POST /_emdash/courriels/lettre/desinscrire?jeton=...  confirme=1 (le bouton de cette page : 303 vers l'accueil)
 //   POST /_emdash/courriels/lettre/desinscrire?jeton=...  (le bouton des messageries, RFC 8058 : 200, sans page)
 //
 // La route vit sous /_emdash/ (voir reception.ts). Astro verifie l'origine
@@ -21,7 +22,8 @@ import { CONFIGURATION } from "./configuration.ts";
 import { IDENTITE } from "./identite.mjs";
 import { lireLesReglages } from "./noyau/base.ts";
 import { type Canal, poster } from "./noyau/canal.ts";
-import { accueilDe, confirmer, demanderLInscription, desinscrire, liensDeLAbonne } from "./noyau/lettre.ts";
+import { abonneDuJeton, accueilDe, confirmer, demanderLInscription, desinscrire, liensDeLAbonne } from "./noyau/lettre.ts";
+import { CHAMP_CONFIRME, pageDeDesinscription } from "./noyau/page-desinscription.ts";
 import { confirmation } from "./noyau/parution.ts";
 import { cheminDeRetour, type Langue } from "./noyau/regles.ts";
 import { LETTRE_EN } from "./ecrans/lettre.textes.en.ts";
@@ -94,9 +96,23 @@ async function lien(url: URL, geste: "confirmer" | "desinscrire", unClic: boolea
     if (issue.issue === "inconnu" || !issue.abonne) return retour(accueilDe(lettre, "en"), "inconnu");
     return retour(accueilDe(lettre, issue.abonne.langue), "confirme");
   }
+  // Le lien du pied : une page qui demande la confirmation (un robot qui ouvre le lien ne desinscrit personne).
+  if (!unClic) {
+    const abonne = await abonneDuJeton(base, jeton);
+    if (!abonne) return retour(accueilDe(lettre, "en"), "inconnu");
+    const t = abonne.langue === "fr" ? LETTRE_FR : LETTRE_EN;
+    const reglages = await lireLesReglages(base);
+    const html = pageDeDesinscription(t.desinscription, {
+      langue: abonne.langue === "fr" ? "fr" : "en",
+      site: reglages.nom || (await nomDuSite()),
+      adresse: abonne.adresse,
+      action: `${url.pathname}?jeton=${encodeURIComponent(String(jeton))}`,
+      accueil: accueilDe(lettre, abonne.langue),
+    });
+    return new Response(html, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex", "Referrer-Policy": "no-referrer" } });
+  }
   const parti = await desinscrire(base, jeton);
-  if (unClic) return new Response(null, { status: parti ? 200 : 404, headers: { "Cache-Control": "no-store" } });
-  return parti ? retour(accueilDe(lettre, parti.langue), "desinscrit") : retour(accueilDe(lettre, "en"), "inconnu");
+  return new Response(null, { status: parti ? 200 : 404, headers: { "Cache-Control": "no-store" } });
 }
 
 export const GET: APIRoute = async ({ params, url }) => {
@@ -108,6 +124,22 @@ export const GET: APIRoute = async ({ params, url }) => {
 export const POST: APIRoute = async ({ params, url, request, locals }) => {
   const geste = params.geste;
   if (geste === "inscrire") return inscrire(request, locals);
-  if (geste === "desinscrire") return lien(url, "desinscrire", true);
+  if (geste === "desinscrire") {
+    // Le bouton de la page de confirmation porte confirme=1 : il desinscrit et ramene a l'accueil avec la phrase.
+    let confirme = false;
+    try {
+      confirme = (await request.clone().formData()).get(CHAMP_CONFIRME) === "1";
+    } catch {
+      /* corps illisible : le POST en un clic des messageries */
+    }
+    if (confirme) {
+      const lettre = lettreDuSite();
+      const { base } = await hote();
+      if (!lettre || !base) return retour("/", "inconnu");
+      const parti = await desinscrire(base, url.searchParams.get("jeton"));
+      return parti ? retour(accueilDe(lettre, parti.langue), "desinscrit") : retour(accueilDe(lettre, "en"), "inconnu");
+    }
+    return lien(url, "desinscrire", true);
+  }
   return new Response(null, { status: 404 });
 };

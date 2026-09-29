@@ -49,6 +49,12 @@ export const LETTRE_EN: TextesDeLaLettre = {
   parutions: "Latest newsletter sends",
   colonnesParutions: { quand: "When", article: "Article", envoyes: "Sent", refuses: "Not sent" },
   aucuneParution: "No article sent yet.",
+  desinscription: {
+    titre: "Unsubscribe from the newsletter",
+    phrase: (site: string, adresse: string) => `The address ${adresse} will no longer receive the ${site} newsletter. You can sign up again at any time from the site.`,
+    bouton: "Unsubscribe me",
+    garder: "Keep my subscription",
+  },
   visiteur: {
     attente: "Almost done: an email is on its way to your address. Click the link inside to confirm your subscription.",
     invalide: "This address does not look valid: check it, then sign up again.",

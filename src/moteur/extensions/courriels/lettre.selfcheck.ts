@@ -31,6 +31,16 @@ is(c.entetes["List-Unsubscribe-Post"], "List-Unsubscribe=One-Click", "desinscrip
 is(c.entetes["List-Unsubscribe"], "<https://x.test/_emdash/courriels/lettre/desinscrire?jeton=j>", "le lien personnel dans l'en-tete");
 is(c.texte.includes("Se désinscrire : https://x.test/"), true, "le lien personnel dans le texte");
 
+// La page de confirmation de la desinscription (3.8.3) : dans la langue, adresse masquee, un bouton POST, echappee.
+{
+  const { adresseMasquee, CHAMP_CONFIRME, pageDeDesinscription } = await import("./noyau/page-desinscription.ts");
+  const html = pageDeDesinscription(LETTRE_FR.desinscription, { langue: "fr", site: "Reef <b>", adresse: "camille@exemple.test", action: "/_emdash/courriels/lettre/desinscrire?jeton=j", accueil: "/fr/" });
+  is(adresseMasquee("camille@exemple.test"), "c***@exemple.test", "l'adresse est masquee");
+  is([html.includes('lang="fr"'), html.includes("c***@exemple.test"), html.includes("camille@"), html.includes("Reef &lt;b&gt;"), html.includes(`name="${CHAMP_CONFIRME}" value="1"`), html.includes('method="post"'), html.includes("Garder mon abonnement"), html.includes("noindex")], [true, true, false, true, true, true, true, true], "page de confirmation : langue, adresse masquee, nom echappe, bouton POST, garder, noindex");
+  is(pageDeDesinscription(LETTRE_EN.desinscription, { langue: "en", site: "Reef", adresse: "a@b.test", action: "/x", accueil: "/" }).includes("Unsubscribe me"), true, "page anglaise");
+  is(/[\u2013\u2014]/.test(html), false, "aucun tiret long");
+}
+
 // La vue de l'ecran : un libelle retraduit, une valeur inconnue ou "Choisissez..." ne choisit rien.
 const vue = lireVueDeLaLettre({ article: null, abonne: null, articles: { "Mon article": "G1" }, abonnes: { "a@b.test": "ab_1" } });
 is(choisir(vue, ACTIONS.article, "Mon article").article, "G1", "le titre choisi donne le groupe de l'article");
