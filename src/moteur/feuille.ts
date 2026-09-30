@@ -3,7 +3,7 @@
 // LE DEFAUT. Moteur allume, Astro ne produit qu'une feuille pour tout le
 // serveur et l'attache a chaque route qui touche un module style : la page du
 // back office recoit donc, en ligne, les 120 ko de la boutique (mesure sur
-// Kai le 21 septembre 2026, puis corrige sur Kona). Les deux feuilles sortent
+// Kai, puis corrige sur Kona). Les deux feuilles sortent
 // de Tailwind et rangent leurs utilitaires dans le meme calque : le `.hidden`
 // du site, arrive en second, battait la regle d'affichage a partir de 640 px
 // du back office, et les boutons "Nouveau dossier" et "Televerser" de la

@@ -1,4 +1,4 @@
-// scripts/essai-administrer.gestes.mjs - les gestes du guide communs a tous les themes (generique, socle 1.3.0), parametres par ESSAI_DE_L_ADMINISTRATION de theme.ts ; lus par essai-administrer.mjs.
+// scripts/essai-administrer.gestes.mjs - les gestes du guide communs a tous les themes (generique), parametres par ESSAI_DE_L_ADMINISTRATION de theme.ts ; lus par essai-administrer.mjs.
 //
 // Chaque fonction rend une liste de gestes { nom, faire, verifierFait,
 // restaurer, verifierRestaure } ; un geste dont le parametre manque n'y est
@@ -187,7 +187,7 @@ export async function gestesCommuns(P, o) {
   return gestes;
 }
 
-/** Les deux derniers gestes du guide : une redirection, un titre SEO ; puis (univers 3.8.2) la police du site et la place d'un bloc de l'accueil. */
+/** Les deux derniers gestes du guide : une redirection, un titre SEO ; puis la police du site et la place d'un bloc de l'accueil. */
 export async function gestesDeFin(P, o) {
   const { page, ADMIN, anonyme, entree, ouvrir, ouvrirSection, enregistrerEtPublier } = o;
   const gestes = [];

@@ -120,7 +120,7 @@ export const STYLES = {
 } as const;
 
 /**
- * LE MODE EDITION A 390 PX (socle 1.4.0). Les pastilles sont posees en
+ * LE MODE EDITION A 390 PX. Les pastilles sont posees en
  * surimpression dans le coin du bloc : sur un telephone elles s'empilaient
  * sous la barre et derriere le panneau. Sous 640 px elles passent dans le
  * flux, en tete du bloc, sur toute la largeur ; le panneau se fait plus
@@ -142,7 +142,7 @@ export const FEUILLE_D_EDITION =
   "[data-aloha-avis]{display:block;margin-top:.25rem;white-space:normal;font-weight:500}";
 
 /**
- * L'ADRESSE D'UN BOUTON CORRIGEE A LA SAISIE (socle 1.4.0). La barre d'EmDash
+ * L'ADRESSE D'UN BOUTON CORRIGEE A LA SAISIE. La barre d'EmDash
  * enregistre le texte de la pastille au blur ou sur Entree, par ses propres
  * ecouteurs poses sur l'element. Ce script ecoute AVANT elle (phase de
  * capture, sur le document) et applique la regle d'adresseDuLien (cadre.ts,
@@ -158,7 +158,7 @@ export function scriptDesAdresses(regle: string, mots: { adresseCorrigee: string
 /**
  * DEUX CORRECTIFS DE LA BARRE D'EMDASH 0.38, en mode edition seulement. Le
  * script de la barre lit ses reponses sans l'enveloppe { success, data } de
- * l'API (mesure du 28 septembre 2026, request-context.mjs) :
+ * l'API (mesure, request-context.mjs) :
  *   - mediatheque (/_emdash/api/media) : il cherche `item` et `items` a la
  *     racine, donc "Upload" repondait "Upload failed" et "Replace" montrait
  *     une mediatheque vide ;
@@ -174,7 +174,7 @@ export function scriptDesAdresses(regle: string, mots: { adresseCorrigee: string
 export const CORRECTIF_DE_LA_BARRE = `(function(){var f=window.fetch;function img(v){if(v&&typeof v==="object"&&!v.src&&(!v.provider||v.provider==="local")&&v.meta&&v.meta.storageKey){v.src="/_emdash/api/media/file/"+v.meta.storageKey;}return v;}window.fetch=function(i,o){var u=typeof i==="string"?i:(i&&i.url)||"";var m=((o&&o.method)||(i&&i.method)||"GET").toUpperCase();var p=f.apply(this,arguments);var media=u.indexOf("/_emdash/api/media")!==-1;var entree=m==="GET"&&/\\/_emdash\\/api\\/content\\/[^/?#]+\\/[^/?#]+$/.test(u);if(!media&&!entree)return p;return p.then(function(r){if((r.headers.get("content-type")||"").indexOf("application/json")===-1)return r;return r.clone().json().then(function(j){if(!j||j.success!==true||!j.data||typeof j.data!=="object")return r;var n=null;if(media&&!("item" in j)&&!("items" in j))n=Object.assign({},j,j.data);if(entree&&j.data.item&&j.data.item.data){n=Object.assign({},j.data.item);Object.keys(n.data).forEach(function(k){img(n.data[k]);});}return n?new Response(JSON.stringify(n),{status:r.status,statusText:r.statusText,headers:r.headers}):r;},function(){return r;});});};})();`;
 
 /**
- * LA BARRE D'EMDASH 0.38 EN FRANCAIS (socle 1.4.0), en mode edition et quand
+ * LA BARRE D'EMDASH 0.38 EN FRANCAIS, en mode edition et quand
  * le back office est en francais. Le script de la barre ecrit ses libelles en
  * anglais, en dur (request-context.mjs : "Edit", "Publish", "No image
  * selected", "Alt text", "Upload"...), hors de tout catalogue. Ce script les

@@ -1,6 +1,6 @@
 // src/moteur/deployer/textes.fr.ts - tout ce que la page "Mettre le site a jour" affiche, en francais. Sa forme est le contrat du dictionnaire anglais.
 //
-// DEUX LECTEURS, DEUX PARTIES (socle 1.4.0). Le haut de la page parle au
+// DEUX LECTEURS, DEUX PARTIES. Le haut de la page parle au
 // client : aucun mot technique, aucune variable, aucune commande ; il dit
 // quand le bouton sert et quoi faire si quelque chose manque. Le detail
 // technique (build, caches, hook, commande du secret) est replie dans

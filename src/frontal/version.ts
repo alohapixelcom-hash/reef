@@ -17,7 +17,12 @@
 //   - les reglages du site (options "site:*", par leur revision) ;
 //   - les menus et chacun de leurs liens (libelle, adresse, ordre, classes :
 //     renommer un lien ne touche aucune date) ;
-//   - les redirections, le SEO des entrees, la mediatheque, les taxonomies.
+//   - les redirections, le SEO des entrees, la mediatheque, les taxonomies ;
+//   - la boutique, quand le site en a une : les reglages de vente (TTC ou HT,
+//     TVA, devise : boutique_reglages) et le stock (boutique_stock). Une vente
+//     qui epuise un produit ou un passage en HT change donc la version. Ces
+//     tables ne sont lues que si elles existent (signature du schema), une
+//     table absente ferait echouer toute la requete.
 // Une requete, un aller-retour vers D1, qui est fortement coherente : une
 // ecriture validee se lit a la requete suivante (KV, lui, met 30 a 60 s).
 //
@@ -39,10 +44,21 @@ export interface Version {
 /** Les slugs de collection sont des noms de table : seuls lettres minuscules, chiffres et soulignes passent. */
 const SLUG = /^[a-z0-9_]+$/;
 
-const SCHEMA = "(SELECT group_concat(slug || '@' || IFNULL(updated_at, ''), ',') FROM (SELECT slug, updated_at FROM _emdash_collections ORDER BY slug))";
+/** Les tables de la boutique que la version sait resumer, et ce qu'elle en lit. */
+const TABLES_DE_LA_BOUTIQUE: Record<string, string> = {
+  boutique_reglages: "(SELECT COUNT(*) || '.' || IFNULL(MAX(maj), '') FROM boutique_reglages) AS boutique_reglages",
+  boutique_stock:
+    "(SELECT COUNT(*) || '.' || IFNULL(MAX(maj), '') || '.' || IFNULL(SUM(IFNULL(quantite, -1) * 2 + precommande), 0) FROM boutique_stock) AS boutique_stock",
+};
 
-/** La requete qui resume la base, pour ces collections. */
-export function requeteDeLaVersion(collections: readonly string[]): string {
+const SCHEMA = `(IFNULL((SELECT group_concat(slug || '@' || IFNULL(updated_at, ''), ',') FROM (SELECT slug, updated_at FROM _emdash_collections ORDER BY slug)), '') || '#' || IFNULL((SELECT group_concat(name, ',') FROM (SELECT name FROM sqlite_master WHERE type = 'table' AND name IN (${Object.keys(
+  TABLES_DE_LA_BOUTIQUE,
+)
+  .map((t) => `'${t}'`)
+  .join(", ")}) ORDER BY name)), ''))`;
+
+/** La requete qui resume la base, pour ces collections et ces tables de la boutique. */
+export function requeteDeLaVersion(collections: readonly string[], tables: readonly string[] = []): string {
   const parCollection = collections
     .filter((slug) => SLUG.test(slug))
     .map(
@@ -62,17 +78,24 @@ export function requeteDeLaVersion(collections: readonly string[]): string {
       "(SELECT COUNT(*) || '.' || IFNULL(MAX(updated_at), '') FROM _emdash_seo) AS seo",
       "(SELECT COUNT(*) || '.' || IFNULL(MAX(created_at), '') || '.' || IFNULL(SUM(length(IFNULL(alt, '')) + IFNULL(focal_x, 0) * 1000 + IFNULL(focal_y, 0)), 0) FROM media) AS medias",
       "(SELECT COUNT(*) FROM taxonomies) || '.' || (SELECT COUNT(*) FROM content_taxonomies) AS taxonomies",
+      ...tables.filter((t) => Object.hasOwn(TABLES_DE_LA_BOUTIQUE, t)).map((t) => TABLES_DE_LA_BOUTIQUE[t]!),
     ].join(",\n  "),
   ].join("\n  ");
 }
 
-/** Les collections nommees par la signature du schema ("sections@2026-...,site@..."). */
+/** Les collections nommees par la signature du schema ("sections@2026-...,site@...#boutique_stock"). */
 export function collectionsDuSchema(schema: string | null | undefined): string[] {
   if (!schema) return [];
-  return schema
+  return (schema.split("#")[0] ?? "")
     .split(",")
     .map((morceau) => morceau.split("@")[0] ?? "")
     .filter((slug) => SLUG.test(slug));
+}
+
+/** Les tables de la boutique presentes, nommees apres le "#" de la signature. */
+export function tablesDuSchema(schema: string | null | undefined): string[] {
+  const apres = schema?.split("#")[1] ?? "";
+  return apres.split(",").filter((t) => Object.hasOwn(TABLES_DE_LA_BOUTIQUE, t));
 }
 
 const DATE = /\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?Z?/g;
@@ -108,12 +131,12 @@ export async function lireLaVersion(base: Base): Promise<Version | null> {
     if (!requete) {
       const tete = await base.prepare(`SELECT ${SCHEMA} AS schema`).first<{ schema: string | null }>();
       const schema = tete?.schema ?? "";
-      requete = { schema, sql: requeteDeLaVersion(collectionsDuSchema(schema)) };
+      requete = { schema, sql: requeteDeLaVersion(collectionsDuSchema(schema), tablesDuSchema(schema)) };
     }
     let ligne = await base.prepare(requete.sql).first<Record<string, unknown>>();
     if (ligne && ligne.schema !== requete.schema) {
       const schema = typeof ligne.schema === "string" ? ligne.schema : "";
-      requete = { schema, sql: requeteDeLaVersion(collectionsDuSchema(schema)) };
+      requete = { schema, sql: requeteDeLaVersion(collectionsDuSchema(schema), tablesDuSchema(schema)) };
       ligne = await base.prepare(requete.sql).first<Record<string, unknown>>();
     }
     if (!ligne) return null;

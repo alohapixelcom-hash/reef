@@ -58,7 +58,7 @@ export interface DonneesDuSite {
   credit_name?: string;
   credit_link?: string;
   brand_color?: string;
-  /** Le logo pour le mode sombre (socle 1.7.0) : une image de la mediatheque, commune aux deux langues. */
+  /** Le logo pour le mode sombre : une image de la mediatheque, commune aux deux langues. */
   logo_dark?: unknown;
 }
 
@@ -112,7 +112,7 @@ const texte = (valeur: unknown): string | null => (typeof valeur === "string" &&
 /**
  * Une image d'un champ du moteur, ou null si le champ est vide. EmDash 0.38
  * range une image de sa mediatheque sans son adresse (seulement
- * meta.storageKey, mesure du 28 septembre 2026) : l'adresse de son fichier se
+ * meta.storageKey) : l'adresse de son fichier se
  * deduit de cette cle ; une image d'un fournisseur externe porte previewUrl.
  */
 export function media(valeur: unknown): Media | null {
@@ -215,7 +215,7 @@ export interface LienRendu {
  * Les liens d'un menu natif de la langue, ou le repli des fichiers (navData)
  * quand le menu n'existe pas, est vide ou vient d'une autre langue. Un lien
  * porte la classe "bouton" (posee par la graine) quand il se rend en bouton.
- * `defaut` est la langue servie sans prefixe (univers 3.8.2) : "en" pour les
+ * `defaut` est la langue servie sans prefixe : "en" pour les
  * themes, "fr" pour un site francais a la racine (alohapixel.com), dont les
  * menus francais ne doivent pas recevoir "/fr" (adresse introuvable).
  */
@@ -271,7 +271,7 @@ export function imageDePartage(page: Page, slug: string): { src: string; alt: st
 }
 
 /**
- * CE QU'UN EDITEUR TAPE COMME ADRESSE, RENDU SUR (socle 1.4.0). Un client tape
+ * CE QU'UN EDITEUR TAPE COMME ADRESSE, RENDU SUR. Un client tape
  * "www.exemple.fr" ou "contact" : publie tel quel, le navigateur en fait un
  * chemin relatif (/fr/www.exemple.fr), une page introuvable, sans que rien ne
  * le dise. La regle, la meme a la saisie (script des pastilles) et au rendu :
@@ -311,7 +311,7 @@ export function lienDe(page: Page, slug: string, champ: string): string | null {
 }
 
 /**
- * Un chemin du site dans la langue d'un menu (socle 1.4.0) : un lien "/contact"
+ * Un chemin du site dans la langue d'un menu : un lien "/contact"
  * ajoute au menu francais menait a la page anglaise. Pour une langue autre que
  * la langue par defaut, un chemin interne sans prefixe de langue recoit
  * "/<langue>" ; restent tels quels les adresses completes, les ancres de la

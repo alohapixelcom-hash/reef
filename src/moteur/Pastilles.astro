@@ -65,7 +65,7 @@ const pastille = (defaut: boolean) => `${STYLES.pastille}${defaut ? `;${STYLES.p
     <div style={rangee} data-aloha-pastilles>
       {liens.map(([champ, defaut, libelle]) => {
         const valeur = texte(donnees[champ]);
-        // Une adresse enregistree avant la 1.4.0 ("www.exemple.fr") : la page
+        // Une adresse enregistree sans protocole ("www.exemple.fr") : la page
         // la rend corrigee (lienDe), la pastille dit ce que le bouton ouvre.
         const lue = adresseDuLien(valeur);
         return (

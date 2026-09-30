@@ -31,7 +31,7 @@ is(teinteDuHexa("#0000ff"), 240, "bleu pur");
 is(teinteDuHexa("#ff0000"), 0, "rouge pur");
 is(teinteDuHexa("#808080"), null, "un gris n'a pas de teinte");
 
-// Une recette juste ne ment pas ; celle d'avant la 1.3.0 (accent tourne de 250 sans remonter) ment.
+// Une recette juste ne ment pas ; un accent tourne de 250 sans remonter ment.
 const hexa = (h: number) => {
   const f = (n: number) => {
     const k = (n + h / 30) % 12;
@@ -46,13 +46,13 @@ is(couleursQuiMentent((t) => ({ "--visible": hexa((t + 250) % 360) }), "--visibl
 is(feuilleDeLaPalette("", () => ({})), null, "vide : aucune feuille");
 is(feuilleDeLaPalette("Bleu océan", (t) => ({ "--x": String(t) })), ":root{--x:208}", "la feuille porte la teinte nommee");
 
-// La couleur d'origine (socle 1.4.0) : premier choix de la liste, sans feuille.
+// La couleur d'origine : premier choix de la liste, sans feuille.
 is(CHOIX_DE_COULEUR[0], COULEUR_D_ORIGINE, "la couleur d'origine vient en premier");
 is(CHOIX_DE_COULEUR.length, Object.keys(COULEURS).length + 1, "l'origine plus les cinq couleurs");
 is(teinteDe(COULEUR_D_ORIGINE), null, "la couleur d'origine ne donne aucune teinte");
 is(feuilleDeLaPalette(COULEUR_D_ORIGINE, (t) => ({ "--x": String(t) })), null, "la couleur d'origine : aucune feuille, la palette du theme");
 
-// Le contraste des boutons (socle 1.4.0) : WCAG, puis la garantie.
+// Le contraste des boutons : WCAG, puis la garantie.
 is(Math.round(contraste("#ffffff", "#000000") * 100) / 100, 21, "blanc sur noir : 21");
 is(Math.round(contraste("#23f6af", "#ffffff") * 100) / 100, 1.41, "le vert emeraude du testeur sous du blanc : 1,41");
 const recette = (t: number) => ({ "--b-400": hexa(t), "--b-600": hexa(t), "--b-700": hexa(t), "--b-300": hexa(t), "--n-950": "#0a0a0f" });

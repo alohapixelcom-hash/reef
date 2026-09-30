@@ -6,8 +6,8 @@
 // Quatre des conventions non negociables sont verifiables par une machine :
 // le plafond de 400 lignes, l'interdiction des tirets cadratins, l'en-tete
 // d'une ligne, et l'absence de noms de palette dans le markup. Elles etaient
-// tenues a la main, et elles l'etaient bien : un audit exterieur du 31 aout
-// 2026 a passe 324 fichiers et n'a trouve aucune violation reelle. C'est
+// tenues a la main, et elles l'etaient bien : un audit exterieur
+// a passe 324 fichiers et n'a trouve aucune violation reelle. C'est
 // justement l'argument. Une discipline tenue par l'attention se tient jusqu'au
 // jour ou elle ne se tient plus, et ce jour-la rien ne le dit.
 //
@@ -221,7 +221,7 @@ function checkPalette(file, text, families) {
  * il range "text-display-sm" et "text-foreground" dans le meme groupe et ne
  * garde que le DERNIER. Une taille ecrite avant la couleur disparait donc du
  * rendu, et le titre retombe a la taille heritee sous son point de bascule.
- * Le 31 aout 2026, quatre themes servaient ainsi un titre de page a 16 px sur
+ * Quatre themes servaient ainsi un titre de page a 16 px sur
  * telephone, avec la bonne classe dans le source.
  *
  * Le controle ne regarde que les valeurs de PROPRIETE (`slot: "..."`), qui
@@ -251,8 +251,8 @@ function checkMergeOrder(file, text) {
  * Regle 7 : aucun composant, aucune mise en page, aucune page ne lit le disque.
  *
  * Moteur allume, ces fichiers se rendent dans le Worker, qui n'a pas de
- * disque : un existsSync au rendu y repond toujours non (PhoneShot de Kona,
- * 3.4.0 : la capture du telephone disparaissait de l'accueil). Ce qui doit se
+ * disque : un existsSync au rendu y repond toujours non (PhoneShot de Kona :
+ * la capture du telephone disparaissait de l'accueil). Ce qui doit se
  * savoir du disque se calcule au build (un `define` de la configuration) et
  * arrive au composant comme une constante.
  */
@@ -274,7 +274,7 @@ function checkDisque(file, text) {
  * Une page importee par un module qui n'est pas une page cesse d'etre une
  * frontiere pour le partage des feuilles de style d'Astro : des que les pages
  * se rendent a la demande, chacune recoit les feuilles de toutes les autres
- * (Nalu, 3.4.0 : 359 regles partout). Le plan recalcule ses chemins depuis
+ * (Nalu : 359 regles partout). Le plan recalcule ses chemins depuis
  * @i18n et le catalogue (table CHEMINS, voir plan-du-site.xml.ts du socle).
  */
 function checkPlan(file, text) {
@@ -291,8 +291,8 @@ function checkPlan(file, text) {
  *
  * Tailwind v4 cherche ses utilitaires dans tout le depot ; un mot d'un guide
  * qui ressemble a une utilitaire fabrique une regle dans la feuille de chaque
- * page et change le build statique sans qu'aucun composant ait bouge (Koa,
- * 3.4.0 ; Reef en portait dix, mesure au socle 1.3.0). La feuille qui importe Tailwind l'exclut donc
+ * page et change le build statique sans qu'aucun composant ait bouge (Koa ;
+ * Reef en portait dix). La feuille qui importe Tailwind l'exclut donc
  * explicitement : `@source not "../../docs";`.
  */
 function checkDocs(file, text) {

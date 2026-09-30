@@ -8,7 +8,7 @@
 // un pixel. La liste de revue a la fin de docs/design.md, elle, s'adresse a un
 // oeil : c'est exactement ce qu'un agent n'a pas.
 //
-// Le trou s'est vu le 31 aout 2026. Sur la boutique, a 390 px, le prix se
+// Le trou s'est vu. Sur la boutique, a 390 px, le prix se
 // posait SUR le nom du theme. Une premiere sonde comparait des
 // getBoundingClientRect(), annoncait dix-sept pixels d'ecart, et declarait la
 // ligne saine : les boites ne se chevauchaient pas, l'encre si. Une colonne
@@ -40,7 +40,7 @@ const DIST = join(ROOT, "dist");
 //
 // Le banc a longtemps mesure 390, 768 et 1440 : un telephone, une tablette, un
 // grand ecran. Il ne regardait donc JAMAIS la bande ou travaille la majorite
-// des visiteurs professionnels, entre 1024 et 1366. Le 3 septembre 2026, sur
+// des visiteurs professionnels, entre 1024 et 1366. Sur
 // deux sites de la maison, le second bouton du premier ecran sortait de sa
 // colonne et se faisait couper net par le `overflow-hidden` de la section, de
 // 174 px a 1024, de 125 a 1152, de 75 a 1280. A 1440 il tenait, a 768 la
@@ -51,7 +51,7 @@ const DIST = join(ROOT, "dist");
 // grille passe a deux colonnes avec le moins de place pour le faire. 1280 est
 // l'ordinateur portable le plus courant. Ces deux-la ne se retirent plus.
 const WIDTHS = [390, 768, 1024, 1280, 1440];
-// LES DEUX MODES, ET POURQUOI LE SOMBRE MANQUAIT. Le 5 septembre 2026 l'editeur
+// LES DEUX MODES, ET POURQUOI LE SOMBRE MANQUAIT. L'editeur
 // a vu, sur l'accueil d'un site de la maison en mode sombre, trois cartes
 // blanches au texte clair : illisibles. Le banc les avait declarees saines
 // parce qu'il ne mesurait que le mode clair. Un jeton qui suit le theme (bg-card) se
@@ -178,8 +178,7 @@ const browser = await chromium.launch({
  * Attend que la mise en page soit POSEE avant de mesurer.
  *
  * POURQUOI CETTE FONCTION EXISTE. Le banc a longtemps mesure 400 ms apres son
- * parcours de defilement, en esperant que ce delai suffise. Le 7 septembre
- * 2026 il a rendu trois verdicts differents sur le meme dist/ : vert, puis
+ * parcours de defilement, en esperant que ce delai suffise. Il a rendu trois verdicts differents sur le meme dist/ : vert, puis
  * cinq "aucun h1 sur la page", puis six, sur des adresses qui changeaient a
  * chaque passage et arrivaient toujours en RAFALE, par blocs contigus. C'est
  * la signature d'une machine chargee, pas d'un defaut de page : rejouee a la

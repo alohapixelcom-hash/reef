@@ -35,7 +35,7 @@ is(lu.erreurs, [], "des reglages propres passent");
 is([lu.reglages.expediteur, lu.reglages.destinataires.contact, lu.reglages.plafonds.heure, lu.reglages.cycle], ["contact@exemple.test", "a@x.test, b@x.test", 12, 15], "adresses rognees, en minuscules, sans doublon");
 const refus = lireReglages({ expediteur: "pas bon", destinataires: { contact: "a@x.test,b@x.test,c@x.test,d@x.test" }, plafonds: { jour: -1 }, cycle: 31 });
 is(refus.erreurs.map((e) => e.champ), ["expediteur", "contact", "plafonds", "cycle"], "chaque champ refuse est nomme");
-// Une messagerie grand public ne peut pas servir d'expediteur (socle 1.4.0) ; un destinataire, si.
+// Une messagerie grand public ne peut pas servir d'expediteur ; un destinataire, si.
 const gmail = lireReglages({ expediteur: "patron@gmail.com", destinataires: { contact: "patron@gmail.com" } });
 is([gmail.erreurs, gmail.reglages.expediteur, gmail.reglages.destinataires.contact], [[{ champ: "expediteur", raison: "messagerie" }], "", "patron@gmail.com"], "gmail refuse comme expediteur, accepte comme destinataire");
 is(lireReglages({ expediteur: "Contact@Orange.fr" }).erreurs, [{ champ: "expediteur", raison: "messagerie" }], "orange.fr refuse, casse ignoree");
@@ -194,7 +194,7 @@ if (sqlite) {
   const moisSuivant = await bilanDuCycle(base, Date.UTC(2026, 9, 2), reglages.cycle);
   is(moisSuivant.envoyes, 0, "le compteur repart a zero au cycle suivant");
   is(manques(reglages, true, false), ["fournisseur"], "une liaison sans fournisseur choisi se signale");
-  // La carte rouge du tableau de bord (socle 1.4.0) : un echec sans renvoi reussi reste signale, un echec rattrape ne l'est plus.
+  // La carte rouge du tableau de bord : un echec sans renvoi reussi reste signale, un echec rattrape ne l'est plus.
   const enAttente = await echecsEnAttente(base, 0);
   is(enAttente.some((l) => l.id === refuse.id), false, "un refus rattrape par un renvoi reussi n'est plus en attente");
   horloge += 2 * 3_600_000;

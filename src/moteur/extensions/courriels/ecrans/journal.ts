@@ -92,7 +92,7 @@ export function rangee(t: Textes, l: Ligne, maintenant: number): Record<string, 
     destinataire: l.destinataire === "-" ? "-" : masquer(l.destinataire),
     sujet: l.sujet.length > 60 ? `${l.sujet.slice(0, 57)}...` : l.sujet,
     etat: t.etats[l.etat] ?? l.etat,
-    // La raison d'un refus en toutes lettres, dans la ligne meme (socle 1.4.0).
+    // La raison d'un refus en toutes lettres, dans la ligne meme.
     motif: l.etat === "envoye" ? "" : (erreurEnClair(t, l.code) ?? l.erreur ?? ""),
   };
 }

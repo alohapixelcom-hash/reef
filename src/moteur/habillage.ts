@@ -5,8 +5,7 @@
 // main. Ici on laisse passer sa reponse et on y ajoute une feuille de style,
 // rien d'autre : le moteur se met a jour sans nous.
 //
-// CE QUE L'HABILLAGE A LE DROIT DE FAIRE (regle de l'editeur, 23 septembre
-// 2026) : la couleur d'accent, les polices, le logo et le nom du site. Les
+// CE QUE L'HABILLAGE A LE DROIT DE FAIRE (regle de l'editeur) : la couleur d'accent, les polices, le logo et le nom du site. Les
 // fonds restent ceux du moteur, blanc en clair et noir en sombre, et
 // back-office.css ne nomme plus aucune surface. Les jetons viennent de
 // tokens.css LUI-MEME, relu tel quel pour qu'un rebrand suive : `@theme`
@@ -22,20 +21,20 @@
 // reunit les trois corrections que les depots avaient faites chacun de leur
 // cote (commentaires retires, pont des polices, feuille du site retiree),
 // le correctif de l'ecran Parametres d'EmDash 0.38 trouve par Swell, et
-// (socle 1.4.0) les ecrans en mots de client, ECRANS_SIMPLES ci-dessous.
+// les ecrans en mots de client, ECRANS_SIMPLES ci-dessous.
 import { defineMiddleware } from "astro:middleware";
 import { sansLaFeuilleDuSite } from "./feuille";
 import { FEUILLES, JETONS, MARQUE_DU_SITE, POLICES } from "./habillage.site";
 
-// LA CARTE DES CHAMPS DE CHAQUE BLOC (socle 1.7.0). Tous les blocs d'un site
+// LA CARTE DES CHAMPS DE CHAQUE BLOC. Tous les blocs d'un site
 // partagent le schema de leur collection : "Photo du bloc", "Adresse de la
 // video", "Image montree avant la video" et la photo des elements s'affichent
-// sur chaque bloc, alors que la plupart ne les lisent pas (mesure univers
-// 3.8.2 : 135 champs sans effet sur Aloha). Le theme dit, dans theme.ts
+// sur chaque bloc, alors que la plupart ne les lisent pas (135 champs
+// sans effet sur Aloha). Le theme dit, dans theme.ts
 // (CHAMPS_DES_BLOCS, forme : champs-des-blocs.ts de l'extension administrable),
 // quels champs agissent sur quel bloc ; l'ecran d'un bloc cache les autres. Un
 // site sans carte, ou un bloc absent de la carte, garde tous ses champs. La
-// carte et le script qui la lit (scriptDeLaCarte, socle 1.7.1 : le meme pour
+// carte et le script qui la lit (scriptDeLaCarte : le meme pour
 // un back office qui n'a pas cet habillage, celui de la boutique) sont lus
 // sans import nomme : un site qui ne les a pas se construit comme avant.
 const modulesDuTheme = import.meta.glob<Record<string, unknown>>("./theme.ts", { eager: true });
@@ -69,20 +68,20 @@ const FEUILLE = `<style data-aloha-back-office>${POLICES}\n${pont}\n${jetons}\n$
 // UN CORRECTIF DE L'ECRAN PARAMETRES D'EMDASH 0.38. "Supprimer" sous le logo
 // (ou la favicon, ou l'image de partage du SEO) vide le champ du formulaire,
 // mais "Enregistrer" envoie alors un corps SANS ce champ, et le moteur, qui
-// fusionne, garde l'ancienne image : le logo ne se retirait pas (mesure du
-// 28 septembre 2026, POST /_emdash/api/settings). Ce script recopie le vide
+// fusionne, garde l'ancienne image : le logo ne se retirait pas (mesure sur
+// POST /_emdash/api/settings). Ce script recopie le vide
 // dans l'envoi, sous la seule forme que l'API accepte ({ mediaId: "" }, une
 // reference qui ne mene a aucun fichier) ; la page, qui ne trouve pas
 // d'adresse, rend alors l'image du theme (cadre.ts, identite).
 const CORRECTIF_PARAMETRES = `<script data-aloha-back-office>(function(){var f=window.fetch;window.fetch=function(i,o){try{var u=typeof i==="string"?i:(i&&i.url)||"";if(/\\/_emdash\\/api\\/settings$/.test(u)&&o&&(o.method||"").toUpperCase()==="POST"&&typeof o.body==="string"){var b=JSON.parse(o.body);if("title" in b||"tagline" in b){["logo","favicon"].forEach(function(k){if(!(k in b))b[k]={mediaId:""};});}if(b.seo&&typeof b.seo==="object"&&!("defaultOgImage" in b.seo))b.seo.defaultOgImage={mediaId:""};o=Object.assign({},o,{body:JSON.stringify(b)});}}catch(e){}return f.call(this,i,o);};})();</script>`;
 
-// LES ECRANS D'EMDASH 0.38 EN MOTS DE CLIENT (socle 1.4.0). Ce que le
+// LES ECRANS D'EMDASH 0.38 EN MOTS DE CLIENT. Ce que le
 // catalogue ne peut pas traduire, parce que le moteur l'ecrit en dur :
 //   - "(optional)" apres chaque libelle (composant Label de kumo) ;
 //   - les dates relatives ("15 mins ago", "9 hours ago", "just now") ;
 //   - l'exemple "my-post-slug" sous l'adresse d'une page ;
 //   - la version du moteur au bas du rail ("Onda v0.38.0 (8975a850)") ;
-//   - (socle 1.8.0) les noms des taxonomies natives, que le moteur ecrit
+//   - les noms des taxonomies natives, que le moteur ecrit
 //     depuis leur definition anglaise : "Taxonomies" (le panneau d'un
 //     article) devient "Classement", "Tags" "Etiquettes", "Categories"
 //     "Categories" accentue, et les trois phrases de l'ecran des etiquettes
@@ -100,10 +99,10 @@ const CORRECTIF_PARAMETRES = `<script data-aloha-back-office>(function(){var f=w
 //   - dans chaque ecran de contenu, les panneaux Responsabilite,
 //     Collaborateurs et Taxonomies, que le site ne lit pas ; Taxonomies
 //     reste visible quand le site dit lire ses etiquettes
-//     (--aloha-panneaux-lus: taxonomies, dans sa feuille ; Reef 3.8.3) ;
-//   - (socle 1.7.0) dans l'ecran d'un bloc, les champs que la carte du theme
+//     (--aloha-panneaux-lus: taxonomies, dans sa feuille) ;
+//   - dans l'ecran d'un bloc, les champs que la carte du theme
 //     dit sans effet sur ce bloc (SCRIPT_DE_LA_CARTE ci-dessus, pose apres) ;
-//   - (socle 1.7.0) le "0" qu'EmDash ecrit dans "Place du bloc" vide : 0 vaut
+//   - le "0" qu'EmDash ecrit dans "Place du bloc" vide : 0 vaut
 //     vide pour le site (ordre-des-blocs.ts), le champ se montre donc vide tant
 //     qu'on n'y ecrit pas.
 // Rien n'est retire de la page : les elements sont caches, et reviennent le

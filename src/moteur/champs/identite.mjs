@@ -13,8 +13,19 @@ export const CHAMP_ENTREE = "entree";
 export const WIDGET_ENTREE = `${IDENTITE.id}:${CHAMP_ENTREE}`;
 
 /**
+ * Le nom du champ "plusieurs entrees d'une autre collection, cochees par leur
+ * nom" (les etiquettes d'un article, les autres disciplines d'un projet). Le
+ * champ de la graine est de sorte "json" : il range la liste des groupes de
+ * traductions choisis.
+ */
+export const CHAMP_ENTREES = "entrees";
+
+/** La valeur du `widget` d'un champ de la graine qui prend ce champ de saisie. */
+export const WIDGET_ENTREES = `${IDENTITE.id}:${CHAMP_ENTREES}`;
+
+/**
  * Le nom du champ "garde sans l'afficher" : un champ que le site ne lit plus
- * (Reef 3.8.3 : les anciens mots-cles, remplaces par les etiquettes natives)
+ * (Reef : les anciens mots-cles, remplaces par les etiquettes natives)
  * mais dont la colonne et les valeurs restent. EmDash 0.38 renvoie chaque
  * valeur de l'entree a l'enregistrement : retirer la definition du champ
  * ferait refuser l'enregistrement ("unknown field"). Le champ reste donc

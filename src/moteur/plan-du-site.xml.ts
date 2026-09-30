@@ -1,6 +1,6 @@
 // src/moteur/plan-du-site.xml.ts - le plan du site des pages gerees, rendu a la demande (generique) : le site donne la table de ses chemins, ce module ecrit le XML.
 //
-// SANS IMPORTER LES PAGES (modele : Nalu, 3.4.0). Une page importee par un
+// SANS IMPORTER LES PAGES (modele : Nalu). Une page importee par un
 // module qui n'est pas une page cesse d'etre une frontiere pour le partage
 // des feuilles de style d'Astro : des que les pages se rendent a la demande,
 // chacune recevait les feuilles de toutes les autres. Le site recalcule donc

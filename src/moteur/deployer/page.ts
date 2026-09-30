@@ -153,8 +153,8 @@ function nomsDesCaches(TEXTES: Textes, caches: typeof __ALOHA_CACHES__): string 
   return noms.length > 0 ? noms.join(" + ") : TEXTES.aucun;
 }
 
-// Le fuseau du site : un site qui ne fige pas encore __ALOHA_BO_FUSEAU__ (avant
-// la 3.4.0) lit l'heure de Paris, comme avant, au lieu de planter la page.
+// Le fuseau du site : un site qui ne fige pas __ALOHA_BO_FUSEAU__ lit l'heure
+// de Paris au lieu de planter la page.
 const FUSEAU = lireLeFuseau(typeof __ALOHA_BO_FUSEAU__ === "string" ? __ALOHA_BO_FUSEAU__ : FUSEAU_PAR_DEFAUT);
 
 export function composer(etat: Etat, clic?: Resultat): Reponse {

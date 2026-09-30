@@ -16,6 +16,7 @@
   installing Capacitor, signing and the stores.
 - Repository: SQL migrations in `migrations/`, documentation rewritten for the
   current version.
+- Aloha Pixel core 1.9.0 (stock module, reservation at checkout, the front Worker's cache follows the shop tables).
 
 ## 3.8.3 - 2026-09-29
 

@@ -1,15 +1,15 @@
-// src/moteur/champs-des-blocs.ts - la carte des champs de chaque bloc (generique, socle 1.7.0, textes et elements en 1.7.1) : ce que le theme declare dans theme.ts (CHAMPS_DES_BLOCS) pour que l'ecran d'un bloc cache les champs qui n'y font rien.
+// src/moteur/champs-des-blocs.ts - la carte des champs de chaque bloc (generique) : ce que le theme declare dans theme.ts (CHAMPS_DES_BLOCS) pour que l'ecran d'un bloc cache les champs qui n'y font rien.
 //
 // POURQUOI. Tous les blocs de la collection "sections" partagent un schema :
 // la photo, la video, l'image montree avant la video et la photo des elements
 // s'affichent sur chaque bloc, alors que la plupart ne les lisent pas. Un
 // client qui change une photo sans effet croit le site casse. Le theme dit
-// ici quels champs agissent sur quel bloc (releve par la sonde de l'univers
-// 3.8.2 : chaque champ change, publie, relu en visiteur) ; l'habillage du back
+// ici quels champs agissent sur quel bloc (releve par la sonde :
+// chaque champ change, publie, relu en visiteur) ; l'habillage du back
 // office (habillage.ts, par scriptDeLaCarte ci-dessous) cache les autres dans
 // l'ecran du bloc. Rien n'est retire de la base : un champ cache garde sa valeur.
 //
-// Socle 1.7.1 : la carte gouverne aussi les textes (petit titre, mot en gris,
+// La carte gouverne aussi les textes (petit titre, mot en gris,
 // chapeau, note...) et la liste des elements entiere, pas seulement les
 // medias (mesure sur Holo : "Petit titre" et "Mot du titre ecrit en gris"
 // s'affichaient sur des blocs qui ne les lisent pas). Et le script vit ici,

@@ -183,7 +183,7 @@ export const LISIBILITE = ({ TARGET_MIN }) => {
   // d'opacite et declarait le contraste non mesurable. Elle se taisait donc
   // sur toute une famille de surfaces parfaitement calculables : une teinte
   // posee a dix pour cent sur une carte opaque. Lighthouse, lui, compose et
-  // mesure. Le 7 septembre 2026 il a trouve ainsi, sur les sept themes, une
+  // mesure. Il a trouve ainsi, sur les sept themes, une
   // etiquette de rubrique a 3,98 pour 1 la ou il en faut 4,5, que ce banc
   // avait laissee passer depuis le premier jour.
   //
@@ -346,7 +346,7 @@ export const LISIBILITE = ({ TARGET_MIN }) => {
   // alohapixel.com ouvre chaque page interieure sur une bande sombre de 277 px
   // avec un titre de 40 px, puis des sections a 72-90 px : c'est la
   // composition du site, relevee et reproduite (PageHero.astro), et l'editeur
-  // l'a confirmee le 4 septembre 2026 en montrant la page d'origine. Un h1
+  // l'a confirmee en montrant la page d'origine. Un h1
   // pose dans ce bandeau n'est donc pas compare a ses h2.
   const dansBandeau = h1.length === 1 && !!h1[0].closest('[data-slot="page-hero"]');
   if (h1.length === 1 && !dansBandeau) {
@@ -367,7 +367,7 @@ export const LISIBILITE = ({ TARGET_MIN }) => {
   }
 
   /* --- 5 bis. Un titre a la taille d'un paragraphe ------------------
-     Mesure de verite, posee apres le defaut du 31 aout : sur quatre themes,
+     Mesure de verite, posee apres un defaut reel : sur quatre themes,
      tailwind-merge supprimait la taille de base des titres passes par tv(),
      parce qu'il range "text-display-sm" et "text-foreground" dans le meme
      groupe et ne garde que le dernier. Le titre de page retombait a la taille

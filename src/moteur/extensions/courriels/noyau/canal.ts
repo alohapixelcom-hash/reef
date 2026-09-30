@@ -64,7 +64,7 @@ interface Supplement {
 // UNE SEULE COPIE PAR ISOLAT, rangee sur globalThis. Le formulaire (route
 // injectee par Astro) et le fournisseur (extension chargee par EmDash)
 // peuvent importer ce module par deux chemins et en obtenir deux copies (vu
-// sous astro dev le 28 septembre : le fournisseur ne voyait pas le contexte
+// sous astro dev : le fournisseur ne voyait pas le contexte
 // ouvert par le formulaire et ecrivait une seconde ligne "Autre extension").
 // Le contexte et la liste des messages livres doivent etre les memes pour tous.
 interface Partage {
@@ -152,7 +152,7 @@ export function journaliste(charger: () => Promise<DependancesDuJournal>) {
     const d = await charger();
     // Deuxieme garde, independante de la memoire du module : en developpement,
     // un rechargement de Vite peut donner au fournisseur et au journal deux
-    // copies de ce module (vu le 28 septembre : une ligne "Autre extension" en
+    // copies de ce module (vu : une ligne "Autre extension" en
     // double d'un accuse). Si Courriels est le livreur choisi, la ligne existe.
     if (d.livreur === d.soi) return;
     const m = evenement.message;

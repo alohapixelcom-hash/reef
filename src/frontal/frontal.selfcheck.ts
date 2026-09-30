@@ -12,7 +12,7 @@ import {
   peutEtreGardee,
   porteLEdition,
 } from "./cache.ts";
-import { collectionsDuSchema, lireLaVersion, plusRecente, requeteDeLaVersion } from "./version.ts";
+import { collectionsDuSchema, lireLaVersion, plusRecente, requeteDeLaVersion, tablesDuSchema } from "./version.ts";
 
 const req = (chemin: string, init: RequestInit = {}) => new Request(`https://site.test${chemin}`, init);
 const html = (corps = "<html>page</html>", entetes: Record<string, string> = {}, status = 200) =>
@@ -67,6 +67,13 @@ assert.equal(etatDeLaCopie(0, 60_000, 60), "perimee");
 
 // 5. La version : la requete, le schema, les dates.
 assert.deepEqual(collectionsDuSchema("pages@2026,sections@2026,x-y@1"), ["pages", "sections"]);
+assert.deepEqual(collectionsDuSchema("pages@2026,sections@2026#boutique_reglages,boutique_stock"), ["pages", "sections"]);
+assert.deepEqual(tablesDuSchema("pages@2026#boutique_reglages,boutique_stock,autre"), ["boutique_reglages", "boutique_stock"]);
+assert.deepEqual(tablesDuSchema("pages@2026#"), []);
+assert.deepEqual(tablesDuSchema("pages@2026"), []);
+assert.ok(requeteDeLaVersion(["products"], ["boutique_stock", "boutique_reglages"]).includes("FROM boutique_stock) AS boutique_stock"), "le stock entre dans la version");
+assert.ok(requeteDeLaVersion(["products"], ["boutique_reglages"]).includes("AS boutique_reglages"), "les reglages de vente entrent dans la version");
+assert.ok(!requeteDeLaVersion(["products"]).includes("FROM boutique_"), "sans boutique, aucune table de la boutique n'est lue");
 const sql = requeteDeLaVersion(["sections", "site", "mal'nom"]);
 assert.ok(sql.includes('FROM "ec_sections"') && sql.includes('FROM "ec_site"') && !sql.includes("mal'nom"));
 assert.equal(plusRecente(["1.2026-09-28 17:17:04.0", "2026-09-28T17:17:05.000Z", 3]), Date.parse("2026-09-28T17:17:05.000Z"));
@@ -76,7 +83,7 @@ function base(etat: { publie: string; schema: string }) {
   return {
     prepare: (requete: string) => ({
       first: async <T>() =>
-        (requete.startsWith("SELECT (SELECT group_concat(slug") && !requete.includes("revisions")
+        (requete.includes("sqlite_master") && !requete.includes("revisions")
           ? { schema: etat.schema }
           : { schema: etat.schema, c_sections: etat.publie, revisions: "1.2026-01-01 00:00:00" }) as T,
     }),
@@ -89,6 +96,33 @@ const v2 = await lireLaVersion(base(etat));
 assert.ok(v1 && v2 && v1.cle !== v2.cle, "une publication doit changer la version");
 assert.equal(v2?.derniere, Date.parse("2026-01-02T00:00:00.000Z"));
 assert.equal(await lireLaVersion({ prepare: () => ({ first: async () => { throw new Error("table absente"); } }) }), null);
+
+// 5 bis. La vraie requete sur une base SQLite en memoire (quand node:sqlite existe) : sans boutique, puis avec ; une vente change la version.
+interface Sqlite {
+  DatabaseSync: new (f: string) => { exec(s: string): void; prepare(s: string): { get(...p: unknown[]): Record<string, unknown> | undefined } };
+}
+const sqlite = (await import("node:sqlite").catch(() => null)) as unknown as Sqlite | null;
+if (sqlite) {
+  const db = new sqlite.DatabaseSync(":memory:");
+  db.exec(`CREATE TABLE _emdash_collections (slug TEXT, updated_at TEXT); INSERT INTO _emdash_collections VALUES ('products', '2026-01-01');
+    CREATE TABLE ec_products (updated_at TEXT, status TEXT, published_at TEXT); CREATE TABLE revisions (created_at TEXT); CREATE TABLE options (name TEXT, revision TEXT);
+    CREATE TABLE _emdash_menus (updated_at TEXT); CREATE TABLE _emdash_menu_items (id TEXT, sort_order INT, parent_id TEXT, label TEXT, custom_url TEXT, reference_id TEXT, css_classes TEXT, target TEXT, locale TEXT);
+    CREATE TABLE _emdash_redirects (updated_at TEXT, enabled INT); CREATE TABLE _emdash_seo (updated_at TEXT); CREATE TABLE media (created_at TEXT, alt TEXT, focal_x REAL, focal_y REAL);
+    CREATE TABLE taxonomies (id TEXT); CREATE TABLE content_taxonomies (id TEXT);`);
+  const sur = { prepare: (q: string) => ({ first: async <T>() => (db.prepare(q).get() ?? null) as T | null }) };
+  const sans = await lireLaVersion(sur);
+  assert.ok(sans, "une base sans boutique a une version");
+  db.exec("CREATE TABLE boutique_reglages (cle TEXT PRIMARY KEY, valeur TEXT, maj INTEGER, qui TEXT); CREATE TABLE boutique_stock (produit TEXT, variante TEXT, quantite INTEGER, seuil INTEGER, precommande INTEGER, maj INTEGER, qui TEXT)");
+  db.exec("INSERT INTO boutique_stock VALUES ('planche', '', 1, 3, 0, 1, 'essai')");
+  const avec = await lireLaVersion(sur);
+  assert.ok(avec && avec.cle !== sans.cle, "les tables de la boutique entrent dans la version des qu'elles existent");
+  db.exec("UPDATE boutique_stock SET quantite = 0, maj = 2, qui = 'Vente'");
+  const vendu = await lireLaVersion(sur);
+  assert.ok(vendu && vendu.cle !== avec.cle, "une vente qui epuise un produit change la version");
+  db.exec("INSERT INTO boutique_reglages VALUES ('reglages', '{}', 3, 'admin')");
+  const ht = await lireLaVersion(sur);
+  assert.ok(ht && ht.cle !== vendu.cle, "un reglage de vente change la version");
+}
 
 // 6. Un parcours complet sur un cache simule : MISS, HIT, PRIVEE, publication, STALE.
 const magasin = new Map<string, Response>();
