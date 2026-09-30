@@ -142,29 +142,12 @@ export function ecranDeLaLettre(t: Textes, l: TextesDeLaLettre, d: DonneesDeLaLe
         { key: "etat", label: l.colonnes.etat, format: "badge" },
         { key: "depuis", label: l.colonnes.depuis },
       ],
-      rows: d.abonnes.map((a) => ({ adresse: a.adresse, langue: l.langues[a.langue], etat: l.etats[a.etat], depuis: depuis(t, a.confirme_le ?? a.demande_le, d.maintenant) })),
+      rows: d.abonnes.slice(0, 20).map((a) => ({ adresse: a.adresse, langue: l.langues[a.langue], etat: l.etats[a.etat], depuis: depuis(t, a.confirme_le ?? a.demande_le, d.maintenant) })),
     },
   );
 
-  // Retirer une adresse.
-  if (d.abonnes.length > 0) {
-    const cible = d.abonnes.find((a) => a.id === d.vue.abonne) ?? null;
-    blocks.push(
-      { type: "header", text: l.retirer },
-      { type: "context", text: l.retirerAide },
-      {
-        type: "actions",
-        block_id: `lettre-abonne-${cible?.id ?? "aucun"}`,
-        elements: [{ type: "select", action_id: ACTIONS.abonne, label: l.choisirAbonne, options: [l.aucuneAdresseChoisie, ...d.abonnes.map((a) => a.adresse)].map((x) => ({ label: x, value: x })), initial_value: cible?.adresse ?? l.aucuneAdresseChoisie }],
-      },
-    );
-    if (cible) {
-      blocks.push({
-        type: "actions",
-        elements: [{ type: "button", action_id: ACTIONS.retirer, label: l.boutonRetirer, style: "danger", value: cible.id, confirm: { title: l.retirerTitre, text: l.retirerTexte(cible.adresse), confirm: l.boutonRetirer, deny: l.confirmerNon } }],
-      });
-    }
-  }
+  // Les gestes sur la liste vivent dans l'ecran "Abonnes de la lettre" (extension Gestion) : selection, masse, recherche, export.
+  blocks.push({ type: "context", text: l.gererAilleurs });
 
   // Les derniers envois.
   blocks.push(

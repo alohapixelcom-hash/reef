@@ -170,7 +170,7 @@ export async function inscrire(base: Base, ligne: Ligne): Promise<void> {
   await base.executer("DELETE FROM courriels_journal WHERE quand < ?", [ligne.quand - CONSERVATION_MS]);
 }
 
-function versLigne(brut: Record<string, unknown>): Ligne {
+export function versLigne(brut: Record<string, unknown>): Ligne {
   let message: Message | null = null;
   try {
     message = typeof brut.message === "string" ? (JSON.parse(brut.message) as Message) : null;

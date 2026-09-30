@@ -2,6 +2,13 @@
 
 # Changelog
 
+## 3.8.5 - 2026-09-30
+
+- Back office, « Messages »: every message of the contact form is kept in the site database before the notification is sent, and can be read, marked read or unread, archived, deleted and answered (Cloudflare Email), with an unread badge in the sidebar (`migrations/import-3.8.5-reef.sql`).
+- « Journal des courriels » as a checklist: resend, delete, search, CSV export.
+- « Abonnés de la lettre »: search, unsubscribe, resubscribe, delete several subscribers at once, tick the suspicious sign-ups, CSV export.
+- Aloha Pixel core 1.10.0 (gestion extension).
+
 ## 3.8.4 - 2026-09-30
 
 - Tables in posts are real tables, in the editor and on the site. The demo

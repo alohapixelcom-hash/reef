@@ -14,6 +14,7 @@ import { catalogueDuBackOffice } from "./src/moteur/catalogue-bo.config.mjs";
 import { IDENTITE as DEPLOYER } from "./src/moteur/deployer/identite.mjs";
 import { IDENTITE as CHAMPS } from "./src/moteur/champs/identite.mjs";
 import { capacites, IDENTITE as COURRIELS } from "./src/moteur/extensions/courriels/identite.mjs";
+import { CAPACITES as CAPACITES_GESTION, IDENTITE as GESTION } from "./src/moteur/extensions/gestion/identite.mjs";
 import { PAGES_EN_CACHE, PAGES_GEREES } from "./src/moteur/pages-gerees.mjs";
 import { routesDuCache } from "./src/moteur/routes-du-cache.mjs";
 
@@ -246,6 +247,9 @@ async function allume() {
         plugins: [
           { ...DEPLOYER, entrypoint: ici("./src/moteur/deployer/extension.ts") },
           { ...COURRIELS, entrypoint: ici("./src/moteur/extensions/courriels/extension.ts"), options: { livrer: LIAISON_COURRIELS }, capabilities: capacites(LIAISON_COURRIELS) },
+          // "Gestion" : les listes du back office a cocher (messages du formulaire,
+          // abonnes de la lettre, journal des courriels), en React.
+          { ...GESTION, entrypoint: ici("./src/moteur/extensions/gestion/extension.ts"), adminEntry: ici("./src/moteur/extensions/gestion/admin/admin.tsx"), capabilities: CAPACITES_GESTION },
           // Le champ "une entree choisie par son nom" (auteur et sujet d'un
           // article) : une extension React, sans route ni base,
           // dont le composant est importe par le paquet de l'administration.

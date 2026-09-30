@@ -15,7 +15,8 @@
   "extensions": [
     "deployer",
     "courriels",
-    "administrable"
+    "administrable",
+    "gestion"
   ],
   "exclus": [],
   "chemins": {},
