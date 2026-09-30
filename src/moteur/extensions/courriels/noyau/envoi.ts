@@ -149,6 +149,12 @@ export interface Site {
   /** La langue de la personne qui recoit les notifications : celle du back office. */
   langue: Langue;
   catalogues: Record<Langue, Textes>;
+  /**
+   * Garde le message dans la base du site (ecran "Messages" du back office),
+   * AVANT la notification : un message dont la notification echoue reste
+   * lisible. Absent : rien n'est garde (les essais purs).
+   */
+  garder?: (m: { nom: string; adresse: string; sujet: string; message: string; langue: Langue }) => Promise<void>;
 }
 
 /**
@@ -164,6 +170,7 @@ export async function recevoirContact(poster: Poster, reglages: Reglages, champs
 
   const t = site.catalogues[site.langue];
   const sujet = champs.sujet || t.courriels.sansSujet;
+  if (site.garder) await site.garder({ nom: champs.nom, adresse: champs.adresse, sujet, message: champs.message, langue: champs.langue });
   const issue = await poster(
     {
       a: listeDAdresses(reglages.destinataires.contact),

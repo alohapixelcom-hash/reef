@@ -119,8 +119,8 @@ applied in order, each once, before deploying the new code:
 
 ```bash
 npx wrangler d1 export reef-moteur --remote --output=backup.sql                               # a full backup first
-node scripts/base-3.4.0.mjs --remote reef-moteur --sql migrations/import-3.8.4-reef.sql              # the plan: nothing is written
-node scripts/base-3.4.0.mjs --remote reef-moteur --sql migrations/import-3.8.4-reef.sql --appliquer  # the missing columns, then the file
+node scripts/base-3.4.0.mjs --remote reef-moteur --sql migrations/import-3.8.5-reef.sql              # the plan: nothing is written
+node scripts/base-3.4.0.mjs --remote reef-moteur --sql migrations/import-3.8.5-reef.sql --appliquer  # the missing columns, then the file
 ```
 
 The plan lists the columns to add and the writes that will be left aside
@@ -136,6 +136,7 @@ second run changes nothing) and none contains a `DELETE` or a `DROP`.
 | 3.8.1 | `import-3.8.2-reef.sql` | « Logo pour le mode sombre » |
 | 3.8.2 | `import-3.8.3-reef.sql` | author and topic chosen by name, native tags, the newsletter tables |
 | 3.8.3 | `import-3.8.4-reef.sql` | help texts of the back office, tables of the demo posts |
+| 3.8.4 | `import-3.8.5-reef.sql` | the table of the contact form messages (« Messages » screen) |
 
 ## What not to break
 

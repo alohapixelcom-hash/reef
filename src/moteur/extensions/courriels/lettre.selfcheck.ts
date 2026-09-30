@@ -76,7 +76,7 @@ if (sqlite) {
   is([d1.etat, jetonValide(d1.jeton)], ["nouveau", true], "une nouvelle inscription recoit un jeton de 64 caracteres");
   const d2 = await demanderLInscription(base, { adresse: "camille@exemple.test", langue: "fr", page: "/fr/" }, t0 + 1000, nouvelId);
   is([d2.etat, d2.jeton], ["attente", d1.jeton], "une seconde demande avant confirmation renvoie le meme lien");
-  is(await compterLesAbonnes(base, t0), { inscrits: 0, attente: 1 }, "en attente tant que le lien n'est pas ouvert");
+  is(await compterLesAbonnes(base, t0), { inscrits: 0, attente: 1, desinscrits: 0 }, "en attente tant que le lien n'est pas ouvert");
   is((await confirmer(base, "0".repeat(64), t0)).issue, "inconnu", "un jeton faux ne confirme rien");
   is((await confirmer(base, d1.jeton, t0 + 2000)).issue, "confirme", "le lien confirme l'inscription");
   is((await confirmer(base, d1.jeton, t0 + 3000)).issue, "deja", "un second clic ne change rien");
@@ -84,7 +84,7 @@ if (sqlite) {
 
   // Une inscription jamais confirmee est effacee au bout de 7 jours.
   await demanderLInscription(base, { adresse: "robot@exemple.test", langue: "en", page: "/" }, t0, nouvelId);
-  is(await compterLesAbonnes(base, t0 + ATTENTE_MS + 1), { inscrits: 1, attente: 0 }, "l'attente de plus de 7 jours est effacee");
+  is(await compterLesAbonnes(base, t0 + ATTENTE_MS + 1), { inscrits: 1, attente: 0, desinscrits: 0 }, "l'attente de plus de 7 jours est effacee");
 
   // Une parution : un courriel par abonne confirme, dans sa langue, par le canal.
   db.exec("CREATE TABLE ec_posts (id TEXT, translation_group TEXT, slug TEXT, locale TEXT, title TEXT, description TEXT, status TEXT, deleted_at TEXT, published_at TEXT)");

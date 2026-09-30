@@ -21,6 +21,7 @@ import { hote, nouvelId } from "./adaptateur.ts";
 import { CONFIGURATION } from "./configuration.ts";
 import { IDENTITE } from "./identite.mjs";
 import { lireLesReglages } from "./noyau/base.ts";
+import { garderLeMessage } from "./noyau/messages.ts";
 import { type Canal, poster } from "./noyau/canal.ts";
 import { cheminDeRetour } from "./noyau/regles.ts";
 import { type Accueil, lireChamps, recevoirContact } from "./noyau/envoi.ts";
@@ -65,6 +66,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       nom: reglages.nom || (await nomDuSite()),
       langue: CONFIGURATION.langue,
       catalogues: { fr: FR, en: EN },
+      garder: (m) => garderLeMessage(base, { ...m, page: chemin }, Date.now(), nouvelId()),
     });
     return retour(chemin, accueil);
   } catch (erreur) {

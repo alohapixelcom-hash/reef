@@ -1,0 +1,354 @@
+/* src/moteur/extensions/gestion/styles/fiche.css - la suite de gestion.css : liste et fiche cote a cote, fenetre de confirmation, pastille du rail, telephone.
+ *
+ * Meme regle que gestion.css : les variables natives du back office, aucune
+ * couleur en dur.
+ */
+
+/* --- Liste et fiche cote a cote -------------------------------------------- */
+.gs-maitre {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.gs-maitre--ouvert {
+  grid-template-columns: minmax(0, 1.35fr) minmax(20rem, 1fr);
+}
+
+.gs-detail {
+  position: sticky;
+  top: 1rem;
+  display: grid;
+  gap: 0.875rem;
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 1.25rem;
+  background: var(--color-kumo-base);
+  box-shadow: 0 1px 2px var(--color-kumo-shadow-drop);
+}
+
+.gs-retour {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-kumo-brand);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gs-surtitre {
+  margin: 0;
+  color: var(--text-color-kumo-subtle);
+  font-size: 0.8125rem;
+}
+
+.gs-fiche-titre {
+  margin: 0;
+  font-family: var(--aloha-police-titre, inherit);
+  font-size: 1.375rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.gs-de {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.gs-de a {
+  color: var(--color-kumo-brand);
+}
+
+.gs-texte {
+  padding: 1rem 1.125rem;
+  border-radius: 0.875rem;
+  background: color-mix(in oklab, var(--color-kumo-contrast) 4%, var(--color-kumo-base));
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.gs-texte--reponse {
+  background: color-mix(in oklab, var(--color-kumo-success) 8%, var(--color-kumo-base));
+}
+
+.gs-deja {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.gs-champ {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.gs-champ-titre {
+  font-weight: 700;
+}
+
+.gs-champ-aide {
+  color: var(--text-color-kumo-subtle);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.gs-champ textarea {
+  padding: 0.75rem 0.875rem;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+/* --- La fenetre de confirmation --------------------------------------------- */
+.gs-fenetre {
+  position: fixed;
+  inset: 0;
+  width: min(32rem, calc(100vw - 2rem));
+  height: fit-content;
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 1.25rem;
+  background: var(--color-kumo-base);
+  color: var(--text-color-kumo-default);
+  box-shadow: 0 24px 60px var(--color-kumo-shadow-drop);
+}
+
+.gs-fenetre::backdrop {
+  background: color-mix(in oklab, var(--color-kumo-contrast) 40%, transparent);
+}
+
+.gs-fenetre-corps {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.gs-fenetre-titre {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.gs-fenetre-texte {
+  color: var(--text-color-kumo-subtle);
+  line-height: 1.55;
+}
+
+.gs-fenetre-gestes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* --- Lien d'action ------------------------------------------------------------ */
+.gs-lien {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-kumo-brand);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* --- Boutons ---------------------------------------------------------------- */
+.gs-bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0 1rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 0.625rem;
+  background: var(--color-kumo-base);
+  color: var(--text-color-kumo-default);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.gs-bouton--petit {
+  min-height: 2.125rem;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+}
+
+.gs-bouton:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--color-kumo-contrast) 6%, var(--color-kumo-base));
+}
+
+.gs-bouton:focus-visible {
+  outline: 2px solid var(--color-kumo-brand);
+  outline-offset: 2px;
+}
+
+.gs-bouton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.gs-bouton--primary {
+  border-color: var(--color-kumo-brand);
+  background: var(--color-kumo-brand);
+  color: var(--text-color-kumo-inverse);
+}
+
+.gs-bouton--primary:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--color-kumo-brand) 85%, var(--color-kumo-contrast));
+}
+
+.gs-bouton--destructive {
+  border-color: var(--color-kumo-danger);
+  background: var(--color-kumo-danger);
+  color: var(--text-color-kumo-inverse);
+}
+
+.gs-bouton--destructive:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--color-kumo-danger) 85%, var(--color-kumo-contrast));
+}
+
+.gs-bouton--ghost {
+  border-color: transparent;
+  background: none;
+  color: var(--text-color-kumo-subtle);
+}
+
+.gs-tourne {
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: gs-tourne 0.7s linear infinite;
+}
+
+@keyframes gs-tourne {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- La pastille du rail ---------------------------------------------------- */
+.gs-pastille {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  margin-left: auto;
+  padding: 0 0.375rem;
+  border-radius: 999px;
+  background: var(--color-kumo-brand);
+  color: var(--text-color-kumo-inverse);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* --- Telephone : une carte par ligne --------------------------------------- */
+@media (max-width: 1100px) {
+  .gs-maitre--ouvert {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gs-maitre--ouvert .gs-liste {
+    display: none;
+  }
+
+  .gs-detail {
+    position: static;
+    max-height: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .gs-table,
+  .gs-table tbody {
+    display: grid;
+    gap: 0.625rem;
+    border: 0;
+    background: none;
+  }
+
+  .gs-table thead tr {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 0.25rem;
+  }
+
+  .gs-table thead th:not(.gs-case) {
+    display: none;
+  }
+
+  .gs-table thead th.gs-case {
+    padding: 0;
+    border: 0;
+  }
+
+  .gs-table tbody tr {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.25rem 0.5rem;
+    padding: 0.75rem;
+    border: 1px solid var(--color-kumo-line);
+    border-radius: 1rem;
+    background: var(--color-kumo-base);
+  }
+
+  .gs-table tbody td,
+  .gs-table tbody tr:hover td,
+  .gs-table tbody tr[aria-selected="true"] td {
+    grid-column: 2;
+    padding: 0;
+    white-space: normal;
+    border: 0;
+    background: none;
+  }
+
+  .gs-table tbody tr[aria-selected="true"] {
+    border-color: var(--color-kumo-brand);
+    background: color-mix(in oklab, var(--color-kumo-brand) 8%, var(--color-kumo-base));
+  }
+
+  .gs-table tbody td.gs-case {
+    grid-row: 1 / span 6;
+    grid-column: 1;
+    width: auto;
+    text-align: left;
+  }
+
+  .gs-table tbody td.gs-principale {
+    order: -1;
+  }
+
+  .gs-table tbody td:not(.gs-case):not(.gs-principale):empty {
+    display: none;
+  }
+
+  .gs-masse-gestes {
+    margin-left: 0;
+  }
+
+  .gs-recherche {
+    max-width: none;
+  }
+}

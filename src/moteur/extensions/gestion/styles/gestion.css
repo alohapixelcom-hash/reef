@@ -1,0 +1,391 @@
+/* src/moteur/extensions/gestion/styles/gestion.css - la mise en page des listes a gerer (classes gs-*) : en-tete, filtres, barre des gestes de masse, tableau, fiche, fenetre de confirmation, pastille du rail.
+ *
+ * Meme regle que la feuille de la boutique : les surfaces, filets et encres
+ * sont les variables natives du back office (--color-kumo-*,
+ * --text-color-kumo-*), l'accent est sa marque (--color-kumo-brand), reglee
+ * par l'habillage du site. Aucune couleur en dur : clair et sombre suivent le
+ * back office. Sous 720 px, chaque ligne du tableau devient une carte.
+ */
+
+.gs-ecran {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 88rem;
+  padding-bottom: 3rem;
+  color: var(--text-color-kumo-default);
+}
+
+.gs-masque {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.gs-discret {
+  color: var(--text-color-kumo-subtle);
+  font-size: 0.875rem;
+}
+
+.gs-gras {
+  font-weight: 800;
+}
+
+.gs-entete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+}
+
+.gs-titre {
+  margin: 0;
+  font-family: var(--aloha-police-titre, inherit);
+  font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.gs-chapeau {
+  margin: 0.5rem 0 0;
+  max-width: 72ch;
+  color: var(--text-color-kumo-subtle);
+  line-height: 1.55;
+}
+
+.gs-actions,
+.gs-gestes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* --- Tuiles -------------------------------------------------------------- */
+.gs-tuiles {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+
+.gs-tuile {
+  display: grid;
+  gap: 0.25rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 1.25rem;
+  background: var(--color-kumo-base);
+}
+
+.gs-tuile p {
+  margin: 0;
+}
+
+.gs-tuile-libelle,
+.gs-tuile-detail {
+  color: var(--text-color-kumo-subtle);
+  font-size: 0.8125rem;
+}
+
+.gs-tuile-valeur {
+  font-size: 1.75rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* --- Outils : filtres, recherche, choix ----------------------------------- */
+.gs-liste {
+  display: grid;
+  gap: 0.875rem;
+  min-width: 0;
+  align-content: start;
+}
+
+.gs-outils {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.gs-filtres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.gs-filtre {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0 0.875rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 999px;
+  background: var(--color-kumo-base);
+  color: var(--text-color-kumo-subtle);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.gs-filtre:hover {
+  color: var(--text-color-kumo-default);
+}
+
+.gs-filtre[aria-checked="true"] {
+  border-color: var(--color-kumo-contrast);
+  background: var(--color-kumo-contrast);
+  color: var(--text-color-kumo-inverse);
+  font-weight: 600;
+}
+
+.gs-filtre-compte {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+.gs-recherche {
+  position: relative;
+  display: inline-flex;
+  flex: 1 1 16rem;
+  align-items: center;
+  max-width: 26rem;
+  color: var(--text-color-kumo-subtle);
+}
+
+.gs-recherche svg {
+  position: absolute;
+  left: 0.875rem;
+  pointer-events: none;
+}
+
+.gs-recherche input,
+.gs-choix select,
+.gs-champ textarea {
+  width: 100%;
+  min-height: 2.5rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 0.75rem;
+  background: var(--color-kumo-base);
+  color: var(--text-color-kumo-default);
+  font: inherit;
+  font-size: 0.9375rem;
+}
+
+.gs-recherche input {
+  padding: 0 0.875rem 0 2.5rem;
+  border-radius: 999px;
+}
+
+.gs-choix select {
+  padding: 0 0.875rem;
+}
+
+.gs-recherche input:focus-visible,
+.gs-choix select:focus-visible,
+.gs-champ textarea:focus-visible {
+  outline: 2px solid var(--color-kumo-brand);
+  outline-offset: 1px;
+}
+
+/* --- La barre des gestes de masse ----------------------------------------- */
+.gs-masse {
+  position: sticky;
+  top: 0.5rem;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--color-kumo-brand);
+  border-radius: 1rem;
+  background: color-mix(in oklab, var(--color-kumo-brand) 9%, var(--color-kumo-base));
+  box-shadow: 0 6px 18px var(--color-kumo-shadow-drop);
+}
+
+.gs-masse-compte {
+  font-variant-numeric: tabular-nums;
+}
+
+.gs-masse-gestes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-left: auto;
+}
+
+/* --- Le tableau ------------------------------------------------------------ */
+.gs-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 1rem;
+  background: var(--color-kumo-base);
+  font-size: 0.9375rem;
+}
+
+.gs-table th {
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid var(--color-kumo-line);
+  color: var(--text-color-kumo-subtle);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.gs-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--color-kumo-line);
+  vertical-align: top;
+}
+
+.gs-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.gs-table .gs-principale {
+  width: 100%;
+  min-width: 14rem;
+}
+
+/* Les colonnes secondaires gardent leur texte sur une ligne : seule la principale se replie. */
+.gs-table th,
+.gs-table td:not(.gs-principale):not(.gs-repliable) {
+  white-space: nowrap;
+}
+
+.gs-table .gs-repliable {
+  min-width: 14rem;
+}
+
+/* Le tableau defile dans son cadre plutot que de faire deborder la page. */
+.gs-defile {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.gs-case {
+  width: 2.75rem;
+  text-align: center;
+}
+
+.gs-case input,
+.gs-table input[type="checkbox"] {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--color-kumo-brand);
+  cursor: pointer;
+}
+
+.gs-ouvrable {
+  cursor: pointer;
+}
+
+.gs-table tbody tr:hover td,
+.gs-table tr[aria-current="true"] td {
+  background: color-mix(in oklab, var(--color-kumo-contrast) 4%, var(--color-kumo-base));
+}
+
+.gs-table tr[aria-selected="true"] td {
+  background: color-mix(in oklab, var(--color-kumo-brand) 8%, var(--color-kumo-base));
+}
+
+.gs-deux-lignes {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.gs-deux-lignes > * {
+  overflow-wrap: anywhere;
+}
+
+.gs-etiquette {
+  --gs-teinte: var(--text-color-kumo-subtle);
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--gs-teinte) 14%, var(--color-kumo-base));
+  color: color-mix(in oklab, var(--gs-teinte) 58%, var(--text-color-kumo-default));
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.gs-etiquette--succes { --gs-teinte: var(--color-kumo-success); }
+.gs-etiquette--attention { --gs-teinte: var(--color-kumo-warning); }
+.gs-etiquette--erreur { --gs-teinte: var(--color-kumo-danger); }
+.gs-etiquette--info { --gs-teinte: var(--color-kumo-brand); }
+
+/* --- Etats ------------------------------------------------------------------ */
+.gs-chargement {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 0;
+  color: var(--text-color-kumo-subtle);
+}
+
+.gs-vide {
+  padding: 2.25rem 1.5rem;
+  border: 1px dashed var(--color-kumo-line);
+  border-radius: 1rem;
+  text-align: center;
+}
+
+.gs-vide-titre {
+  margin: 0;
+  font-weight: 700;
+}
+
+.gs-vide-texte {
+  margin: 0.375rem 0 0;
+  color: var(--text-color-kumo-subtle);
+}
+
+.gs-suite {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--text-color-kumo-subtle);
+  font-size: 0.875rem;
+}
+
+.gs-avis {
+  --gs-teinte: var(--color-kumo-brand);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid color-mix(in oklab, var(--gs-teinte) 45%, var(--color-kumo-line));
+  border-radius: 0.875rem;
+  background: color-mix(in oklab, var(--gs-teinte) 9%, var(--color-kumo-base));
+  line-height: 1.5;
+}
+
+.gs-avis--succes { --gs-teinte: var(--color-kumo-success); }
+.gs-avis--erreur { --gs-teinte: var(--color-kumo-danger); }
+
+.gs-avis-fermer {
+  padding: 0 0.25rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}

@@ -53,7 +53,12 @@ export const SQL_LETTRE = `-- Lettre d'information : abonnes et parutions. Idemp
 /** Une inscription non confirmee est effacee au bout de ce delai. */
 export const ATTENTE_MS = 7 * 24 * 3_600_000;
 
-export type EtatAbonne = "attente" | "inscrit";
+/**
+ * "desinscrit" : retire de l'envoi par l'administrateur (geste de masse de
+ * l'ecran "Abonnes de la lettre"), ligne gardee pour pouvoir le reinscrire.
+ * La desinscription par le lien du courriel, elle, efface toujours la ligne.
+ */
+export type EtatAbonne = "attente" | "inscrit" | "desinscrit";
 
 export interface Abonne {
   id: string;
@@ -95,7 +100,7 @@ function versAbonne(brut: Record<string, unknown>): Abonne {
     id: String(brut.id),
     adresse: String(brut.adresse),
     langue: brut.langue === "fr" ? "fr" : "en",
-    etat: brut.etat === "inscrit" ? "inscrit" : "attente",
+    etat: brut.etat === "inscrit" || brut.etat === "desinscrit" ? brut.etat : "attente",
     jeton: String(brut.jeton),
     page: brut.page == null ? null : String(brut.page),
     demande_le: Number(brut.demande_le),
@@ -170,11 +175,63 @@ export async function retirer(base: Base, id: string): Promise<boolean> {
   return Number(brut?.n ?? 0) > 0;
 }
 
-export async function compterLesAbonnes(base: Base, maintenant: number): Promise<{ inscrits: number; attente: number }> {
+export async function compterLesAbonnes(base: Base, maintenant: number): Promise<{ inscrits: number; attente: number; desinscrits: number }> {
   await purgerLesAttentes(base, maintenant);
   const lignes = await base.lire<{ etat: string; n: number }>("SELECT etat, COUNT(*) AS n FROM courriels_abonnes GROUP BY etat");
   const n = (e: string) => Number(lignes.find((l) => l.etat === e)?.n ?? 0);
-  return { inscrits: n("inscrit"), attente: n("attente") };
+  return { inscrits: n("inscrit"), attente: n("attente"), desinscrits: n("desinscrit") };
+}
+
+/* --- La gestion de la liste (ecran "Abonnes de la lettre") --------------- */
+
+export type FiltreAbonnes = EtatAbonne | "tous";
+
+/** Une page de la liste, filtree et cherchee, et le nombre total qui correspond. */
+export async function chercherDesAbonnes(base: Base, r: { filtre?: FiltreAbonnes; q?: string; depuis?: number; limite?: number }, maintenant: number): Promise<{ items: Abonne[]; suite: number | null; total: number }> {
+  await purgerLesAttentes(base, maintenant);
+  const conditions: string[] = [];
+  const params: unknown[] = [];
+  if (r.filtre && r.filtre !== "tous") {
+    conditions.push("etat = ?");
+    params.push(r.filtre);
+  }
+  const q = (r.q ?? "").trim().toLowerCase().slice(0, 120);
+  if (q) {
+    conditions.push("adresse LIKE ? ESCAPE '\\'");
+    params.push(`%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`);
+  }
+  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  const limite = Math.min(Math.max(r.limite ?? 100, 1), 5000);
+  const depuis = Math.max(r.depuis ?? 0, 0);
+  const brut = await base.lire(`SELECT * FROM courriels_abonnes ${where} ORDER BY COALESCE(confirme_le, demande_le) DESC, id DESC LIMIT ? OFFSET ?`, [...params, limite + 1, depuis]);
+  const [compte] = await base.lire<{ n: number }>(`SELECT COUNT(*) AS n FROM courriels_abonnes ${where}`, params);
+  return { items: brut.slice(0, limite).map(versAbonne), suite: brut.length > limite ? depuis + limite : null, total: Number(compte?.n ?? 0) };
+}
+
+export type GesteDeMasse = "desinscrire" | "reinscrire" | "supprimer";
+
+/**
+ * Un geste sur plusieurs abonnes a la fois ; rend le nombre de lignes changees.
+ * Reinscrire ne vaut que pour une adresse qui avait confirme elle-meme (date
+ * de confirmation) : une inscription jamais confirmee ne devient pas un
+ * abonne par un clic de l'administrateur (double confirmation, RGPD).
+ */
+export async function gesteSurLesAbonnes(base: Base, ids: readonly string[], geste: GesteDeMasse): Promise<number> {
+  const propres = ids.filter((id) => typeof id === "string" && id.length > 0 && id.length <= 80).slice(0, 5000);
+  if (!propres.length) return 0;
+  await preparerLaLettre(base);
+  let n = 0;
+  // Par paquets de 90 : D1 limite le nombre de parametres d'une requete.
+  for (let i = 0; i < propres.length; i += 90) {
+    const paquet = propres.slice(i, i + 90);
+    const marques = paquet.map(() => "?").join(", ");
+    const condition = geste === "desinscrire" ? " AND etat = 'inscrit'" : geste === "reinscrire" ? " AND etat = 'desinscrit' AND confirme_le IS NOT NULL" : "";
+    const [avant] = await base.lire<{ n: number }>(`SELECT COUNT(*) AS n FROM courriels_abonnes WHERE id IN (${marques})${condition}`, paquet);
+    if (geste === "supprimer") await base.executer(`DELETE FROM courriels_abonnes WHERE id IN (${marques})`, paquet);
+    else await base.executer(`UPDATE courriels_abonnes SET etat = ? WHERE id IN (${marques})${condition}`, [geste === "desinscrire" ? "desinscrit" : "inscrit", ...paquet]);
+    n += Number(avant?.n ?? 0);
+  }
+  return n;
 }
 
 /** Les abonnes, confirmes d'abord, du plus recent au plus ancien. */

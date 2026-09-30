@@ -18,10 +18,14 @@ export function capacites(livrer) {
   return ["email:send", "hooks.email-events:register", ...(livrer ? ["hooks.email-transport:register"] : [])];
 }
 
-/** Les pages du rail, dans l'ordre. Les icones sont des noms Phosphor. */
+/**
+ * Les pages du rail, dans l'ordre. Les icones sont des noms Phosphor. Le
+ * journal des courriels vit dans l'extension Gestion (liste a selection
+ * multiple, recherche, export) ; l'ecran Block Kit "/journal" repond encore a
+ * qui garde son ancienne adresse.
+ */
 export const PAGES = [
   { path: "/", label: "Courriels", icon: "envelope-simple" },
-  { path: "/journal", label: "Journal des courriels", icon: "list" },
   { path: "/brancher", label: "Brancher les courriels", icon: "plug" },
   { path: "/reglages", label: "Réglages des courriels", icon: "gear" },
 ];
