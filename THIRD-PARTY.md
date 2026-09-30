@@ -7,8 +7,8 @@ license and where it lives. If it is not on this page, it was made for this
 theme. This inventory is what makes Reef safe to ship and to reuse inside your
 own products.
 
-Verified against the repository on 2026-09-29 (3.6.1) (packages read from
-node_modules metadata, assets listed with find over public/ and src/).
+Packages are read from their node_modules metadata, assets listed from
+public/ and src/.
 
 ## Fonts
 
@@ -26,7 +26,7 @@ The imports live at the top of src/layouts/BaseHead.astro. Each package
 carries its own LICENSE file in node_modules; the license fields above were
 read from the packages' own metadata. The accent word of a big title loads no
 extra font: it keeps the heading font, turns the house turquoise, with no
-underline (the wave was removed in 3.3.1). Coral is the second accent, rationed.
+underline. Coral is the second accent, rationed.
 
 ## Icons
 
@@ -135,9 +135,7 @@ node -e "console.log(require('@fontsource-variable/space-grotesk/package.json').
 
 These packages are installed with the theme but enter a build ONLY when
 `ALOHA_MOTEUR=emdash` is set (see docs/moteur.md). With the variable absent,
-the theme compiles exactly as before, to static HTML, and none of them is
-bundled: the 63 HTML, XML and TXT files of the static build were compared one
-by one on 2026-09-21. Licenses read from node_modules metadata on that date.
+the theme compiles to static HTML and none of them is bundled.
 
 | Package | License | Why it is here |
 |---|---|---|

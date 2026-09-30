@@ -11,7 +11,7 @@
 //     billet arrive avec `etiquettes` deja resolues (source.emdash.ts) ;
 //   - fichiers, le champ `tags` du billet : l'etiquette d'une traduction prend
 //     l'adresse de l'etiquette de meme rang dans la version par defaut du meme
-//     billet (meme regle que la migration import-3.8.3-reef.sql).
+//     billet (meme regle que la migration migrations/import-3.8.3-reef.sql).
 import { defaultLocale, type Locale } from "@i18n";
 import { entrySlug } from "@i18n/content";
 import { slug } from "github-slugger";

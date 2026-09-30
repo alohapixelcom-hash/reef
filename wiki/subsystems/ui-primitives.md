@@ -9,7 +9,6 @@ sources:
   - src/components/ui/_dialog.ts
   - src/components/ui/_overlay.css
   - src/components/ui/accordion/AccordionItem.astro
-updated: 2026-08-15
 ---
 
 # UI primitives

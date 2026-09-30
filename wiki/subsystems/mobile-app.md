@@ -1,105 +1,100 @@
 <!-- wiki/subsystems/mobile-app.md - shipping the theme as a native iOS and Android app with Capacitor. -->
 ---
 title: Mobile app (Capacitor)
-summary: How Reef builds into a real iOS and Android app, what the theme already does for you, and the exact commands.
+summary: How Reef builds into a real iOS and Android app, what the theme already does, and the exact commands from install to the stores.
 sources:
-  - astro.config.mjs
+  - capacitor.config.ts
+  - scripts/app.mjs
   - src/layouts/BaseHead.astro
   - src/styles/global.css
-  - scripts/app.mjs
-updated: 2026-08-15
 ---
 
 # Mobile app (Capacitor)
 
-Reef compiles to a folder of static files. Capacitor takes that folder and
-wraps it in a native shell, so the same codebase ships as a website **and** as
-an app on the App Store and Google Play. No rewrite, no React Native, no
-second design system.
+Reef compiles to a folder of static files. [Capacitor](https://capacitorjs.com)
+wraps that folder in a native shell, so the same code ships as a website and
+as an app on the App Store and Google Play.
 
-This is not a checkbox. Everything below is already true in the theme, and
-`pnpm app` produces a build that a native shell can load as is.
+## What the theme provides, and what you do
 
-## Why it works without a rewrite
+| The theme provides | You do |
+|---|---|
+| `capacitor.config.ts`: app id and name, background colours, splash screen, HTTPS scheme on Android, no mixed content | Change `appId` and `appName` |
+| `pnpm app`: the static build, then `scripts/app.mjs`, which removes the canonical and sitemap tags and makes the manifest start on the bundled home page | Install Capacitor and add the platforms, once |
+| A layout ready for a phone: safe areas, `svh` heights, 44 px touch targets, no horizontal scroll, 16 px inputs | Icons and splash screen, signing, the store listings |
 
-A Capacitor shell serves your files from a local origin (`capacitor://` on iOS,
-`https://localhost` on Android) and there is no server. Three consequences, and
-Reef is built for all three:
-
-| Constraint | What breaks in most themes | What Reef does |
-|---|---|---|
-| No server | Any SSR route, image endpoint or form action 404s | The theme is 100 % static, no adapter, and the contact form (`contact.astro`) ships with no `action`, deliberately not wired |
-| Relative paths | Absolute `/foo/` links can resolve outside the bundle | `trailingSlash: "always"` plus directory builds keep every internal link a real folder |
-| The notch | Content slides under the status bar and the home indicator | `viewport-fit=cover` in `BaseHead.astro:78` and `env(safe-area-inset-*)` on every fixed element |
+Capacitor is not a dependency of the theme: a site that never becomes an app
+installs nothing more.
 
 ## The commands
 
 ```bash
-pnpm app                    # build tuned for a native shell, into dist/
-npx cap add ios             # once
-npx cap add android         # once
-npx cap sync                # after every pnpm app
-npx cap open ios            # opens Xcode
-npx cap open android        # opens Android Studio
+pnpm add @capacitor/core @capacitor/ios @capacitor/android
+pnpm add -D @capacitor/cli
+
+pnpm app                  # dist/, tuned for a native shell
+npx cap add ios           # once
+npx cap add android       # once
+npx cap sync              # after every pnpm app: copies dist/ into both projects
+npx cap open ios          # Xcode
+npx cap open android      # Android Studio
 ```
 
-`pnpm app` is `scripts/app.mjs`. It runs the normal build, then applies the two
-changes a native shell needs and a website must not have:
+Once `@capacitor/cli` is installed, the type block at the top of
+`capacitor.config.ts` can be replaced by
+`import type { CapacitorConfig } from "@capacitor/cli";`.
 
-1. **Strips the canonical and sitemap tags.** In an app they point at a website
-   that the user is not on, and Apple's review has rejected apps for looking
-   like a wrapped website because of exactly this kind of leftover.
-2. **Rewrites the manifest start URL to a relative path**, so a cold start opens
-   the bundled home page and not the public site.
+`ios/` and `android/` are native projects: commit them to your own repository
+if you edit them (icons, permissions, signing), or generate them again with
+`npx cap add`.
 
-Nothing else is touched: the HTML and the CSS are identical between the web
-build and the app build. One codebase, one visual result.
+## What the app contains
 
-## What the theme already guarantees
+The app carries the **static build**: its posts are the Markdown files of `src/data/posts/`. The optional publication
+engine needs a Worker and a database, so its back office does not apply to the
+app. To show content managed in the back office, point the app at your site
+with `server.url` in `capacitor.config.ts` for development only: Apple rejects
+an app that only loads a remote website.
 
-**Safe areas.** The floating navbar sits at
-`max(1rem, env(safe-area-inset-top))` (`Navbar.astro`), so it clears the notch
-and the Dynamic Island without a magic number. Any bottom bar does the same
-with `safe-area-inset-bottom`.
+## Why it works without a rewrite
 
-**Viewport units.** The theme uses `svh` and never `vh`. On iOS Safari, `100vh`
-is taller than the visible area while the URL bar is showing, which is the
-single most common reason a hero looks cropped on an iPhone. `100svh` is the
-small viewport, and it is always right.
+A Capacitor shell serves your files from a local origin (`capacitor://` on iOS,
+`https://localhost` on Android), with no server.
 
-**Touch targets.** Every interactive element is at least 44 px on its smallest
-side, which is Apple's own minimum. The primitives enforce it with `min-h-11`
-rather than leaving it to each page.
+| Constraint | What breaks in most themes | What Reef does |
+|---|---|---|
+| No server | Any SSR route, image endpoint or form action fails | `pnpm app` runs the static build, with no adapter; the contact form (`contact.astro`) ships with no `action` |
+| Relative paths | Absolute links can resolve outside the bundle | `trailingSlash: "always"` and directory builds keep every internal link a real folder |
+| The notch | Content slides under the status bar and the home indicator | `viewport-fit=cover` in `BaseHead.astro`, and `env(safe-area-inset-*)` on every fixed element |
 
-**No horizontal overflow.** Verified, not claimed: `scrollWidth` equals
-`clientWidth` at 390x844 on every page of the theme. This is the check to run
-before any release, because a single overflowing element makes the whole app
-feel broken on a phone.
+## Signing and the stores
 
-**No zoom on focus.** Every input is at least 16 px, which is the threshold
-below which iOS zooms the page when a field takes focus and never zooms back.
+- **iOS**: in Xcode, target App, "Signing & Capabilities": your team and a
+  bundle identifier equal to `appId`. Product, Archive, then Distribute App to
+  App Store Connect. An Apple Developer account is required.
+- **Android**: in Android Studio, Build, Generate Signed App Bundle, with your
+  own upload key (keep it safe: it signs every update). Upload the `.aab` to
+  the Google Play Console.
+- **Icons and splash screen**: `npx @capacitor/assets generate` from one
+  1024 px icon and one splash image.
 
-## The checklist before submitting
+## Before submitting
 
-- [ ] `pnpm app` then `npx cap sync`
-- [ ] Set `appId` and `appName` in `capacitor.config.ts`
-- [ ] Replace the icon and splash screen (`npx @capacitor/assets generate`)
-- [ ] Test on a device with a notch, in both orientations
-- [ ] Test with the system font size at its largest setting
-- [ ] Check that every external link opens in the system browser, not in the
-      shell: Capacitor's `Browser` plugin, or `target="_blank"`
-- [ ] Turn off the WebView bounce if the content is not scrollable
-- [ ] Apple rejects apps that are "just a website". Ship at least one thing the
-      web version does not have: push notifications, offline reading, the
-      camera, a share sheet. Capacitor has a plugin for each.
+- [ ] `appId` and `appName` are yours; the icon and splash screen too.
+- [ ] `pnpm app`, then `npx cap sync`, on the final content.
+- [ ] Tested on a phone with a notch, in both orientations, with the largest
+      system font size.
+- [ ] External links open in the system browser (`target="_blank"`, or the
+      `@capacitor/browser` plugin).
+- [ ] `server.url` is commented out in `capacitor.config.ts`.
+- [ ] The app offers something the website does not (offline reading, push
+      notifications, a share sheet): Apple rejects apps that are "just a
+      website". Each has a Capacitor plugin.
 
 ## What is deliberately not included
 
-No native plugin is bundled. A theme that shipped push notifications and a
-camera plugin would force every user to carry them, and would tie the theme to
-plugin versions that move faster than a design system. The theme guarantees the
-build is loadable and the layout is correct. The plugins are one `npm install`
-away and belong to the app, not to the theme.
+No native plugin is bundled: plugins belong to the app, not to the theme, and
+each is one install away.
 
 ## Related pages
 

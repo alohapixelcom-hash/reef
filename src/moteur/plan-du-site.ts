@@ -12,8 +12,8 @@
 //
 // SANS IMPORTER LES PAGES. Une page importee par un module qui n'est pas une
 // page cesse d'etre une frontiere pour le partage des feuilles de style
-// d'Astro : le CSS du theme (127 ko) se retrouvait dans le back office et
-// dans le manifeste de 73 routes d'API (mesure le 21 septembre 2026). Les
+// d'Astro : le CSS du theme se retrouvait dans le back office et dans le
+// manifeste des routes d'API. Les
 // chemins vivent donc dans des modules partages (@i18n, @js/archive,
 // @js/adresses), que la page et ce plan importent chacun de leur cote.
 import { defaultLocale, localePaths, localePrefix, locales } from "@i18n";

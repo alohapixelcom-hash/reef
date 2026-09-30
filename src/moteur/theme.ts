@@ -11,7 +11,7 @@
 //   - repliDuSite(locale) et identiteDuSite(page, locale) : son identite
 //     livree, rendue quand les reglages du back office sont vides ;
 //   - variablesDeLaPalette(teinte) : ses jetons de couleur pour la teinte
-//     VISIBLE que le nom de la couleur dit (palette.ts, socle 1.3.0), par la
+//     VISIBLE que le nom de la couleur dit (palette.ts), par la
 //     recette de son `pnpm rebrand` ;
 //   - VARIABLES_DE_POLICE : ses jetons de police (texte et titres), que la
 //     police choisie dans le back office repeint (typographie.ts, socle) ;
@@ -230,9 +230,9 @@ export const ADMIN_EXTERNE: { libelle: string; url: string } | null = null;
 
 // LA COULEUR DE LA MARQUE, par la recette de scripts/rebrand.mjs : l'accent
 // (rampe coral : liens, mot en script) sur la teinte nommee, telle quelle
-// (palette.ts, socle 1.3.0 : "Bleu océan" est un bleu), les deux neutres (ink
+// (palette.ts : "Bleu océan" est un bleu), les deux neutres (ink
 // et paper) sur une teinte froide d'ancrage. Les boutons pleins (rampe reef)
-// prennent AUSSI la teinte nommee (3.6.2) : `pnpm rebrand` tourne cette rampe
+// prennent AUSSI la teinte nommee : `pnpm rebrand` tourne cette rampe
 // de 181 degres, ce qui rendait "Bleu océan" en boutons orange.
 function hslVersHex(h: number, s: number, l: number): string {
   const t = ((h % 360) + 360) % 360;
@@ -285,10 +285,10 @@ function rampesDeLaPalette(h: number): Record<string, string> {
   return vars;
 }
 
-// LE CONTRASTE DES BOUTONS (socle 1.4.0) : le fond des boutons pleins et
+// LE CONTRASTE DES BOUTONS : le fond des boutons pleins et
 // l'encre qui s'y ecrit, en clair (palier 600, texte blanc) et en sombre
 // (palier 400, texte du fond le plus sombre), releves dans le Chrome du Mac
-// sur le build (rapport socle 1.4.0). garantirLeContraste (palette.ts)
+// sur le build. garantirLeContraste (palette.ts)
 // pousse ces fonds jusqu'a 4,5:1 au moins pour chaque couleur de la marque.
 // Les noms des variables sont composes : ecrits en entier, Tailwind les
 // lirait ici et les ajouterait a la feuille.
@@ -319,6 +319,6 @@ export const ESSAI_DE_L_ADMINISTRATION: ParametresDeLEssai = {
   seo: { entree: "contact", page: "/contact/" },
 };
 
-// LA CARTE DES CHAMPS DE CHAQUE BLOC (socle 1.8.0, 3.8.3) : relevee par la sonde, textes compris,
+// LA CARTE DES CHAMPS DE CHAQUE BLOC : relevee par la sonde, textes compris,
 // dans champs-des-blocs.site.ts (un champ qui ne change rien sur la page d'un bloc est cache dans son ecran).
 export { CHAMPS_DES_BLOCS } from "./champs-des-blocs.site.ts";

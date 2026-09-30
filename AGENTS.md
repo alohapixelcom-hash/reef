@@ -37,16 +37,16 @@ accessibility. Those are never the place to be economical.
 Two things carry the rest of the context. The review checklist at the end
 of docs/design.md, which you run on your own work before calling it done.
 And the wiki in wiki/, which explains how each subsystem actually works:
-start with wiki/overview.md, and add a sync entry there after a structural
-change.
+start with wiki/overview.md, and update the page of a subsystem when you
+change its structure.
 
 ## What this theme is
 
 A blog, free, in English and in French: a home that leads with the latest
-piece, a paginated blog, topic and author pages, a reading column, and a
+piece, a paginated blog, topic, tag and author pages, a reading column, and a
 per-language RSS feed. The content is three Astro content collections (posts,
-authors, topics) with zod schemas. There is no shop, no pricing, no CMS and no
-server. The demo publication is fictional and named **Reef Notes**; the theme
+authors, topics) with zod schemas. By default there is no server; the optional
+publication engine (below) turns it into a blog CMS. The demo publication is fictional and named **Reef Notes**; the theme
 is named **Reef**. A user replaces Reef Notes and keeps Reef.
 
 ## Stack
@@ -54,12 +54,10 @@ is named **Reef**. A user replaces Reef Notes and keeps Reef.
 Astro 7 (static output and no adapter BY DEFAULT), Tailwind CSS 4 (CSS-first config, no
 tailwind.config.js), tailwind-variants, @astrojs/mdx (Markdown and MDX posts)
 and @astrojs/sitemap, Fontsource for Space Grotesk and Instrument Sans (the
-only two fonts: the accent word keeps the heading font under a turquoise wave
-underline). Node >= 22.18, pnpm. Demo copy is bilingual, for a fictional
+only two fonts: the accent word keeps the heading font and turns turquoise). Node >= 22.18, pnpm. Demo copy is bilingual, for a fictional
 publication named Reef Notes.
 
-**No React, no WebGL, no animation library.** Reef has zero islands and nine
-runtime dependencies. Every effect on the page is CSS. Adding a framework to
+**No React, no WebGL, no animation library.** Reef has zero islands on the public site. Every effect on the page is CSS. Adding a framework to
 this repo is a design failure, not a feature.
 
 **One opt-in exception: the publication engine.** With `ALOHA_MOTEUR=emdash`
@@ -72,7 +70,7 @@ EmDash's own page, and no public page gains an island. Everything on this page
 describes the default, static build, which must stay identical, file by file,
 to what it was: read docs/moteur.md before touching src/moteur/,
 src/js/posts.ts or a managed page. Posts are listed through `@js/posts`, never
-through `getCollection("posts")`. Since 3.4.0 the whole site is run from the
+through `getCollection("posts")`. With the engine on, the whole site is run from the
 back office (menus, settings, the per-language `site` entry, topics, authors,
 footer, photos, button addresses, free pages): a new visible text or image
 must be reachable there, with an empty field rendering the theme as before;
@@ -80,7 +78,7 @@ must be reachable there, with an empty field rendering the theme as before;
 `docs/administrer.md` (the editor's guide) must stay true.
 
 Shared files: every file listed in `socle.lock.json` comes byte for byte from
-the house base (aloha-socle 1.4.0), and `pnpm test` ends with `node
+the house base (aloha-socle), and `pnpm test` ends with `node
 scripts/socle.mjs check`, which fails on any change to one of them. Change
 them in aloha-socle, then sync; what belongs to this theme alone goes in
 `src/moteur/theme.ts` and `socle.adaptateur.json`.
@@ -90,7 +88,7 @@ them in aloha-socle, then sync; what belongs to this theme alone goes in
 ```text
 src/
   components/
-    Sections/   24 sections (Home/, Post/, Archive/, Search/, Global/, Legal/)
+    Sections/   the sections, by page (Home/, Post/, Archive/, Search/, Global/, Legal/)
     svg/icons/  60 original icons, name union derived from icons.ts
     ui/         36 primitive families, see ui/README.md (the contract)
   config/       siteData, navData, legalData; types in config/types/
@@ -109,9 +107,8 @@ src/
 scripts/        og.mjs (share cards), rebrand.mjs (repaint), app.mjs (Capacitor),
                 moteur-import.mjs (pours src/data/posts into the engine, once),
                 graine-sections.mjs (copies the page texts into the seed)
-seed/           seed.json, the engine's schema and the page texts;
-                import-3.3.0-reef.sql (the texts, and their 3.3.0 corrections, for a
-                database older than 3.3.0)
+seed/           seed.json, the engine's schema and the page texts
+migrations/     the SQL that brings a database online to the current version
 wiki/           the maintained knowledge base
 ```
 
@@ -122,7 +119,7 @@ Import through aliases (tsconfig.json): @components/*, @config/*,
 
 ```bash
 pnpm dev        # dev server
-pnpm build      # static build into dist/ (54 pages when green)
+pnpm build      # static build into dist/
 pnpm preview    # serve dist/
 pnpm dev:moteur   # the same site with the publication engine on (docs/moteur.md)
 pnpm build:moteur # the Worker build: managed pages on demand, the rest prerendered
@@ -158,9 +155,8 @@ work is done".
   brand, the hero copy or the first screen changes. Re-run it after
   `pnpm rebrand` and after any redesign of the first screen, or the frame
   will keep showing the demo to a buyer who has already replaced it.
-- Nothing here opens the site in a real browser on a real phone. The two worst
-  defects of 31 August 2026 were both found by a human on an iPhone, and both
-  are now covered by `pnpm verify`. The next one will not be.
+- Nothing here opens the site in a real browser on a real phone. Look at it on
+  an iPhone before a release.
 
 ## Non-negotiable conventions
 
@@ -179,7 +175,7 @@ work is done".
 7. Buttons are pills (rounded-pill). Cards float (bg-card rounded-card
    shadow-float). Sections breathe (py-24 md:py-32). Exactly one accent-script
    word per big title: it keeps the heading font, turns the house turquoise,
-   no underline (the wave was removed in 3.3.1). Coral is the second accent,
+   no underline. Coral is the second accent,
    rationed. Never an italic serif.
 8. Bilingual is mandatory: `export const getStaticPaths = localePaths;` on
    every page under [...locale]/ (dynamic routes multiply it), every internal
@@ -198,10 +194,9 @@ work is done".
     written in small spaced capitals, the way SectionHeader writes its own.
     The test: if the element is neither clickable nor fillable, it takes no
     pill, and a pill that says what its neighbour says is removed rather than
-    restyled. House rule of 5 September 2026: the "A la une" label left
-    Cards/FeaturedPostCard.astro that day, because the section eyebrow above
-    the card already said it. The author card's post count stays: a counter is
-    not a label.
+    restyled: the featured card carries no "A la une" label, because the
+    section eyebrow above it already says it. The author card's post count
+    stays: a counter is not a label.
 
 ## Gotchas that have already bitten
 
@@ -233,8 +228,8 @@ work is done".
   Wiring it to an endpoint is the user's documented decision, not a fix.
 - Draft posts build (for preview) but must stay out of lists, RSS and
   llms.txt: filter with data.draft !== true, like the existing readers.
-- A share card (og:image, twitter:image) is ONE PHOTOGRAPH AND NOTHING ELSE,
-  house rule of 23 September 2026: no gradient, grid, eyebrow, title, wave,
+- A share card (og:image, twitter:image) is ONE PHOTOGRAPH AND NOTHING ELSE:
+  no gradient, grid, eyebrow, title, wave,
   domain, panel or screenshot drawn on it, because the platform already writes
   the title under the preview. scripts/og.mjs crops the theme photos into
   public/og/*.jpg at every build, right after covers.mjs; public/og/ is not
@@ -242,11 +237,11 @@ work is done".
 
 ## Definition of done
 
-`pnpm check` at 0 errors, 0 warnings, 0 hints, `pnpm build` green with 54
-pages, the selfchecks passing, no em dash anywhere, no file over 400 lines,
+`pnpm check` at 0 errors, 0 warnings, 0 hints, `pnpm build` green,
+the selfchecks passing, no em dash anywhere, no file over 400 lines,
 the review checklist at the end of docs/design.md passed (or you fixed
-what it found), and if the change was structural, the wiki got a sync
-entry. Then, and only then, the task is finished.
+what it found), and if the change was structural, the wiki says so.
+Then, and only then, the task is finished.
 
 ## The design doctrine
 

@@ -1,6 +1,6 @@
 /* src/moteur/back-office.css - habille le back office du moteur : la couleur d'accent du theme, ses polices, ses pilules. Rien d'autre.
  *
- * LA REGLE DE L'EDITEUR (23 septembre 2026) : tous les back offices gardent
+ * LA REGLE DE L'EDITEUR : tous les back offices gardent
  * les deux fonds natifs d'EmDash, blanc en clair, noir en sombre. Cette
  * feuille ne touche donc plus jamais --color-kumo-canvas, ni les fonds du
  * rail, des cartes, des champs, ni les filets, ni la couleur du texte de
@@ -264,14 +264,14 @@ html[data-theme][data-mode] [class~="grid"]:has(> * .aloha-carte, > * .aloha-car
   }
 }
 
-/* Les Parametres que Reef lit (socle 1.4.0) : le script des ecrans simples
+/* Les Parametres que Reef lit : le script des ecrans simples
  * (habillage.ts) cache ceux qui n'agissent pas sur le site ; « Articles par
  * page » pagine les listes de billets de Reef, il reste affiche. */
 :root {
   --aloha-parametres-lus: posts;
 }
 
-/* Les etiquettes (3.8.3) : Reef lit la taxonomie native "tag" (pages
+/* Les etiquettes : Reef lit la taxonomie native "tag" (pages
  * /tags/<etiquette>/, pied de chaque article). Son ecran revient au rail (le
  * rail du socle cache toutes les taxonomies), et le panneau Taxonomies de
  * l'ecran d'un article reste affiche : c'est la qu'on coche les etiquettes. */

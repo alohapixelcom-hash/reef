@@ -33,13 +33,15 @@ export function planDuSite(request: Request, connus: readonly string[]): Respons
 // LA BARRE FINALE. Une seule forme d'adresse (trailingSlash "always") : une
 // page demandee sans sa barre repond 301 vers la forme canonique, au lieu de
 // 200 (moteur allume, Astro accepte les deux) ou de 307 (les fichiers). Les
-// adresses internes (/_emdash, /_image, /_astro, /_actions) et les fichiers
+// adresses internes (/_emdash, /_image, /_astro, /_actions), celles du serveur
+// de developpement (/@vite, /@id, /node_modules : sans elles, le back office ne
+// se charge pas sous astro dev) et les fichiers
 // (une extension) ne sont jamais touches.
 export function barreFinale(request: Request): Response | null {
   if (request.method !== "GET" && request.method !== "HEAD") return null;
   const url = new URL(request.url);
   const chemin = url.pathname;
-  if (chemin.endsWith("/") || chemin.startsWith("/_") || /\.[a-z0-9]+$/i.test(chemin)) return null;
+  if (chemin.endsWith("/") || /^\/(?:_|@|node_modules\/)/.test(chemin) || /\.[a-z0-9]+$/i.test(chemin)) return null;
   // Une seule barre en tete : "//hote" (ou "/\hote", que l'URL lit "//hote")
   // serait lu par le navigateur comme une adresse sur un autre domaine.
   const cible = chemin.replace(/^\/+/, "/");

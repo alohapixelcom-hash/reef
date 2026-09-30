@@ -1,25 +1,27 @@
 /**
  * capacitor.config.ts - la coquille native.
  *
- * Deux valeurs a changer avant de publier : appId et appName. Le reste est
- * regle pour qu'une application construite depuis ce theme se comporte comme
- * une application, et non comme un site dans un cadre.
+ * Deux valeurs a changer avant le premier `npx cap add` : appId et appName.
+ * Le reste est regle pour qu'une application construite depuis ce theme se
+ * comporte comme une application, et non comme un site dans un cadre.
  *
- *   pnpm app          construit dist/ pour une coquille native
- *   npx cap add ios   une seule fois
- *   npx cap sync      apres chaque pnpm app
- *   npx cap open ios  ouvre Xcode
+ *   pnpm add @capacitor/core @capacitor/ios @capacitor/android
+ *   pnpm add -D @capacitor/cli      une seule fois
+ *   pnpm app                        construit dist/ pour une coquille native
+ *   npx cap add ios                 une seule fois (et : npx cap add android)
+ *   npx cap sync                    apres chaque pnpm app
+ *   npx cap open ios                ouvre Xcode (npx cap open android : Android Studio)
  *
- * Voir wiki/subsystems/mobile-app.md pour la liste complete avant soumission.
+ * La marche complete, signature et magasins compris :
+ * wiki/subsystems/mobile-app.md.
  */
 
 /**
  * Le type est declare ici plutot qu'importe de "@capacitor/cli".
  *
- * Pourquoi : le theme annonce neuf dependances d'execution et les tient.
- * Importer le type obligerait tout utilisateur a installer Capacitor pour que
- * `pnpm check` passe, meme s'il ne fait jamais d'application. Ce serait une
- * dependance imposee pour une ligne de typage.
+ * Pourquoi : importer le type obligerait tout utilisateur a installer
+ * Capacitor pour que `pnpm check` passe, meme s'il ne fait jamais
+ * d'application : une dependance imposee a tous pour une ligne de typage.
  *
  * Des que vous installez Capacitor, remplacez tout ce bloc par :
  *   import type { CapacitorConfig } from "@capacitor/cli";
@@ -42,9 +44,9 @@ type CapacitorConfig = {
 
 const config: CapacitorConfig = {
   // Identifiant inverse de votre domaine. A CHANGER.
-  appId: "app.alohapixel.aloha",
+  appId: "app.alohapixel.reef",
   // Le nom affiche sous l'icone. A CHANGER.
-  appName: "Aloha",
+  appName: "Reef",
 
   // Le build Astro, prepare par `pnpm app`.
   webDir: "dist",
@@ -55,14 +57,14 @@ const config: CapacitorConfig = {
     // theme gere deja son propre defilement.
     scrollEnabled: true,
     // Le fond visible pendant le rebond doit etre celui du theme, jamais blanc.
-    backgroundColor: "#021c24",
+    backgroundColor: "#fbfcfe",
     // Le clavier ne doit pas redimensionner la vue : cela casse les hauteurs
     // en svh et fait sauter les elements en position fixe.
     contentInset: "always",
   },
 
   android: {
-    backgroundColor: "#021c24",
+    backgroundColor: "#fbfcfe",
     // Autoriser le contenu mixte serait la porte ouverte a du contenu non
     // chiffre dans une application signee.
     allowMixedContent: false,
@@ -84,7 +86,7 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchAutoHide: true,
       launchShowDuration: 0,
-      backgroundColor: "#021c24",
+      backgroundColor: "#fbfcfe",
       showSpinner: false,
     },
   },

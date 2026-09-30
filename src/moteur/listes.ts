@@ -10,7 +10,7 @@
 // "topic" et "author" des billets) dont les valeurs sont les identifiants de
 // ces entrees.
 //
-// UNE BASE SANS CES COLLECTIONS (d'avant la 3.4.0), ou qui n'en publie
+// UNE BASE SANS CES COLLECTIONS (pas encore migree), ou qui n'en publie
 // aucune entree dans la langue, rend les fichiers : c'est ce qui rend l'ordre
 // SQL puis deploiement, ou l'inverse, sans risque.
 //

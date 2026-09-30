@@ -7,7 +7,6 @@ sources:
   - src/styles/global.css
   - scripts/rebrand.mjs
   - src/layouts/BaseHead.astro
-updated: 2026-09-23
 ---
 
 # Design tokens
@@ -33,8 +32,7 @@ Inside `@theme`: three colour ramps and the non-colour tokens.
   the ink.
 - **Reef**, the action colour and the signature of the theme. A frank
   aquamarine (reef-600 `#147ea0` in light, reef-400 `#3fc0e0` in dark) that
-  carries `--color-primary`: buttons, links, focus rings and the wave under the
-  accent word.
+  carries `--color-primary`: buttons, links, focus rings and the accent word.
 - **Coral**, the second accent, the thread that says Aloha, Reef, Swell, Koa and
   Kai come from one workshop. coral-600 in light, coral-400 in dark, and
   rationed: an eyebrow, a marker, one call to action per screen, never a page.
@@ -42,7 +40,7 @@ Inside `@theme`: three colour ramps and the non-colour tokens.
   Instrument Sans (body and interface); only these two fonts load.
   `--font-serif` and `--font-script` are compatibility aliases of the display
   font: the accent word of a big title keeps the heading font, turns the house
-  turquoise, with no underline (the wave was removed in 3.3.1), never an
+  turquoise, with no underline, never an
   italic serif. The display scale runs to 5.5rem; both variable families load
   the weight axis only.
 - **Radii**: card 0.875rem, panel 1.25rem, pill 999px. Buttons are pills; cards

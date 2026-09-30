@@ -43,6 +43,9 @@ const cas: [string, string | null][] = [
   ["/version.json", null],
   ["/_emdash/admin", null],
   ["/_image", null],
+  ["/@vite/client", null],
+  ["/@id/astro:scripts/before-hydration.js", null],
+  ["/node_modules/.vite/deps/react.js", null],
   // Jamais vers un autre domaine : "//hote/" serait une adresse sans schema.
   ["//evil", "/evil/"],
   ["/\\evil", "/evil/"],

@@ -215,7 +215,7 @@ export default async function gestesDeReef(o) {
         await ouvrir(`${ADMIN}/content/posts/new`);
         await page.locator("#field-title").fill("Essai billet");
         await page.locator("#field-description").fill("Essai du guide : un billet.");
-        // Sujet et auteur par leur nom (3.8.3), dans la liste de l'extension "champs".
+        // Sujet et auteur par leur nom, dans la liste de l'extension "champs".
         await page.locator("#field-topic").selectOption({ label: "Craft" });
         await page.locator("#field-author").selectOption({ label: "Mara Lindqvist" });
         await page.getByLabel(/^(Adresse web|Slug)$/).fill(`essai-billet-${o.suffixe}`);

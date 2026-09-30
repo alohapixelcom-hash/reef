@@ -4,8 +4,7 @@
 // une photo en JPEG 1200x630. Moteur allume, la couverture d'un billet vit
 // dans la mediatheque d'EmDash (/_emdash/api/media/file/<cle>) : un WebP a sa
 // taille d'origine, jusqu'a 556 Ko et parfois en portrait (1200x1500), que
-// les pages d'article donnaient telle quelle comme og:image (mesure en ligne
-// le 24 septembre 2026).
+// les pages d'article donnaient telle quelle comme og:image.
 //
 // POURQUOI PAS /_image. Pour une image de la mediatheque, le point d'entree
 // d'images qu'EmDash installe sous Cloudflare ne transmet au liant IMAGES que

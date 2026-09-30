@@ -15,7 +15,6 @@ sources:
   - src/i18n/index.ts
   - src/moteur/carte-du-billet.ts
   - src/moteur/plan-du-site.ts
-updated: 2026-09-24
 ---
 
 # SEO layer
@@ -98,8 +97,7 @@ unknown `/sitemap*.xml`.
 
 ## OG images
 
-A share card is one photograph and nothing else (house rule of 23 September
-2026): no gradient, title, wave or domain drawn on it, since the platform
+A share card is one photograph and nothing else: no gradient, title, wave or domain drawn on it, since the platform
 writes og:title under the preview. scripts/og.mjs crops a theme photograph
 already fetched by scripts/covers.mjs into public/og/<slug>.jpg with sharp
 (1200x630, fit cover, position "attention", JPEG 86 mozjpeg 4:4:4), checks

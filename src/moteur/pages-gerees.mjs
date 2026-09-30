@@ -1,10 +1,10 @@
 // src/moteur/pages-gerees.mjs - LA liste des pages que le moteur rend a la demande.
 //
 // Tout ce qui affiche un billet se rend a la demande, pour qu'une publication
-// se voie sans build. Depuis la 3.3.0, les pages fixes aussi (contact,
+// se voie sans build. Les pages fixes aussi (contact,
 // mentions legales, confidentialite, conditions) : leurs textes rediges
 // viennent de la base (collection `sections`, voir contenu.ts), et une section
-// publiee doit se voir sans build. Depuis la 3.4.0, la page introuvable aussi
+// publiee doit se voir sans build. La page introuvable aussi
 // (entree "introuvable") : le Worker la demande a 404-introuvable pour toute
 // reponse 404, afin qu'elle passe par le chemin normal de la requete (barre
 // d'edition), et page-libre rend les pages ecrites dans le back office. Seul

@@ -61,7 +61,7 @@ const SHOT = "reef-iphone-poster.webp";
 // visiteur, et il rend `pnpm poster` facultatif au lieu d'obligatoire. Il ne
 // se fait plus au rendu avec existsSync : moteur allume, la page se rend a la
 // demande dans un Worker, qui n'a pas le disque du depot (le telephone
-// disparaissait de la page A propos ; regle 7 de house.mjs, socle 1.3.0).
+// disparaissait de la page A propos ; regle 7 de house.mjs).
 // Une capture choisie dans le back office passe avant celle de `pnpm poster`.
 const hasShot = capture !== null || __REEF_CAPTURE_DU_TELEPHONE__;
 ---

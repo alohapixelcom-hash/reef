@@ -79,8 +79,7 @@ one voice and the eye still lands on the word that matters.
 
 One accent word per title; two is a decoration. The rule lives in
 `.accent-script` in `src/styles/global.css`: same font as the title, primary
-colour, no underline (the wave was removed in 3.3.1: no decorative stroke under
-a title, anywhere in the house).
+colour, no underline: no decorative stroke under a title, anywhere in the house.
 
 **Scale.** Five display steps, tuned with `clamp()` so they hold from 320 px to
 1440 px. Line height tightens as size grows: 1.6 for prose, under 1.1 for the
@@ -113,7 +112,7 @@ rings are made of it, and it is what a reader learns to read as "this responds".
 
 Coral is the second voice, mapped to `--color-accent`, and its ramp is identical
 to the hex in every theme. It is the only warm note in an otherwise cold
-house, and it is rationed: an eyebrow, a marker, the wave under an accent word.
+house, and it is rationed: an eyebrow, a marker.
 It never dominates a page, because an accent that dominates is a second
 background. Reef alone takes coral a step darker in light mode, its ground being
 paler than the other four.
@@ -224,8 +223,8 @@ licence anyone can verify, named in `THIRD-PARTY.md` and traceable in
 two blurred halos and nothing behind it is what a hero looks like when there
 was no photograph available. There is always one. Aloha ran both for a while,
 and the comment in its own hero said the halos dirtied the image while keeping
-them anyway. On 2 September 2026 the halos left the family entirely, heroes and
-annexes alike: a blurred disc drifting behind a title is the single most
+them anyway. The halos have left the family entirely, heroes and annexes
+alike: a blurred disc drifting behind a title is the single most
 recognisable mark of a page assembled by a machine, and the warm one passed
 BEHIND the title, staining the photograph at the exact place the text has to
 stay readable. All seven carry the photograph alone.
@@ -388,6 +387,6 @@ better, and because a house that refuses assembled work should not pretend it
 arrived at everything alone.
 
 The disagreements are ours too. This house keeps a single accent word in a big
-title where some of that work would remove it, because the wave beneath it is
-the mark. It keeps light as the default where much of the field has settled on
+title where some of that work would remove it, because that word is the
+mark. It keeps light as the default where much of the field has settled on
 dark. And it ships two heavy effects where a stricter reading would ship none.

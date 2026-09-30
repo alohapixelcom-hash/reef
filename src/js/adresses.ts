@@ -81,7 +81,7 @@ export const cheminsDeLAuteur = (async () => {
 }) satisfies GetStaticPaths;
 
 /**
- * L'archive paginee d'une etiquette, par langue (3.8.3). Une page par
+ * L'archive paginee d'une etiquette, par langue. Une page par
  * etiquette portee par au moins un billet publie de la langue : une etiquette
  * sans billet n'a pas de page, et son adresse repond 404.
  */

@@ -1,15 +1,15 @@
-<!-- README.md - the front page of the repo: what Reef is, what it contains, how to run it, what to do before deploying. -->
+<!-- README.md - the front page of the repo: what Reef is, how to run it, the back office, deployment, the native app, the licence. -->
 
 <p align="center">
-  <img src="https://alohapixel.app/screenshots/theme-reef.webp" alt="Reef, a free bilingual blog theme for Astro: the home page hero, shown on desktop" width="720">
+  <img src="https://alohapixel.app/screenshots/theme-reef.webp" alt="Reef, a free bilingual blog theme for Astro: the home page, shown on desktop" width="720">
 </p>
 
 <h1 align="center">Reef</h1>
 
 <p align="center">
-  <b>A sober, bilingual blog for Astro 7 that you run from its back office.</b><br>
-  A static theme with no server by default; with the optional EmDash engine,<br>
-  a blog CMS where posts, pages, menus, fonts, colours and the home page layout are set by the editor.
+  <b>A sober, bilingual blog for Astro 7, with a real blog CMS when you want one.</b><br>
+  Plain static HTML by default. Switch on the optional EmDash engine and the whole site<br>
+  is written, scheduled, sent and arranged from its back office.
 </p>
 
 <p align="center">
@@ -27,160 +27,54 @@
   <img alt="Tailwind CSS v4" src="https://img.shields.io/badge/Tailwind-v4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white">
   <img alt="TypeScript strict" src="https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white">
   <img alt="English and French" src="https://img.shields.io/badge/i18n-EN%20%2B%20FR-1D7F8D?style=flat-square">
-  <img alt="Free" src="https://img.shields.io/badge/price-free-FF7A59?style=flat-square">
+  <img alt="MIT" src="https://img.shields.io/badge/licence-MIT-FF7A59?style=flat-square">
 </p>
 
 ---
 
-Reef is two things from one source, MIT licensed and free.
+Reef is two things from one source, free and MIT licensed.
 
 - **A static blog theme.** `pnpm build` writes plain HTML: a home that leads
-  with the latest piece, a paginated blog, topic and author pages, a reading
-  column with a table of contents, a per-language RSS feed, in English and in
-  French. No server, no adapter, no database.
+  with the latest piece, a paginated blog, topic, tag and author pages, a
+  reading column with a table of contents, search, and an RSS feed per
+  language, in English and in French. No server, no adapter, no database.
 - **A blog CMS.** With `ALOHA_MOTEUR=emdash` the same source builds as a
-  Cloudflare Worker on [EmDash](https://github.com/emdash-cms/emdash) 0.38
-  (MIT), the CMS for Astro that runs on Workers, D1 and R2. Posts live in the
-  database, publishing shows on the site with no rebuild, and the whole visible
-  site is set from the back office at `/_emdash/admin`, in French by default
-  (English one setting away). The live demo, `reef.alohapixel.app`, runs this
-  way.
+  Cloudflare Worker on [EmDash](https://github.com/emdash-cms/emdash), the
+  MIT-licensed CMS for Astro that runs on Workers, D1 and R2. Posts live in the
+  database, a published change shows on the site with no rebuild, and
+  everything a reader sees is set from the back office at `/_emdash/admin`.
+  The live demo runs this way.
 
-The demo publication is Reef Notes, a fictional three-person web studio's
-notebook. Every word lives in the back office, in a typed dictionary or in a
-Markdown post, never inside a component.
+The demo publication is Reef Notes, the notebook of a fictional web studio.
+Every word lives in the back office, in a typed dictionary or in a Markdown
+post, never inside a component.
 
-## A blog you run from the back office
+## The blog CMS
 
-What a blogger expects from a sober WordPress, and where it stands in Reef
-3.8.3 with the engine on. "Partly" and "Not yet" are said as they are.
+What a writer expects from a blogging platform, with the engine on.
 
-| You want to | In Reef | Where, in the back office |
-|---|---|---|
-| Write posts, keep drafts, go back to a revision | Yes | "Articles": title, lead, cover, rich text, date, featured, SEO panel |
-| Add pages | Yes | "Pages": served at `/<address>/`, then added to a menu |
-| Show authors | Yes (3.8.3) | "Auteurs": name, role, bio, portrait, links. On a post, the author is picked by name (a native EmDash reference) |
-| Sort posts into topics and tags | Yes (3.8.3) | One topic per post, picked by name ("Sujets": name, description, colour, rank); tags are EmDash's native taxonomy, typed in the post's panel, renamed in "Étiquettes", one page per tag at `/tags/<tag>/` |
-| Comments | Not yet | None on the site, on purpose. EmDash 0.38 has a moderation screen, not connected |
-| Edit menus | Yes | "Menus": main bar, phone menu, buttons, three footer columns, per language |
-| Footer widgets | Partly | The footer columns are menus and its texts are editable; EmDash's widget areas are not used |
-| Site name, logo, favicon, description, share image | Yes | "Paramètres" and "Réglages par langue" |
-| Choose a typeface | Yes (3.8.1) | "Réglages par langue", « Police du site »: the theme's fonts, or one of three system font stacks (nothing to download) |
-| Choose colours | Yes | « Couleur de la marque »: the theme's colour or one of five, each keeping button text at 4.5:1 contrast or more |
-| Arrange the home page | Yes (3.8.1) | Each of the eight blocks can be hidden, and given a place (« Place du bloc sur l'accueil ») |
-| Social links | Yes | "Paramètres", social: X, GitHub, Facebook, Instagram, LinkedIn, YouTube (the list EmDash 0.38 offers), in the footer and the JSON-LD |
-| SEO | Yes | Per entry: title, description, share image, canonical, noindex; site-wide: title separator, Google and Bing verification |
-| RSS feed | Yes | One per language; its title in "Réglages par langue" |
-| Sitemap | Yes | Rendered on demand; a noindex entry leaves it |
-| Emails | Yes | Contact form messages sent and logged by the house Emails screens (Cloudflare `send_email` binding) |
-| Newsletter | Yes (3.8.3) | Built in, no outside service: double opt-in signup, subscriber list in "Lettre d'information", one-click sending of a published post in each reader's language, one-click unsubscribe (link and `List-Unsubscribe` headers). Sent through the house Emails screens |
-| Redirects | Yes | "Redirections" (EmDash, 301) |
-| Media | Yes | EmDash's media library, stored in R2 |
-| Posts per page | Yes | "Paramètres", general |
-
-An empty field always renders the theme as shipped. `scripts/essai-administrer.mjs`
-replays twenty of these gestures in a real browser, through the interface
-only, checks each one as an anonymous visitor, then undoes it. The editor's
-guide is [docs/administrer.md](docs/administrer.md) (French) and
-[docs/administer.md](docs/administer.md) (English).
-
-## Back office (EmDash)
-
-The engine is off by default: without `ALOHA_MOTEUR=emdash` nothing of it is
-bundled and the static build is unchanged (3.8.1 included: its static build is
-byte-identical to 3.8.0's).
-
-With the variable set, the demo is served by the **reef-moteur** Worker
-(EmDash engine, D1 `reef-moteur`, R2 `reef-moteur-media`), built with
-`pnpm build:moteur` and deployed with `bash scripts/deployer-frontal.sh`,
-behind a light front Worker that serves the pages already kept (see
-[DEPLOY.md](DEPLOY.md)).
-
-- **A complete back office at `/_emdash/admin`** (and `/secret-spot/` redirects
-  there). Posts live in D1, media in R2, and the pages that show a post are
-  rendered on demand, so publishing is visible on the site with no rebuild.
-- **French by default, entirely.** EmDash 0.38 still leaves part of its French
-  catalogue in English; the theme's dictionary (`src/moteur/catalogue-bo.fr.ts`)
-  fills every message left, without forking the package, and a selfcheck
-  fails if one is missing. `ALOHA_BO_LANGUE` changes the default (`en`, or
-  `navigateur` to follow the browser), and each person can override it in
-  their settings.
-- **EmDash's native backgrounds**, white in light mode and black in dark mode.
-  The theme only brings its accent colour, fonts, logo and site name.
-- **An edit bar on the site itself**: an editor signed in edits a title or a
-  photo on the page, and the fields a text cannot show (button addresses,
-  hiding a block) sit next to it as small labels.
-- **"Mettre le site à jour"**, a button that empties the caches and rebuilds
-  the prerendered pages through a Cloudflare Deploy Hook.
-
-```bash
-pnpm dev:moteur                                              # back office at http://localhost:4321/_emdash/admin
-node scripts/moteur-import.mjs --url http://localhost:4321   # pours the Markdown posts into the database, once
-pnpm build:moteur                                            # the Worker build
-```
-
-How it is wired: [docs/moteur.md](docs/moteur.md). Putting it online, step by
-step: "First deployment of the engine" in [DEPLOY.md](DEPLOY.md).
-
-The six paid themes carry the same EmDash back office:
-https://alohapixel.app/themes/
-
-## What is in the box, counted from this repo
-
-Numbers below were counted from the source and the build, not estimated
-(recounted on 2026-09-29 for 3.6.1; the static build of 3.8.0 and 3.8.1 is
-byte-identical to it, 54 HTML pages counted again for 3.8.1; `pnpm build`
-green, `pnpm check` clean).
-
-| What | Count |
+| You want to | Where, in the back office |
 |---|---|
-| Pages emitted by `pnpm build` | 54 |
-| Plain-text endpoints | robots.txt, llms.txt, per-language rss.xml, sitemap-index.xml |
-| Content collections (zod validated) | 3 (posts, authors, topics) |
-| Demo content entries | 9 posts (one of them a draft), 3 authors, 5 topics, in 2 languages |
-| UI primitive families (src/components/ui) | 36, across 63 .astro files |
-| Primitive files that need a script tag | 10 of 63; the rest are pure HTML and CSS |
-| Section components | 27 |
-| Original hand-drawn icons | 60 |
-| animate-* utilities (motion catalog + brand tokens) | 55 + 3 |
-| Languages, from one page source each | 2 (English at the root, French under /fr/) |
-| Runtime dependencies | 16, 6 of them only for the optional engine (@astrojs/cloudflare, @astrojs/react, react, react-dom, emdash, @emdash-cms/cloudflare); every one listed in THIRD-PARTY.md |
+| Write, keep drafts, schedule, go back to a revision | « Articles »: title, lead, cover, rich text with headings, lists, quotes, code, images and tables; « Enregistrer » keeps a draft, « Publier » puts it live, « Programmer » picks a date and time |
+| Duplicate or delete a post | The list of posts: « Dupliquer » makes a draft copy, « Déplacer vers la corbeille » removes it, the « Corbeille » tab restores it |
+| Sort posts into topics and tags | One topic per post, picked by name; tags are typed in the post's « Classement » panel, renamed in « Étiquettes », and each has its own page at `/tags/<tag>/` |
+| Show authors | « Auteurs »: name, role, bio, portrait, links, one page each; a post picks its author by name |
+| Search engines and social cards | Each post, page, topic and author has an « SEO » panel: title, description, share image, canonical address, noindex |
+| A newsletter, with no outside service | Double opt-in signup on the site, the subscriber list in « Lettre d'information », one click sends a published post to every subscriber in their language, unsubscribe through a confirmation page |
+| Contact form emails | The « Courriels » screens send and log every message, through the Worker's Cloudflare email binding |
+| Pages and menus | « Pages » for free pages, « Menus » for the main bar, the phone menu, the buttons and the three footer columns, per language |
+| Identity and look | « Paramètres »: site name, logo, favicon, social links, posts per page; « Réglages par langue »: description, contact details, typeface, brand colour, logo for dark mode |
+| Arrange the home page | Each of the eight home blocks can be hidden or moved |
+| Redirects and media | « Redirections » (301, 410), and the media library, stored in R2 |
+| RSS and sitemap | One feed per language, and a sitemap that keeps itself up to date |
 
-## Why it feels expensive
+Every field says, in one sentence above it, what it changes, and an empty
+field renders the theme as shipped. The back office opens in French, and
+each person can switch it to English. Comments are not part of the theme.
 
-- **Almost no JavaScript.** Dialogs are native `<dialog>`, accordions are
-  native `<details>`, the marquee is pure CSS. The scripts that ship are the
-  mobile drawer, the theme switch, the shrinking navbar and the reader's table
-  of contents, and all of them survive view transitions.
-- **A design system, not a stylesheet.** One file (src/styles/tokens.css)
-  defines the palette, semantic roles and generated utilities. Markup only
-  speaks roles (bg-primary, bg-card, text-muted-foreground), so
-  `pnpm rebrand "#yourhex"` repaints the theme, the favicon and the share
-  cards from a single colour.
-- **An owned SEO layer.** Canonical, Open Graph, JSON-LD builders, robots.txt,
-  llms.txt, a per-language RSS feed and the sitemap are hand-written, readable
-  files in the repo, not a plugin.
-- **Two themes, not one switch.** Semantic tokens invert under one `.dark`
-  class, applied before first paint, with zero flash. Light and dark do not
-  share a shadow recipe: dark swaps cast shadows for luminous borders.
-- **Bilingual by construction.** One page source per route, one output per
-  language, one post file per language under the same slug. The dictionary is
-  a typed object, so a missing French key is a build error, not a silently
-  English sentence in production.
-- **Accessibility as a feature.** 44px touch targets, correct aria wiring,
-  visible focus everywhere, and reduced motion honored at both the CSS and the
-  scroll-timeline layer.
-
-## Stack
-
-Astro 7 (static output, no adapter), Tailwind CSS 4 (CSS-first, no config
-file), tailwind-variants, @astrojs/mdx (Markdown and MDX posts) and
-@astrojs/sitemap, self-hosted fonts via Fontsource (Space Grotesk, Instrument
-Sans, both OFL); the accent word of a heading keeps the heading font and only
-changes colour, so no third font loads. Node >= 22.18 and pnpm. No
-React, no animation library, no WebGL on the public site. The optional
-publication engine adds the Cloudflare adapter, EmDash and React to ITS build
-only; React carries EmDash's back office and no public page gains an island.
+The editor's guide, for someone who never opens the code:
+[docs/administer.md](docs/administer.md) (English) and
+[docs/administrer.md](docs/administrer.md) (French).
 
 ## Quick start
 
@@ -189,176 +83,167 @@ pnpm install
 pnpm dev        # http://localhost:4321
 ```
 
-`pnpm dev` fetches the demo photographs into `src/assets/` before the server
-starts, because the repository does not version them.
-
-All commands:
+Node 22.18 or later and pnpm. `pnpm dev` first fetches the demo photographs
+into `src/assets/`, because the repository does not store them.
 
 ```bash
-pnpm dev          # dev server
-pnpm build        # static site into dist/
-pnpm preview      # serve the build locally
-pnpm check        # astro check (types and templates)
-pnpm rebrand "#7a59ff"   # repaint the theme from one brand color
+pnpm dev            # dev server
+pnpm build          # static site into dist/
+pnpm preview        # serve the build locally
+pnpm check          # astro check: types and templates
+pnpm test           # the selfchecks, plain Node, no framework
+pnpm lint:house     # the mechanical house rules
+pnpm rebrand "#7a59ff"   # repaint the theme from one brand colour
 pnpm rebrand --restore   # back to the Reef palette
-pnpm og           # crop the share cards into public/og/ (the build does it too)
-pnpm app          # build tuned for a native Capacitor shell
-pnpm dev:moteur   # the same site with the publication engine on (docs/moteur.md)
-pnpm build:moteur # the Worker build: managed pages on demand, the rest prerendered
-pnpm test         # the selfchecks, plain Node, no framework
-pnpm lint:house   # the mechanical house rules
-
-# selfchecks, plain Node, no framework:
-node src/js/schema.selfcheck.ts
-node src/js/pagination.selfcheck.ts
+pnpm app            # the build for a native Capacitor app
+pnpm dev:moteur     # the same site with the publication engine on
+pnpm build:moteur   # the Worker build of the engine
 ```
+
+## The back office, locally
+
+```bash
+pnpm dev:moteur                                              # http://localhost:4321/_emdash/admin
+node scripts/moteur-import.mjs --url http://localhost:4321   # pours the demo posts into the database, once
+```
+
+The first visit to `/_emdash/admin` opens EmDash's setup: the site title,
+then an administrator account with a passkey, and the schema and demo texts
+of `seed/seed.json`. Locally,
+`/_emdash/api/setup/dev-bypass?redirect=/_emdash/admin` skips the account
+step. With the engine off, nothing of it is bundled: the static build does
+not change.
+
+How the engine is wired (the two sources of posts, the managed pages, the
+caches, the back office language): [docs/moteur.md](docs/moteur.md).
+
+## Deploy
+
+**Static.** Upload `dist/` to any static host: Cloudflare Pages or Workers,
+Netlify, Vercel, an nginx box. `npx wrangler deploy` publishes it as a
+Cloudflare Worker with static assets (`wrangler.toml`: the visitor's
+language, the sitemaps, the 404 page). No environment variable is required.
+
+**With the engine.** Two Cloudflare Workers: the engine (EmDash, D1, R2),
+and a light front Worker that serves the pages already built and keeps the
+others in cache. [DEPLOY.md](DEPLOY.md) walks through the first deployment,
+the updates, and rolling back.
+
+**Updating a site already online.** Each version that changes the database
+ships one SQL file in `migrations/`, applied in order by
+`node scripts/base-3.4.0.mjs`: it shows the plan first, never deletes
+anything, and a second run changes nothing. The list is in DEPLOY.md.
+
+## A native app (Capacitor)
+
+The static build has no server, no external CDN and local fonts, which is
+what Capacitor wraps. Fixed elements respect the safe areas, heights use
+`svh`, touch targets are 44 px, and no page scrolls sideways at 390 px.
+
+```bash
+pnpm add @capacitor/core @capacitor/ios @capacitor/android
+pnpm add -D @capacitor/cli
+pnpm app              # dist/, tuned for a native shell
+npx cap add ios       # once (and: npx cap add android)
+npx cap sync          # after every pnpm app
+npx cap open ios      # Xcode: signing, then the App Store
+```
+
+`capacitor.config.ts` ships with the theme: change `appId` and `appName`
+before the first `cap add`. The app carries the static build, so its posts
+are the Markdown files of `src/data/`, not the back office. Signing, icons,
+store review: [wiki/subsystems/mobile-app.md](wiki/subsystems/mobile-app.md).
+
+## Make it yours
+
+1. `src/config/siteData.json.ts`: name, title, description, author.
+2. `astro.config.mjs`: `site`, your production address (canonical links,
+   share cards, sitemap, robots.txt, RSS).
+3. `pnpm rebrand "#yourcolour"`.
+4. `src/data/`: your posts (one Markdown file per language, same name),
+   authors and topics.
+5. `src/i18n/ui/en/` and `src/i18n/ui/fr/`: every word of the interface.
+6. `src/config/navData.json.ts` and `legalData.json.ts`: your links, your
+   privacy and terms pages.
+
+With the engine on, the same changes are made in the back office instead.
+
+## Before you deploy
+
+- [ ] `site` in `astro.config.mjs` is your real address.
+- [ ] `demoNotice` in `src/config/siteData.json.ts` is empty, so the footer
+      line saying the site is a demo does not show.
+- [ ] The share card is your photograph: `scripts/og.mjs` crops it from the
+      home page photo at build time.
+- [ ] The legal pages (`src/config/legalData.json.ts`, and the bracketed
+      fields of the legal notice in `src/i18n/ui/*/pages.ts`) are read by
+      someone qualified. They are a starting point, not legal advice.
+- [ ] The contact form points at your endpoint, or at the « Courriels »
+      screens with the engine on. It ships with no `action`.
+- [ ] `pnpm check`, `pnpm test` and `pnpm build` are green.
+
+## Why it feels expensive
+
+- **Almost no JavaScript.** Dialogs are native `<dialog>`, accordions native
+  `<details>`, the marquee is CSS. The scripts that ship are the phone menu,
+  the theme switch, the shrinking navbar and the table of contents.
+- **A design system, not a stylesheet.** `src/styles/tokens.css` holds the
+  palette, the roles and the utilities; markup only speaks roles, so one
+  command repaints the theme, the favicon and the share cards.
+- **An owned SEO layer.** Canonical links, Open Graph, JSON-LD, robots.txt,
+  llms.txt, RSS and the sitemap are readable files in the repo, not a plugin.
+- **Light and dark, both composed.** The theme switches before first paint,
+  with no flash, and dark mode trades cast shadows for luminous borders.
+- **Bilingual by construction.** One page source per route, one post file per
+  language, and a typed dictionary: a missing French key fails the build.
+- **Accessible.** 44 px touch targets, visible focus, correct ARIA, reduced
+  motion honoured by the CSS and by the scroll timelines.
 
 ## Structure
 
 ```text
 src/
-  components/
-    ui/         36 primitive families (button, dialog, tabs, reveal, ...)
-    Sections/   24 sections, grouped by page (Home/, Post/, Archive/, Search/, Global/, Legal/)
-    svg/icons/  the 60-icon original set
+  components/   ui/ (the primitives), Sections/ (by page), Cards/, svg/icons/
   config/       typed site data: siteData, navData, legalData
-  content.config.ts  the posts, authors and topics collections, zod schemas
-  data/         your content: posts (Markdown/MDX), authors and topics (JSON)
-  i18n/         the bilingual layer: config, helpers, en/ and fr/ dictionaries
-  js/           pure logic: JSON-LD builders, pagination, text utils
-  layouts/      BaseLayout + BaseHead (the entire <head>, hand-written)
-  pages/        [...locale]/ (index, blog, topics, authors, about, contact, legal), 404, robots, llms, rss
-  styles/       tokens.css, global.css, prose.css, the motion catalog
-  moteur/       the optional publication engine: two post sources behind one alias, managed pages,
-                on-demand sitemap, back office skin and language, the two house extensions
-scripts/        rebrand.mjs, og.mjs, app.mjs, moteur-import.mjs
-seed/           seed.json, the engine's schema
-wiki/           how the theme works, anchored to the code
-docs/           the five convention files, one per subsystem
+  data/         the demo content: posts (Markdown), authors and topics (JSON)
+  i18n/         the bilingual layer and its en/ and fr/ dictionaries
+  js/           pure logic: JSON-LD, pagination, addresses, text
+  layouts/      BaseLayout and BaseHead (the whole <head>)
+  moteur/       the optional publication engine and its back office
+  pages/        [...locale]/ routes, 404, robots.txt, llms.txt, rss.xml
+  styles/       tokens.css, global.css, prose.css, the motion catalogue
+migrations/     the SQL that brings a database online to the current version
+scripts/        build steps (photos, share cards, favicon), rebrand, app, engine tools, checks
+seed/           seed.json: the engine's schema and first content
+docs/           the editor's guide, the engine, the design, the conventions
+wiki/           how each subsystem works, anchored to the code
 ```
-
-## Make it yours, in order
-
-1. **src/config/siteData.json.ts**: name, title, description, author. This is
-   the only file you must edit to change the publication identity.
-2. **astro.config.mjs**: set `site` to your production URL. It feeds canonical
-   URLs, OG tags, the sitemap, robots.txt, llms.txt and the RSS feed at once.
-3. `pnpm rebrand "#yourbrandcolor"`. The share cards need no step: they are
-   photographs, cropped by the build from the theme photos (scripts/og.mjs).
-4. **src/data/**: replace the demo posts, authors and topics. One Markdown post
-   per language under the same slug.
-5. **src/i18n/ui/en/** and **src/i18n/ui/fr/**: all the interface copy. Nothing
-   displayed lives in a component.
-6. **src/config/navData.json.ts** and **legalData.json.ts**: your links, and the
-   privacy and terms copy. The bracketed fields to fill in are not there: they
-   are in the legal notice, in src/i18n/ui/en/pages.ts and src/i18n/ui/fr/pages.ts.
-
-## Before you deploy
-
-- [ ] `site` in astro.config.mjs points at your real domain.
-- [ ] `demoNotice` in src/config/siteData.json.ts is emptied, so the footer
-      line saying "this site is a demo of the Reef theme" does not render on
-      your site. The demo keeps it; you clear the field, and there is no
-      component to open.
-- [ ] The share card is YOUR photograph: the build crops public/og/default.jpg
-      from the home page hero photo (scripts/og.mjs, run by `pnpm build`), so
-      replace that photo, or point the `default` line of scripts/og.mjs at
-      yours, and Reef's wave leaves your link previews.
-- [ ] Legal copy in src/config/legalData.json.ts reviewed by a human who may
-      legally have an opinion, and the bracketed fields of the legal notice
-      (src/i18n/ui/en/pages.ts and src/i18n/ui/fr/pages.ts) filled in. It all
-      ships as a generic starting point, in both languages, and none of it is
-      legal advice.
-- [ ] The demo posts, authors and topics replaced with your own.
-- [ ] The contact form points at your own endpoint, or is removed. It ships
-      with no `action` on purpose (the note is at the top of contact.astro). With the engine on, the contact form goes through the back office's
-      Emails screens once they are connected (docs/administer.md).
-- [ ] `pnpm check` and `pnpm build` are green, and the selfchecks pass.
-
-Deploy dist/ to any static host: Cloudflare Pages, Netlify, Vercel, an nginx
-box. No adapter, no server, no environment variable required. The publication
-engine is the one exception, and it is opt-in: its deployment is a Cloudflare
-Worker, described step by step in DEPLOY.md.
-
-## Ship it as a native app (Capacitor)
-
-Reef builds to plain static files with no server, no external CDN and local
-fonts, which is exactly what Capacitor wraps. Every fixed element respects
-`env(safe-area-inset-*)`, viewport heights use `svh` and never `vh`, touch
-targets are 44px, and no page overflows horizontally at 390x844.
-
-```bash
-pnpm app          # build tuned for a native shell
-npx cap add ios
-npx cap sync
-npx cap open ios
-```
-
-`capacitor.config.ts` ships with the theme. The full guide, including the
-checklist Apple reviewers care about, is in
-[wiki/subsystems/mobile-app.md](wiki/subsystems/mobile-app.md).
 
 ## Documentation
 
-- AGENTS.md: the operating manual (conventions, commands, gotchas), binding
-  for everyone who works in the repository.
-- docs/conventions/: the five convention files (astro, tailwind, typescript,
-  motion, seo), each anchored to real files in this repo. They are written to
-  be read on day one and followed by anyone who extends the theme afterwards.
-- wiki/: start at wiki/overview.md; each subsystem has its own anchored page.
-- docs/moteur.md: the optional publication engine: how it is wired, the
-  back office, the online data and what was measured.
-- docs/administrer.md (French) and docs/administer.md (English): the
-  editor's guide, running the whole site from the back office, with no code.
-- THIRD-PARTY.md: the complete honest inventory (two OFL fonts, permissive
-  npm packages, and the photographs that ship with the demo).
+- [docs/administer.md](docs/administer.md) and [docs/administrer.md](docs/administrer.md): running the site from the back office.
+- [docs/moteur.md](docs/moteur.md): the publication engine.
+- [DEPLOY.md](DEPLOY.md): static hosting, the engine online, updates.
+- [docs/design.md](docs/design.md) and [docs/conventions/](docs/conventions/): the design rules and the code conventions.
+- [wiki/overview.md](wiki/overview.md): the architecture, then one page per subsystem.
+- [AGENTS.md](AGENTS.md): the working rules of the repository, for people and for coding assistants.
+- [CHANGELOG.md](CHANGELOG.md): what changed, version by version.
 
-## Questions
+## Support
 
-Issues are turned off on this repository, and that is deliberate: support for
-this theme is handled in one place rather than two.
+Issues are closed on purpose: support lives in one place.
+Write to https://alohapixel.app/contact/. Pull requests are welcome.
 
-- Something is wrong with the theme, or you want to tell us it helped:
-  https://alohapixel.app/contact/
-- The rest of the family:
-  https://alohapixel.app/themes/
+Reef is the free member of a family of seven themes built on the same
+foundation; the others add a shop, a SaaS site with its dashboard, a launch
+page, a portfolio: https://alohapixel.app/themes/
 
-Pull requests are welcome all the same.
+## Licence
 
-## What the paid themes add
+MIT, full text in [LICENSE](LICENSE). Use it, fork it, sell what you build
+with it, no attribution required.
 
-Reef ships the whole foundation: the UI primitives, the typed bilingual layer
-with its language switcher, the measured dark mode, the owned SEO, the motion,
-the verification scripts and the written conventions. That is
-deliberate: it is how you try the house without paying, and for a blog it is
-complete.
-
-The six paid themes add the business built on top of that foundation: a shop
-with products and a cart, a headless storefront
-read from WooCommerce or Shopify, a SaaS site with its pricing page and its
-eight-screen dashboard, a launch page with its pricing section. Not one of
-those files is in Reef.
-
-The seven themes, side by side, with prices and live demos:
-https://alohapixel.app/themes/
-
-## License
-
-MIT, full text in [LICENSE](LICENSE), which holds the MIT text and nothing else
-so that GitHub reads it correctly. Use it, fork it, sell what you build with it,
-no attribution required. Republishing Reef itself as your own theme is what the
-MIT license already allows, so there is nothing to negotiate here.
-
-The photographs are covered separately, and [NOTICE.md](NOTICE.md) says so in
-full: the ten photographs in src/assets/ come from Pexels and carry the Pexels
-licence, which is free for commercial and personal use, requires no attribution
-and allows redistribution. Keep them in the site you publish with Reef, or
-replace them with your own; both are inside the licence. scripts/covers.mjs is a
-plain list of URLs, and a post with no cover falls back to a typographic card.
-PHOTOS.md names the Pexels page of every single file.
-
-NOTICE.md carries the rest of what the MIT grant does and does not reach: the
-photographs, the demo content, and the fonts and npm packages inventoried in
-THIRD-PARTY.md. Nothing there restricts the MIT grant.
-
-Provided as is, without warranty.
+The ten demo photographs come from Pexels and carry the Pexels licence (free
+for commercial use, no attribution required): [NOTICE.md](NOTICE.md) and
+[PHOTOS.md](PHOTOS.md). Fonts and packages are listed in
+[THIRD-PARTY.md](THIRD-PARTY.md).

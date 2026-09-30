@@ -80,7 +80,7 @@ function measureCompact(header: HTMLElement, nav: HTMLElement, track: HTMLElemen
   // lecture, le navigateur voyait l'etat resserre de la mesure puis l'etat
   // restaure avec les transitions revenues : la barre glissait au chargement
   // (et a chaque document.fonts.ready), et chaque glissement comptait dans le
-  // CLS (recette du socle, mesuree sur Kona le 28 septembre 2026).
+  // CLS (recette du socle).
   void header.offsetWidth;
   delete header.dataset.measuring;
 

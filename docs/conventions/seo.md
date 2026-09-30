@@ -76,8 +76,7 @@ source, so the sitemap cannot contradict it.
 
 ## Images and indexing
 
-- A share card is ONE PHOTOGRAPH AND NOTHING ELSE (house rule of
-  23 September 2026): no gradient, grid, eyebrow, title, wave, domain, panel
+- A share card is ONE PHOTOGRAPH AND NOTHING ELSE: no gradient, grid, eyebrow, title, wave, domain, panel
   or screenshot on it; the platform writes og:title under the preview.
   scripts/og.mjs crops a theme photo from src/assets into
   public/og/<slug>.jpg (1200x630, sharp "attention", JPEG 86) at every build,

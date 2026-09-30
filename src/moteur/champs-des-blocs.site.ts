@@ -1,10 +1,9 @@
-// src/moteur/champs-des-blocs.site.ts - la carte des champs de chaque bloc de Reef (socle 1.8.0, forme : champs-des-blocs.ts) :
+// src/moteur/champs-des-blocs.site.ts - la carte des champs de chaque bloc de Reef (forme : champs-des-blocs.ts) :
 // ce que theme.ts declare (CHAMPS_DES_BLOCS) pour que l'ecran d'un bloc ne montre que les champs qui agissent.
 //
 // RELEVEE PAR LA SONDE, pas ecrite a la main : chaque champ de chaque bloc change
 // par l'API du moteur, publie, les pages du bloc relues sans session (visiteur),
-// puis la valeur remise (outil sonde-champs.mjs du chantier 3.8.3, rapports
-// champs-383.md et integration-383.md). Un champ figure pour un bloc s'il change le HTML d'une de ses
+// puis la valeur remise. Un champ figure pour un bloc s'il change le HTML d'une de ses
 // pages. Une adresse de bouton est mesuree avec son texte, un mot en couleur
 // avec un mot du titre, une image d'attente avec une video ; un sous-champ
 // d'element sur tous les elements a la fois (une liste vide en recoit un).

@@ -27,7 +27,7 @@ export interface Configuration {
   /** La langue par defaut du back office (ALOHA_BO_LANGUE) ; null quand le navigateur decide. */
   langueDuBackOffice: string | null;
   /**
-   * La lettre d'information (socle 1.8.0) : la collection des articles, leur
+   * La lettre d'information : la collection des articles, leur
    * adresse par langue, l'accueil de chaque langue. Absente : pas de lettre,
    * ni page au back office ni formulaire branche.
    */
