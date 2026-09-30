@@ -52,8 +52,8 @@
  * statut, jamais sur le point lui-meme.
  *
  * Aucun theme de la maison ne s'en sert, et ce n'est pas un oubli : le point
- * qui bat sous une capsule "beta publique" a quitte le premier ecran le
- * 24 aout, docs/design.md refusant la pastille de statut posee au-dessus d'un
+ * qui bat sous une capsule "beta publique" a quitte le premier ecran,
+ * docs/design.md refusant la pastille de statut posee au-dessus d'un
  * titre. L'utilitaire reste au catalogue pour un vrai indicateur de direct,
  * dans un produit, jamais pour decorer une page de vente. */
 @utility animate-ping-soft {
@@ -74,7 +74,7 @@
 /* Fait voyager un degrade dans son propre fond. A reserver a un FOND en
  * linear-gradient : le degrade pose sur du TEXTE (background-clip: text) est
  * un refus nomme de docs/design.md, et l'utilitaire qui le posait a ete retire
- * de global.css le 24 aout. */
+ * de global.css. */
 @utility animate-gradient-shift {
   background-size: 200% 200%;
   animation: gradient-shift 8s ease-in-out infinite;

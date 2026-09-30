@@ -34,7 +34,7 @@
 // --ecraser une retouche locale (elle remonte d'abord au socle) ; toucher un
 // fichier du site qui existe deja (adaptateur, habillage.site.ts, site.ts...).
 //
-// --seulement <unites> (1.5.0) : poser un module urgent dans un site en retard
+// --seulement <unites> : poser un module urgent dans un site en retard
 // d'une version sans toute la montee. Seuls ces fichiers sont poses et ajoutes
 // au verrou existant, l'unite est notee dans "partiels" ; version, commit et
 // autres empreintes ne bougent pas. Refus sans verrou (adoption complete).
@@ -58,7 +58,7 @@ const empreinte = (contenu) => createHash("sha256").update(contenu).digest("hex"
 const lireJson = (chemin) => JSON.parse(readFileSync(chemin, "utf8"));
 /**
  * Le verrou, compact : une ligne par fichier. Indente en entier, il passait
- * les 400 lignes des 93 fichiers et `pnpm lint:house` le refusait (Nalu, 3.4.0).
+ * les 400 lignes des 93 fichiers et `pnpm lint:house` le refusait (Nalu).
  * Il reste du JSON ordinaire, lu par n'importe quelle version de l'outil.
  */
 function ecrireVerrou(chemin, verrou) {
@@ -177,7 +177,7 @@ function sync(cible, options) {
     process.exit(1);
   }
   // Un fichier du site au nom d'un fichier nouveau du socle, hors verrou et
-  // different (1.4.0, adresses.selfcheck.ts de Swell) : refus, sauf --ecraser.
+  // different (adresses.selfcheck.ts de Swell) : refus, sauf --ecraser.
   const etranger = (f) => !verrou.fichiers?.[f.cible] && existsSync(join(cible, f.cible)) && etatDe(cible, f, verrou) !== "a-jour";
   const etrangers = verrou ? fichiers.filter(etranger) : [];
   if (etrangers.length > 0 && !options.ecraser) {

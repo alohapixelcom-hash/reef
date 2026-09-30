@@ -3,7 +3,7 @@
 // POURQUOI UN DETOUR : le fournisseur de @astrojs/cloudflare appelle
 // `cache.purge` de `cloudflare:workers` a chaque invalidation. Dans le workerd
 // local, cette fonction n'existe pas, et EmDash invalide le cache APRES avoir
-// ecrit : mesure le 22 septembre 2026, chaque creation de billet repondait 404
+// ecrit : sans ce filet, chaque creation de billet repondait 404 en local,
 // avec un corps vide alors que le billet etait bien en base. Ici, la purge qui
 // echoue est ecrite dans le journal du Worker et la reponse repart entiere.
 // En ligne, avec Workers Cache active dans wrangler.moteur.jsonc, la purge

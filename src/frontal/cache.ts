@@ -1,7 +1,6 @@
 // src/frontal/cache.ts - le Worker frontal leger du socle : fichiers, redirections du site, puis cache des pages anonymes devant le Worker du moteur, qui ne se reveille que pour une page absente du cache, le back office et l'API.
 //
-// POURQUOI UN SECOND WORKER (rapport performance du chantier 3.4, rangs 1 et
-// 2). Le Worker du moteur embarque EmDash : 13,3 Mio, 3,3 Mio compresse. Chaque
+// POURQUOI UN SECOND WORKER. Le Worker du moteur embarque EmDash : 13,3 Mio, 3,3 Mio compresse. Chaque
 // nouvel isolat le recharge, et un visiteur sur quelques-uns payait 1,1 a
 // 2,7 s de premier octet (MESURE en ligne). Ce Worker-ci ne pese que ce
 // fichier et les regles d'adresses du site : il repond seul aux fichiers,

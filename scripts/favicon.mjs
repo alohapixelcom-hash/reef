@@ -17,8 +17,7 @@
  *   et il ne lit que des images matricielles. Sa documentation liste BMP, GIF,
  *   ICO, PNG, JPEG, PPM et TIFF. Le SVG n'y est pas, et une data-uri n'est pas
  *   une adresse a crawler. Un site livre ainsi sort dans les resultats avec le
- *   globe gris generique, a cote de concurrents qui ont leur marque. Constate
- *   sur alohapixel.app le 2 septembre 2026, dans une vraie page de resultats.
+ *   globe gris generique, a cote de concurrents qui ont leur marque.
  *
  * D'ou ce script, et d'ou l'inversion : le DESSIN vit ici et nulle part
  * ailleurs. BaseHead.astro ne fabrique plus d'icone, il pointe les fichiers.

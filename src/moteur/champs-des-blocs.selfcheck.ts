@@ -1,4 +1,4 @@
-// src/moteur/champs-des-blocs.selfcheck.ts - self-check de la carte des champs de chaque bloc (generique, socle 1.7.0, 1.7.1) : un bloc absent garde tout, un bloc connu ne garde que ses champs, une carte fausse est dite, le script de l'ecran se lit.
+// src/moteur/champs-des-blocs.selfcheck.ts - self-check de la carte des champs de chaque bloc (generique) : un bloc absent garde tout, un bloc connu ne garde que ses champs, une carte fausse est dite, le script de l'ecran se lit.
 // Lancer : node src/moteur/champs-des-blocs.selfcheck.ts
 import assert from "node:assert/strict";
 import { champsCaches, defautsDeLaCarte, scriptDeLaCarte, type ChampsDesBlocs } from "./champs-des-blocs.ts";
@@ -42,7 +42,7 @@ is(defautsDeLaCarte({ ...carte, surveilles: [...carte.surveilles, "galerie"] }, 
 is(defautsDeLaCarte({ ...carte, libelles: { "arguments.image": "Photo" } }, graine).length, 1, "un libelle faux est dit (l'ecran ne trouverait pas le champ)");
 is(defautsDeLaCarte({ ...carte, blocs: { hero: ["cta"] } }, graine), ["hero : cta n'est pas un champ surveille"], "un bloc qui cite un champ non surveille est dit");
 
-// 3. Les textes (socle 1.7.1) : un texte court se trouve par son identifiant, un texte long par son libelle.
+// 3. Les textes : un texte court se trouve par son identifiant, un texte long par son libelle.
 const textes: ChampsDesBlocs = { surveilles: ["eyebrow", "lede", "arguments", "arguments.image"], libelles: { lede: "Texte d'introduction, sous le titre", "arguments.image": "Photo (vide : celle du thème)" }, blocs: { hero: ["lede", "arguments", "arguments.image"], pied: [] } };
 is(defautsDeLaCarte(textes, graine), [], "une carte des textes juste n'a aucun defaut");
 is(defautsDeLaCarte({ ...textes, libelles: { ...textes.libelles, lede: "Chapeau" } }, graine).length, 1, "le libelle faux d'un texte long est dit");

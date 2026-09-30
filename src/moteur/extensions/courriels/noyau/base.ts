@@ -224,7 +224,7 @@ export async function lignes(base: Base, filtre: Filtre): Promise<Ligne[]> {
 
 /**
  * Les envois refuses depuis `depuis` qu'aucun renvoi reussi n'a rattrapes, du
- * plus recent au plus ancien (socle 1.4.0) : de quoi mettre une carte rouge
+ * plus recent au plus ancien : de quoi mettre une carte rouge
  * au tableau de bord tant qu'un courriel n'est pas parti, et l'oter des qu'il
  * l'est.
  */

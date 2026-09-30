@@ -1,6 +1,6 @@
 // src/moteur/extensions/courriels/noyau/page-desinscription.ts - la page de confirmation de la desinscription (lien du pied d'un courriel de la lettre).
 //
-// DECIDE le 29 septembre 2026 (sortie 3.8.3) : le lien du pied ne desinscrit
+// DECIDE : le lien du pied ne desinscrit
 // plus d'un seul clic. Un antivirus de messagerie qui "ouvre" chaque lien pour
 // le verifier desinscrivait l'abonne a son insu. Le lien mene a cette page :
 // une phrase, un bouton "Me desinscrire" (un formulaire POST, que les robots

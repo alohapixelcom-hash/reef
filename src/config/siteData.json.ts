@@ -15,10 +15,7 @@ const siteData: SiteDataProps = {
   useViewTransitions: true,
 
   // La ligne de pied de page qui dit que ce site est une demonstration du
-  // theme, avec le lien vers la boutique. Elle avait ete eteinte le temps que
-  // le catalogue Astro approuve la fiche ; rallumee le 13 septembre 2026, parce
-  // que la demonstration etait le seul site de la famille sans lien vers les
-  // themes payants. Le texte vit dans src/i18n/ui/{en,fr}/demo.ts et ne cite
+  // theme, avec le lien vers la boutique. Le texte vit dans src/i18n/ui/{en,fr}/demo.ts et ne cite
   // que la boutique, aucune personne ni adresse. Vider ce champ eteint la ligne.
   demoNotice: "demo.notice",
 
@@ -31,7 +28,7 @@ const siteData: SiteDataProps = {
     twitter: "",
   },
 
-  // La carte de partage est une photo seule (depuis 3.1.1) : son alternative
+  // La carte de partage est une photo seule : son alternative
   // decrit la photo, la vague en tube de l'accueil, et non la marque. Une
   // valeur par langue, comme tout texte lu par un lecteur d'ecran.
   defaultImage: {

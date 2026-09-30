@@ -43,7 +43,7 @@ interface DonneesBillet {
   cover?: { id?: string; src?: string; alt?: string; width?: number; height?: number; meta?: { storageKey?: string } };
   topic: string;
   author: string;
-  /** Avant la 3.8.3 : une liste de mots (champ "Mots-cles"). Depuis : les etiquettes natives, dans `terms`. */
+  /** L'ancienne liste de mots (champ "Mots-cles"), avant la migration des etiquettes natives (`terms`). */
   tags?: unknown;
   terms?: { tag?: { slug?: string; label?: string; translationGroup?: string | null }[] };
   featured?: boolean;
@@ -83,7 +83,7 @@ interface Liens {
 /**
  * Les etiquettes d'un billet : les etiquettes natives d'EmDash (taxonomie
  * "tag", panneau "Etiquettes" de l'article), a l'adresse commune de leur
- * groupe ; une base d'avant la 3.8.3 garde sa liste de mots.
+ * groupe ; une base qui n'a pas encore migre garde sa liste de mots.
  */
 function etiquettesDe(d: DonneesBillet, adresses: Map<string, string>): { slug: string; label: string }[] | undefined {
   // EmDash pose `terms` sur chaque billet des que la collection a une
@@ -112,7 +112,7 @@ function enBillet(entree: Entree, locale: Locale, liens: Liens): CollectionEntry
       pubDate: new Date(date),
       updatedDate: d.updated_date ? new Date(d.updated_date) : undefined,
       // L'auteur et le sujet sont choisis par leur nom dans le back office
-      // (champ "reference", 3.8.3) : la base range l'identifiant de l'entree,
+      // (champ "reference") : la base range l'identifiant de l'entree,
       // le site le ramene a son adresse. Une base d'avant range l'adresse.
       author: { collection: "authors", id: `${locale}/${adresseDeLaReference(d.author, locale, liens.auteurs)}` },
       topic: { collection: "topics", id: `${locale}/${adresseDeLaReference(d.topic, locale, liens.sujets)}` },
@@ -204,7 +204,7 @@ export async function billetParSlug(locale: Locale, slug: string): Promise<Colle
   return enBillet(entry, locale, await liensDe(locale));
 }
 
-/** Toutes les entrees publiees d'une collection dans une langue ; null si la collection n'existe pas (une base d'avant la 3.4.0). */
+/** Toutes les entrees publiees d'une collection dans une langue ; null si la collection n'existe pas (une base pas encore migree). */
 async function toutesPubliees(collection: string, locale: Locale): Promise<Entree[] | null> {
   const entrees: Entree[] = [];
   let cursor: string | undefined;
@@ -260,7 +260,7 @@ function enAuteur(entree: Entree, locale: Locale): CollectionEntry<"authors"> {
 /**
  * Les sujets publies d'une langue (collection "sujets"). Une base qui n'a pas
  * la collection, ou qui n'en publie aucun dans la langue, rend les fichiers de
- * src/data/topics : le rendu d'avant la 3.4.0.
+ * src/data/topics : le rendu des fichiers.
  */
 export async function sujetsPublies(locale: Locale): Promise<CollectionEntry<"topics">[]> {
   return [...(await parRequete(`sujets:${locale}`, () => lireLesSujets(locale)))];
@@ -345,8 +345,8 @@ export function textesDesFichiers(locale: Locale): Textes {
 /**
  * Les sections PUBLIEES d'une langue, par slug, et leurs proxys d'edition (en
  * mode edition seulement : voir annotations.ts). Une base qui n'a pas encore
- * la collection (un Worker deploye avant import-3.3.0-reef.sql, voir
- * docs/moteur.md) ne casse pas le site : la page garde les textes des
+ * la collection (migrations/import-3.3.0-reef.sql pas encore passe, voir
+ * DEPLOY.md) ne casse pas le site : la page garde les textes des
  * fichiers, et le journal du Worker le dit.
  */
 async function sectionsPubliees(locale: Locale): Promise<{ sections: Map<string, DonneesDeSection>; editions: Editions }> {

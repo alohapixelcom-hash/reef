@@ -1,7 +1,7 @@
 // src/moteur/plan-du-site.index.ts - l'index des plans de site, rendu a la demande : /sitemap-index.xml, moteur allume.
 //
 // Moteur eteint, l'integration sitemap ecrit cet index au build. Moteur
-// allume, toutes les pages indexables se rendent a la demande depuis 3.3.0,
+// allume, toutes les pages indexables se rendent a la demande,
 // l'integration n'est pas posee (astro.config.mjs), et robots.txt pointe
 // toujours ici : l'index declare le seul plan qui existe alors, celui des
 // pages gerees (plan-du-site.ts).

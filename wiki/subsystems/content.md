@@ -9,7 +9,6 @@ sources:
   - src/config/navData.json.ts
   - src/config/legalData.json.ts
   - src/config/types/configDataTypes.ts
-updated: 2026-08-15
 ---
 
 # Content and config

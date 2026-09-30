@@ -9,7 +9,6 @@ sources:
   - src/styles/tokens.css
   - src/components/ui/reveal/Reveal.astro
   - src/components/ui/stagger-reveal/StaggerReveal.astro
-updated: 2026-08-15
 ---
 
 # Motion system
@@ -69,7 +68,5 @@ observes the root and fans out incremental delays to its direct children
 ## No heavy effect
 
 There is no canvas and no WebGL, and nothing loops on its own. The heaviest
-thing that moves is an entrance reveal, which plays once and stops. A set of
-blurred radial-gradient halos used to drift in the hero; they were removed from
-the whole family on 2 September 2026, because a blurred disc drifting behind a
-title is the mark of a page assembled by a machine.
+thing that moves is an entrance reveal, which plays once and stops. There are no
+blurred halos drifting behind a title, anywhere in the family.

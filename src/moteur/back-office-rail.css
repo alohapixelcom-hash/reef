@@ -14,7 +14,7 @@
  * disparaissent seulement du rail. Menus et Redirections restent, ce sont des
  * ecrans du site.
  *
- * Un site qui lit une taxonomie (Reef 3.8.3 : ses etiquettes) la rend au rail
+ * Un site qui lit une taxonomie (Reef : ses etiquettes) la rend au rail
  * dans SA feuille, par une regle plus precise que celle-ci :
  *   html [data-sidebar="menu-item"]:has(> a[href^="/_emdash/admin/taxonomies/tag"]) { display: list-item; }
  * et pose --aloha-panneaux-lus: taxonomies pour garder le panneau de l'article.
@@ -31,7 +31,7 @@
   display: none;
 }
 
-/* Les ecrans simples (socle 1.4.0) : ce drapeau dit au script du back office
+/* Les ecrans simples : ce drapeau dit au script du back office
  * (ECRANS_SIMPLES, habillage.ts) que ce site ne lit ni le slogan, ni l'URL,
  * ni le format des dates des Parametres, ni le slug d'un bloc, ni les
  * panneaux Responsabilite, Collaborateurs et Taxonomies : il les cache. */
@@ -52,7 +52,7 @@ html[lang^="fr"] [id^="field-"]:has(> button > span > div > svg + span)::after {
 html:not([lang^="fr"]) [id^="field-"]:has(> button > span > div > svg + span)::after {
   content: "No photo chosen: the site shows the photo delivered with the theme. Choose one to replace it.";
 }
-/* Deux champs image disent autre chose quand ils sont vides (socle 1.7.0) :
+/* Deux champs image disent autre chose quand ils sont vides :
  * le logo du mode sombre (vide : le logo clair reste affiche en mode sombre,
  * identite() de cadre.ts) et l'image de partage d'une page (vide : celle du
  * site). La phrase generique y etait fausse. */
@@ -69,7 +69,7 @@ html:not([lang^="fr"]) #field-meta_image:has(> button > span > div > svg + span)
   content: "No image chosen: the page is shared with the site's sharing image. Choose one for this page.";
 }
 
-/* Une liste de choix vide (socle 1.7.0) : EmDash 0.38 laisse le bouton sans
+/* Une liste de choix vide : EmDash 0.38 laisse le bouton sans
  * aucun texte (couleur de la marque, police du site). Vide veut dire, dans
  * chaque liste des sites de la maison, le reglage d'origine du theme : le
  * bouton le dit. */
@@ -84,7 +84,7 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
 }
 
 /* Le bandeau d'avertissement d'EmDash 0.38 (Courriels, Mettre le site a jour) :
- * texte jaune sur fond jaune pale, 1,9:1 (mesure dans Chrome, socle 1.4.0),
+ * texte jaune sur fond jaune pale, 1,9:1 (mesure dans Chrome),
  * illisible pour le client. Le texte passe au brun, 6:1 et plus ; le fond et
  * l'icone gardent leur jaune. */
 .bg-kumo-banner-warning.text-kumo-warning {

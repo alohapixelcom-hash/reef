@@ -31,7 +31,7 @@ is(c.entetes["List-Unsubscribe-Post"], "List-Unsubscribe=One-Click", "desinscrip
 is(c.entetes["List-Unsubscribe"], "<https://x.test/_emdash/courriels/lettre/desinscrire?jeton=j>", "le lien personnel dans l'en-tete");
 is(c.texte.includes("Se désinscrire : https://x.test/"), true, "le lien personnel dans le texte");
 
-// La page de confirmation de la desinscription (3.8.3) : dans la langue, adresse masquee, un bouton POST, echappee.
+// La page de confirmation de la desinscription : dans la langue, adresse masquee, un bouton POST, echappee.
 {
   const { adresseMasquee, CHAMP_CONFIRME, pageDeDesinscription } = await import("./noyau/page-desinscription.ts");
   const html = pageDeDesinscription(LETTRE_FR.desinscription, { langue: "fr", site: "Reef <b>", adresse: "camille@exemple.test", action: "/_emdash/courriels/lettre/desinscrire?jeton=j", accueil: "/fr/" });

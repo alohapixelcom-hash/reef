@@ -1,6 +1,6 @@
 // src/moteur/qualite-image.ts - la qualite d'encodage des images rendues a la demande : celle que sharp applique au build statique, ecrite dans l'adresse.
 //
-// LE DEFAUT MESURE EN LIGNE LE 24 SEPTEMBRE 2026. Au build, aucune image du
+// LE DEFAUT MESURE EN LIGNE. Au build, aucune image du
 // site ne declare de qualite : le service sharp d'Astro laisse alors sharp
 // appliquer ses defauts, 80 en WebP et en JPEG, 50 en AVIF. A la demande
 // (moteur allume), l'adresse /_image ne portait pas de parametre q, et le

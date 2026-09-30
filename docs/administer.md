@@ -42,7 +42,7 @@ Bottom left, the **"Site frame"** panel links straight to what the bar cannot re
 
 Each field carries a sentence that says what it changes. The coloured word of a heading must repeat a word of the heading, spelt the same. The heading of a topic page is a template: `{topic}` becomes the topic name.
 
-**Going back**: in the block, "Discard changes" while it is not published; after, "Revisions" (part 18).
+**Going back**: in the block, "Discard changes" while it is not published; after, "Revisions" (part 20).
 
 ## 4. Changing an image or the video
 
@@ -159,39 +159,40 @@ Every text exists in English and French. In an entry, the "Translations" panel s
 
 "Redirects", "New Redirect": "Source path" (the old address, starting with `/`), "Destination path" (an address of the site, starting with `/` too), "Status code" (301 permanent most of the time; 410 to say a page is gone), "Create". Changing a post's or page's slug creates the 301 by itself. The "404 Errors" tab lists addresses asked for that do not exist.
 
-## 17 b. Emails of the contact form and the newsletter
+## 18. Emails of the contact form and the newsletter
 
-Messages from the contact page reach you by email as soon as the email screen is connected (administrators): « Brancher les courriels » (sending address and its domain, checked on screen), « Réglages des courriels » (sender, reply address, recipient of the contact form, acknowledgement sent to the reader in their language), « Courriels » (this month's sends and failures) and « Journal des courriels » (each send, its error explained, "Resend"). The newsletter goes out the same way, with no outside service: see part 17 c.
+Messages from the contact page reach you by email as soon as the email screen is connected (administrators): « Brancher les courriels » (sending address and its domain, checked on screen), « Réglages des courriels » (sender, reply address, recipient of the contact form, acknowledgement sent to the reader in their language), « Courriels » (this month's sends and failures) and « Journal des courriels » (each send, its error explained, "Resend"). The newsletter goes out the same way, with no outside service: see part 19.
 
 **Sender address**: a mailbox address (Gmail, Orange, Outlook, Free...) is refused as the sender address, with a sentence that says why: a site cannot send on behalf of those mailboxes. It stays possible as a recipient.
 
 **If an email does not leave**: a red card says so at the top of « Courriels » and on the back office home page, until it is sent again successfully. In « Journal des courriels », the "Why" column gives the reason in plain words, and "Send this email again" sends it again.
 
-## 17 c. The newsletter
+## 19. The newsletter
 
 As soon as emails are connected (sending address set), the "Subscribe" form of the home page and the footer signs readers up on your own site, with no outside service:
 
 1. The reader types their address and sends. The page says an email is on its way: they click the link inside to confirm (double opt-in: nobody can sign up someone else's address). Without confirmation, the sign-up is erased after 7 days.
 2. « Lettre d'information » (left menu, under « Courriels »): the number of subscribers and pending sign-ups, then the list of addresses, their language and since when.
 3. **Sending a post**: pick it in « Article à envoyer », then « Envoyer à N abonnés » and confirm. Each subscriber receives it in their language (title, standfirst, a link to the post). A post already sent says so, with its date, before going out again.
-4. **Unsubscribing**: every email carries an "Unsubscribe" link at the bottom; one click is enough, the address is erased from the list. Mail apps that show their own "Unsubscribe" button go through the same path.
+4. **Unsubscribing**: every email carries an "Unsubscribe" link at the bottom. It opens a page that asks for confirmation (« Me désinscrire » or « Garder mon abonnement »), so software that opens the links of an email unsubscribes nobody. The "Unsubscribe" button of mail apps unsubscribes in one click.
 5. **Removing an address** at someone's request: « Adresse à retirer », then « Retirer cette adresse » and confirm.
 6. « Derniers envois de la lettre »: each post sent, when, and how many emails went out. An email that did not go out is in « Journal des courriels », with "Resend".
 
 Newsletter sends count in the month's allowance (« Courriels » screen): a send that would go over the monthly limit is refused beforehand, with what to do. While emails are not connected, the form posts to the outside service set in « Réglages par langue » if there is one, otherwise it stays a demonstration.
 
-## 18. Revisions, going back, trash
+## 20. Revisions, going back, trash
 
 - **Before publishing**: "Discard changes" returns to the live version.
 - **After**: "Revisions" lists the versions; restore one, then publish. **Careful: a revision restores the texts, not the photo, the button addresses or the « Masquer ce bloc » box** (they hold for both languages): put them back by hand. The confirmation window says so.
 - **Delete**: "Move to Trash", then confirm. The "Trash" tab of the list restores.
-- **Take off the site without deleting**: unpublish. For a block of « Textes des pages », the theme's original text comes back; to make a block disappear, hide it (part 6). An unpublished topic or author gives back the theme's original card.
+- **Duplicate**: in the list, "Duplicate" makes a draft copy whose title ends with "(Copy)"; rename it, change its web address, then publish.
+- **Take off the site without deleting**: "Unpublish" at the top of the right panel. For a block of « Textes des pages », the theme's original text comes back; to make a block disappear, hide it (part 6). An unpublished topic or author gives back the theme's original card.
 
-## 19. Site map: where each area is changed
+## 21. Site map: where each area is changed
 
-The table of the French guide ([administrer.md](administrer.md), part 19) holds for both languages: brand, logo, favicon and posts per page in "Settings"; the typeface and the brand colour in « Réglages par langue »; the order of the home page blocks in each block's « Place du bloc sur l'accueil »; navigation, the "Subscribe" button and footer columns in "Menus"; footer texts in « Textes des pages » (page « Tout le site ») and « Réglages par langue »; every block of every page in « Textes des pages », filtered by its page; posts, topics and authors in their collections; tags in each post's « Classement » panel and their names in « Étiquettes »; subscribers and sends in « Lettre d'information »; added pages in « Pages »; contact form emails in the email screens.
+The table of the French guide ([administrer.md](administrer.md), part 21) holds for both languages: brand, logo, favicon and posts per page in "Settings"; the typeface and the brand colour in « Réglages par langue »; the order of the home page blocks in each block's « Place du bloc sur l'accueil »; navigation, the "Subscribe" button and footer columns in "Menus"; footer texts in « Textes des pages » (page « Tout le site ») and « Réglages par langue »; every block of every page in « Textes des pages », filtered by its page; posts, topics and authors in their collections; tags in each post's « Classement » panel and their names in « Étiquettes »; subscribers and sends in « Lettre d'information »; added pages in « Pages »; contact form emails in the email screens.
 
-## 20. What needs a developer
+## 22. What needs a developer
 
 - the order of the blocks of a page other than the home page, a new kind of block, the layout and drawing of the site;
 - generic interface texts (accessibility, "change language", "open menu", "min read", counters), the cookie banner;

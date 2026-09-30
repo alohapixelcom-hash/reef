@@ -18,7 +18,7 @@
 // bas, vient d'alohapixel.com (et Koa et Nalu faisaient la meme chose dans
 // leur worker.moteur.ts) : la requete de la page du back office entre dans
 // Astro avec la langue du site pour Accept-Language, sans rien ecrire dans le
-// navigateur. alohapixel.com a mesure le 22 septembre 2026 que la reecriture
+// navigateur. alohapixel.com a mesure que la reecriture
 // de la requete DANS un middleware Astro (ce que fait encore langue-bo.ts)
 // faisait echouer sous workerd les pages du back office arrivees a plusieurs
 // ("Cannot perform I/O on behalf of a different request"). langue-bo.ts reste

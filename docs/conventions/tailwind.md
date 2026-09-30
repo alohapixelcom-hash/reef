@@ -22,25 +22,23 @@ Vite plugin (astro.config.mjs:53). Adding a config file would be a bug.
    `border-border`, `bg-surface`, `text-accent`, `text-accent-text`,
    `text-primary-text`, `ring-ring`.
 
-An eleventh role joined the list on 1 September 2026, and it is the only one
-that exists for a measurement rather than for a meaning: `text-accent-text`.
+The eleventh role is the only one that exists for a measurement rather than for a meaning: `text-accent-text`.
 The house coral is built to be seen, so on a pale ground it lands between 2.6
 and 3.7 to 1, where WCAG AA asks 4.5 for body text. Rather than repaint the
-brand, the two jobs were split: `bg-accent`, `border-accent`, the gradients and
-the title wave keep the exact coral they always had, and any accent that
+brand, the two jobs were split: `bg-accent` and `border-accent` keep the exact
+coral, and any accent that
 carries TEXT or an icon uses `text-accent-text`, one step darker on the same
 ramp. In dark mode the accent already clears AA, so the token simply points
 back at it. Writing `text-accent` on a piece of text is now a bug: the utility
 still exists, because `--color-accent` still has to name the decorative colour.
 
-A twelfth role joined on 7 September 2026, for the same reason and by the same
-split: `text-primary-text`. The turquoise clears AA on white (4.64) and misses
+The twelfth role exists for the same reason and by the same split: `text-primary-text`. The turquoise clears AA on white (4.64) and misses
 it the moment it sits on twelve percent of itself, which is exactly what a
 topic label on a post card does: 3.99 to 1, measured. The decorative primary is
 untouched; primary INK on a tinted ground takes one step darker on the same
 ramp, and points back at the primary in dark mode. The render bench composites
-translucent grounds since the same day, so a ground like that is measured now
-instead of being declared unreadable.
+translucent grounds, so a ground like that is measured instead of being
+declared unreadable.
 
 Hard rule: palette names never appear in markup. No `bg-ink-900`, no
 `text-coral-400`, no raw hex. Those names exist only inside tokens.css and
@@ -78,8 +76,7 @@ for `dark:` only for effects a role cannot express; if you are writing
 `dark:bg-...` for a color role, the token layer is the place to fix.
 
 A surface written `bg-white` or as a hex value stays white in dark mode while
-its text, written with a token, turns light: on 5 September 2026 three such
-cards on the alohapixel.com home page rendered light text on a white ground,
+its text, written with a token, turns light: light text on a white ground,
 unreadable. So a surface ALWAYS carries a role (`bg-card`, `bg-surface`,
 `bg-background`) and its text the matching role (`text-card-foreground`,
 `text-foreground`, `text-muted-foreground`). `bg-white` is admitted only under
@@ -105,5 +102,4 @@ that forgot its role.
 - Sections breathe: `py-24 md:py-32`.
 - Display headings: `font-display` (Space Grotesk), and exactly one word per
   big title wrapped in `<span class="accent-script">`: it keeps the heading
-  font, turns the house turquoise, no underline (the wave was removed in
-  3.3.1). Coral is the second accent, rationed. Never an italic serif.
+  font, turns the house turquoise, no underline. Coral is the second accent, rationed. Never an italic serif.

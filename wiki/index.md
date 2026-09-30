@@ -4,7 +4,6 @@ title: Reef wiki
 summary: Entry point of the repo's knowledge base; every wiki page is reachable from here.
 sources:
   - AGENTS.md
-updated: 2026-08-15
 ---
 
 # Reef wiki
@@ -17,8 +16,6 @@ page gets fixed.
 
 - [overview.md](overview.md) - the architecture in one read: layers, data
   flow, build outputs, commands.
-- [log.md](log.md) - the append-only journal: what changed, when, and the
-  open threads.
 
 ## Subsystems
 

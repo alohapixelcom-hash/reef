@@ -14,7 +14,7 @@
  * dictionnaire du back office y fait entrer une utilitaire que le site
  * n'emploie pas, voir rapports/reef.md). */
 @source not "../moteur/PageLibre.astro";
-/* Le champ "une entree choisie par son nom" du back office (socle 1.8.0) : ses classes sont celles de l'administration, pas du site. */
+/* Le champ "une entree choisie par son nom" du back office : ses classes sont celles de l'administration, pas du site. */
 @source not "../moteur/champs";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -143,9 +143,8 @@
 
   /* Le mot d'accent d'un titre. Un seul par titre, jamais deux.
    * Meme police que le titre, dans la couleur primaire du theme, SANS
-   * soulignement : la vague qui le soulignait est retiree depuis la 3.3.1
-   * (regle de l'editeur du 28 septembre 2026 : aucun trait decoratif sous un
-   * titre, sur aucun site de la maison). L'italique serif d'accent reste
+   * soulignement (regle de l'editeur : aucun trait decoratif sous un titre,
+   * sur aucun site de la maison). L'italique serif d'accent reste
    * bannie de toute la famille : un mot en serif italique au milieu d'un
    * titre sans serif est l'ornement le plus repandu du web, et il ne dit
    * rien de la marque. */

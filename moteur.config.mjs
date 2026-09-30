@@ -41,9 +41,8 @@ const LIAISON_COURRIELS = readFileSync(ici("./wrangler.moteur.jsonc"), "utf8")
 // LES IMAGES DES PAGES RENDUES A LA DEMANDE.
 //
 // "compile" seul les laisserait sortir dans leur poids d'origine : sharp ne
-// tourne qu'au build, et une page rendue a la demande n'a pas de build. Mesure
-// sur l'accueil de Kai le 21 septembre 2026 : 552 430 octets par largeur au
-// lieu de 19 960. Le liant Images de Cloudflare fait a la demande ce que sharp
+// tourne qu'au build, et une page rendue a la demande n'a pas de build : une
+// photo pesait vingt-cinq fois son poids optimise. Le liant Images de Cloudflare fait a la demande ce que sharp
 // fait au build ; il demande Cloudflare Images sur le compte.
 //
 // ALOHA_IMAGES=origine garde "compile" seul, pour qui n'a pas ce service : le
@@ -125,7 +124,7 @@ function partageDesPages() {
         // middleware : src/worker.moteur.ts applique la regle du socle
         // (langueDuBackOffice) avant Astro, comme Nalu.
         injectRoute({ pattern: "/sitemap-contenu.xml", entrypoint: ici("./src/moteur/plan-du-site.ts"), prerender: false });
-        // Toutes les pages indexables se rendent a la demande depuis la 3.3.0 :
+        // Toutes les pages indexables se rendent a la demande :
         // l'integration sitemap n'a plus de page figee a inventorier et n'ecrit
         // plus l'index. Il est servi ici (voir plan-du-site.index.ts).
         injectRoute({ pattern: "/sitemap-index.xml", entrypoint: ici("./src/moteur/plan-du-site.index.ts"), prerender: false });
@@ -133,7 +132,7 @@ function partageDesPages() {
         // Le formulaire de contact poste ici quand les courriels sont
         // branches (src/moteur/extensions/courriels/reception.ts).
         injectRoute({ pattern: "/_emdash/courriels/envoyer", entrypoint: ici("./src/moteur/extensions/courriels/reception.ts"), prerender: false });
-        // La lettre d'information (socle 1.8.0) : inscription, confirmation et
+        // La lettre d'information : inscription, confirmation et
         // desinscription (src/moteur/extensions/courriels/inscription.ts).
         injectRoute({ pattern: "/_emdash/courriels/lettre/[geste]", entrypoint: ici("./src/moteur/extensions/courriels/inscription.ts"), prerender: false });
         // La carte de partage d'un billet : sa couverture de la mediatheque,
@@ -187,9 +186,8 @@ const alias = (source) => [
   { find: "@moteur/courriels", replacement: ici(`./src/moteur/extensions/courriels/formulaire.${source}.ts`) },
   // LA QUALITE DES IMAGES RENDUES A LA DEMANDE. Le service d'image que
   // l'adapter pose pour IMAGES ci-dessus ecrit des adresses /_image sans
-  // qualite, et le liant Cloudflare Images encode alors presque sans perte
-  // (image de tete de la demo : 569 Ko a 390 px, 1,5 Mo a 1440 px en ligne le
-  // 24 septembre 2026, contre 100 a 200 Ko au build statique). Le meme
+  // qualite, et le liant Cloudflare Images encode alors presque sans perte,
+  // plusieurs fois le poids du build statique. Le meme
   // service, avec la qualite du build dans chaque adresse : voir
   // src/moteur/service-image.ts.
   ...(source === "emdash"
@@ -249,7 +247,7 @@ async function allume() {
           { ...DEPLOYER, entrypoint: ici("./src/moteur/deployer/extension.ts") },
           { ...COURRIELS, entrypoint: ici("./src/moteur/extensions/courriels/extension.ts"), options: { livrer: LIAISON_COURRIELS }, capabilities: capacites(LIAISON_COURRIELS) },
           // Le champ "une entree choisie par son nom" (auteur et sujet d'un
-          // article, socle 1.8.0) : une extension React, sans route ni base,
+          // article) : une extension React, sans route ni base,
           // dont le composant est importe par le paquet de l'administration.
           { ...CHAMPS, entrypoint: ici("./src/moteur/champs/extension.ts"), adminEntry: ici("./src/moteur/champs/admin.ts") },
           // La carte du site sur le tableau de bord : une extension React, son

@@ -15,9 +15,8 @@
 #   pnpm install   -> ERR_PNPM_IGNORED_BUILDS, code de sortie 1
 #   pnpm build     -> echoue, dist/ reste vide
 #
-# Mesure le 17 aout 2026 sur pnpm 11.22 et Node 22 : quatre etapes sur quatre
-# en echec. Avec ce fichier : install, build et check sortent en 0, et les 55
-# pages sont construites.
+# Sans ce fichier, sur pnpm 11 et Node 22, les quatre etapes echouent ; avec
+# lui, install, build et check sortent en 0.
 #
 # Le nom du reglage a change : `pnpm.onlyBuiltDependencies` dans package.json
 # n'est PLUS LU par pnpm 11 (il l'annonce dans un avertissement facile a

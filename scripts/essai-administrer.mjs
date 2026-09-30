@@ -1,4 +1,4 @@
-// scripts/essai-administrer.mjs - rejoue les gestes du guide docs/administrer.md dans un vrai navigateur, par l'interface (barre d'edition et back office, jamais l'API), verifie chaque resultat en visiteur anonyme, puis RESTAURE (generique, socle 1.3.0).
+// scripts/essai-administrer.mjs - rejoue les gestes du guide docs/administrer.md dans un vrai navigateur, par l'interface (barre d'edition et back office, jamais l'API), verifie chaque resultat en visiteur anonyme, puis RESTAURE (generique).
 //
 // CE QUE LE SCRIPT PROUVE. Un client qui suit le guide y arrive sans code :
 // chaque geste est fait comme lui le ferait (clic, saisie, Enregistrer,
@@ -40,7 +40,7 @@ if (!P) {
   process.exit(2);
 }
 const IMAGE = fileURLToPath(new URL(`../${P.image}`, import.meta.url));
-// La langue servie a la racine du site (socle 1.7.0) : "en" pour les themes, "fr" pour alohapixel.com. Les
+// La langue servie a la racine du site : "en" pour les themes, "fr" pour alohapixel.com. Les
 // entrees et les ecrans du back office s'ouvrent dans cette langue, sinon un site francais a la racine
 // ouvrirait la version anglaise d'un bloc et le geste ne se verrait pas sur la page.
 const LANGUE = P.langue ?? "en";
@@ -174,9 +174,12 @@ async function corbeille(collection, slug, locale = LANGUE) {
 /** Une option d'une liste du back office, par le libelle du champ : le nom exact d'abord, sinon le nom approche (une liste qui affiche "Carte" pour "carte"). */
 async function choisir(libelle, option) {
   await page.getByRole("combobox", { name: libelle }).click();
-  await page.getByRole("option").first().waitFor();
-  const exacte = page.getByRole("option", { name: option, exact: true });
-  await ((await exacte.count()) > 0 ? exacte : page.getByRole("option", { name: option })).first().click();
+  // Les options de la liste ouverte seulement : une liste native de la page
+  // (un champ choisi par son nom) a aussi des options, cachees.
+  const liste = page.getByRole("listbox").last();
+  await liste.getByRole("option").first().waitFor();
+  const exacte = liste.getByRole("option", { name: option, exact: true });
+  await ((await exacte.count()) > 0 ? exacte : liste.getByRole("option", { name: option })).first().click();
 }
 
 /** Une verification refaite jusqu'a cinq fois, a une seconde d'intervalle (une liste se relit apres la publication, pas pendant). */
@@ -211,7 +214,7 @@ async function geste({ nom, faire, verifierFait, restaurer, verifierRestaure }) 
 }
 
 // Les identifiants des entrees que l'essai cree portent un suffixe propre a ce passage : une entree mise a la
-// corbeille garde son identifiant, et un second passage sur la meme base se heurtait a un 409 (Reef, socle 1.3.0).
+// corbeille garde son identifiant, et un second passage sur la meme base se heurtait a un 409 (Reef).
 const suffixe = Date.now().toString(36);
 const outils = {
   page, url, ADMIN, IMAGE, nommes, suffixe, anonyme, lire, entree, ouvrir, capture, enregistrerEtPublier, editerDansLaPage, publierParLaBarre,

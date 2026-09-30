@@ -5,7 +5,7 @@
 // editeur choisit "Bleu océan", il ne tape pas un code couleur qui casserait
 // les contrastes.
 //
-// LA TEINTE EST CELLE QUE LE NOM DIT (socle 1.3.0). Chaque couleur donne la
+// LA TEINTE EST CELLE QUE LE NOM DIT. Chaque couleur donne la
 // teinte VISIBLE, sur la roue HSL : celle des boutons et des liens du site,
 // quel que soit le theme. "Bleu océan" vaut 208, un bleu, partout. Le theme
 // dit, dans son adaptateur (src/moteur/theme.ts, variablesDeLaPalette), quelle
@@ -13,9 +13,6 @@
 // autres, par la meme recette que son `pnpm rebrand`. Si sa rampe visible est
 // une rotation de son accent, il remonte a l'accent par teinteAvantRotation :
 // aucun decalage propre au socle a compenser.
-// (Avant la 1.3.0, les teintes etaient celles de l'accent de Swell, dont la
-// couleur visible est l'accent tourne de 250 degres : "Bleu océan" donnait un
-// rose sur tout theme dont l'accent est la couleur visible.)
 //
 // Champ vide : aucune feuille, la palette du theme (le rendu d'origine).
 // GENERIQUE et pur, sans import : le Worker le calcule a chaque page, en
@@ -33,7 +30,7 @@ export const COULEURS = {
 export type NomDeCouleur = keyof typeof COULEURS;
 
 /**
- * Le retour a la couleur livree avec le theme (socle 1.4.0) : la liste n'avait
+ * Le retour a la couleur livree avec le theme : la liste n'avait
  * que les cinq couleurs, et un client qui en avait choisi une ne savait pas
  * revenir en arriere (vider une liste deroulante n'est pas un geste connu).
  * Ce choix vaut vide : aucune feuille, la palette du theme.
@@ -82,7 +79,7 @@ export function couleursQuiMentent(variables: (teinte: number) => Record<string,
   });
 }
 
-/* --- Le contraste des boutons (socle 1.4.0) --------------------------------
+/* --- Le contraste des boutons --------------------------------
    "Vert émeraude" rendait le texte blanc du bouton illisible (1,41:1, mesure
    du testeur dans Chrome). Chaque theme dit, dans theme.ts, quelles variables
    portent le fond de ses boutons et quelle encre s'ecrit dessus

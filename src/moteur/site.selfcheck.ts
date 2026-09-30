@@ -95,19 +95,19 @@ is(feuilleDeLaPalette(undefined, variablesDeLaPalette), null, "vide : aucune feu
 for (const [nom, icone] of Object.entries(ICONES)) assert.ok(icone in icons, `${nom} : l'icone ${icone} n'existe pas`);
 is(iconeChoisie("Enveloppe", "check"), "mail", "un nom francais donne son icone");
 
-// La couleur nommee est celle des liens et des boutons (rampe coral) : "Bleu océan" est un bleu (socle 1.3.0).
+// La couleur nommee est celle des liens et des boutons (rampe coral) : "Bleu océan" est un bleu.
 // Le nom de la variable est compose : ecrit en entier, Tailwind le lirait ici et l'ajouterait a la feuille.
 is(couleursQuiMentent(variablesDeLaPalette, `--color-coral-${500}`), [], "une couleur de la liste ne donne pas la teinte que son nom dit");
-// Les boutons pleins aussi (3.6.2) : "Bleu océan" les rendait orange.
+// Les boutons pleins aussi : "Bleu océan" les rendait orange.
 is(couleursQuiMentent(variablesDeLaPalette, `--color-reef-${600}`), [], "une couleur de la liste ne donne pas aux boutons (clair) la teinte que son nom dit");
 is(couleursQuiMentent(variablesDeLaPalette, `--color-reef-${400}`), [], "une couleur de la liste ne donne pas aux boutons (sombre) la teinte que son nom dit");
-// Le texte des boutons reste lisible pour chaque couleur (socle 1.4.0, 4,5:1 au moins).
+// Le texte des boutons reste lisible pour chaque couleur.
 {
   const { CONTRASTE_DES_BOUTONS, variablesDeLaPalette: variables } = await import("./theme.ts");
   is(couleursIllisibles(variables, CONTRASTE_DES_BOUTONS), [], "une couleur de la liste laisse un bouton illisible");
 }
 
-// 9. La police du site (3.8.1) : la graine propose les choix de la table, la feuille repeint les deux jetons de police de tokens.css.
+// 9. La police du site : la graine propose les choix de la table, la feuille repeint les deux jetons de police de tokens.css.
 is(champ("site", "font").validation?.options, [...CHOIX_DE_POLICE], "la graine propose les polices de la table");
 is(champ("site", "font").translatable, false, "la police vaut pour les deux langues");
 {
@@ -116,10 +116,10 @@ is(champ("site", "font").translatable, false, "la police vaut pour les deux lang
   is(feuilleDeLaTypographie(CHOIX_DE_POLICE[0], VARIABLES_DE_POLICE), null, "l'origine : aucune feuille, les polices du theme");
   assert.ok(feuilleDeLaTypographie(CHOIX_DE_POLICE[2], VARIABLES_DE_POLICE)?.startsWith(":root{"), "une police choisie : une feuille posee a la racine");
 }
-// 10. La place d'un bloc sur l'accueil (3.8.1) : un entier commun aux deux langues.
+// 10. La place d'un bloc sur l'accueil : un entier commun aux deux langues.
 is([champ("sections", "order").type, champ("sections", "order").translatable], ["integer", false], "la place d'un bloc est un entier commun aux deux langues");
 
-// La carte des champs de chaque bloc (3.8.2) : chaque champ cite existe dans la graine, le libelle d'un sous-champ est le sien.
+// La carte des champs de chaque bloc : chaque champ cite existe dans la graine, le libelle d'un sous-champ est le sien.
 {
   const { defautsDeLaCarte } = await import("./champs-des-blocs.ts");
   const { CHAMPS_DES_BLOCS } = await import("./theme.ts");

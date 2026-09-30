@@ -46,7 +46,7 @@ En bas à gauche, le panneau **« Cadre du site »** donne les liens directs ver
 
 Chaque champ porte une phrase qui dit ce qu'il change. Le « Mot du titre écrit en couleur » doit reprendre un mot du titre, écrit pareil. Le titre de la page d'un sujet est un modèle : `{topic}` y devient le nom du sujet.
 
-**Revenir en arrière** : dans l'écran du bloc, « Ignorer les modifications » tant que ce n'est pas publié ; après, « Révisions » (voir la partie 18).
+**Revenir en arrière** : dans l'écran du bloc, « Ignorer les modifications » tant que ce n'est pas publié ; après, « Révisions » (voir la partie 20).
 
 ## 4. Changer une image ou la vidéo
 
@@ -194,7 +194,7 @@ Chaque texte existe en anglais et en français. Dans l'écran d'une entrée, le 
 
 « Redirections », « Nouvelle redirection » : « Chemin source » (l'ancienne adresse, qui commence par `/`), « Chemin d'arrivée » (une adresse du site, qui commence aussi par `/`), « Code d'état » (« 301 Permanent » le plus souvent ; 410 pour dire qu'une page a disparu), « Créer ». Changer le slug d'un article ou d'une page crée seul la redirection 301. L'onglet « Erreurs 404 » liste les adresses demandées qui n'existent pas.
 
-## 17 bis. Les courriels du formulaire de contact et de la lettre
+## 18. Les courriels du formulaire de contact et de la lettre
 
 Les messages de la page Contact vous arrivent par courriel dès que l'écran « Courriels » est branché (administrateurs) :
 
@@ -202,33 +202,34 @@ Les messages de la page Contact vous arrivent par courriel dès que l'écran « 
 2. « Réglages des courriels » : l'expéditeur, l'adresse de réponse, le destinataire du formulaire de contact, l'accusé de réception envoyé au lecteur dans sa langue.
 3. « Courriels » : les envois du mois et les échecs ; « Journal des courriels » : chaque envoi, son erreur expliquée, « Renvoyer ».
 
-La lettre d'information part par le même chemin, sans service externe : voir la partie 17 ter.
+La lettre d'information part par le même chemin, sans service externe : voir la partie 19.
 
 **Adresse d'expédition** : une adresse de messagerie (Gmail, Orange, Outlook, Free...) est refusée comme adresse d'expédition, avec une phrase qui dit pourquoi : un site ne peut pas envoyer au nom de ces messageries. Elle reste possible comme destinataire.
 
 **Si un courriel ne part pas** : une carte rouge le dit en haut de « Courriels » et sur la page d'accueil du back office, jusqu'à ce qu'il soit renvoyé avec succès. Dans « Journal des courriels », la colonne « Pourquoi » donne la raison en toutes lettres, et « Renvoyer ce courriel » le fait repartir.
 
-## 17 ter. La lettre d'information
+## 19. La lettre d'information
 
 Dès que les courriels sont branchés (adresse d'expédition réglée), le formulaire « S'abonner » de l'accueil et du pied de page inscrit les lecteurs sur votre site, sans service externe :
 
 1. Le lecteur tape son adresse et valide. La page lui dit qu'un courriel est parti : il doit cliquer le lien qu'il contient pour confirmer (double confirmation : personne ne peut inscrire l'adresse d'un autre). Sans confirmation, l'inscription est effacée au bout de 7 jours.
 2. « Lettre d'information » (menu de gauche, sous « Courriels ») : le nombre d'abonnés et d'inscriptions en attente, puis la liste des adresses, leur langue et depuis quand.
 3. **Envoyer un article** : choisissez-le dans « Article à envoyer », puis « Envoyer à N abonnés » et confirmez. Chaque abonné le reçoit dans sa langue (le titre, le chapo, un lien vers l'article). Un article déjà envoyé le dit, avec sa date, avant de repartir.
-4. **Se désinscrire** : chaque courriel porte un lien « Se désinscrire » en bas ; un clic suffit, l'adresse est effacée de la liste. Les messageries qui affichent leur propre bouton « Se désinscrire » passent par le même chemin.
+4. **Se désinscrire** : chaque courriel porte un lien « Se désinscrire » en bas. Il ouvre une page qui demande de confirmer (« Me désinscrire » ou « Garder mon abonnement ») : un logiciel qui ouvre les liens d'un courriel ne désinscrit donc personne. Le bouton « Se désinscrire » des messageries, lui, désinscrit en un clic.
 5. **Retirer une adresse** à la demande d'une personne : « Adresse à retirer », puis « Retirer cette adresse » et confirmez.
 6. « Derniers envois de la lettre » : chaque article envoyé, quand, et combien de courriels sont partis. Un courriel qui n'est pas parti est dans « Journal des courriels », avec « Renvoyer ».
 
 Les envois de la lettre comptent dans le forfait du mois (écran « Courriels ») : un envoi qui dépasserait le plafond du mois est refusé d'avance, avec la marche à suivre. Tant que les courriels ne sont pas branchés, le formulaire poste vers le service externe réglé dans « Réglages par langue » s'il y en a un, sinon il reste une démonstration.
 
-## 18. Révisions, retour arrière, corbeille
+## 20. Révisions, retour arrière, corbeille
 
 - **Avant publication** : « Ignorer les modifications » revient à la version en ligne.
 - **Après** : « Révisions » liste les versions ; restaurez-en une, puis publiez. **Attention : une révision remet les textes, pas la photo, les adresses des boutons ni la case « Masquer ce bloc »** (elles valent pour les deux langues) : remettez-les à la main. La fenêtre de confirmation le rappelle.
 - **Supprimer** : « Déplacer vers la corbeille », puis confirmer. L'onglet « Corbeille » de la liste permet de restaurer.
-- **Retirer du site sans supprimer** : « Annuler la publication ». Pour un bloc de « Textes des pages », le texte d'origine du thème revient ; pour faire disparaître un bloc, masquez-le (partie 6). Un sujet ou un auteur dépublié rend la fiche d'origine du thème.
+- **Dupliquer** : dans la liste, « Dupliquer » crée une copie en brouillon, dont le titre finit par « (Copy) » ; renommez-la, changez son adresse web, puis publiez.
+- **Retirer du site sans supprimer** : « Retirer du site », en haut du panneau de droite. Pour un bloc de « Textes des pages », le texte d'origine du thème revient ; pour faire disparaître un bloc, masquez-le (partie 6). Un sujet ou un auteur dépublié rend la fiche d'origine du thème.
 
-## 19. Carte du site : où se change chaque zone
+## 21. Carte du site : où se change chaque zone
 
 | Page | Zone | Où la changer |
 |---|---|---|
@@ -236,7 +237,7 @@ Les envois de la lettre comptent dans le forfait du mois (écran « Courriels »
 | Toutes | Liens de la barre, bouton « S'abonner », menu du téléphone | « Menus » : menu principal, boutons, liens du téléphone |
 | Toutes | Colonnes et liens du pied | « Menus » : « Lire », « Le studio », « Légal » |
 | Toutes | Phrase du pied, mentions, e-mail, crédit | « Textes des pages » (page « Tout le site ») et « Réglages par langue » |
-| Toutes | Lettre d'information | « Textes des pages », bloc « lettre » ; abonnés et envois dans « Lettre d'information » (partie 17 ter) |
+| Toutes | Lettre d'information | « Textes des pages », bloc « lettre » ; abonnés et envois dans « Lettre d'information » (partie 19) |
 | Toutes | Couleur de la marque | « Réglages par langue », « Couleur de la marque » |
 | Toutes | Police des titres et du texte | « Réglages par langue », « Police du site » |
 | Toutes | Logo sur fond sombre | « Réglages par langue », « Logo pour le mode sombre » |
@@ -254,7 +255,7 @@ Les envois de la lettre comptent dans le forfait du mois (écran « Courriels »
 | Page introuvable | Code, titre, texte, trois boutons | « Textes des pages », page « Page introuvable » |
 | Pages ajoutées | Tout | « Pages » |
 
-## 20. Ce qui demande un développeur
+## 22. Ce qui demande un développeur
 
 - l'ordre des blocs d'une autre page que l'accueil, un nouveau type de bloc, la mise en page et le dessin du site ;
 - les textes d'interface génériques (accessibilité, « changer de langue », « ouvrir le menu », « min de lecture », compteurs), le bandeau de cookies ;

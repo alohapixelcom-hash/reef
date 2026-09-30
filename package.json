@@ -1,7 +1,7 @@
 {
   "name": "reef",
   "type": "module",
-  "version": "3.8.3",
+  "version": "3.8.4",
   "description": "Reef, a bilingual Astro blog theme with an optional EmDash back office.",
   "license": "MIT",
   "author": "Aloha Pixel (https://alohapixel.app)",
@@ -27,7 +27,7 @@
     "node": ">=22.18.0"
   },
   "scripts": {
-    "app": "node scripts/covers.mjs && node scripts/og.mjs && astro build && node scripts/app.mjs",
+    "app": "node scripts/covers.mjs && node scripts/og.mjs && node scripts/favicon.mjs && astro build && node scripts/app.mjs",
     "build": "node scripts/covers.mjs && node scripts/og.mjs && node scripts/favicon.mjs && astro build",
     "check": "astro check",
     "covers": "node scripts/covers.mjs",

@@ -22,7 +22,7 @@
 // pas les ajouter sans erreur si elles existent deja. base-3.4.0.mjs les
 // ajoute avant de passer ce fichier.
 //
-// TROIS PIEGES EVITES (socle 1.3.0) :
+// TROIS PIEGES EVITES :
 //   - les MEDIAS : les deux bases recoivent les memes images par deux imports,
 //     sous des identifiants locaux differents. Avant toute difference, chaque
 //     media de la base suivante est rapproche de celui de la base de depart

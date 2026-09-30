@@ -1,4 +1,4 @@
-// scripts/base-3.4.0.mjs - met une base du moteur deja remplie au niveau de la 3.4.0 (generique : le meme script, renomme a chaque version) : les colonnes nouvelles, puis le fichier SQL idempotent de la version.
+// scripts/base-3.4.0.mjs - met une base du moteur deja remplie au niveau de la version courante (generique : le meme script dans chaque site) : les colonnes nouvelles, puis le fichier SQL idempotent de la version.
 //
 // POURQUOI UN SCRIPT EN PLUS DU SQL. Un champ ajoute a une collection qui
 // existe deja est une colonne de plus dans sa table (ec_<collection>), et
@@ -16,8 +16,8 @@
 //   node scripts/base-3.4.0.mjs --remote swell-moteur [--appliquer]
 //   node scripts/base-3.4.0.mjs --sqlite chemin/de/la/base.sqlite [--appliquer]
 //
-// Options : --sql <fichier> (defaut : le seul import-3.4.0-*.sql a la racine
-// du depot), --config <fichier wrangler> (defaut : wrangler.moteur.jsonc),
+// Options : --sql <fichier> (defaut : le seul import-3.4.0-*.sql du dossier
+// migrations/, a defaut de la racine du depot), --config <fichier wrangler> (defaut : wrangler.moteur.jsonc),
 // --graine <fichier> (defaut : seed/seed.json).
 //
 // --local et --remote passent par wrangler (d1 execute), comme la marche a
@@ -61,9 +61,10 @@ function lireLesArguments(argv) {
   opts.config ??= `${RACINE}wrangler.moteur.jsonc`;
   opts.graine ??= `${RACINE}seed/seed.json`;
   if (!opts.sql) {
-    const candidats = readdirSync(RACINE).filter((f) => /^import-3\.4\.0-.+\.sql$/.test(f));
-    if (candidats.length !== 1) throw new Error(`--sql manquant : ${candidats.length} fichier(s) import-3.4.0-*.sql a la racine.`);
-    opts.sql = `${RACINE}${candidats[0]}`;
+    const dossier = existsSync(`${RACINE}migrations`) ? `${RACINE}migrations/` : RACINE;
+    const candidats = readdirSync(dossier).filter((f) => /^import-3\.4\.0-.+\.sql$/.test(f));
+    if (candidats.length !== 1) throw new Error(`--sql manquant : ${candidats.length} fichier(s) import-3.4.0-*.sql dans ${dossier === RACINE ? "la racine" : "migrations/"}.`);
+    opts.sql = `${dossier}${candidats[0]}`;
   }
   if (!existsSync(opts.sql)) throw new Error(`Fichier SQL introuvable : ${opts.sql}`);
   return opts;
@@ -149,11 +150,13 @@ for (const garde of gardes) {
     const rendu = base.lire(garde.requete);
     const valeur = rendu[0] ? Object.values(rendu[0])[0] : 0;
     if (Number(valeur) === 0) laissees.push(garde.description);
-  } catch {
+  } catch (erreur) {
     // La garde nomme une colonne que ce script va ajouter : vide a sa
     // creation, la valeur est encore celle de depart, l'ecriture passera.
+    // Une table que le SQL cree (CREATE TABLE IF NOT EXISTS) : de meme.
     const nommeUneNouvelle = manquantes.some((m) => garde.requete.includes(`"${m.colonne}"`) && garde.requete.includes(`"${m.table}"`));
-    if (!opts.appliquer && !nommeUneNouvelle) laissees.push(`${garde.description} (a verifier apres l'ajout des colonnes)`);
+    const tableNouvelle = /no such table/i.test(String(erreur));
+    if (!opts.appliquer && !nommeUneNouvelle && !tableNouvelle) laissees.push(`${garde.description} (a verifier apres l'ajout des colonnes)`);
   }
 }
 console.log(laissees.length === 0 ? "Ecritures laissees de cote : aucune." : `Ecritures que le SQL laissera de cote, la valeur ayant ete changee (${laissees.length}) :`);

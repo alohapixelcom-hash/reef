@@ -7,8 +7,7 @@
 // Cette fonction fait le pont, sans base ni moteur : on lui donne les fiches
 // lues une fois par requete, elle rend l'adresse.
 //
-// UNE BASE D'AVANT LA MIGRATION range encore l'adresse elle-meme (les listes
-// d'identifiants de Reef 3.8.1) : une valeur qui n'est l'identifiant d'aucune
+// UNE BASE D'AVANT LA MIGRATION range encore l'adresse elle-meme : une valeur qui n'est l'identifiant d'aucune
 // fiche est rendue telle quelle. Le code et la base peuvent donc arriver en
 // ligne dans n'importe quel ordre.
 

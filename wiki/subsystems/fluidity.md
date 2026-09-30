@@ -11,7 +11,6 @@ sources:
   - src/styles/motion/materials.css
   - src/components/ui/button/Button.astro
   - src/styles/tokens.css
-updated: 2026-08-15
 ---
 
 # Fluidity

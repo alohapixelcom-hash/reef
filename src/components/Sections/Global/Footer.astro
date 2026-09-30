@@ -62,7 +62,7 @@ const columns = getFooterData(locale).map((repli, rang) => {
 const cible = (target?: string) => (target ? { target, rel: target === "_blank" ? "noopener" : undefined } : {});
 // L'adresse du service qui recoit les inscriptions (entree "site") : vide, le
 // formulaire reste une demonstration sans action, comme les fichiers le livrent.
-// La lettre d'information du back office quand elle est branchee (3.8.3),
+// La lettre d'information du back office quand elle est branchee,
 // sinon l'adresse externe de l'entree "site", sinon rien (demonstration).
 const envoiDeLettre = newsletter ? await envoiDeLaLettre(Astro) : null;
 const envoiLettre = envoiDeLettre?.attributs ?? (marque.formulaires.newsletter ? { action: marque.formulaires.newsletter, method: "post" } : {});
@@ -152,8 +152,8 @@ const columnLink =
 
         {/* --- Inscription a la lettre ------------------------------------
             Moteur allume, la lettre d'information du back office (extension
-            Courriels, 3.8.3) : inscription avec double confirmation, liste des
-            abonnes, envoi d'un article, desinscription en un clic, sans
+            Courriels) : inscription avec double confirmation, liste des
+            abonnes, envoi d'un article, desinscription confirmee, sans
             service externe. Sinon l'adresse d'un fournisseur reglee dans
             l'entree "site" (Buttondown, Listmonk...). Build statique : un
             formulaire de DEMONSTRATION, qui n'envoie rien. */}

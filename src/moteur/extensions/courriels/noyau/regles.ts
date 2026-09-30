@@ -61,7 +61,7 @@ export interface Reglages {
   cycle: number;
 }
 
-/** Le forfait de Cloudflare Email Sending sur Workers Paid, lu le 16 septembre 2026 et relu le 28 dans sa documentation. */
+/** Le forfait de Cloudflare Email Sending sur Workers Paid, lu et relu le 28 dans sa documentation. */
 export const INCLUS_PAR_MOIS = 3000;
 export const PRIX_PAR_MILLE_USD = 0.35;
 
@@ -113,7 +113,7 @@ export function listeDAdresses(valeur: string): string[] {
 }
 
 /**
- * Les messageries grand public (socle 1.4.0). Cloudflare n'envoie que depuis
+ * Les messageries grand public. Cloudflare n'envoie que depuis
  * un domaine qu'il gere : une adresse d'expedition en gmail.com ou orange.fr
  * est acceptee par l'ecran puis refusee a chaque envoi, sans que le client
  * comprenne pourquoi (releve du testeur). L'ecran la refuse tout de suite, en

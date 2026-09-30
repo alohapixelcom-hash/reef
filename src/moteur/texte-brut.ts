@@ -3,7 +3,7 @@
 // POURQUOI. Un billet ou une note publie sans texte a un champ `content` a
 // null, pas a [] : `texteBrut(d.content)` avec une valeur par defaut (`= []`)
 // ne protege que de undefined, et le `.map` sur null faisait tomber TOUTES
-// les pages moteur allume (Reef, 3.4.0 : accueil 500, listes 404 ; Kona :
+// les pages moteur allume (Reef : accueil 500, listes 404 ; Kona :
 // journal vide). Une entree a moitie ecrite ne doit jamais casser le site.
 //
 // GENERIQUE et pur : chaque theme passe sa propre facon de lire un bloc

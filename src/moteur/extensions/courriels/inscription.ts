@@ -8,7 +8,7 @@
 //
 //   POST /_emdash/courriels/lettre/inscrire     email, langue, retour, site_web (piege)
 //   GET  /_emdash/courriels/lettre/confirmer?jeton=...
-//   GET  /_emdash/courriels/lettre/desinscrire?jeton=...  (le lien du pied : la page de confirmation, 3.8.3)
+//   GET  /_emdash/courriels/lettre/desinscrire?jeton=...  (le lien du pied : la page de confirmation)
 //   POST /_emdash/courriels/lettre/desinscrire?jeton=...  confirme=1 (le bouton de cette page : 303 vers l'accueil)
 //   POST /_emdash/courriels/lettre/desinscrire?jeton=...  (le bouton des messageries, RFC 8058 : 200, sans page)
 //

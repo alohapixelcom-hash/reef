@@ -1267,13 +1267,13 @@ const IDENTIQUES: string[] = [
  * "Select" : le catalogue d'EmDash le traduit par un nom, "Liste deroulante",
  * alors que c'est le bouton qui valide le choix d'une image (logo, favicon,
  * photo d'un champ). Un client qui choisit son logo doit lire "Choisir"
- * (releve du 28 septembre 2026, fenetre "Choisir le logo").
+ * (releve, fenetre "Choisir le logo").
  *
  * "Item added" et "Item updated" : traduits "Article ajoute" et "Article mis
  * a jour", alors qu'ils saluent l'ajout d'un lien de menu (le meme ecran dit
  * "Element supprime" a la suppression) : "Element", comme la suppression.
  *
- * Releve du testeur (29 septembre 2026, socle 1.4.0), le client ne comprend
+ * Releve du testeur : le client ne comprend
  * pas ou lit une faute :
  *   - "Nouveau {x}" et "Aucun {x} disponible" accordent au masculin un nom
  *     qui ne l'est pas ("Nouveau Page", "Aucun catégories disponible") : des

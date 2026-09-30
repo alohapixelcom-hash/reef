@@ -1,6 +1,6 @@
 // src/moteur/seo.emdash.ts - le panneau SEO d'une entree de collection, moteur allume (generique) : relu par getEmDashEntry quand la liste ne l'a pas apporte.
 //
-// LE DEFAUT D'EMDASH 0.38 (trouve par Koa, 3.4.0). Le chargeur ne plie la
+// LE DEFAUT D'EMDASH 0.38 (trouve par Koa). Le chargeur ne plie la
 // table _emdash_seo (titre, description, image de partage, canonique,
 // noindex) que dans la lecture d'UNE entree : une entree rendue par
 // getEmDashCollection n'a pas data.seo. Un gabarit qui lit le SEO d'un projet,

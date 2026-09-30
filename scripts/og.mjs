@@ -5,7 +5,7 @@
  * Usage :
  *   pnpm og            ecrit public/og/<slug>.jpg (1200x630) depuis la table CARTES ci-dessous
  *
- * LA REGLE (23 septembre 2026, a vie) : une carte de partage est UNE PHOTO ET
+ * LA REGLE : une carte de partage est UNE PHOTO ET
  * RIEN D'AUTRE. Ni degrade, ni grille, ni surtitre, ni titre, ni vague, ni
  * cercles, ni domaine, ni panneau, ni capture d'ecran. La plateforme qui
  * affiche l'apercu (Facebook, LinkedIn, X, iMessage, Slack) ecrit deja le

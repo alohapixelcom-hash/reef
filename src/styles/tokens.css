@@ -80,7 +80,7 @@
   --color-reef-400: #3fc0e0;
   --color-reef-500: #1a9fc4;
   --color-reef-600: #147ea0;
-  /* Un cinquieme pas, ajoute le 7 septembre 2026 pour la meme raison que
+  /* Un cinquieme pas, pour la meme raison que
    * coral-700 : le turquoise 600 porte du TEXTE sur une teinte pale et n'y
    * atteint que 3,99 pour 1. Il ne peint rien d'autre. */
   --color-reef-700: #10657f;
@@ -97,8 +97,7 @@
    * dessinee pour l'ecran. C'est elle qu'on lit pendant huit minutes.
    *
    * Le mot d'accent des titres n'a PLUS de police a lui : il garde la police
-   * du titre, en primaire, sans soulignement (la vague est retiree depuis la
-   * 3.3.1, regle du 28 septembre 2026). Plus aucune italique serif nulle part :
+   * du titre, en primaire, sans soulignement (regle de l'editeur). Plus aucune italique serif nulle part :
    * --font-serif et --font-script ne subsistent que comme alias du display,
    * pour le contenu qui les cite encore. */
   --font-display: "Space Grotesk Variable", "Space Grotesk", system-ui, sans-serif;
@@ -208,8 +207,8 @@
    * Turquoise 600 et non 500 en mode clair : le texte des boutons est blanc,
    * et 500 le fait passer sous le rapport de contraste de 4,5. */
   /* Quatre variables --halo-* vivaient ici : les couleurs des disques floutes
-     des couvertures. Les disques ont ete retires le 2 septembre 2026, avec
-     toutes les lueurs de la famille, et les variables partent avec eux. Une
+     des couvertures. Les disques ont ete retires, avec toutes les lueurs de
+     la famille, et les variables partent avec eux. Une
      variable de couleur sans lecteur finit toujours par en retrouver un. */
 
   --reef-primary: var(--color-reef-600);
@@ -218,9 +217,8 @@
    * pour l'accent, et pour une mesure, pas pour un gout : le turquoise 600
    * passe AA sur le blanc (4,64) et le rate des qu'on le pose sur sa propre
    * teinte a douze pour cent (3,99 pour 1, releve sur l'etiquette de rubrique
-   * des cartes de billet le 7 septembre 2026). La couleur DECORATIVE ne bouge
-   * pas d'un pixel (bg-primary, border-primary, la vague, la pastille de la
-   * frise) ; le TEXTE en primaire prend une marche plus sombre de la meme
+   * des cartes de billet). La couleur DECORATIVE ne bouge pas d'un pixel
+   * (bg-primary, border-primary, la pastille de la frise) ; le TEXTE en primaire prend une marche plus sombre de la meme
    * rampe. En sombre le primaire est deja clair sur fond d'encre, le bloc
    * sombre renvoie donc simplement vers lui. */
   --reef-primary-text: var(--color-reef-700);

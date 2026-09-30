@@ -52,7 +52,7 @@ export const PAGES_DU_SITE = [
 ] as const;
 export type PageDuSite = (typeof PAGES_DU_SITE)[number];
 
-/** Les valeurs du champ Page jusqu'a la 3.3, que le SQL de la 3.4.0 remplace si l'editeur ne les a pas changees. */
+/** Les anciennes valeurs du champ Page, que migrations/import-3.4.0-reef.sql remplace si l'editeur ne les a pas changees. */
 export const ANCIENNES_PAGES: Record<string, PageDuSite> = {
   accueil: "Accueil",
   billet: "Billet",

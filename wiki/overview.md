@@ -12,7 +12,6 @@ sources:
   - src/i18n/index.ts
   - package.json
   - tsconfig.json
-updated: 2026-09-13
 ---
 
 # Architecture overview
@@ -85,9 +84,9 @@ carries an Article node plus breadcrumbList.
 
 ## What the build emits
 
-`pnpm build` (verified 2026-09-24): 54 pages. In two languages: the home, the
-paginated blog, a page per post, the topic index and topic pages, the author
-index and author pages, a search page, and the about, contact and legal
+`pnpm build` emits, in two languages: the home, the paginated blog, a page per
+post, the topic index and topic pages, a page per tag, the author index and
+author pages, a search page, and the about, contact and legal
 annexes, plus one 404 page per language (404.html, fr/404.html). Text endpoints are
 robots.txt, llms.txt and a per-language rss.xml, with sitemap-index.xml from
 the sitemap integration.
@@ -123,38 +122,9 @@ Capacitor shell, scripts/app.mjs). Selfchecks run directly with Node:
 `node src/js/schema.selfcheck.ts` and `node src/js/pagination.selfcheck.ts`.
 Node >= 22.18 required. Path aliases live in tsconfig.json.
 
-## Sync 2026-09-15: the Git-based editorial back office (removed in 3.3.0)
+## The publication engine
 
-Reef 2.3 carried an optional editor that wrote posts to GitHub (`/secret-spot/`, with a read-only public demo). House rule of 22 September 2026: one back office per site, EmDash's. The editor, its pages, scripts, preview Worker and documentation were removed in 3.3.0; `/secret-spot/` now opens EmDash with the engine on.
-
-## Sync 2026-09-21: optional publication engine
-
-`ALOHA_MOTEUR=emdash` builds Reef as a Cloudflare Worker on EmDash (MIT): posts in D1, media in R2, the pages that show a post rendered on demand, everything else prerendered. Publishing in the back office (/_emdash/admin) shows on the post page, the blog index and the RSS feed with no build: 55 to 93 ms on the production build served locally by workerd, three passes. One alias (`@moteur/source`) picks the files or the database, both sources return the same collection entry, and no component was rewritten; `src/moteur/chemins.ts` replays a page's own getStaticPaths on demand. The engine also ships an on-demand sitemap for managed pages, Cloudflare Images at request time, a back office skinned from tokens.css, and a "Tout deployer" extension (cache purge, Deploy Hook, proof by /version.json). With the variable absent the build is unchanged: 63 HTML, XML and TXT files compared one by one. Not yet deployed online. See docs/moteur.md.
-
-## Sync 2026-09-22: version 3.1.0, the engine finished
-
-Three structural changes on top of the 21 September sync. **The on-demand sitemap no longer imports pages**: the path functions of the dynamic pages moved to `src/js/adresses.ts` (next to `cheminsArchive` in `src/js/archive.ts`), each page exports them as its `getStaticPaths`, and `src/moteur/plan-du-site.ts` replays them from an explicit table. A page imported by a non-page module stops being a style boundary for Astro's build, which was inlining the theme's 127 KB stylesheet into the admin page and into the manifest of 73 API routes (the server entry chunk went from 12.2 MB to 2.3 MB). **The back office speaks the person's language**: EmDash picks it per request (cookie, then browser), `ALOHA_BO_LANGUE` sets a site default through `src/moteur/langue-bo.ts`, and the theme's own admin texts have two dictionaries (`deployer/textes.fr.ts`, `deployer/textes.en.ts`, `accueil/textes.ts`). **A second house extension** (`src/moteur/accueil/`) adds the site card to the dashboard, the only React component the theme gives the admin. Also: `back-office.css` now writes the pill buttons and fields, the focus ring, the flat primary button with the theme's ink, and the Block Kit heading hierarchy; `ALOHA_CACHE_ROUTES` (Workers Cache or memory) joins `ALOHA_CACHE_OBJETS`, with route rules tagged by collection so that EmDash purges them at each publication (proven locally with the memory providers, 21 September 2026); `DEPLOY.md` documents the first deployment of the engine. Still not deployed online. See docs/moteur.md.
-
-## Sync 2026-09-23: version 3.1.1, the share card is a photograph
-
-House rule of 23 September 2026: an Open Graph or Twitter image is one photograph and nothing else. `scripts/og.mjs` no longer renders an SVG template from the tokens; it crops a photograph already fetched by `scripts/covers.mjs` into `public/og/<slug>.jpg` (sharp, 1200x630, fit cover, position "attention", JPEG 86 mozjpeg 4:4:4) and checks the size. `build`, `build:moteur`, `app` and `predev` run it right after covers.mjs, `public/og/` is ignored by git, and the script deletes any file there it did not make. Only `default` is referenced (siteData.defaultImage), cropped from `src/assets/reef-hero-vague.webp`; the blog, topics, about and contact cards had no reader and are gone. The script no longer reads tokens.css. See wiki/subsystems/seo.md.
-
-## Sync 2026-09-24: version 3.1.2, engine images at build quality, post cards
-
-Engine on, the pages rendered on demand sent their images through `/_image` without a `q` parameter, and the Cloudflare Images binding encoded them almost losslessly (the demo's lead image at 1.5 MB for 1440 px online). `src/moteur/service-image.ts`, aliased onto `@astrojs/cloudflare/image-service-workerd` by moteur.config.mjs, is the adapter's service plus the quality sharp applies at build time (`src/moteur/qualite-image.ts`, 80 WebP and JPEG, 50 AVIF, checked against installed sharp by its selfcheck). The static build never reads it, and the prerendered files of the engine build are unchanged. A post's share card is now its cover cropped to a 1200x630 JPEG in both modes (`carteDuBillet` in `@moteur/source`): sharp at build time, and with the engine on the route `/og/billet/[cle].jpg` (`src/moteur/carte-du-billet.ts`), which reads the cover from the media library and crops it with the Images binding, since EmDash's `/_image` endpoint drops `fit` for media files. `/search/` and `/fr/search/` left both sitemaps. See docs/moteur.md and wiki/subsystems/seo.md.
-
-## Sync 2026-09-24: version 3.1.3, the EmDash edit bar finds what it edits
-
-Engine on, a signed-in editor saw EmDash's "Edit" bar, but no tag carried `data-emdash-ref`, the only thing its script reads: the conversion of a database entry into a `posts` entry dropped EmDash's `edit` proxy. The proxy now travels with the post in edit mode only (`edition`, set by `enBillet` in `src/moteur/source.emdash.ts`), and templates spread `annotation(post, field?)` from `@moteur/source` (`src/moteur/annotations.ts`; the files source returns `{}`). The post header carries the entry (first annotated tag, where the bar reads status and Publish) and its `title`, `description` and `cover`; cards, the featured post, search results and the previous and next links carry the entry and `title`. The body stays with EmDash's inline editor. Static build and anonymous HTML unchanged. See docs/moteur.md.
-
-## Sync 2026-09-24: version 3.3.0, the page texts are managed by the engine
-
-Engine on, the copy a reader sees first (hero, section headers, buttons, newsletter block, footer line, the headers of the lists, about, contact, legal notice, privacy, terms) came from the dictionary and could not be edited from the bar. It is now the `sections` collection, 26 entries per language seeded with the exact file texts: `src/moteur/contenu.sections.ts` maps each entry to its dictionary paths, `lireLaPage` of `@moteur/source` lays the published entries on the dictionary, pages call `textesDeLaPage(Astro)`, and components read `useTranslations(Astro)` and `annotationsDe(Astro, slug)`. Contact, legal, privacy and terms became managed pages. Engine off, nothing changes. See docs/moteur.md, "The page texts".
-
-## Sync 2026-09-24: version 3.3.0, finishing after the audit of the live demo
-
-The live demo has run with the engine since 22 September 2026 (Worker `reef-moteur`, deployed from the Mac with `npx wrangler deploy` after `pnpm build:moteur`); DEPLOY.md, docs/moteur.md and the README say so. One back office: the Git-based editor and its footer link are gone. The Workers settle their own addresses (`src/worker-adresses.ts`): `/sitemap.xml` 301 to the index, unknown sitemaps 404, missing pages the 404 of the address's language (`fr/404.html`, built from `src/pages/[locale]/404.astro`), `/404` answering 404, no `Server-Timing`; `robots.txt` disallows `/_emdash/`. Legal notice, privacy and terms describe a blog served by a Worker with a database (no account, no subscription); the corrections reach the online database through `seed/import-3.3.0-reef.sql`. The share card's alternative text and the RSS title have one value per language, author placeholder links are gone, the footer credit gives way to the demo line, and the back office is named from `siteData.name` with a French catalogue free of em and en dashes. See docs/moteur.md, "What was measured".
-
-## Sync 2026-09-29: version 3.8.1, typeface and home page order from the back office
-
-Engine on, `BaseHead.astro` reads the `font` field of the language's `site` entry: a chosen value adds one `:root` rule that repaints `--font-sans` and `--font-display` with a system font stack (`src/moteur/typographie.ts`, shared base) and drops the two font preloads; empty, nothing is added. `src/pages/[...locale]/index.astro` renders its eight blocks in the order `ordreDesBlocs` (`src/moteur/ordre-des-blocs.ts`) returns from the `order` field of each block; empty everywhere, the theme's order. Engine off, neither is read, and the static build is byte-identical to 3.8.0.
+With `ALOHA_MOTEUR=emdash` the same source builds as a Cloudflare Worker on
+EmDash: posts in D1, media in R2, managed pages rendered on demand, the page
+texts in the `sections` collection, the whole site set from the back office.
+Nothing of it enters the default build. How it is wired: docs/moteur.md.

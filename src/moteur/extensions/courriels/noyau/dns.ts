@@ -1,7 +1,7 @@
 // src/moteur/extensions/courriels/noyau/dns.ts - les enregistrements DNS qu'attend Cloudflare Email Sending, et leur verification par une requete DNS sur HTTPS.
 //
 // CE QUI EST ATTENDU (documentation Cloudflare, email-service/configuration/
-// domains, relue le 28 septembre 2026) : inscrire un domaine a Email Sending
+// domains, relue) : inscrire un domaine a Email Sending
 // pose quatre enregistrements, tous sur le sous-domaine cf-bounce sauf DMARC :
 //   MX   cf-bounce.<domaine>              route1, route2, route3.mx.cloudflare.net
 //   TXT  cf-bounce.<domaine>              v=spf1 include:_spf.mx.cloudflare.net ~all

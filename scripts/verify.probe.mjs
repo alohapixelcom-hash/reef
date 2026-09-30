@@ -68,7 +68,7 @@ export const PROBE = ({ asked }) => {
   }
 
   /* --- 1 bis. Coupe par un ancetre qui clippe ----------------------
-     Le controle ci-dessus ne suffit pas, et la nuit du 31 aout l'a montre : la
+     Le controle ci-dessus ne suffit pas, un defaut reel l'a montre : la
      barre de la page d'apercu portait un bouton d'achat dont le bord droit
      tombait 19 px au-dela de la fenetre, sur un conteneur en overflow:hidden.
      scrollWidth etait donc EGAL a innerWidth, la page ne defilait pas, et le
@@ -103,7 +103,7 @@ export const PROBE = ({ asked }) => {
     // La seconde est un RAPPORT. Une piste porte un contenu bien plus large
     // que sa boite (1748 px dans 350 sur le carrousel d'avis d'Aloha, soit
     // cinq fois) ; une barre cassee deborde de quelques pour cent (19 px sur
-    // 390, la nuit du 31 aout). Au-dela d'une fois et demie, on est sur une
+    // 390). Au-dela d'une fois et demie, on est sur une
     // piste, meme quand elle clippe sans defiler.
     let clipped = false;
     for (let n = el.parentElement; n && !clipped; n = n.parentElement) {
@@ -134,7 +134,7 @@ export const PROBE = ({ asked }) => {
   // defaut alors que la bascule est declaree, en toutes lettres, sur
   // l'element. La classe n'est pas ecrite ici en clair : Tailwind lit aussi
   // scripts/, et une classe citee dans un commentaire part dans la feuille du
-  // site (mesure a l'essai du socle, 28 septembre 2026 : une regle de plus
+  // site (mesure : une regle de plus
   // dans chaque page de Reef).
   const DISPLAY =
     /^(block|flex|inline-flex|grid|inline|inline-block|inline-grid|table|table-header-group|table-row-group|table-footer-group|table-row|table-cell|table-caption|table-column|table-column-group|list-item|contents|flow-root)$/;
@@ -157,7 +157,7 @@ export const PROBE = ({ asked }) => {
       if (value && DISPLAY.test(value) && BREAKPOINT[prefix]) from = Math.min(from, BREAKPOINT[prefix]);
       // Le mode sombre est une bascule comme les autres : "hidden dark:block"
       // est masque en clair, affiche en sombre, et c'est l'auteur qui l'a
-      // demande. Depuis que le banc mesure les deux modes (5 septembre 2026),
+      // demande. Le banc mesure les deux modes :
       // un element qui porte une variante dark: d'affichage sur une page dont
       // <html> porte .dark est affiche a dessein : 124 faux defauts sinon.
       if (value && DISPLAY.test(value) && prefix === "dark" && sombre) from = 0;
@@ -245,7 +245,7 @@ export const PROBE = ({ asked }) => {
   // d'encre se recouvrent verticalement des que l'interligne descend sous 1,
   // ce qui est le cas de tous nos grands titres. Les comparer reviendrait a
   // signaler la typographie serree comme un defaut. Le vrai chevauchement,
-  // celui du 31 aout sur la boutique, est ENTRE deux blocs voisins : une
+  // celui sur la boutique, est ENTRE deux blocs voisins : une
   // colonne flex comprimee sous la largeur de son mot deborde sur sa voisine.
   // Un enfant d'un conteneur EN LIGNE reste dans la ligne, meme quand le
   // moteur l'a "blockifie" : un `inline-block` pose comme item d'un
@@ -280,7 +280,7 @@ export const PROBE = ({ asked }) => {
       // n'en a pas. Sur un titre de 120 px cela fait une trentaine de pixels
       // qui mordent sur le bloc du dessous sans qu'un seul trait ne se touche.
       // Le seuil suit donc la taille du texte au lieu d'etre un chiffre fixe.
-      // Le vrai defaut du 31 aout, un prix pose SUR un nom de theme, mordait
+      // Le vrai defaut, un prix pose SUR un nom de theme, mordait
       // de dix-sept pixels sur du texte de vingt-quatre : trois fois ce seuil.
       const marge = 0.28 * Math.max(A.size, B.size);
       if (ox > 1 && oy > Math.max(1, marge)) {

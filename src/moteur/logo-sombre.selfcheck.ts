@@ -1,4 +1,4 @@
-// src/moteur/logo-sombre.selfcheck.ts - self-check du logo pour le mode sombre (generique, socle 1.7.0) : un champ vide ne change rien, une image de la mediatheque donne son adresse.
+// src/moteur/logo-sombre.selfcheck.ts - self-check du logo pour le mode sombre (generique) : un champ vide ne change rien, une image de la mediatheque donne son adresse.
 // Lancer : node src/moteur/logo-sombre.selfcheck.ts
 import assert from "node:assert/strict";
 import { identite, type Cadre, type RepliDuSite } from "./cadre.ts";

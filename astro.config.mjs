@@ -126,8 +126,7 @@ export default defineConfig({
       // billet technique dont le code est le contenu principal ne peut pas se
       // permettre de le rendre a la limite du lisible.
       //
-      // Le sombre a ete cru sain jusqu'au 5 septembre 2026, jour ou le banc a
-      // mesure le mode sombre pour la premiere fois : "github-dark-dimmed"
+      // Le banc de rendu mesure aussi le mode sombre : "github-dark-dimmed"
       // pose ses commentaires (#768390) a 3,88 pour 1 sur son propre fond
       // (#22272e), sur dix billets. "github-dark-default" les pose a 6,15 et
       // aucun de ses jetons ne descend sous ce chiffre ; il reste dans la meme
