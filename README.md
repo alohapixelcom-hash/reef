@@ -53,6 +53,10 @@ post, never inside a component.
 
 What a writer expects from a blogging platform, with the engine on.
 
+<p align="center">
+  <img src="docs/images/back-office-editor.webp" alt="The post editor of Reef's back office: title, lead, cover and rich text, with the publishing, translation and tags panels" width="720">
+</p>
+
 | You want to | Where, in the back office |
 |---|---|
 | Write, keep drafts, schedule, go back to a revision | « Articles »: title, lead, cover, rich text with headings, lists, quotes, code, images and tables; « Enregistrer » keeps a draft, « Publier » puts it live, « Programmer » picks a date and time |
@@ -67,6 +71,10 @@ What a writer expects from a blogging platform, with the engine on.
 | Arrange the home page | Each of the eight home blocks can be hidden or moved |
 | Redirects and media | « Redirections » (301, 410), and the media library, stored in R2 |
 | RSS and sitemap | One feed per language, and a sitemap that keeps itself up to date |
+
+<p align="center">
+  <img src="docs/images/back-office-posts.webp" alt="The list of posts in Reef's back office, with their status, language and the view, edit, duplicate and delete actions" width="720">
+</p>
 
 Every field says, in one sentence above it, what it changes, and an empty
 field renders the theme as shipped. The back office opens in French, and
