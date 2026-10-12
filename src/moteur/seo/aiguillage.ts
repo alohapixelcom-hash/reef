@@ -21,7 +21,7 @@
 import { ADRESSES_DU_SEO, ROUTE_DE_L_INDEX, ROUTE_DU_PLAN } from "./identite.mjs";
 import type { Base } from "./base.ts";
 import { type Fichiers, servirLeFichier } from "./fichiers.ts";
-import { EN_TETES_XML, estUnAncienPlan, xmlDeLIndex } from "./plan.ts";
+import { EN_TETES_DU_PLAN, estUnAncienPlan, xmlDeLIndex } from "./plan.ts";
 
 export { ADRESSES_DU_SEO };
 // Un seul import pour le Worker : l'aiguillage et la facon de lui donner la base.
@@ -44,6 +44,18 @@ export interface OptionsDeLAiguillage {
   origine?: string;
 }
 
+/**
+ * La reponse d'un autre Worker telle que le visiteur la recoit : sans
+ * Server-Timing, qu'EmDash pose sur chaque reponse (temps de la base, nombre
+ * de requetes). Il decrit le moteur, jamais pour un visiteur.
+ */
+export function sansServerTiming(reponse: Response): Response {
+  if (!reponse.headers.has("Server-Timing")) return reponse;
+  const entetes = new Headers(reponse.headers);
+  entetes.delete("Server-Timing");
+  return new Response(reponse.body, { status: reponse.status, statusText: reponse.statusText, headers: entetes });
+}
+
 /** Une 301 vers l'index du plan, jamais gardee en cache. */
 function versLIndex(url: URL): Response {
   return new Response(null, { status: 301, headers: { location: new URL(ROUTE_DE_L_INDEX, url.origin).href, "cache-control": "no-store" } });
@@ -60,9 +72,9 @@ export async function aiguillerLeSeo(request: Request, options: OptionsDeLAiguil
   if (!ADRESSES_DU_SEO.test(chemin)) return null;
   if (estUnAncienPlan(chemin)) return versLIndex(url);
   if (chemin === ROUTE_DE_L_INDEX) {
-    return new Response(request.method === "HEAD" ? null : xmlDeLIndex(options.origine ?? url.origin, ROUTE_DU_PLAN), { status: 200, headers: EN_TETES_XML });
+    return new Response(request.method === "HEAD" ? null : xmlDeLIndex(options.origine ?? url.origin, ROUTE_DU_PLAN), { status: 200, headers: EN_TETES_DU_PLAN });
   }
-  if (chemin === ROUTE_DU_PLAN) return options.moteur ? options.moteur.fetch(request) : null;
+  if (chemin === ROUTE_DU_PLAN) return options.moteur ? sansServerTiming(await options.moteur.fetch(request)) : null;
   if (chemin === "/robots.txt") return servirLeFichier(request, "robots", options.base, options.fichiers, options.rendu);
   if (chemin === "/llms.txt") return servirLeFichier(request, "llms", options.base, options.fichiers, options.rendu);
   return null;

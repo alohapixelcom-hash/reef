@@ -92,24 +92,21 @@ const IDENTIFIANT = /^[a-z][a-z0-9_]*$/;
  * rendue dans `manquantes`, jamais une erreur du plan entier.
  */
 export async function lireLesEntrees(base: Base, collections: string[]): Promise<{ entrees: EntreePubliee[]; manquantes: string[] }> {
-  const entrees: EntreePubliee[] = [];
-  const manquantes: string[] = [];
-  for (const collection of collections) {
-    // Le nom de la table entre dans le SQL : seul un identifiant propre passe.
-    if (!IDENTIFIANT.test(collection)) {
-      manquantes.push(collection);
-      continue;
-    }
-    try {
-      const lignes = await base.lire<Record<string, unknown>>(
-        `SELECT c.id, c.slug, c.locale, c.translation_group, c.updated_at, s.seo_no_index, s.seo_image, s.seo_canonical
-         FROM "ec_${collection}" c
-         LEFT JOIN _emdash_seo s ON s.collection = ? AND s.content_id = c.id
-         WHERE c.status = 'published' AND c.deleted_at IS NULL AND c.slug IS NOT NULL AND TRIM(c.slug) <> ''`,
-        [collection],
-      );
-      for (const l of lignes) {
-        entrees.push({
+  // Une requete par collection, toutes lancees ensemble : sur D1, chaque
+  // aller-retour coute de 50 a 200 ms, et le plan les payait l'un apres l'autre.
+  const lues = await Promise.all(
+    collections.map(async (collection): Promise<EntreePubliee[] | null> => {
+      // Le nom de la table entre dans le SQL : seul un identifiant propre passe.
+      if (!IDENTIFIANT.test(collection)) return null;
+      try {
+        const lignes = await base.lire<Record<string, unknown>>(
+          `SELECT c.id, c.slug, c.locale, c.translation_group, c.updated_at, s.seo_no_index, s.seo_image, s.seo_canonical
+           FROM "ec_${collection}" c
+           LEFT JOIN _emdash_seo s ON s.collection = ? AND s.content_id = c.id
+           WHERE c.status = 'published' AND c.deleted_at IS NULL AND c.slug IS NOT NULL AND TRIM(c.slug) <> ''`,
+          [collection],
+        );
+        return lignes.map((l) => ({
           collection,
           id: String(l.id),
           slug: String(l.slug),
@@ -119,12 +116,18 @@ export async function lireLesEntrees(base: Base, collections: string[]): Promise
           noindex: Number(l.seo_no_index ?? 0) === 1,
           image: l.seo_image ? String(l.seo_image) : null,
           canonique: l.seo_canonical ? String(l.seo_canonical) : null,
-        });
+        }));
+      } catch {
+        return null;
       }
-    } catch {
-      manquantes.push(collection);
-    }
-  }
+    }),
+  );
+  const entrees: EntreePubliee[] = [];
+  const manquantes: string[] = [];
+  lues.forEach((lot, i) => {
+    if (lot) entrees.push(...lot);
+    else manquantes.push(collections[i]!);
+  });
   return { entrees, manquantes };
 }
 

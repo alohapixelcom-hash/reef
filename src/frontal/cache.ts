@@ -8,6 +8,12 @@
 // par liaison de service (MOTEUR), que pour le reste.
 //
 // L'ORDRE, pour chaque requete :
+//   0. la lecture anonyme du plan du site (/sitemap-moteur.xml, option
+//      plansGardes) : droit au cache de l'etape 5, fraicheur de 300 s. Le
+//      plan vivant se calcule depuis la base ; sans copie, la Search Console
+//      attendait jusqu'a 86 s et le declarait illisible (MESURE le 12 octobre
+//      2026). Le site peut l'envoyer au moteur par versLeMoteur : il y passe
+//      quand meme, mais par le cache ;
 //   1. ni GET ni HEAD, adresse interne (/_emdash, /_image, /_actions...,
 //      sauf /_astro), entree du back office, page introuvable demandee par
 //      son adresse : au moteur, telle quelle ;
@@ -44,8 +50,11 @@
 // d'avant). La langue : les redirections de langue sont decidees a l'etape 2,
 // avant le cache ; une page gardee ne depend donc que de son adresse.
 //
+// SERVER-TIMING : EmDash le pose sur chaque reponse (temps et nombre de
+// requetes de la base). Il ne sort jamais d'ici, ni garde ni relaye.
+//
 // L'EN-TETE x-aloha-cache dit ce qui s'est passe (HIT, STALE, MISS, NON-GARDEE,
-// PRIVEE, MOTEUR, FICHIER, FIGEE, REGLE, SANS-VERSION, MAINTENANCE) : a relever par le banc de
+// PRIVEE, MOTEUR, FICHIER, FIGEE, REGLE, SANS-VERSION, MAINTENANCE, PLAN-PRECEDENT) : a relever par le banc de
 // mesure apres chaque deploiement.
 import { composerLAttente } from "./attente.ts";
 import { adresseDeLAttente, entetesDeLAttente, lireLaMaintenance, lireLesReglages, PAGE_DE_MAINTENANCE, PAGE_DE_SECOURS, reessayerApres } from "./maintenance.ts";
@@ -83,9 +92,13 @@ export interface OptionsDuFrontal {
   memoireDeLaVersion?: number;
   /** Une page figee par le build est servie depuis les fichiers avant le cache (vrai). */
   pagesFigees?: boolean;
+  /** Les plans du site gardes par le cache, meme quand versLeMoteur les envoie au moteur (/sitemap-moteur.xml). */
+  plansGardes?: RegExp;
+  /** Fraicheur d'un plan garde, en secondes (300). */
+  fraicheurDesPlans?: number;
 }
 
-export const REGLAGES = { fraicheur: 60, conservation: 7 * 24 * 3600, sansCopieApresChangement: 35, memoireDeLaVersion: 1000, pagesFigees: true };
+export const REGLAGES = { fraicheur: 60, conservation: 7 * 24 * 3600, sansCopieApresChangement: 35, memoireDeLaVersion: 1000, pagesFigees: true, plansGardes: /^\/sitemap-moteur\.xml$/, fraicheurDesPlans: 300 };
 
 /** Les adresses du socle qui vont droit au moteur : l'entree du back office et la page introuvable demandee par son adresse. */
 export const VERS_LE_MOTEUR = /^\/(?:(?:[a-z]{2}\/)?secret-spot|_emdash\/secret-spot)(?:\/.*)?$|^\/(?:[a-z]{2}\/)?404(?:\.html|\/)?$/;
@@ -152,14 +165,34 @@ export function cleDuCache(url: URL, version: string): Request {
   return new Request(`https://cache.aloha/${version}/${url.host}${url.pathname}${url.search}`);
 }
 
+/**
+ * La cle du dernier plan connu, sans version : ce qu'un plan sert le temps
+ * que le moteur recalcule celui de la nouvelle version.
+ */
+export function cleDuDernierPlan(url: URL): Request {
+  return new Request(`https://cache.aloha/dernier-plan/${url.host}${url.pathname}${url.search}`);
+}
+
 /** Fraiche ou perimee, selon l'age de la copie. */
 export function etatDeLaCopie(gardeeLe: number, maintenant: number, fraicheur: number): "fraiche" | "perimee" {
   return maintenant - gardeeLe < fraicheur * 1000 ? "fraiche" : "perimee";
 }
 
-/** Une reponse avec l'en-tete de diagnostic. */
+/**
+ * Vrai pour la lecture anonyme d'un plan du site : il passe par le cache avant
+ * toute autre regle. Le plan vivant se calcule depuis la base a chaque appel ;
+ * garde sous la version du contenu, il repond tout de suite a la Search
+ * Console, et une publication change sa cle comme celle de toute page.
+ */
+export function estUnPlanGarde(request: Request, plans: RegExp): boolean {
+  if (request.method !== "GET" && request.method !== "HEAD") return false;
+  return plans.test(new URL(request.url).pathname) && !estPrivee(request);
+}
+
+/** Une reponse avec l'en-tete de diagnostic, sans Server-Timing (EmDash le pose partout, jamais pour un visiteur). */
 function marquee(reponse: Response, etat: string): Response {
   const entetes = new Headers(reponse.headers);
+  entetes.delete("Server-Timing");
   entetes.set(ENTETE, etat);
   return new Response(reponse.body, { status: reponse.status, statusText: reponse.statusText, headers: entetes });
 }
@@ -170,6 +203,7 @@ function servie(copie: Response, etat: string, tete: boolean): Response {
   const origine = entetes.get(CONTROLE_D_ORIGINE);
   entetes.delete(DATE_GARDEE);
   entetes.delete(CONTROLE_D_ORIGINE);
+  entetes.delete("Server-Timing");
   if (origine) entetes.set("Cache-Control", origine);
   else entetes.delete("Cache-Control");
   entetes.set(ENTETE, etat);
@@ -197,14 +231,16 @@ export function creerFrontal(options: OptionsDuFrontal = {}) {
   }
 
   /** Garde la copie en arriere-plan, apres avoir lu son corps (jamais une page d'editeur). */
-  async function garder(cle: Request, reponse: Response, corps: ReadableStream<Uint8Array>): Promise<void> {
+  async function garder(cle: Request, reponse: Response, corps: ReadableStream<Uint8Array>, dernier: Request | null): Promise<void> {
     const texte = await new Response(corps).text();
     if (porteLEdition(texte)) return;
     const entetes = new Headers(reponse.headers);
+    entetes.delete("Server-Timing");
     entetes.set(DATE_GARDEE, String(Date.now()));
     entetes.set(CONTROLE_D_ORIGINE, reponse.headers.get("Cache-Control") ?? "");
     entetes.set("Cache-Control", `public, max-age=${r.conservation}`);
     await cacheParDefaut().put(cle, new Response(texte, { status: 200, headers: entetes }));
+    if (dernier) await cacheParDefaut().put(dernier, new Response(texte, { status: 200, headers: entetes }));
   }
 
   /** Demande la page au moteur et la garde si elle peut l'etre ; rend la reponse du moteur. */
@@ -214,7 +250,9 @@ export function creerFrontal(options: OptionsDuFrontal = {}) {
     const recent = maintenant - v.derniere < fenetre || maintenant - changementVu < fenetre;
     if (request.method !== "GET" || recent || !peutEtreGardee(reponse) || !reponse.body) return marquee(reponse, "NON-GARDEE");
     const [visiteur, copie] = reponse.body.tee();
-    ctx.waitUntil(garder(cle, reponse, copie).catch(() => undefined));
+    const url = new URL(request.url);
+    const dernier = r.plansGardes.test(url.pathname) ? cleDuDernierPlan(url) : null;
+    ctx.waitUntil(garder(cle, reponse, copie, dernier).catch(() => undefined));
     return marquee(new Response(visiteur, { status: reponse.status, statusText: reponse.statusText, headers: reponse.headers }), "MISS");
   }
 
@@ -289,8 +327,39 @@ export function creerFrontal(options: OptionsDuFrontal = {}) {
     return new Response(tete ? null : PAGE_DE_SECOURS, { status: 503, headers: entetesDeLAttente("text/html; charset=utf-8") });
   }
 
+  /** L'etape 5 : la copie gardee sous la version du contenu, fraiche, perimee ou absente. */
+  async function parLeCache(request: Request, env: EnvDuFrontal, ctx: Contexte, url: URL, fraicheur: number): Promise<Response> {
+    const maintenant = Date.now();
+    const v = await version(env, maintenant);
+    if (!v) return marquee(await env.MOTEUR.fetch(request), "SANS-VERSION");
+    const cle = cleDuCache(url, v.cle);
+    const tete = request.method === "HEAD";
+    const copie = await cacheParDefaut().match(cle);
+    // Un plan sans copie de cette version : le dernier plan connu part tout
+    // de suite, et le moteur calcule le nouveau en arriere-plan. Le robot ne
+    // paie jamais le calcul ; la copie de la version d'avant ne sert que
+    // jusqu'a ce que la nouvelle soit gardee (x-aloha-cache PLAN-PRECEDENT).
+    const secours = copie ?? (r.plansGardes.test(url.pathname) ? await cacheParDefaut().match(cleDuDernierPlan(url)) : undefined);
+    if (secours) {
+      const gardeeLe = Number(secours.headers.get(DATE_GARDEE) ?? 0);
+      if (copie && etatDeLaCopie(gardeeLe, maintenant, fraicheur) === "fraiche") return servie(copie, "HIT", tete);
+      if (!enCours.has(cle.url)) {
+        enCours.add(cle.url);
+        // La regeneration demande la page entiere : sans en-tete conditionnel, le moteur ne repond pas 304.
+        const entetes = new Headers(request.headers);
+        entetes.delete("If-None-Match");
+        entetes.delete("If-Modified-Since");
+        const neuve = new Request(request.url, { method: "GET", headers: entetes });
+        ctx.waitUntil(rendre(neuve, env, ctx, cle, v, maintenant).then((rep) => rep.body?.cancel()).catch(() => undefined).finally(() => enCours.delete(cle.url)));
+      }
+      return servie(secours, copie ? "STALE" : "PLAN-PRECEDENT", tete);
+    }
+    return rendre(request, env, ctx, cle, v, maintenant);
+  }
+
   return {
     async fetch(request: Request, env: EnvDuFrontal, ctx: Contexte): Promise<Response> {
+      if (estUnPlanGarde(request, r.plansGardes)) return parLeCache(request, env, ctx, new URL(request.url), r.fraicheurDesPlans);
       if (passeAuMoteur(request, r.versLeMoteur)) return marquee(await env.MOTEUR.fetch(request), "MOTEUR");
       const regle = r.avantLeCache ? await r.avantLeCache(request) : null;
       if (regle) return marquee(regle, "REGLE");
@@ -306,27 +375,7 @@ export function creerFrontal(options: OptionsDuFrontal = {}) {
         await fichier.body?.cancel();
       }
       if (estPrivee(request)) return marquee(await env.MOTEUR.fetch(request), "PRIVEE");
-      const maintenant = Date.now();
-      const v = await version(env, maintenant);
-      if (!v) return marquee(await env.MOTEUR.fetch(request), "SANS-VERSION");
-      const cle = cleDuCache(url, v.cle);
-      const tete = request.method === "HEAD";
-      const copie = await cacheParDefaut().match(cle);
-      if (copie) {
-        const gardeeLe = Number(copie.headers.get(DATE_GARDEE) ?? 0);
-        if (etatDeLaCopie(gardeeLe, maintenant, r.fraicheur) === "fraiche") return servie(copie, "HIT", tete);
-        if (!enCours.has(cle.url)) {
-          enCours.add(cle.url);
-          // La regeneration demande la page entiere : sans en-tete conditionnel, le moteur ne repond pas 304.
-          const entetes = new Headers(request.headers);
-          entetes.delete("If-None-Match");
-          entetes.delete("If-Modified-Since");
-          const neuve = new Request(request.url, { method: "GET", headers: entetes });
-          ctx.waitUntil(rendre(neuve, env, ctx, cle, v, maintenant).then((rep) => rep.body?.cancel()).catch(() => undefined).finally(() => enCours.delete(cle.url)));
-        }
-        return servie(copie, "STALE", tete);
-      }
-      return rendre(request, env, ctx, cle, v, maintenant);
+      return parLeCache(request, env, ctx, url, r.fraicheur);
     },
   };
 }

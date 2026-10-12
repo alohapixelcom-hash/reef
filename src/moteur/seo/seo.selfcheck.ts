@@ -1,5 +1,6 @@
 // src/moteur/seo/seo.selfcheck.ts - verifie le moteur SEO : union des trois sources, noindex et redirections retires, XML echappe, hreflang et x-default, anciens plans en 301, robots.txt et llms.txt, manifeste du build, sur une vraie base SQLite.
 // Lancer : node src/moteur/seo/seo.selfcheck.ts (Node 22.18 ou plus)
+import type { APIContext } from "astro";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -13,7 +14,7 @@ import { avecLePlan, enregistrer, lireLeFichier, revenirAuDefaut, TexteRefuse, v
 import { ADRESSES_DU_SEO } from "./identite.mjs";
 import { lireLaPage, lireLeBuild, sourcesDesRedirections } from "./integration.mjs";
 import { assembler, devinerLesLangues, entreesDepuisXml, estUnAncienPlan, motifDeRedirection, redirections, versW3C, xmlDeLIndex, xmlDuPlan } from "./plan.ts";
-import { calculerLePlan, type Manifeste } from "./route.ts";
+import { calculerLePlan, type Manifeste, planVivant } from "./route.ts";
 
 let n = 0;
 const is = (a: unknown, b: unknown, m: string) => {
@@ -81,9 +82,11 @@ for (const ancien of ["/sitemap.xml", "/sitemap-0.xml", "/sitemap-12.xml", "/sit
 ok(!estUnAncienPlan("/sitemap-index.xml") && !estUnAncienPlan("/sitemap-moteur.xml"), "l'index et le plan vivant ne sont pas d'anciens noms");
 {
   const index = await aiguillerLeSeo(new Request(`${O}/sitemap-index.xml`), { base: null });
-  ok(index?.status === 200 && index.headers.get("content-type") === "application/xml; charset=utf-8" && index.headers.get("cache-control") === "no-store", "l'index part en XML, no-store");
+  ok(index?.status === 200 && index.headers.get("content-type") === "application/xml; charset=utf-8" && index.headers.get("cache-control") === "public, max-age=300", "l'index part en XML, garde cinq minutes");
   is(await aiguillerLeSeo(new Request(`${O}/sitemap-moteur.xml`), { base: null }), null, "le plan vivant passe a Astro");
-  const transmis = await aiguillerLeSeo(new Request(`${O}/sitemap-moteur.xml`), { base: null, moteur: { fetch: async () => new Response("plan") } });
+  const transmis = await aiguillerLeSeo(new Request(`${O}/sitemap-moteur.xml`), { base: null, moteur: { fetch: async () => new Response("plan", { headers: { "Server-Timing": "db.count;dur=16", "Cache-Control": "public, max-age=300" } }) } });
+  is(transmis?.headers.get("server-timing") ?? null, null, "le plan relaye sort sans Server-Timing");
+  is(transmis?.headers.get("cache-control"), "public, max-age=300", "le plan relaye garde ses autres en-tetes");
   is(await transmis?.text(), "plan", "sans Astro, le plan vivant est demande au Worker du moteur");
   is(await aiguillerLeSeo(new Request(`${O}/contact/`), { base: null }), null, "une page n'est pas l'affaire du SEO");
   is(await aiguillerLeSeo(new Request(`${O}/robots.txt`, { method: "POST" }), { base: null }), null, "seuls GET et HEAD");
@@ -281,6 +284,29 @@ if (existsSync(script)) {
   const juste = await lancer(`${o}/sitemap-moteur.xml`, "--limite", "3");
   is(juste.code, 0, `un plan juste sort en code 0 :\n${juste.sortie}`);
   serveur.close();
+}
+
+/* --- La route du plan : en-tetes d'un plan gardable, sources lues ensemble -- */
+{
+  let enCours = 0;
+  let auPlus = 0;
+  const lent = async <T>(valeur: T): Promise<T> => {
+    enCours++;
+    auPlus = Math.max(auPlus, enCours);
+    await new Promise((fin) => setTimeout(fin, 20));
+    enCours--;
+    return valeur;
+  };
+  const route = planVivant({ manifeste: () => lent({ construit: "x", pages: [{ chemin: "/" }], aLaDemande: [], redirections: [], ecartees: [] }), aLaDemande: () => lent(["/contact/"]) });
+  const r = (await route({ site: new URL(O), url: new URL(`${O}/sitemap-moteur.xml`), locals: {} } as unknown as APIContext)) as Response;
+  is(r.status, 200, "la route du plan repond 200");
+  is(r.headers.get("cache-control"), "public, max-age=300", "le plan se garde cinq minutes, plus de no-store");
+  ok((await r.text()).includes(`<loc>${O}/contact/</loc>`), "le plan porte les adresses du site");
+  is(auPlus, 2, "le manifeste et les adresses du site sont lus en meme temps");
+  const enPanne = planVivant({ manifeste: async () => null, aLaDemande: async () => { throw new Error("base"); } });
+  const r503 = (await enPanne({ site: new URL(O), url: new URL(`${O}/sitemap-moteur.xml`), locals: {} } as unknown as APIContext)) as Response;
+  is(r503.status, 503, "un plan incomplet ne part pas");
+  is(r503.headers.get("cache-control"), "no-store", "un plan indisponible ne se garde nulle part");
 }
 
 console.log(`seo.selfcheck : ${n} verifications passees`);

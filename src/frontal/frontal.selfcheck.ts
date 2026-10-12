@@ -11,6 +11,8 @@ import {
   peutEtreFigee,
   peutEtreGardee,
   porteLEdition,
+  REGLAGES,
+  estUnPlanGarde,
 } from "./cache.ts";
 import { collectionsDuSchema, lireLaVersion, plusRecente, requeteDeLaVersion, tablesDuSchema } from "./version.ts";
 import { adresseDeLAttente, estFerme, lireLaMaintenance, OPTION_DE_MAINTENANCE } from "./maintenance.ts";
@@ -274,4 +276,67 @@ assert.equal(rep.status, 503);
 assert.ok((await rep.text()).includes("Site en maintenance"), "la page de secours quand le moteur ne rend rien");
 await Promise.all(attentes.splice(0));
 
-console.log("frontal.selfcheck : parcours MISS, HIT, PRIVEE, REGLE, publication, STALE, fenetre sans copie, pages figees, maintenance : tout passe.");
+// 9. Le plan du site : garde par le cache meme quand le site l'envoie au moteur, jamais pour une session, purge par une publication ; Server-Timing ne sort jamais.
+assert.equal(estUnPlanGarde(req("/sitemap-moteur.xml"), REGLAGES.plansGardes), true);
+assert.equal(estUnPlanGarde(req("/sitemap-moteur.xml", { method: "POST" }), REGLAGES.plansGardes), false);
+assert.equal(estUnPlanGarde(req("/sitemap-moteur.xml", { headers: { Cookie: "astro-session=x" } }), REGLAGES.plansGardes), false);
+assert.equal(estUnPlanGarde(req("/sitemap-index.xml"), REGLAGES.plansGardes), false);
+assert.equal(REGLAGES.fraicheurDesPlans, 300);
+interrupteur.valeur = null;
+vieux.publie = "4.2020-01-04T00:00:00.000Z.4.";
+let calculs = 0;
+const moteurDuPlan = {
+  fetch: async (r: Request) => {
+    const chemin = new URL(r.url).pathname;
+    if (chemin !== "/sitemap-moteur.xml") return html("<p>page</p>", { "Server-Timing": 'db.count;dur=12;desc="Query count"' });
+    calculs += 1;
+    return new Response(`<urlset>${calculs}</urlset>`, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=300", "Server-Timing": 'db.total;dur=3312;desc="DB total"' } });
+  },
+};
+const envPlan = { MOTEUR: moteurDuPlan, DB: base(vieux) };
+const avecPlan = creerFrontal({ memoireDeLaVersion: 0, versLeMoteur: /^\/(?:sitemap[^/]*\.xml|robots\.txt|llms\.txt)$/ });
+const passePlan = async (r: Request) => {
+  const reponse = await avecPlan.fetch(r, envPlan, ctx);
+  await Promise.all(attentes.splice(0));
+  return reponse;
+};
+rep = await passePlan(req("/sitemap-moteur.xml"));
+assert.equal(rep.headers.get("x-aloha-cache"), "MISS", "le plan passe par le cache malgre versLeMoteur");
+assert.equal(rep.headers.get("Server-Timing"), null, "Server-Timing ne sort pas du moteur");
+rep = await passePlan(req("/sitemap-moteur.xml"));
+assert.equal(rep.headers.get("x-aloha-cache"), "HIT");
+assert.equal(await rep.text(), "<urlset>1</urlset>");
+assert.equal(rep.headers.get("Cache-Control"), "public, max-age=300", "le visiteur recoit la garde du plan");
+assert.equal(rep.headers.get("Server-Timing"), null, "Server-Timing n'est pas garde");
+assert.equal(calculs, 1, "un seul calcul pour deux lectures");
+rep = await passePlan(req("/sitemap-moteur.xml", { headers: { Cookie: "astro-session=x" } }));
+assert.equal(rep.headers.get("x-aloha-cache"), "MOTEUR", "une session passe au moteur, sans cache");
+assert.equal((await passePlan(req("/robots.txt"))).headers.get("x-aloha-cache"), "MOTEUR", "robots.txt reste au moteur");
+assert.equal((await passePlan(req("/une-page/"))).headers.get("Server-Timing"), null, "aucune page ne porte Server-Timing");
+for (const [cle, copie] of magasin) {
+  if (!cle.endsWith("/sitemap-moteur.xml")) continue;
+  const h = new Headers(copie.headers);
+  h.set("x-aloha-garde-le", String(Date.now() - 120_000));
+  magasin.set(cle, new Response(await copie.clone().text(), { headers: h }));
+}
+assert.equal((await passePlan(req("/sitemap-moteur.xml"))).headers.get("x-aloha-cache"), "HIT", "un plan de deux minutes est encore frais");
+vieux.publie = "5.2020-01-05T00:00:00.000Z.5.";
+rep = await passePlan(req("/sitemap-moteur.xml"));
+assert.equal(rep.headers.get("x-aloha-cache"), "PLAN-PRECEDENT", "une publication change la cle : le dernier plan part, le nouveau se calcule");
+assert.equal(await rep.text(), "<urlset>1</urlset>");
+assert.equal(calculs, 3, "le nouveau plan est calcule en arriere-plan (le deuxieme calcul etait celui de la session)");
+// Un autre isolat, sans changement vu : le plan neuf est garde, puis servi.
+const autrePlan = creerFrontal({ memoireDeLaVersion: 0 });
+const passeAutrePlan = async (r: Request) => {
+  const reponse = await autrePlan.fetch(r, envPlan, ctx);
+  await Promise.all(attentes.splice(0));
+  return reponse;
+};
+assert.equal((await passeAutrePlan(req("/sitemap-moteur.xml"))).headers.get("x-aloha-cache"), "PLAN-PRECEDENT");
+rep = await passeAutrePlan(req("/sitemap-moteur.xml"));
+assert.equal(rep.headers.get("x-aloha-cache"), "HIT", "le plan de la nouvelle version est garde");
+assert.equal(await rep.text(), "<urlset>4</urlset>", "jamais le plan d'avant une fois le nouveau garde");
+magasin.clear();
+assert.equal((await passeAutrePlan(req("/sitemap-moteur.xml"))).headers.get("x-aloha-cache"), "MISS", "sans aucune copie, le plan est calcule devant le robot");
+
+console.log("frontal.selfcheck : parcours MISS, HIT, PRIVEE, REGLE, publication, STALE, fenetre sans copie, pages figees, maintenance, plan garde : tout passe.");
