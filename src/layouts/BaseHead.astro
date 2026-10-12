@@ -28,6 +28,7 @@ import policeTexte from "@fontsource-variable/instrument-sans/files/instrument-s
 import siteSettings from "@config/siteSettings.json";
 import { defaultLocale, fmt, getAlternates, getLocale, localeMeta, localizePath, useTranslations } from "@i18n";
 import { pageTitle } from "@js/pageTitle";
+import { type ChoixDuDesign, feuilleDuDesign } from "@moteur/design/echelles";
 import { feuilleDeLaPalette } from "@moteur/palette";
 import { identiteDuSite, VARIABLES_DE_POLICE, variablesDeLaPalette } from "@moteur/theme";
 import { feuilleDeLaTypographie, policesDuTheme } from "@moteur/typographie";
@@ -62,6 +63,9 @@ const palette = feuilleDeLaPalette(Astro.locals.cadre?.site?.brand_color, variab
 // pose : les polices du theme et leurs prechargements, comme avant.
 const choixDePolice = (Astro.locals.cadre?.site as { font?: unknown } | undefined)?.font;
 const typographie = feuilleDeLaTypographie(choixDePolice, VARIABLES_DE_POLICE);
+// Les tailles des titres, du texte et les coins choisis dans la page Design
+// (extension design) : vide ou Standard, aucune balise, le rendu du theme.
+const design = feuilleDuDesign(Astro.locals.cadre?.site as ChoixDuDesign | undefined);
 const prechargerLesPolices = policesDuTheme(choixDePolice);
 
 const {
@@ -250,6 +254,7 @@ const groundLight = resolveToken("color-background", lightBlock);
 
 {siteSettings.useViewTransitions && <ClientRouter />}
 {/* La couleur de marque choisie dans le back office (entree "site") : les rampes de tokens.css, recalculees. Absente, aucune balise. */}
-{palette && <style is:inline set:html={palette} />}
+{palette && <style is:inline data-aloha-design set:html={palette} />}
 {/* La police choisie dans le back office (entree "site") : les jetons de police de tokens.css, repeints. Absente, aucune balise. */}
-{typographie && <style is:inline set:html={typographie} />}
+{typographie && <style is:inline data-aloha-design set:html={typographie} />}
+{design && <style is:inline data-aloha-design set:html={design} />}

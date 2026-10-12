@@ -129,7 +129,12 @@
         {"slug":"form_contact","label":"Adresse d'un service externe qui reçoit les messages de la page Contact, quand l'écran Courriels n'est pas branché (sans l'un ni l'autre, le formulaire n'envoie rien)","type":"string"},
         {"slug":"brand_color","label":"Couleur de la marque, sur tout le site (« Couleur d'origine du thème » ou vide : le corail du thème)","type":"select","translatable":false,"validation":{"options":["Couleur d'origine du thème","Bleu océan","Bleu nuit","Vert émeraude","Rouge framboise","Orange soleil"]}},
         {"slug":"font","label":"Police du site, pour les titres et le texte (« Police d'origine du thème » ou vide : celle du thème ; les autres sont déjà installées sur chaque appareil, rien à télécharger)","type":"select","translatable":false,"validation":{"options":["Police d'origine du thème","Police du système, la plus légère","Classique, à empattements","Titres classiques, texte sans empattements"]}},
-        {"slug":"logo_dark","label":"Logo pour le mode sombre (vide : le logo des Paramètres sert aussi sur fond sombre)","type":"image","translatable":false}
+        {"slug":"logo_dark","label":"Logo pour le mode sombre (vide : le logo des Paramètres sert aussi sur fond sombre)","type":"image","translatable":false},
+        {"slug":"h1_size","label":"Taille des grands titres (H1), réglée dans la page Design","type":"select","translatable":false,"validation":{"options":["Standard","Compacte","Généreuse"]}},
+        {"slug":"h2_size","label":"Taille des titres de section (H2), réglée dans la page Design","type":"select","translatable":false,"validation":{"options":["Standard","Compacte","Généreuse"]}},
+        {"slug":"h3_size","label":"Taille des petits titres (H3), réglée dans la page Design","type":"select","translatable":false,"validation":{"options":["Standard","Compacte","Généreuse"]}},
+        {"slug":"text_size","label":"Taille du texte, réglée dans la page Design","type":"select","translatable":false,"validation":{"options":["Standard","Compacte","Généreuse"]}},
+        {"slug":"radius","label":"Rayon des coins, réglé dans la page Design","type":"select","translatable":false,"validation":{"options":["Rayon d'origine du thème","Net","Doux","Arrondi"]}}
       ]
     }
   ],

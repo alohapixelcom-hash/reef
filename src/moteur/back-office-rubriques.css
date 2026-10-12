@@ -1,0 +1,143 @@
+/* src/moteur/back-office-rubriques.css - les rubriques du rail du back office (Boutique, Contenu, Apparence, Courriels, Reglages), ses icones propres, et ce qui n'a rien a faire sous les yeux d'un client (generique, socle 2.0.0).
+ *
+ * POSEE APRES back-office-rail.css, par habillage.ts lui-meme (aucun fichier
+ * de site a toucher) : la feuille du rail range les entrees en une seule
+ * colonne ; celle-ci y ajoute les intitules de rubrique, comme la barre
+ * laterale d'une application bien rangee (recommandations d'Apple, relues
+ * dans claude/40-APPLE-DESIGN.md : des groupes nommes court, deux niveaux au
+ * plus, des icones qui disent chacune une chose).
+ *
+ * LES INTITULES SANS SCRIPT. Les groupes et les listes d'EmDash sont en
+ * `display: contents` : leurs pseudo-elements ::before et ::after restent des
+ * boites, enfants de la colonne du rail, et prennent leur rang par `order`
+ * comme les entrees. Trois groupes existent sur tout site (accueil, Contenu,
+ * Gerer) : six intitules possibles, cinq servis. Une rubrique sans aucune
+ * entree sur ce site (pas de boutique, pas de courriels) n'a pas d'intitule.
+ * Rail replie (icones seules) : aucun intitule. */
+
+[data-sidebar="content"] [data-sidebar="group"]:nth-of-type(-n + 3)::before,
+[data-sidebar="content"] [data-sidebar="group"]:nth-of-type(-n + 3)::after {
+  display: block;
+  margin: 0;
+  padding: 1.125rem 0.75rem 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  color: var(--text-color-kumo-subtle, currentColor);
+  pointer-events: none;
+}
+/* Rubrique Boutique, au rang 21 (sous Messages) */
+[data-sidebar="content"] [data-sidebar="group"]:nth-of-type(1)::before {
+  order: 21;
+  content: "Boutique";
+}
+/* Rubrique Contenu, au rang 59 */
+[data-sidebar="content"] [data-sidebar="group"]:nth-of-type(1)::after {
+  order: 59;
+  content: "Contenu";
+}
+/* Rubrique Apparence, au rang 83 */
+[data-sidebar="content"] [data-sidebar="group"]:nth-of-type(2)::before {
+  order: 83;
+  content: "Apparence";
+}
+/* Rubrique Courriels, au rang 99 */
+[data-sidebar="content"] [data-sidebar="group"]:nth-of-type(2)::after {
+  order: 99;
+  content: "Courriels";
+}
+/* Rubrique Reglages, au rang 119 */
+[data-sidebar="content"] [data-sidebar="group"]:nth-of-type(3)::before {
+  order: 119;
+  content: "Réglages";
+}
+html:not([lang^="fr"]) [data-sidebar="content"] [data-sidebar="group"]:nth-of-type(1)::before {
+  content: "Shop";
+}
+html:not([lang^="fr"]) [data-sidebar="content"] [data-sidebar="group"]:nth-of-type(1)::after {
+  content: "Content";
+}
+html:not([lang^="fr"]) [data-sidebar="content"] [data-sidebar="group"]:nth-of-type(2)::before {
+  content: "Appearance";
+}
+html:not([lang^="fr"]) [data-sidebar="content"] [data-sidebar="group"]:nth-of-type(2)::after {
+  content: "Email";
+}
+html:not([lang^="fr"]) [data-sidebar="content"] [data-sidebar="group"]:nth-of-type(3)::before {
+  content: "Settings";
+}
+/* Le sixieme pseudo-element ne sert pas. */
+[data-sidebar="content"] [data-sidebar="group"]:nth-of-type(3)::after {
+  display: none;
+}
+/* Pas de boutique sur ce site : pas de rubrique Boutique. */
+[data-sidebar="content"]:not(:has(a[href^="/_emdash/admin/plugins/aloha-commerce"], a[href="/_emdash/admin/content/products"], a[href^="/_emdash/admin/plugins/aloha-stock"])) [data-sidebar="group"]:nth-of-type(1)::before,
+/* Pas de courriels : pas de rubrique Courriels. */
+[data-sidebar="content"]:not(:has(a[href^="/_emdash/admin/plugins/aloha-courriels"], a[href="/_emdash/admin/plugins/aloha-gestion/abonnes"], a[href="/_emdash/admin/plugins/aloha-gestion/journal"])) [data-sidebar="group"]:nth-of-type(2)::after,
+/* Rail replie : les icones seules. */
+[data-state="collapsed"] [data-sidebar="content"] [data-sidebar="group"]::before,
+[data-state="collapsed"] [data-sidebar="content"] [data-sidebar="group"]::after {
+  display: none;
+}
+
+/* CE QUI N'EST PAS POUR UN CLIENT. Les types de contenu (le schema de la
+ * base) et le gestionnaire d'extensions sont des ecrans de construction :
+ * ils quittent le rail, ils restent joignables par leur adresse. */
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content-types"], > a[href="/_emdash/admin/plugins-manager"], > a[href="/_emdash/admin/plugins/marketplace"], > a[href="/_emdash/admin/themes/marketplace"]) {
+  display: none !important;
+}
+
+/* JAMAIS DEUX FOIS LA MEME ENTREE. Une taxonomie declaree dans chaque langue
+ * (Tags et Etiquettes) sort deux fois dans le rail d'EmDash 0.38, au meme
+ * lien : la seconde est cachee. */
+[data-sidebar="menu-item"]:has(> a[href^="/_emdash/admin/taxonomies/tag"]) ~ [data-sidebar="menu-item"]:has(> a[href^="/_emdash/admin/taxonomies/tag"]),
+[data-sidebar="menu-item"]:has(> a[href^="/_emdash/admin/taxonomies/category"]) ~ [data-sidebar="menu-item"]:has(> a[href^="/_emdash/admin/taxonomies/category"]) {
+  display: none !important;
+}
+
+/* DES ICONES QUI DISENT CHACUNE UNE CHOSE. EmDash donne la meme icone de
+ * fichiers a toute collection : Produits, Rayons, Textes des pages et
+ * Reglages par langue se ressemblaient, comme Sujets et Auteurs. Ceux-la, et le Stock qui
+ * partageait le carton de Colissimo, recoivent un dessin de la maison, au
+ * trait, dans la couleur et l'opacite de l'icone d'origine (masque CSS). */
+[data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/products"], > a[href="/_emdash/admin/content/rayons"], > a[href="/_emdash/admin/content/sections"], > a[href="/_emdash/admin/content/site"], > a[href="/_emdash/admin/plugins/aloha-stock"], > a[href="/_emdash/admin/plugins/aloha-stock/"], > a[href="/_emdash/admin/content/sujets"], > a[href="/_emdash/admin/content/topics"], > a[href="/_emdash/admin/content/rubriques"], > a[href="/_emdash/admin/content/auteurs"], > a[href="/_emdash/admin/content/authors"]) > a svg {
+  display: none;
+}
+[data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/products"], > a[href="/_emdash/admin/content/rayons"], > a[href="/_emdash/admin/content/sections"], > a[href="/_emdash/admin/content/site"], > a[href="/_emdash/admin/plugins/aloha-stock"], > a[href="/_emdash/admin/plugins/aloha-stock/"], > a[href="/_emdash/admin/content/sujets"], > a[href="/_emdash/admin/content/topics"], > a[href="/_emdash/admin/content/rubriques"], > a[href="/_emdash/admin/content/auteurs"], > a[href="/_emdash/admin/content/authors"]) > a > div::before {
+  content: "";
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  background: currentColor;
+  opacity: 0.4;
+  -webkit-mask: var(--aloha-icone) center / contain no-repeat;
+  mask: var(--aloha-icone) center / contain no-repeat;
+}
+/* Produits : un sac */
+[data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/products"]) {
+  --aloha-icone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2'/%3E%3C/svg%3E");
+}
+/* Rayons : des etageres */
+[data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/rayons"]) {
+  --aloha-icone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4v16M20 4v16M4 9h16M4 15h16M8 6v3M12 12v3M15 17v3'/%3E%3C/svg%3E");
+}
+/* Textes des pages : des lignes de texte dans un cadre */
+[data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/sections"]) {
+  --aloha-icone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h16v16H4zM8 9h8M8 13h8M8 17h5'/%3E%3C/svg%3E");
+}
+/* Reglages par langue : un globe */
+[data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/site"]) {
+  --aloha-icone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z'/%3E%3C/svg%3E");
+}
+/* Stock : des cartons empiles */
+[data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-stock"], > a[href="/_emdash/admin/plugins/aloha-stock/"]) {
+  --aloha-icone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 13h7v7H4zM13 13h7v7h-7zM8.5 4h7v7h-7z'/%3E%3C/svg%3E");
+}
+
+[data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/sujets"], > a[href="/_emdash/admin/content/topics"], > a[href="/_emdash/admin/content/rubriques"]) {
+  --aloha-icone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2.5h8.5A1.5 1.5 0 0 1 21 9v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z'/%3E%3C/svg%3E");
+}
+[data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/auteurs"], > a[href="/_emdash/admin/content/authors"]) {
+  --aloha-icone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7'/%3E%3C/svg%3E");
+}

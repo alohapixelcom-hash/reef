@@ -20,6 +20,7 @@
 @source not "../moteur/accueil";
 @source not "../moteur/seo";
 @source not "../moteur/medias";
+@source not "../moteur/design";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

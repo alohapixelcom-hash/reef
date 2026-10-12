@@ -94,58 +94,56 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
   color: #f3d77e;
 }
 
-/* LE RAIL RANGE PAR IMPORTANCE, le meme sur tous les sites (regle de la maison
- * du 5 octobre 2026, REGLES-DE-LA-MAISON section 6 : "Messages tout en bas
- * alors que c'est important, c'est n'importe quoi").
+/* LE RAIL RANGE PAR USAGE, le meme sur tous les sites (regles de la maison du
+ * 5 et du 11 octobre 2026, redite le 12 octobre pour la 2.0.0 : "Tableau de
+ * bord, Messages, Commandes, Clients, Livraison, Produits, Articles de blog,
+ * Pages, Mediatheque, puis Design, SEO, Reglages, et le reste").
  *
  * POURQUOI ICI. EmDash 0.38 range ses entrees en cinq groupes figes (accueil,
  * Contenu, Gerer, Administration, Extensions) et pose les pages des
- * extensions dans le dernier : Messages finissait sous les Parametres, et
- * l'ordre des extensions suivait leur declaration dans moteur.config.mjs,
- * different d'un site a l'autre. Aucun poids ne se declare pour une page
- * d'extension (Sidebar.tsx du paquet @emdash-cms/admin). Cette feuille entre
- * dans le back office de chaque site par habillage.site.ts : l'ordre se pose
- * une fois, dans le socle, et descend partout par sync.
+ * extensions dans le dernier, dans l'ordre de leur declaration. Aucun poids
+ * ne se declare pour une page d'extension (Sidebar.tsx du paquet
+ * @emdash-cms/admin). Cette feuille entre dans le back office de chaque site
+ * par habillage.site.ts : l'ordre se pose une fois, dans le socle.
  *
  * COMMENT. `order` ne joue qu'entre enfants d'un meme conteneur flexible : les
  * groupes et leurs listes passent en `display: contents`, toutes les entrees
  * deviennent les enfants de la seule colonne du rail, et chaque rang vaut
- * pour tout le rail. Les intitules des groupes ne disent plus rien une fois
- * les entrees melangees : ils sont caches. Rien n'est deplace dans la page
- * (React garde son arbre, aucun script ne court apres le rail) ; un ecran que
- * le site n'a pas n'a pas de lien, sa regle ne trouve rien et il est saute.
+ * pour tout le rail. Les intitules d'EmDash sont caches ; les rubriques de la
+ * maison (Boutique, Contenu, Apparence, Courriels, Reglages) sont posees par
+ * back-office-rubriques.css, a leur rang. Rien n'est deplace dans la page ;
+ * un ecran que le site n'a pas n'a pas de lien, sa regle ne trouve rien.
  *
  *   10       Tableau de bord
  *   20       Messages, juste dessous sur tous les sites, boutique comprise
- *            (regle redite le 11 octobre 2026 : "Messages va en
- *            haut du rail, tout comme Tableau de bord va en premier")
- *   25-26    Ventes (tableau de bord de la boutique) et Statistiques
- *   30       Commandes
- *   40       Clients
- *   45       Livraison (modes, prix au poids, tarifs Colissimo)
+ *   21       (rubrique Boutique)
+ *   30-45    Commandes, Clients, Livraison
  *   50-53    Produits, Rayons, Stock, Factures
- *   60-63    Articles de blog, categories, etiquettes, auteurs
- *   70-72    Pages, Textes des pages, puis toute autre collection du site
- *   80-81    Medias, puis la page de l'extension aloha-medias si elle en a une
- *   90-92    Codes promo, Cartes cadeaux, Fidelite
+ *   54-56    Codes promo, Cartes cadeaux, Fidelite
+ *   57-58    Ventes (tableau de bord de la boutique), Statistiques
+ *   59       (rubrique Contenu)
+ *   60-63    Articles de blog, categories (taxonomie ou collection), etiquettes, auteurs
+ *   65       toute autre collection du site (projets, offres, references...)
+ *   70-71    Pages, Textes des pages
+ *   80-81    Medias, puis la page de l'extension aloha-medias
+ *   83       (rubrique Apparence)
+ *   84-87    Design, Menus, SEO, Redirections
+ *   99       (rubrique Courriels)
  *   100-103  Courriels, Lettre d'information, Abonnes, Journal des courriels
- *   110-112  Menus, Redirections, SEO (robots.txt, llms.txt, plan du site)
- *   121-126  Colissimo (l'ecran de l'extension colissimo ou celui
- *            de la boutique, jamais les deux), Reglages de boutique, Stripe,
- *            branchement et reglages des courriels, Brevo
- *   129      une entree que cette liste ne connait pas encore : au-dessus de
- *            l'administration, en attendant son rang
- *   130-139  Reglages par langue, Parametres, Utilisateurs, Maintenance,
- *            journal de la boutique, Types de contenu, Extensions, et
- *            Mettre le site a jour tout en bas
+ *   119      (rubrique Reglages)
+ *   120-125  Reglages de boutique, Stripe, Colissimo, Brevo, branchement et
+ *            reglages des courriels
+ *   129      une entree que cette liste ne connait pas encore
+ *   130-134  Reglages par langue, Parametres, Utilisateurs, Maintenance,
+ *            historique de la boutique
+ *   135-136  Types de contenu et Extensions : caches au rail (ecrans
+ *            techniques, joignables par leur adresse)
+ *   139      Mettre le site a jour, tout en bas
  *
- * `!important` : le rang est celui de la maison. Plusieurs back-office.css de
- * site remontaient le groupe de la boutique avec des selecteurs plus precis ;
- * sans lui, ils l'emporteraient. Un site qui doit deroger le fait dans sa
- * feuille, avec `!important` lui aussi. Une nouvelle page d'extension prend
- * son rang ici le jour ou elle nait : rail.selfcheck.ts echoue sinon.
- * Sans ces crochets (une version d'EmDash qui change son rail), le rail garde
- * son ordre d'origine : rien ne disparait. */
+ * `!important` : le rang est celui de la maison, quelles que soient les
+ * feuilles de site. Une nouvelle page d'extension prend son rang ici le jour
+ * ou elle nait : rail.selfcheck.ts echoue sinon. Sans ces crochets (une
+ * version d'EmDash qui change son rail), le rail garde son ordre d'origine. */
 [data-sidebar="content"] [data-sidebar="group"],
 [data-sidebar="content"] [data-sidebar="menu"] {
   display: contents !important;
@@ -163,20 +161,11 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
   order: 129 !important;
 }
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href^="/_emdash/admin/content/"]) {
-  order: 72 !important;
+  order: 65 !important;
 }
 /* Tableau de bord */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/"], > a[href="/_emdash/admin"]) {
   order: 10 !important;
-}
-/* Tableau de bord de la boutique : sous Messages, un message attend une
- * reponse, un chiffre se consulte */
-[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce"], > a[href="/_emdash/admin/plugins/aloha-commerce/"]) {
-  order: 25 !important;
-}
-/* Statistiques de la boutique */
-[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce/statistiques"]) {
-  order: 26 !important;
 }
 /* Messages */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-gestion/messages"]) {
@@ -190,7 +179,7 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce/clients"]) {
   order: 40 !important;
 }
-/* Livraison : les modes, leurs prix au poids, la recopie des tarifs Colissimo, juste apres les commandes et les clients */
+/* Livraison : les modes, leurs prix au poids, la recopie des tarifs Colissimo */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce/livraison"]) {
   order: 45 !important;
 }
@@ -210,13 +199,32 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-stock/factures"]) {
   order: 53 !important;
 }
-/* Articles de blog : les six noms de collection que house.mjs reconnait
- * (COLLECTIONS_DU_BLOG), la meme entree quel que soit le nom choisi par le theme */
+/* Codes promo */
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce/codes"]) {
+  order: 54 !important;
+}
+/* Cartes cadeaux */
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce/cartes"]) {
+  order: 55 !important;
+}
+/* Fidelite */
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-fidelite"], > a[href="/_emdash/admin/plugins/aloha-fidelite/"]) {
+  order: 56 !important;
+}
+/* Ventes : le tableau de bord de la boutique */
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce"], > a[href="/_emdash/admin/plugins/aloha-commerce/"]) {
+  order: 57 !important;
+}
+/* Statistiques de la boutique */
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce/statistiques"]) {
+  order: 58 !important;
+}
+/* Articles de blog : les six noms de collection que house.mjs reconnait (COLLECTIONS_DU_BLOG) */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/posts"], > a[href="/_emdash/admin/content/blog"], > a[href="/_emdash/admin/content/articles"], > a[href="/_emdash/admin/content/billets"], > a[href="/_emdash/admin/content/carnet"], > a[href="/_emdash/admin/content/journal"]) {
   order: 60 !important;
 }
-/* Categories du blog */
-[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href^="/_emdash/admin/taxonomies/category"], > a[href="/_emdash/admin/content/rubriques"]) {
+/* Categories du blog : la taxonomie native, ou la collection qui en tient lieu (rubriques, sujets) */
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/rubriques"], > a[href="/_emdash/admin/content/sujets"], > a[href="/_emdash/admin/content/topics"], > a[href^="/_emdash/admin/taxonomies/category"]) {
   order: 61 !important;
 }
 /* Etiquettes du blog */
@@ -224,7 +232,7 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
   order: 62 !important;
 }
 /* Auteurs du blog */
-[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/auteurs"]) {
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/auteurs"], > a[href="/_emdash/admin/content/authors"]) {
   order: 63 !important;
 }
 /* Pages */
@@ -239,22 +247,25 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/media"]) {
   order: 80 !important;
 }
-/* La page de l'extension aloha-medias, si elle en a une : a cote de Medias,
- * c'est le meme geste (racine ou sous-page) */
+/* La page de l'extension aloha-medias, si elle en a une : a cote de Medias (racine ou sous-page) */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-medias"], > a[href^="/_emdash/admin/plugins/aloha-medias/"]) {
   order: 81 !important;
 }
-/* Codes promo */
-[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce/codes"]) {
-  order: 90 !important;
+/* Design : logo, couleur, police, tailles, coins */
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-design"], > a[href="/_emdash/admin/plugins/aloha-design/"]) {
+  order: 84 !important;
 }
-/* Cartes cadeaux */
-[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce/cartes"]) {
-  order: 91 !important;
+/* Menus */
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/menus"]) {
+  order: 85 !important;
 }
-/* Fidelite */
-[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-fidelite"], > a[href="/_emdash/admin/plugins/aloha-fidelite/"]) {
-  order: 92 !important;
+/* SEO : robots.txt, llms.txt, plan du site et audit */
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-seo"], > a[href="/_emdash/admin/plugins/aloha-seo/"]) {
+  order: 86 !important;
+}
+/* Redirections */
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/redirects"]) {
+  order: 87 !important;
 }
 /* Courriels */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-courriels"], > a[href="/_emdash/admin/plugins/aloha-courriels/"]) {
@@ -272,28 +283,20 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-gestion/journal"]) {
   order: 103 !important;
 }
-/* Menus */
-[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/menus"]) {
-  order: 110 !important;
-}
-/* Redirections */
-[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/redirects"]) {
-  order: 111 !important;
-}
-/* SEO : robots.txt, llms.txt et l'etat du plan du site, a cote des redirections qui en retirent des adresses */
-[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-seo"], > a[href="/_emdash/admin/plugins/aloha-seo/"]) {
-  order: 112 !important;
-}
-/* Colissimo : l'ecran de l'extension colissimo, ou celui de la boutique sur un site qui ne l'a pas */
-[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-colissimo"], > a[href="/_emdash/admin/plugins/aloha-colissimo/"], > a[href="/_emdash/admin/plugins/aloha-commerce/colissimo"]) {
-  order: 121 !important;
-}
 /* Reglages de boutique */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce/reglages"]) {
-  order: 122 !important;
+  order: 120 !important;
 }
 /* Stripe : paiements, factures, abonnements, clients, versements, et le branchement */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce/stripe"]) {
+  order: 121 !important;
+}
+/* Colissimo : l'ecran de l'extension colissimo, ou celui de la boutique sur un site qui ne l'a pas */
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-colissimo"], > a[href="/_emdash/admin/plugins/aloha-colissimo/"], > a[href="/_emdash/admin/plugins/aloha-commerce/colissimo"]) {
+  order: 122 !important;
+}
+/* Brevo : contacts, courriels, relances de panier, alertes de retour en stock */
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-brevo"], > a[href="/_emdash/admin/plugins/aloha-brevo/"]) {
   order: 123 !important;
 }
 /* Brancher les courriels */
@@ -303,10 +306,6 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
 /* Reglages des courriels */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-courriels/reglages"]) {
   order: 125 !important;
-}
-/* Brevo : contacts, courriels, relances de panier, alertes de retour en stock */
-[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-brevo"], > a[href="/_emdash/admin/plugins/aloha-brevo/"]) {
-  order: 126 !important;
 }
 /* Reglages par langue */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/site"]) {
@@ -324,7 +323,7 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-maintenance"], > a[href="/_emdash/admin/plugins/aloha-maintenance/"]) {
   order: 133 !important;
 }
-/* Journal des gestes de la boutique */
+/* Historique des gestes de la boutique */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce/journal"]) {
   order: 134 !important;
 }
@@ -332,7 +331,7 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content-types"]) {
   order: 135 !important;
 }
-/* Extensions */
+/* Extensions et catalogues */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins-manager"], > a[href="/_emdash/admin/plugins/marketplace"], > a[href="/_emdash/admin/themes/marketplace"]) {
   order: 136 !important;
 }

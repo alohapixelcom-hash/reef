@@ -1,0 +1,336 @@
+/* src/moteur/design/ecran.css - la mise en page de la page Design du back office (classes ds-*), posee par admin.tsx, et le retrait des reglages d'apparence de l'ecran "Reglages par langue".
+ *
+ * Meme regle que les ecrans de la SEO et de la gestion : surfaces, filets et
+ * encres sont les variables natives du back office (--color-kumo-*,
+ * --text-color-kumo-*), l'accent est sa marque (--color-kumo-brand), reglee
+ * par l'habillage du site. Aucune couleur de surface en dur : clair et sombre
+ * suivent le back office (blanc et noir, regle de la maison).
+ *
+ * Les reperes viennent des recommandations d'interface d'Apple, relus et
+ * ramenes a nos regles (claude/40-APPLE-DESIGN.md du projet) : cibles de
+ * 44 px, un seul bouton principal, la barre d'enregistrement en bas, des
+ * groupes nommes, le texte d'aide sous le controle.
+ */
+
+.ds-ecran-page {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 82rem;
+  padding-bottom: 7rem;
+  font-size: 0.875rem;
+  color: var(--text-color-kumo-default);
+}
+
+.ds-tete { display: grid; gap: 0.5rem; }
+
+.ds-titre {
+  margin: 0;
+  font-family: var(--aloha-police-titre, inherit);
+  font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.ds-chapeau,
+.ds-aide { margin: 0; max-width: 68ch; color: var(--text-color-kumo-subtle); }
+
+.ds-chapeau { font-size: 0.9375rem; line-height: 1.5; }
+
+.ds-aide { font-size: 0.8125rem; line-height: 1.45; }
+
+.ds-colonnes { display: grid; gap: 1.5rem; align-items: start; }
+
+@media (min-width: 72rem) {
+  .ds-colonnes {
+    grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
+  }
+}
+
+.ds-reglages { display: grid; gap: 1rem; min-width: 0; }
+
+.ds-carte {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 1rem;
+  background: var(--color-kumo-base);
+}
+
+.ds-petit-titre {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.ds-rangee {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ds-legende {
+  margin: 0;
+  padding: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.ds-masque {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Les segments : des boutons radio natifs, presentes cote a cote. */
+.ds-segments { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+
+.ds-segment { position: relative; flex: 1 1 auto; }
+
+.ds-segment input,
+.ds-pastille input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.ds-segment-texte {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.ds-segment input:checked + .ds-segment-texte { border-color: var(--color-kumo-brand); box-shadow: inset 0 0 0 1px var(--color-kumo-brand); font-weight: 650; }
+
+.ds-segment input:focus-visible + .ds-segment-texte,
+.ds-pastille input:focus-visible + .ds-rond { outline: 2px solid var(--color-kumo-brand); outline-offset: 2px; }
+
+.ds-exemple { font-size: 1.125rem; font-weight: 700; }
+
+.ds-coin {
+  width: 1.125rem;
+  height: 1.125rem;
+  border-top: 2px solid currentColor;
+  border-left: 2px solid currentColor;
+}
+
+/* Les pastilles de couleur : un rond plein et son nom, une cible de 44 px. */
+.ds-pastilles { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: 0.5rem; }
+
+.ds-pastille {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: 2.75rem;
+  font-size: 0.875rem;
+}
+
+.ds-rond {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12);
+}
+
+.ds-rond--origine {
+  background: conic-gradient(from 90deg, var(--color-kumo-brand) 0 50%, var(--color-kumo-line) 0 100%);
+}
+
+.ds-pastille input:checked + .ds-rond { box-shadow: 0 0 0 2px var(--color-kumo-base), 0 0 0 4px var(--color-kumo-brand); }
+
+.ds-pastille input:checked ~ .ds-pastille-nom { font-weight: 650; }
+
+/* Le logo : un carre clair ou sombre, quel que soit le mode du back office. */
+.ds-logo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ds-logo-fond {
+  display: grid;
+  place-items: center;
+  width: 9rem;
+  height: 4.5rem;
+  padding: 0.5rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 0.75rem;
+}
+
+.ds-logo-fond img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+.ds-logo-fond--clair { background: #ffffff; color: #3d3d3d; }
+
+.ds-logo-fond--sombre { background: #000000; color: #c7c7c7; }
+
+.ds-logo-gestes { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.ds-grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
+  gap: 0.5rem;
+  max-height: 18rem;
+  margin: 0;
+  padding: 0.25rem;
+  overflow: auto;
+  list-style: none;
+}
+
+.ds-vignette {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  padding: 0.375rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 0.625rem;
+  cursor: pointer;
+}
+
+.ds-vignette[aria-pressed="true"] { border-color: var(--color-kumo-brand); box-shadow: inset 0 0 0 1px var(--color-kumo-brand); }
+
+.ds-vignette img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+/* L'apercu : colle au haut de l'ecran sur un grand ecran, sous les reglages sur un petit. */
+.ds-apercu { display: grid; gap: 0.75rem; min-width: 0; }
+
+@media (min-width: 72rem) {
+  .ds-apercu {
+    position: sticky;
+    top: 1rem;
+  }
+}
+
+.ds-apercu-barre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.ds-apercu-barre .ds-petit-titre { margin-right: auto; }
+
+.ds-groupe {
+  display: inline-flex;
+  padding: 0.1875rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 999px;
+}
+
+.ds-bascule {
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.ds-bascule[aria-pressed="true"] { background: var(--color-kumo-brand); color: var(--text-color-kumo-inverse, #fff); font-weight: 600; }
+
+.ds-bascule:focus-visible,
+.ds-bouton:focus-visible,
+.ds-vignette:focus-visible { outline: 2px solid var(--color-kumo-brand); outline-offset: 2px; }
+
+.ds-ecran {
+  overflow: hidden;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 1rem;
+  background: var(--color-kumo-base);
+}
+
+.ds-cadre {
+  display: block;
+  width: 100%;
+  height: min(78vh, 52rem);
+  border: 0;
+}
+
+.ds-ecran--telephone {
+  justify-self: center;
+  width: 24.375rem;
+  max-width: 100%;
+  border-radius: 2rem;
+}
+
+.ds-ecran--telephone .ds-cadre { height: min(78vh, 52.75rem); }
+
+/* La barre d'enregistrement, collee en bas : un seul bouton principal. */
+.ds-barre {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: -5rem;
+  padding: 0.875rem 1rem calc(0.875rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--color-kumo-line);
+  background: var(--color-kumo-base);
+}
+
+.ds-statut { margin: 0 auto 0 0; font-size: 0.8125rem; color: var(--text-color-kumo-subtle); }
+
+.ds-statut--ok { color: var(--text-color-kumo-default); font-weight: 600; }
+
+.ds-statut--erreur,
+.ds-alerte { color: var(--text-color-kumo-danger, #b42318); font-weight: 600; }
+
+.ds-bouton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 1.25rem;
+  border: 1px solid var(--color-kumo-brand);
+  border-radius: 999px;
+  background: var(--color-kumo-brand);
+  color: var(--text-color-kumo-inverse, #fff);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ds-bouton--second { border-color: var(--color-kumo-line); background: transparent; color: inherit; }
+
+.ds-bouton:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* L'APPARENCE N'A QU'UN ECRAN. Dans "Reglages par langue", la couleur, la
+ * police, le logo sombre, les tailles et les rayons sont regles ici : leurs
+ * lignes y sont cachees. */
+:is(#field-logo_dark),
+div.grid:has(> :is(#field-logo_dark, label[for="field-logo_dark"])),
+div.grid:has(> [data-kumo-part="trigger"]:is([aria-label^="Couleur de la marque"], [aria-label^="Police du site"], [aria-label*="page Design"])) { display: none !important; }
+/* Les listes de choix d'EmDash ne portent pas d'id stable : elles sont reconnues
+ * par le debut de leur nom (le meme dans les graines de tous les sites) ou par
+ * "page Design", que portent les cinq champs des tailles et des coins. Jamais plus haut que la rangee du champ (div.grid) : le parent commun de
+ * tous les champs (div.space-y-6) ne doit pas etre atteint, sinon l'ecran entier
+ * disparait. */

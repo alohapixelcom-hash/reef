@@ -63,7 +63,13 @@ const pile = (nom: string): string =>
   new RegExp(`--font-${nom}:\\s*([^;]+);`).exec(jetonsNus)?.[1] ?? "system-ui, sans-serif";
 const pont = `:root { --aloha-police-texte: ${pile("sans")}; --aloha-police-titre: ${pile("display")}; }`;
 
-const FEUILLE = `<style data-aloha-back-office>${POLICES}\n${pont}\n${jetons}\n${FEUILLES.map(sansCommentaires).join("\n")}</style>`;
+// LES RUBRIQUES DU RAIL (extension administrable, socle 2.0.0) : intitules,
+// icones et entrees techniques cachees. Lues sans import nomme, apres les
+// feuilles du site : un site qui ne les a pas se construit comme avant, et
+// aucun habillage.site.ts n'a a les citer.
+const rubriques = Object.values(import.meta.glob<string>("./back-office-rubriques.css", { query: "?raw", import: "default", eager: true }));
+
+const FEUILLE = `<style data-aloha-back-office>${POLICES}\n${pont}\n${jetons}\n${[...FEUILLES, ...rubriques].map(sansCommentaires).join("\n")}</style>`;
 
 // UN CORRECTIF DE L'ECRAN PARAMETRES D'EMDASH 0.38. "Supprimer" sous le logo
 // (ou la favicon, ou l'image de partage du SEO) vide le champ du formulaire,

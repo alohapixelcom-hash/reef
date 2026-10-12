@@ -19,6 +19,7 @@ import { routesDuCache } from "./src/moteur/routes-du-cache.mjs";
 import { CARTES as CARTES_ACCUEIL, IDENTITE as ACCUEIL } from "./src/moteur/accueil/identite.mjs";
 import { IDENTITE as MEDIAS } from "./src/moteur/medias/identite.mjs";
 import { IDENTITE as SEO, ROUTE_DE_L_INDEX, ROUTE_DU_PLAN } from "./src/moteur/seo/identite.mjs";
+import { IDENTITE as DESIGN } from "./src/moteur/design/identite.mjs";
 import { planFige } from "./src/moteur/seo/integration.mjs";
 
 const ici = (chemin) => fileURLToPath(new URL(chemin, import.meta.url));
@@ -266,6 +267,8 @@ async function allume() {
           { ...ACCUEIL, entrypoint: ici("./src/moteur/accueil/extension.ts"), adminEntry: ici("./src/moteur/accueil/admin.ts"), adminWidgets: CARTES_ACCUEIL },
           // L'ecran SEO du rail : robots.txt, llms.txt, l'etat du plan et l'audit des pages (extension seo du socle).
           { ...SEO, entrypoint: ici("./src/moteur/seo/extension.ts"), adminEntry: ici("./src/moteur/seo/admin.tsx") },
+          // La page Design du rail : logo, couleur, police, tailles, coins, avec apercu (extension design du socle 2.0.0).
+          { ...DESIGN, entrypoint: ici("./src/moteur/design/extension.ts"), adminEntry: ici("./src/moteur/design/admin.tsx") },
           // Les photos converties a l'envoi et la carte Photos du tableau de bord (extension medias du socle).
           { ...MEDIAS, entrypoint: ici("./src/moteur/medias/extension.ts") },
         ],

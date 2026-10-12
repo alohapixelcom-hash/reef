@@ -4,8 +4,8 @@
 // belles tuiles, parcours utilisateur simple." Trois rangees, toujours dans
 // cet ordre :
 //   1. ce qui demande une action (messages non lus, commandes a preparer) ;
-//   2. les gestes du quotidien (ecrire, photos, modifier une page, voir le
-//      site, mettre le site a jour) ;
+//   2. les gestes du quotidien (ajouter un produit, ecrire, photos, modifier
+//      une page, le design, voir le site, mettre le site a jour) ;
 //   3. l'etat du site (derniere publication, plan du site).
 // Une tuile n'existe que si son ecran existe sur CE site, lu dans le
 // manifeste d'EmDash : pas de tuile Commandes sans boutique, pas de tuile
@@ -18,7 +18,7 @@ export const COLLECTIONS_DU_BLOG = ["posts", "blog", "articles", "billets", "car
 /** Le plan du site que la tuile d'etat relit (index d'Astro ou du moteur, meme adresse). */
 export const ADRESSE_DU_PLAN = "/sitemap-index.xml";
 
-export type Icone = "messages" | "commandes" | "ecrire" | "photos" | "page" | "site" | "publier" | "publication" | "plan";
+export type Icone = "messages" | "commandes" | "produit" | "ecrire" | "photos" | "page" | "design" | "site" | "publier" | "publication" | "plan";
 
 export interface Tuile {
   id: string;
@@ -119,11 +119,13 @@ export function tuilesDuSite(m: Manifeste, mesures: Mesures = {}): Accueil {
   }
 
   const gestes: Tuile[] = [];
+  if (aLaCollection(m, "products")) gestes.push({ id: "produit", icone: "produit", titre: "Ajouter un produit", detail: "Une nouvelle fiche dans la boutique", vers: "/content/products/new" });
   const blog = collectionDuBlog(m);
   if (blog) gestes.push({ id: "ecrire", icone: "ecrire", titre: "Écrire un article", detail: "Un nouvel article de blog", vers: `/content/${blog}/new` });
   gestes.push({ id: "photos", icone: "photos", titre: "Ajouter des photos", detail: "La médiathèque du site", vers: "/media" });
   if (aLaCollection(m, "sections")) gestes.push({ id: "page", icone: "page", titre: "Modifier une page", detail: "Les textes, les photos et les boutons", vers: "/content/sections" });
   else if (aLaCollection(m, "pages")) gestes.push({ id: "page", icone: "page", titre: "Modifier une page", detail: "Les pages du site", vers: "/content/pages" });
+  if (aLaPage(m, "aloha-design", "/")) gestes.push({ id: "design", icone: "design", titre: "Design", detail: "Logo, couleur, police et tailles", vers: "/plugins/aloha-design/" });
   gestes.push({ id: "site", icone: "site", titre: "Voir le site", detail: "S'ouvre dans un nouvel onglet", vers: "/", externe: true });
   if (aLaPage(m, "aloha-deployer", "/")) gestes.push({ id: "publier", icone: "publier", titre: "Mettre le site à jour", detail: "À la fin d'une séance de modifications", vers: "/plugins/aloha-deployer/" });
 
