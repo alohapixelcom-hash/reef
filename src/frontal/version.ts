@@ -1,6 +1,6 @@
 // src/frontal/version.ts - la version du contenu publie, lue dans la base du moteur (D1) en une requete : elle entre dans la cle du cache, et une publication la change.
 //
-// LE PRINCIPE (patron CACHE-PUBLICATION d'Explorissima). Le cache ne se purge
+// LE PRINCIPE (patron CACHE-PUBLICATION de la maison). Le cache ne se purge
 // jamais : sa cle porte la version du contenu. Publier une section, renommer
 // un lien de menu, changer le nom du site, ajouter une redirection change la
 // version, donc la cle, et la page suivante est rendue a neuf par le moteur.

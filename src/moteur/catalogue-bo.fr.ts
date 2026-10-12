@@ -141,7 +141,7 @@ const SIMPLES: Record<string, string> = {
   "Couldn’t move file": "Le fichier n'a pas pu être déplacé",
   "Couldn’t search bylines.": "Impossible de rechercher des collaborateurs.",
   "Create a reusable public profile, then add it to this post.":
-    "Créez un profil public réutilisable, puis ajoutez-le à ce billet.",
+    "Créez un profil public réutilisable, puis ajoutez-le à ce contenu.",
   "Create and add": "Créer et ajouter",
   "Create cropped copy": "Créer une copie recadrée",
   "Create passkey": "Créer une clé d'accès",
@@ -240,7 +240,7 @@ const SIMPLES: Record<string, string> = {
   "Format:": "Format :",
   Freeform: "Libre",
   "From URL": "Depuis une adresse",
-  "From the post owner": "D'après la personne propriétaire du billet",
+  "From the post owner": "D'après la personne propriétaire du contenu",
   "Generated automatically.": "Généré automatiquement.",
   Genres: "Genres",
   Group: "Groupe",
@@ -363,7 +363,7 @@ const SIMPLES: Record<string, string> = {
   "Passkeys require a <0>secure context</0>: use <1>HTTPS</1>, or open the admin at <2>http://localhost</2> (with your dev port). Plain <3>http://</3> on a custom hostname is not treated as secure, even on loopback.":
     "Les clés d'accès exigent un <0>contexte sécurisé</0> : utilisez <1>HTTPS</1>, ou ouvrez le back office sur <2>http://localhost</2> (avec votre port de développement). Un simple <3>http://</3> sur un nom de domaine personnalisé n'est pas considéré comme sécurisé, même en local.",
   "Pause other tools that update content.": "Mettez en pause les autres outils qui modifient le contenu.",
-  "People shown publicly on this post.": "Les personnes affichées publiquement sur ce billet.",
+  "People shown publicly on this post.": "Les personnes affichées publiquement sur ce contenu.",
   "Per page": "Par page",
   Period: "Période",
   "Plugin column unavailable": "Colonne du module d'extension indisponible",
@@ -399,7 +399,7 @@ const SIMPLES: Record<string, string> = {
   "Reload after updating EmDash before trying again.": "Rechargez la page après avoir mis EmDash à jour, puis réessayez.",
   "Remove assignment": "Retirer l'affectation",
   "Remove dark mode variant": "Retirer la variante pour le mode sombre",
-  "Remove from post": "Retirer du billet",
+  "Remove from post": "Retirer du contenu",
   "Remove image?": "Retirer l'image ?",
   "Remove schedule": "Retirer la programmation",
   "Replace dark mode image": "Remplacer l'image du mode sombre",
@@ -438,7 +438,7 @@ const SIMPLES: Record<string, string> = {
   "Retrying…": "Nouvelle tentative…",
   "Review Verified Plugin": "Examiner le module d'extension vérifié",
   "Review Verified Update": "Examiner la mise à jour vérifiée",
-  "Role on this post (optional)": "Rôle sur ce billet (facultatif)",
+  "Role on this post (optional)": "Rôle sur ce contenu (facultatif)",
   Routable: "Adressable",
   "Row added above": "Ligne ajoutée au-dessus",
   "Row added below": "Ligne ajoutée en dessous",
@@ -826,7 +826,7 @@ const COMPOSES_SOURCE: [unknown, unknown][] = [
     ],
   ],
   [["Choose a non-empty ", ["0"], " image."], ["Choisissez une image ", ["0"], " non vide."]],
-  [[["0"], " added to this post."], [["0"], " a été ajouté à ce billet."]],
+  [[["0"], " added to this post."], [["0"], " a été ajouté à ce contenu."]],
   [["Dismiss completed ", ["0"]], ["Masquer ", ["0"], ", terminé"]],
   [["Filter by date range: ", ["rangeLabel"]], ["Filtrer par période : ", ["rangeLabel"]]],
   [
@@ -890,7 +890,7 @@ const COMPOSES_SOURCE: [unknown, unknown][] = [
       ],
     ],
   ],
-  [[["0"], " removed from this post."], [["0"], " a été retiré de ce billet."]],
+  [[["0"], " removed from this post."], [["0"], " a été retiré de ce contenu."]],
   [
     [["rejectedCount", "plural", { one: ["#", " file was not added."], other: ["#", " files were not added."] }]],
     [

@@ -34,7 +34,10 @@ interface Props {
 
 const { media, class: className, widths = [720, 1200, 1920], sizes = "100vw", loading = "lazy", fetchpriority, alt = "", style, attributs = {} } = Astro.props;
 
-const absolue = new URL(media.src ?? "", Astro.site ?? Astro.url).href;
+// L'adresse absolue part de la requete, pas du domaine du site : avant la
+// bascule du domaine, la mediatheque vit sur le lien d'apercu, et le domaine
+// sert encore l'ancien site.
+const absolue = new URL(media.src ?? "", Astro.url).href;
 const largeur = typeof media.width === "number" ? media.width : undefined;
 const hauteur = typeof media.height === "number" ? media.height : undefined;
 

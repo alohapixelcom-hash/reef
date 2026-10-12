@@ -2,6 +2,16 @@
 
 # Changelog
 
+## 3.9.0 - 2026-10-12
+
+- Aloha Pixel core 1.16.1 (from 1.10.0). The live sitemap of the `seo` extension: `/sitemap-moteur.xml`, recomputed at every request (frozen pages, managed pages, free pages and dates from the database), the only sitemap of `/sitemap-index.xml`; `/sitemap.xml`, `/sitemap-0.xml`, `/sitemap-contenu.xml` and EmDash's sitemaps answer a 301 to the index. `robots.txt` and `llms.txt` editable in a « SEO » screen of the back office, with a page audit (title, description, headings, canonical, hreflang, structured data).
+- Photos sent to the media library converted on upload (`medias` extension: orientation, metadata removed, 2560 px at most, AVIF or WebP), and « Optimiser les photos existantes » on the dashboard.
+- Back office: dashboard in tiles, Messages right under it, settings at the bottom of the sidebar.
+- SEO: page titles held between 30 and 60 characters when they can be: a short title takes a signature of the brand (« Topics | Reef Notes, a working notebook from a web studio »), a title too long with the brand drops it (`src/js/pageTitle.ts`, `home.titleSignature`). The Organization node of the home page carries a logo.
+- The home title is « Reef Notes, a working notebook from a web studio » (61 characters before). The site card of the dashboard gives way to the core's tiles (last publication, shortcuts, sitemap).
+- Both Workers have no public address other than the domain (`workers_dev` and `preview_urls` false).
+- The static build changes only where intended: the titles and the Organization logo.
+
 ## 3.8.5 - 2026-09-30
 
 - Back office, « Messages »: every message of the contact form is kept in the site database before the notification is sent, and can be read, marked read or unread, archived, deleted and answered (Cloudflare Email), with an unread badge in the sidebar (`migrations/import-3.8.5-reef.sql`).

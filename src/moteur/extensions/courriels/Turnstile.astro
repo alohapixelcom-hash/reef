@@ -1,0 +1,59 @@
+---
+// src/moteur/extensions/courriels/Turnstile.astro - le widget Cloudflare Turnstile d'un formulaire branche sur Courriels, visible, dans la langue de la page et au theme du site ; rien quand la protection n'est pas active.
+//
+// A poser DANS le <form>, a l'endroit ou la case doit apparaitre (avant le
+// bouton) : <Turnstile envoi={envoi} />. Le widget y ajoute le champ cache
+// cf-turnstile-response, que la route verifie (noyau/turnstile.ts), et signe
+// l'action du formulaire ("contact" ou "lettre").
+//
+// DEUX FACONS DE L'APPELER, parce que les sites l'ont pose a des moments
+// differents : avec `envoi` (ce que rend formulaire.emdash.ts), ou avec
+// `langue` (et `class`) seuls, la cle venant alors de la protection du Worker
+// (adaptateur.ts, turnstile()) et l'action de `action` (contact par defaut).
+//
+// Eteint : rien n'est rendu et la page ne charge aucun script. Allume : le
+// script de Cloudflare n'est charge qu'une fois par page, meme quand deux
+// formulaires (contact et lettre du pied) portent chacun leur widget.
+//
+// LE THEME suit celui du site, que l'interrupteur pose en classe `dark` sur
+// <html> : la ligne en ligne le lit avant que le script du widget ne tourne.
+import { turnstile } from "./adaptateur.ts";
+import type { Envoi } from "./formulaire.fichiers.ts";
+import { SCRIPT_TURNSTILE } from "./noyau/turnstile.ts";
+
+interface Props {
+  envoi?: Envoi | null;
+  langue?: string;
+  action?: "contact" | "lettre";
+  class?: string;
+}
+
+const { envoi, langue, action, class: classe } = Astro.props;
+const w = envoi?.turnstile ?? null;
+const protection = !w && envoi === undefined ? await turnstile() : null;
+const cle = w ? w.cle : protection?.etat === "active" ? protection.cle : null;
+const lang = w ? w.langue : langue === "en" ? "en" : "fr";
+const signe = w ? w.action : (action ?? "contact");
+---
+
+{
+  cle && (
+    <Fragment>
+      <div class:list={["cf-turnstile", classe]} style="min-height:65px" data-sitekey={cle} data-language={lang} data-action={signe} data-theme="light" data-size="flexible" data-turnstile />
+      {w && w.sansScript && <noscript><p>{w.sansScript}</p></noscript>}
+      <script is:inline define:vars={{ script: SCRIPT_TURNSTILE }}>
+        document.querySelectorAll("[data-turnstile]").forEach(function (el) {
+          el.setAttribute("data-theme", document.documentElement.classList.contains("dark") ? "dark" : "light");
+        });
+        if (!document.querySelector("script[data-turnstile-script]")) {
+          var s = document.createElement("script");
+          s.src = script;
+          s.async = true;
+          s.defer = true;
+          s.setAttribute("data-turnstile-script", "");
+          document.head.appendChild(s);
+        }
+      </script>
+    </Fragment>
+  )
+}

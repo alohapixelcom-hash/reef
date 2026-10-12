@@ -1,8 +1,14 @@
-// src/moteur/accueil/identite.mjs - l'identite de l'extension "carte du site" du tableau de bord, ecrite une fois.
+// src/moteur/accueil/identite.mjs - l'identite de l'extension "accueil" du back office (generique) : le tableau de bord en tuiles, ecrite une fois.
 //
-// Comme pour "Tout deployer" : moteur.config.mjs la lit au demarrage (Node,
-// donc un fichier .mjs), et extension.ts la rend dans le Worker.
+// Lu par la configuration du moteur (Node, d'ou le .mjs) et par extension.ts
+// dans le Worker, comme les autres extensions de la maison. L'extension n'a
+// ni page, ni route, ni base : une seule carte sur la page d'accueil d'EmDash.
 export const IDENTITE = { id: "aloha-accueil", version: "1.0.0" };
 
-/** L'identifiant de la carte dans le tableau de bord, partage par l'extension et par son composant. */
-export const CARTE = "site";
+/**
+ * La carte de la page d'accueil d'EmDash. Son titre ne s'affiche pas (la
+ * feuille accueil.css retire le cadre de la carte) ; il reste le nom lu par
+ * un lecteur d'ecran si la feuille ne s'applique pas.
+ * @type {{ id: string; size: "full" | "half" | "third"; title: string }[]}
+ */
+export const CARTES = [{ id: "tuiles", size: "full", title: "Votre site" }];

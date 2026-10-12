@@ -97,9 +97,10 @@ export function rangee(t: Textes, l: Ligne, maintenant: number): Record<string, 
   };
 }
 
-/** Ce qui a livre, en clair : Cloudflare, la console d'EmDash en developpement, ou rien. */
+/** Ce qui a livre, en clair : Cloudflare, Brevo (extension brevo), la console d'EmDash en developpement, ou rien. */
 export function nomDuFournisseur(t: Textes, fournisseur: string): string {
   if (fournisseur === "cloudflare") return "Cloudflare Email Sending";
+  if (fournisseur === "brevo") return "Brevo";
   if (fournisseur === "emdash-console-email") return t.brancher.console;
   if (fournisseur === "aucun") return "-";
   return fournisseur;

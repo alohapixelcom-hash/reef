@@ -1,0 +1,351 @@
+/* src/moteur/seo/ecran.css - la mise en page de l'ecran SEO du back office (classes seo-*), posee par admin.tsx.
+ *
+ * Meme regle que les feuilles de la gestion et de la boutique : surfaces,
+ * filets et encres sont les variables natives du back office
+ * (--color-kumo-*, --text-color-kumo-*), l'accent est sa marque
+ * (--color-kumo-brand), reglee par l'habillage du site. Aucune couleur en
+ * dur : clair et sombre suivent le back office.
+ */
+
+.seo-ecran {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 64rem;
+  padding-bottom: 3rem;
+  color: var(--text-color-kumo-default);
+}
+
+.seo-masque {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.seo-titre {
+  margin: 0;
+  font-family: var(--aloha-police-titre, inherit);
+  font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.seo-chapeau,
+.seo-aide {
+  margin: 0;
+  max-width: 72ch;
+  color: var(--text-color-kumo-subtle);
+  line-height: 1.55;
+}
+
+.seo-chapeau {
+  margin-top: 0.5rem;
+}
+
+.seo-carte {
+  display: grid;
+  gap: 0.875rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 1.25rem;
+  background: var(--color-kumo-base);
+}
+
+.seo-carte-tete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.seo-carte-titre {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.seo-pastille {
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: 1px solid var(--color-kumo-line);
+  color: var(--text-color-kumo-subtle);
+}
+
+.seo-pastille--succes {
+  border-color: var(--color-kumo-brand);
+  color: var(--text-color-kumo-default);
+}
+
+.seo-texte {
+  width: 100%;
+  min-height: 12rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 0.75rem;
+  background: var(--color-kumo-elevated, var(--color-kumo-base));
+  color: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.seo-texte:focus-visible {
+  outline: 2px solid var(--color-kumo-brand);
+  outline-offset: 2px;
+}
+
+.seo-pied {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-color-kumo-subtle);
+}
+
+.seo-compteur--trop {
+  color: var(--text-color-kumo-danger, inherit);
+  font-weight: 700;
+}
+
+.seo-gestes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.seo-bouton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.5rem;
+  padding: 0 1.1rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.seo-bouton--principal {
+  border-color: var(--color-kumo-brand);
+  background: var(--color-kumo-brand);
+  color: var(--text-color-kumo-inverse, #fff);
+}
+
+.seo-bouton--discret {
+  border-color: transparent;
+}
+
+.seo-bouton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.seo-bouton:focus-visible,
+.seo-lien:focus-visible {
+  outline: 2px solid var(--color-kumo-brand);
+  outline-offset: 2px;
+}
+
+.seo-lien {
+  color: var(--text-color-kumo-default);
+  font-size: 0.875rem;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+
+.seo-avis {
+  margin: 0;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-kumo-line);
+}
+
+.seo-avis--succes {
+  border-color: var(--color-kumo-brand);
+}
+
+.seo-avis--erreur {
+  border-color: var(--text-color-kumo-danger, currentColor);
+  color: var(--text-color-kumo-danger, inherit);
+}
+
+.seo-tuiles {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+
+.seo-tuile {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 1rem;
+}
+
+.seo-tuile-chiffre {
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.seo-tuile-chiffre--date {
+  font-size: 1rem;
+}
+
+.seo-tuile-libelle {
+  font-size: 0.875rem;
+  color: var(--text-color-kumo-subtle);
+}
+
+.seo-retraits summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.seo-retraits ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+  max-height: 18rem;
+  overflow: auto;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+/* L'audit des pages (audit.tsx). */
+.seo-sous-titre {
+  margin: 0.5rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.seo-avancee {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.seo-avancee progress {
+  flex: 1;
+  accent-color: var(--color-kumo-brand);
+}
+
+.seo-controles {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding-left: 1.25rem;
+  line-height: 1.5;
+}
+
+.seo-controle--bloquant strong {
+  color: var(--text-color-kumo-danger, var(--text-color-kumo-default));
+}
+
+.seo-controle--ok strong {
+  color: var(--text-color-kumo-subtle);
+}
+
+.seo-correction {
+  display: block;
+  color: var(--text-color-kumo-default);
+}
+
+.seo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.seo-table th,
+.seo-table td {
+  padding: 0.5rem 0.625rem;
+  border-bottom: 1px solid var(--color-kumo-line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.seo-note {
+  display: inline-block;
+  min-width: 2.5rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.seo-note--faible {
+  color: var(--text-color-kumo-danger, var(--text-color-kumo-default));
+}
+
+.seo-note--bon {
+  color: var(--color-kumo-brand);
+}
+
+.seo-detail {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.5rem 0 1rem;
+}
+
+.seo-google {
+  display: grid;
+  gap: 0.125rem;
+  max-width: 38rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 1rem;
+  background: var(--color-kumo-elevated, var(--color-kumo-base));
+  font-family: Arial, sans-serif;
+}
+
+.seo-google-fil {
+  font-size: 0.8125rem;
+  color: var(--text-color-kumo-subtle);
+}
+
+.seo-google-titre {
+  font-size: 1.25rem;
+  line-height: 1.3;
+  color: var(--color-kumo-brand);
+}
+
+.seo-google-texte {
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.seo-champ {
+  display: grid;
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
+.seo-champ input,
+.seo-champ select {
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 0.75rem;
+  background: var(--color-kumo-base);
+  color: inherit;
+  font: inherit;
+  font-weight: 400;
+}
+
+.seo-etapes {
+  display: grid;
+  gap: 0.5rem;
+  line-height: 1.55;
+}

@@ -8,6 +8,9 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "reef-frontal",
   "main": "./src/worker.frontal.ts",
+  // Aucune adresse publique hors du domaine : ni workers.dev ni apercu par version.
+  "workers_dev": false,
+  "preview_urls": false,
   "compatibility_date": "2026-08-14",
   // Les memes fichiers que le moteur : servis ici sans le reveiller.
   "assets": { "directory": "./dist/client", "binding": "ASSETS", "run_worker_first": true },

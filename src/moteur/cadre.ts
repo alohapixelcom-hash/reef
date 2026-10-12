@@ -118,7 +118,11 @@ const texte = (valeur: unknown): string | null => (typeof valeur === "string" &&
 export function media(valeur: unknown): Media | null {
   if (!valeur || typeof valeur !== "object") return null;
   const m = valeur as Media & { provider?: string; previewUrl?: string };
-  if (texte(m.src)) return m;
+  // Une adresse de la mediatheque rangee en absolu (l'import la recoit avec
+  // l'hote du site configure) se sert en chemin : le meme fichier repond sur
+  // l'apercu, en local et sur le domaine final.
+  const source = texte(m.src);
+  if (source) return { ...m, src: source.replace(/^https?:\/\/[^/]+(?=\/_emdash\/api\/media\/file\/)/, "") };
   const cle = texte((m.meta as { storageKey?: unknown } | undefined)?.storageKey);
   if (cle && (!m.provider || m.provider === "local")) return { ...m, src: `/_emdash/api/media/file/${cle}` };
   if (texte(m.previewUrl)) return { ...m, src: m.previewUrl };

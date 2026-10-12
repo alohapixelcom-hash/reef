@@ -14,6 +14,8 @@ export const frPages: Pick<
   // --- Accueil -------------------------------------------------------------
   home: {
     metaTitle: "Reef Notes, le carnet de bord d'un studio web indépendant",
+    // La signature courte de la marque : elle allonge un titre de page trop court quand le titre de l'accueil le ferait depasser 60 caracteres (src/js/pageTitle.ts).
+    titleSignature: "Reef Notes, carnet de studio web",
     metaDescription:
       "Journaux de chantier, temps de chargement, typographie et gestion d'un petit studio web. En français et en anglais, quelques notes par mois, écrites par les trois personnes qui font le travail.",
     eyebrow: "Reef Notes",

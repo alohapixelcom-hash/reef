@@ -3,6 +3,9 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "reef-moteur",
   "main": "./src/worker.moteur.ts",
+  // Aucune adresse publique hors du domaine : ni workers.dev ni apercu par version.
+  "workers_dev": false,
+  "preview_urls": false,
   "compatibility_date": "2026-08-14",
   "compatibility_flags": ["nodejs_compat"],
   "d1_databases": [{ "binding": "DB", "database_name": "reef-moteur" }],
@@ -13,7 +16,7 @@
   // src/worker-adresses.ts).
   "assets": {
     "binding": "ASSETS",
-    "run_worker_first": ["/404", "/404/", "/404.html", "/fr/404", "/fr/404/", "/fr/404.html"]
+    "run_worker_first": ["/404", "/404/", "/404.html", "/fr/404", "/fr/404/", "/fr/404.html", "/robots.txt", "/llms.txt", "/sitemap*"]
   },
   // Optimise a la demande les images des pages gerees (voir moteur.config.mjs).
   "images": { "binding": "IMAGES" },

@@ -292,7 +292,6 @@ export const SECTIONS: readonly Section[] = [
     arguments: { objet: "notFound", cles: { title: "searchCta" }, rendus: ["link"] },
   },
 ];
-
 /**
  * CE QUE LE MOTEUR NE GERE PAS, ET POURQUOI. Tout autre texte des deux
  * dictionnaires est dans la table ci-dessus, ou dans un menu natif (menus.ts,
@@ -308,6 +307,7 @@ export const SECTIONS: readonly Section[] = [
  * pagination, etats vides, messages d'envoi), et ce qu'aucune page n'affiche.
  */
 export const HORS_BASE: readonly { chemin: Chemin; raison: string }[] = [
+  { chemin: "home.titleSignature", raison: "la signature courte qui allonge un titre de page trop court, jamais affichee seule dans une page" },
   { chemin: "nav.mainLabel", raison: "le nom de la navigation principale pour les lecteurs d'ecran, pas un texte affiche" },
   { chemin: "nav.mobileLabel", raison: "le nom de la navigation du tiroir pour les lecteurs d'ecran, pas un texte affiche" },
   { chemin: "nav.openMenu", raison: "le nom du bouton du tiroir (une icone), une commande de l'interface" },

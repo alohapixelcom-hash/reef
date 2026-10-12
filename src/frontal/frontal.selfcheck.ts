@@ -1,4 +1,4 @@
-// src/frontal/frontal.selfcheck.ts - self-check du Worker frontal : ce qui va au moteur, ce qui est prive, ce qui se garde, la cle, la fraicheur, la version lue dans une base simulee, et un parcours complet HIT, STALE, MISS sur un cache simule.
+// src/frontal/frontal.selfcheck.ts - self-check du Worker frontal : ce qui va au moteur, ce qui est prive, ce qui se garde, la cle, la fraicheur, la version lue dans une base simulee, un parcours complet HIT, STALE, MISS sur un cache simule, et le mode maintenance.
 import assert from "node:assert/strict";
 import {
   cleDuCache,
@@ -13,6 +13,7 @@ import {
   porteLEdition,
 } from "./cache.ts";
 import { collectionsDuSchema, lireLaVersion, plusRecente, requeteDeLaVersion, tablesDuSchema } from "./version.ts";
+import { adresseDeLAttente, estFerme, lireLaMaintenance, OPTION_DE_MAINTENANCE } from "./maintenance.ts";
 
 const req = (chemin: string, init: RequestInit = {}) => new Request(`https://site.test${chemin}`, init);
 const html = (corps = "<html>page</html>", entetes: Record<string, string> = {}, status = 200) =>
@@ -210,4 +211,67 @@ await Promise.all(attentes.splice(0));
 assert.ok(["MISS", "HIT", "NON-GARDEE"].includes((await avecFichiers.fetch(req("/geree/"), envFichiers, ctx)).headers.get("x-aloha-cache") ?? ""));
 await Promise.all(attentes.splice(0));
 
-console.log("frontal.selfcheck : parcours MISS, HIT, PRIVEE, REGLE, publication, STALE, fenetre sans copie, pages figees : tout passe.");
+// 8. Le mode maintenance : l'interrupteur, l'adresse de la page d'attente, puis un parcours site ferme.
+assert.equal(estFerme("true"), true);
+assert.equal(estFerme("false"), false);
+assert.equal(estFerme(null), false);
+assert.equal(estFerme("pas du json"), false);
+assert.equal(adresseDeLAttente("/"), "/maintenance-du-site/");
+assert.equal(adresseDeLAttente("/shop/bague/"), "/maintenance-du-site/");
+assert.equal(adresseDeLAttente("/en/shop/"), "/en/maintenance-du-site/");
+assert.equal(adresseDeLAttente("/en"), "/en/maintenance-du-site/");
+assert.equal(await lireLaMaintenance({ prepare: () => ({ first: async () => { throw new Error("injoignable"); } }) }), false, "une base injoignable laisse le site ouvert");
+const interrupteur = { valeur: "true" as string | null };
+const baseFermee = {
+  prepare: (requete: string) => ({
+    first: async <T>() => (requete.includes(OPTION_DE_MAINTENANCE) ? (interrupteur.valeur === null ? null : { value: interrupteur.valeur }) : await base(vieux).prepare(requete).first()) as T,
+  }),
+};
+let demandesAuMoteur: string[] = [];
+const moteurFerme = {
+  fetch: async (r: Request) => {
+    const chemin = new URL(r.url).pathname;
+    demandesAuMoteur.push(chemin);
+    if (chemin === "/_emdash/api/auth/me") return new Response("{}", { status: (r.headers.get("Cookie") ?? "").includes("astro-session=bonne") ? 200 : 401 });
+    if (chemin === "/en/maintenance-du-site/") return new Response("absente", { status: 404, headers: { "Content-Type": "text/html" } });
+    if (chemin === "/maintenance-du-site/") return html("<h1>Bientot</h1>");
+    return html(`<p>page ${chemin}</p>`);
+  },
+};
+const envFerme = { MOTEUR: moteurFerme, DB: baseFermee, ASSETS: fichiers };
+const ferme = creerFrontal({ memoireDeLaVersion: 0 });
+rep = await ferme.fetch(req("/fige/"), envFerme, ctx);
+assert.equal(rep.status, 503, "une page figee ne passe pas la porte");
+assert.equal(rep.headers.get("x-aloha-cache"), "MAINTENANCE");
+assert.equal(rep.headers.get("Retry-After"), "3600");
+assert.equal(rep.headers.get("Cache-Control"), "no-store");
+assert.equal(rep.headers.get("X-Robots-Tag"), "noindex");
+assert.equal(await rep.text(), "<h1>Bientot</h1>");
+rep = await ferme.fetch(req("/en/shop/"), envFerme, ctx);
+assert.equal(rep.status, 503);
+assert.equal(await rep.text(), "<h1>Bientot</h1>", "sans page anglaise, la page de la racine");
+assert.notEqual((await ferme.fetch(req("/favicon.svg"), envFerme, ctx)).headers.get("x-aloha-cache"), "MAINTENANCE", "un fichier passe toujours");
+assert.equal((await ferme.fetch(req("/_emdash/admin"), envFerme, ctx)).headers.get("x-aloha-cache"), "MOTEUR", "le back office passe toujours");
+assert.equal((await ferme.fetch(req("/", { method: "POST" }), envFerme, ctx)).headers.get("x-aloha-cache"), "MOTEUR", "un envoi (webhook, formulaire) passe toujours");
+rep = await ferme.fetch(req("/fige/", { headers: { Cookie: "astro-session=fausse" } }), envFerme, ctx);
+assert.equal(rep.status, 503, "un cookie au bon nom ne suffit pas");
+rep = await ferme.fetch(req("/fige/", { headers: { Cookie: "astro-session=bonne" } }), envFerme, ctx);
+assert.equal(rep.headers.get("x-aloha-cache"), "FIGEE", "une personne connectee voit le site");
+demandesAuMoteur = [];
+await ferme.fetch(req("/fige/", { headers: { Cookie: "astro-session=bonne" } }), envFerme, ctx);
+assert.deepEqual(demandesAuMoteur, [], "la session verifiee est gardee");
+rep = await ferme.fetch(req("/fige/", { method: "HEAD" }), envFerme, ctx);
+assert.equal(rep.status, 503);
+assert.equal(await rep.text(), "");
+interrupteur.valeur = "false";
+assert.equal((await ferme.fetch(req("/fige/"), envFerme, ctx)).headers.get("x-aloha-cache"), "FIGEE", "le site rouvert");
+interrupteur.valeur = null;
+assert.equal((await ferme.fetch(req("/fige/"), envFerme, ctx)).headers.get("x-aloha-cache"), "FIGEE", "sans l'extension, rien ne change");
+const moteurMuet = { fetch: async () => new Response("erreur", { status: 500 }) };
+interrupteur.valeur = "true";
+rep = await creerFrontal({ memoireDeLaVersion: 0 }).fetch(req("/fige/"), { ...envFerme, MOTEUR: moteurMuet }, ctx);
+assert.equal(rep.status, 503);
+assert.ok((await rep.text()).includes("Site en maintenance"), "la page de secours quand le moteur ne rend rien");
+await Promise.all(attentes.splice(0));
+
+console.log("frontal.selfcheck : parcours MISS, HIT, PRIVEE, REGLE, publication, STALE, fenetre sans copie, pages figees, maintenance : tout passe.");

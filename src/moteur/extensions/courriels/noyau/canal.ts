@@ -30,6 +30,7 @@ import { type Base, inscrire, type Message } from "./base.ts";
 import { type Contexte, envoyer, erreurEnClair, type Issue } from "./envoi.ts";
 import { listeDAdresses, type Origine, origineDeLaSource, type Reglages } from "./regles.ts";
 import type { Textes } from "../ecrans/textes.fr.ts";
+import { courrielDuBackOffice } from "./systeme.ts";
 
 /** Un message tel que le canal d'EmDash le transporte (EmailMessage). */
 export interface MessageDuCanal {
@@ -111,11 +112,14 @@ export function fournisseur(charger: () => Promise<Dependances>) {
     const { contexte: ctx, reglages, textes, sources } = await charger();
     const origine = s?.origine ?? origineDeLaSource(evenement.source, sources);
     const systeme = origine === "systeme";
+    // Lien de connexion, invitation, verification : reecrits en francais
+    // (noyau/systeme.ts) ; tout autre courriel passe tel quel.
+    const francais = systeme ? courrielDuBackOffice(evenement.message.subject, evenement.message.text) : null;
     const message: Message = {
       a: listeDAdresses(evenement.message.to),
-      sujet: evenement.message.subject,
-      texte: evenement.message.text,
-      ...(evenement.message.html ? { html: evenement.message.html } : {}),
+      sujet: francais?.sujet ?? evenement.message.subject,
+      texte: francais?.texte ?? evenement.message.text,
+      ...(francais ? { html: francais.html } : evenement.message.html ? { html: evenement.message.html } : {}),
       ...(s?.reponse ? { reponse: s.reponse } : reglages.reponse ? { reponse: reglages.reponse } : {}),
       ...(s?.entetes ? { entetes: s.entetes } : {}),
     };

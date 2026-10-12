@@ -18,6 +18,8 @@ export interface DonneesTableau {
   derniers: Ligne[];
   /** Les envois refuses du mois qu'aucun renvoi n'a rattrapes (echecsEnAttente). */
   echecs?: Ligne[];
+  /** La verification anti-robot posee (noyau/garde.ts, protectionPrete) ; absente : non controlee. */
+  turnstile?: boolean;
   maintenant: number;
 }
 
@@ -29,7 +31,7 @@ function alerteDesEchecs(t: Textes, d: DonneesTableau): Bloc[] {
   return [{ type: "banner", variant: "error", title: t.tableau.echecsTitre(echecs.length), description: commande ? t.tableau.echecCommande : t.tableau.echecAutre }];
 }
 
-const manquesDe = (d: DonneesTableau) => manques(d.reglages, d.liaison, d.livreur === IDENTITE.id);
+const manquesDe = (d: DonneesTableau) => manques(d.reglages, d.liaison, d.livreur === IDENTITE.id, d.turnstile ?? true);
 
 function etatDuBranchement(t: Textes, d: DonneesTableau): Bloc {
   const manque = manquesDe(d);

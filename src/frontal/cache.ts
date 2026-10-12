@@ -14,6 +14,10 @@
 //   2. les regles du site (avantLeCache : plans, barre finale, langue du
 //      visiteur), les memes fonctions que le Worker du moteur : une redirection
 //      part d'ici sans reveiller EmDash, jamais gardee ;
+//   2 bis. le site en maintenance (maintenance.ts) : hors fichiers et hors
+//      personne connectee au back office, la page d'attente en 503 (composee
+//      depuis l'ecran par attente.ts, sinon celle du site), jamais gardee
+//      (en-tete x-aloha-cache MAINTENANCE) ;
 //   3. un fichier (une extension, ou /_astro/) : les fichiers du build ; puis
 //      une page figee par le build (lecture d'une adresse de page, hors /_) :
 //      son fichier, sans reveiller le moteur. Le moteur des sept themes la
@@ -41,8 +45,10 @@
 // avant le cache ; une page gardee ne depend donc que de son adresse.
 //
 // L'EN-TETE x-aloha-cache dit ce qui s'est passe (HIT, STALE, MISS, NON-GARDEE,
-// PRIVEE, MOTEUR, FICHIER, FIGEE, REGLE, SANS-VERSION) : a relever par le banc de
+// PRIVEE, MOTEUR, FICHIER, FIGEE, REGLE, SANS-VERSION, MAINTENANCE) : a relever par le banc de
 // mesure apres chaque deploiement.
+import { composerLAttente } from "./attente.ts";
+import { adresseDeLAttente, entetesDeLAttente, lireLaMaintenance, lireLesReglages, PAGE_DE_MAINTENANCE, PAGE_DE_SECOURS, reessayerApres } from "./maintenance.ts";
 import { lireLaVersion, type Base, type Version } from "./version.ts";
 
 export interface Service {
@@ -212,6 +218,77 @@ export function creerFrontal(options: OptionsDuFrontal = {}) {
     return marquee(new Response(visiteur, { status: reponse.status, statusText: reponse.statusText, headers: reponse.headers }), "MISS");
   }
 
+  // LE MODE MAINTENANCE (maintenance.ts) : l'interrupteur relu au plus une
+  // fois par seconde, les sessions verifiees gardees 30 s, la page d'attente
+  // de chaque langue gardee 60 s.
+  let maintenance: { fermee: boolean; lue: number } | null = null;
+  const sessions = new Map<string, { editeur: boolean; jusqua: number }>();
+  const attentes = new Map<string, { corps: string; type: string; jusqua: number }>();
+
+  async function siteFerme(env: EnvDuFrontal, maintenant: number): Promise<boolean> {
+    if (maintenance && maintenant - maintenance.lue < r.memoireDeLaVersion) return maintenance.fermee;
+    maintenance = { fermee: await lireLaMaintenance(env.DB), lue: maintenant };
+    return maintenance.fermee;
+  }
+
+  /** Vrai pour une personne connectee au back office : le moteur le dit, le nom d'un cookie ne suffit pas. */
+  async function estUnEditeur(request: Request, env: EnvDuFrontal, maintenant: number): Promise<boolean> {
+    if (!estPrivee(request)) return false;
+    const entetes = new Headers();
+    for (const nom of ["Cookie", "Authorization"]) {
+      const valeur = request.headers.get(nom);
+      if (valeur) entetes.set(nom, valeur);
+    }
+    const cle = `${entetes.get("Cookie") ?? ""}\n${entetes.get("Authorization") ?? ""}`;
+    const connu = sessions.get(cle);
+    if (connu && connu.jusqua > maintenant) return connu.editeur;
+    let editeur = false;
+    try {
+      const reponse = await env.MOTEUR.fetch(new Request(new URL("/_emdash/api/auth/me", request.url), { headers: entetes }));
+      editeur = reponse.status === 200;
+      await reponse.body?.cancel();
+    } catch {
+      editeur = false;
+    }
+    if (sessions.size > 500) sessions.clear();
+    sessions.set(cle, { editeur, jusqua: maintenant + 30_000 });
+    return editeur;
+  }
+
+  /**
+   * La page d'attente, en 503 : celle que l'ecran compose quand un titre y est
+   * saisi ; sinon celle du site dans la langue de l'adresse, celle de la
+   * racine, puis la page de secours.
+   */
+  async function pageDAttente(request: Request, env: EnvDuFrontal, maintenant: number): Promise<Response> {
+    const url = new URL(request.url);
+    const tete = request.method === "HEAD";
+    const reglages = await lireLesReglages(env.DB);
+    if (reglages) {
+      const langue = /^\/en(?:\/|$)/.test(url.pathname) ? "en" : "fr";
+      return new Response(tete ? null : composerLAttente(reglages, langue), { status: 503, headers: entetesDeLAttente("text/html; charset=utf-8", reessayerApres(reglages.retour, maintenant)) });
+    }
+    for (const chemin of [...new Set([adresseDeLAttente(url.pathname), PAGE_DE_MAINTENANCE])]) {
+      const gardee = attentes.get(chemin);
+      if (gardee && gardee.jusqua > maintenant) return new Response(tete ? null : gardee.corps, { status: 503, headers: entetesDeLAttente(gardee.type) });
+      try {
+        const rendue = await env.MOTEUR.fetch(new Request(new URL(chemin, url), { headers: { Accept: "text/html" } }));
+        const type = rendue.headers.get("Content-Type") ?? "";
+        if (rendue.status !== 200 || !type.startsWith("text/html")) {
+          await rendue.body?.cancel();
+          continue;
+        }
+        const corps = await rendue.text();
+        if (attentes.size > 20) attentes.clear();
+        attentes.set(chemin, { corps, type, jusqua: maintenant + 60_000 });
+        return new Response(tete ? null : corps, { status: 503, headers: entetesDeLAttente(type) });
+      } catch {
+        continue;
+      }
+    }
+    return new Response(tete ? null : PAGE_DE_SECOURS, { status: 503, headers: entetesDeLAttente("text/html; charset=utf-8") });
+  }
+
   return {
     async fetch(request: Request, env: EnvDuFrontal, ctx: Contexte): Promise<Response> {
       if (passeAuMoteur(request, r.versLeMoteur)) return marquee(await env.MOTEUR.fetch(request), "MOTEUR");
@@ -219,6 +296,10 @@ export function creerFrontal(options: OptionsDuFrontal = {}) {
       if (regle) return marquee(regle, "REGLE");
       const url = new URL(request.url);
       const fichierDemande = estUnFichier(url.pathname);
+      if (!fichierDemande) {
+        const instant = Date.now();
+        if ((await siteFerme(env, instant)) && !(await estUnEditeur(request, env, instant))) return marquee(await pageDAttente(request, env, instant), "MAINTENANCE");
+      }
       if (env.ASSETS && (fichierDemande || (r.pagesFigees && peutEtreFigee(request)))) {
         const fichier = await env.ASSETS.fetch(request);
         if (fichier.status !== 404) return marquee(fichier, fichierDemande ? "FICHIER" : "FIGEE");

@@ -29,6 +29,7 @@ export const EN: Textes = {
       fournisseur: "handing the emails to Emails (Connect emails, step 3, one click)",
       expediteur: "the sender address (Email settings)",
       destinataire: "the recipient of the contact form (Email settings)",
+      turnstile: "the forms' anti-robot check: both the public key (TURNSTILE_SITE_KEY variable of the Worker) and the secret key (TURNSTILE_SECRET secret), set by whoever installed the site",
     },
     envoyes: "Sent this month",
     surInclus: (included: number) => `out of ${count(included)} included by Cloudflare`,
@@ -169,6 +170,15 @@ export const EN: Textes = {
     apercu: "Acknowledgement preview (what a visitor named Camille would read)",
     apercuVisiteur: "Camille",
     derniere: (when: string, who: string) => `Last changed on ${when} by ${who}.`,
+    protection: {
+      titre: "Anti-robot protection (Cloudflare Turnstile)",
+      active: "On: every public form shows the Cloudflare check box, and the site checks its answer before saving or sending anything. The hidden trap field and the limits stay in place.",
+      absente:
+        "Off: the forms work, protected only by a hidden trap field and by the limits below. To turn it on, the person who installed the site creates a Turnstile widget in the site's Cloudflare account, sets its public key (TURNSTILE_SITE_KEY, Worker variable) and its secret key (TURNSTILE_SECRET_KEY, Worker secret), then redeploys.",
+      incomplete: (missing: string) => `Off: ${missing} is missing. Both keys come from the same Turnstile widget; while only one is set, the public forms are hidden and refuse submissions: set the missing key, then redeploy.`,
+      cle: "the public key (TURNSTILE_SITE_KEY, Worker variable)",
+      secret: "the secret key (TURNSTILE_SECRET_KEY, Worker secret)",
+    },
   },
 
   erreurs: {
@@ -187,6 +197,10 @@ export const EN: Textes = {
     E_VALIDATION_ERROR: 'Cloudflare finds the email malformed: an address is probably not valid. Check the addresses in "Email settings".',
     E_FIELD_MISSING: 'A recipient, sender or subject is missing. Check "Email settings".',
     E_CONTENT_TOO_LARGE: "The email is larger than Cloudflare allows (5 MB).",
+    E_BREVO_CLE: "Brevo refuses the site's API key (revoked, miscopied, or IP address not allowed in Brevo). Open the Brevo screen and follow the steps, then resend.",
+    E_BREVO_LIMITE: "Brevo asks to slow down. Wait a minute, then resend.",
+    E_BREVO_INJOIGNABLE: "Brevo did not answer. Resend in a moment.",
+    E_BREVO_REFUS: "Brevo refused the email: the sender address is probably not verified in Brevo (Senders, domains and dedicated IPs). Details are below the line.",
     E_INTERNAL_SERVER_ERROR: "Cloudflare is briefly unavailable. Send again in a few minutes.",
     plafond: (which, limit) => {
       const window = { heure: "hourly", jour: "daily", destinataire: "per-recipient", mois: "monthly" }[which];
@@ -199,7 +213,21 @@ export const EN: Textes = {
     envoye: "Thank you, your message is on its way. We will answer as soon as we can.",
     garde: "Your message could not go out right away. It is kept on our side and we will read it as soon as possible; you can also write to us directly.",
     invalide: "Something is missing: check your name, your address and your message, then send again.",
+    verification: "The anti-robot check did not go through: wait until it is confirmed above the button (tick the box if it asks you to), then send again.",
+    sansScript: "This form needs JavaScript for its anti-robot check (Cloudflare Turnstile): turn JavaScript on to send it.",
+    refus: {
+      titre: "The form was not sent",
+      raisons: {
+        methode: "This address receives the site's forms: it does not open in a browser.",
+        indisponible: "The anti-robot check is not set up on this site yet: the form cannot receive anything for now. Please try again later.",
+        "sans-jeton": "The anti-robot check was not completed: go back to the form, wait until it is confirmed above the button, then send again.",
+        "jeton-refuse": "The anti-robot check failed or expired: go back to the form and send again.",
+        "sans-adresse": "Your email address is missing: go back to the form and fill it in.",
+      },
+      retour: "Back to the form",
+    },
   },
+
 
   courriels: {
     notificationSujet: (subject: string) => `New message from the site: ${subject}`,
