@@ -1,7 +1,7 @@
 {
   "socle": "aloha-socle",
   "version": "2.0.0",
-  "commit": "f139b49c161c",
+  "commit": "7eccb2da11ca",
   "depot": "reef",
   "modules": ["outillage","moteur-base","catalogue-bo","habillage-bo","langue-bo","mouvement","plan-du-site","ci","frontal"],
   "extensions": ["deployer","courriels","administrable","gestion","seo","medias","design"],
@@ -76,7 +76,7 @@
     "src/moteur/design/choix.tsx": {"source":"extensions/design/src/moteur/design/choix.tsx","sha256":"e10629717dbce43ad32123c69abd931ba7bcc5588d92891d62f757e7c5a91f74"},
     "src/moteur/design/design.selfcheck.ts": {"source":"extensions/design/src/moteur/design/design.selfcheck.ts","sha256":"55118c44525ddc4872f45f6c4b9a28ffb35337d53c4b0118bd1eeebed6eb775e"},
     "src/moteur/design/echelles.ts": {"source":"extensions/design/src/moteur/design/echelles.ts","sha256":"a028679843e4d49ca885970ef9df06601e7c21d249816fd7c8862261eb32c8c1"},
-    "src/moteur/design/ecran.css": {"source":"extensions/design/src/moteur/design/ecran.css","sha256":"ce645ce3b76f2a9d2c3c1bb28433b74c9007598a19ab67bf4896db4e798da8ef"},
+    "src/moteur/design/ecran.css": {"source":"extensions/design/src/moteur/design/ecran.css","sha256":"230f080958c4acefd99e82459a5d6935cbf09787bee51092da00dc643d5ff378"},
     "src/moteur/design/extension.ts": {"source":"extensions/design/src/moteur/design/extension.ts","sha256":"12c2f9b6f8990bb8da5d8de9b1f833e4285b6196913e8353cce465ac614e1d33"},
     "src/moteur/design/identite.mjs": {"source":"extensions/design/src/moteur/design/identite.mjs","sha256":"350ccb5413c53387f59f87c988204a93fb95604f3edb2f29559da53a77bd6a00"},
     "src/moteur/essai.ts": {"source":"extensions/administrable/src/moteur/essai.ts","sha256":"57407cc8ce85510dd03a4d6d6b3ba5dad1bdd8faaca3e81d3f2c346467d2bd50"},

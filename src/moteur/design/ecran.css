@@ -21,10 +21,7 @@
   color: var(--text-color-kumo-default);
 }
 
-.ds-tete {
-  display: grid;
-  gap: 0.5rem;
-}
+.ds-tete { display: grid; gap: 0.5rem; }
 
 .ds-titre {
   margin: 0;
@@ -36,27 +33,13 @@
 }
 
 .ds-chapeau,
-.ds-aide {
-  margin: 0;
-  max-width: 68ch;
-  color: var(--text-color-kumo-subtle);
-}
+.ds-aide { margin: 0; max-width: 68ch; color: var(--text-color-kumo-subtle); }
 
-.ds-chapeau {
-  font-size: 0.9375rem;
-  line-height: 1.5;
-}
+.ds-chapeau { font-size: 0.9375rem; line-height: 1.5; }
 
-.ds-aide {
-  font-size: 0.8125rem;
-  line-height: 1.45;
-}
+.ds-aide { font-size: 0.8125rem; line-height: 1.45; }
 
-.ds-colonnes {
-  display: grid;
-  gap: 1.5rem;
-  align-items: start;
-}
+.ds-colonnes { display: grid; gap: 1.5rem; align-items: start; }
 
 @media (min-width: 72rem) {
   .ds-colonnes {
@@ -64,11 +47,7 @@
   }
 }
 
-.ds-reglages {
-  display: grid;
-  gap: 1rem;
-  min-width: 0;
-}
+.ds-reglages { display: grid; gap: 1rem; min-width: 0; }
 
 .ds-carte {
   display: grid;
@@ -112,16 +91,9 @@
 }
 
 /* Les segments : des boutons radio natifs, presentes cote a cote. */
-.ds-segments {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-}
+.ds-segments { display: flex; flex-wrap: wrap; gap: 0.375rem; }
 
-.ds-segment {
-  position: relative;
-  flex: 1 1 auto;
-}
+.ds-segment { position: relative; flex: 1 1 auto; }
 
 .ds-segment input,
 .ds-pastille input {
@@ -148,22 +120,12 @@
   text-align: center;
 }
 
-.ds-segment input:checked + .ds-segment-texte {
-  border-color: var(--color-kumo-brand);
-  box-shadow: inset 0 0 0 1px var(--color-kumo-brand);
-  font-weight: 650;
-}
+.ds-segment input:checked + .ds-segment-texte { border-color: var(--color-kumo-brand); box-shadow: inset 0 0 0 1px var(--color-kumo-brand); font-weight: 650; }
 
 .ds-segment input:focus-visible + .ds-segment-texte,
-.ds-pastille input:focus-visible + .ds-rond {
-  outline: 2px solid var(--color-kumo-brand);
-  outline-offset: 2px;
-}
+.ds-pastille input:focus-visible + .ds-rond { outline: 2px solid var(--color-kumo-brand); outline-offset: 2px; }
 
-.ds-exemple {
-  font-size: 1.125rem;
-  font-weight: 700;
-}
+.ds-exemple { font-size: 1.125rem; font-weight: 700; }
 
 .ds-coin {
   width: 1.125rem;
@@ -173,11 +135,7 @@
 }
 
 /* Les pastilles de couleur : un rond plein et son nom, une cible de 44 px. */
-.ds-pastilles {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
-  gap: 0.5rem;
-}
+.ds-pastilles { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: 0.5rem; }
 
 .ds-pastille {
   position: relative;
@@ -200,13 +158,9 @@
   background: conic-gradient(from 90deg, var(--color-kumo-brand) 0 50%, var(--color-kumo-line) 0 100%);
 }
 
-.ds-pastille input:checked + .ds-rond {
-  box-shadow: 0 0 0 2px var(--color-kumo-base), 0 0 0 4px var(--color-kumo-brand);
-}
+.ds-pastille input:checked + .ds-rond { box-shadow: 0 0 0 2px var(--color-kumo-base), 0 0 0 4px var(--color-kumo-brand); }
 
-.ds-pastille input:checked ~ .ds-pastille-nom {
-  font-weight: 650;
-}
+.ds-pastille input:checked ~ .ds-pastille-nom { font-weight: 650; }
 
 /* Le logo : un carre clair ou sombre, quel que soit le mode du back office. */
 .ds-logo {
@@ -226,27 +180,13 @@
   border-radius: 0.75rem;
 }
 
-.ds-logo-fond img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
+.ds-logo-fond img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-.ds-logo-fond--clair {
-  background: #ffffff;
-  color: #3d3d3d;
-}
+.ds-logo-fond--clair { background: #ffffff; color: #3d3d3d; }
 
-.ds-logo-fond--sombre {
-  background: #000000;
-  color: #c7c7c7;
-}
+.ds-logo-fond--sombre { background: #000000; color: #c7c7c7; }
 
-.ds-logo-gestes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
+.ds-logo-gestes { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
 .ds-grille {
   display: grid;
@@ -270,23 +210,12 @@
   cursor: pointer;
 }
 
-.ds-vignette[aria-pressed="true"] {
-  border-color: var(--color-kumo-brand);
-  box-shadow: inset 0 0 0 1px var(--color-kumo-brand);
-}
+.ds-vignette[aria-pressed="true"] { border-color: var(--color-kumo-brand); box-shadow: inset 0 0 0 1px var(--color-kumo-brand); }
 
-.ds-vignette img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
+.ds-vignette img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
 /* L'apercu : colle au haut de l'ecran sur un grand ecran, sous les reglages sur un petit. */
-.ds-apercu {
-  display: grid;
-  gap: 0.75rem;
-  min-width: 0;
-}
+.ds-apercu { display: grid; gap: 0.75rem; min-width: 0; }
 
 @media (min-width: 72rem) {
   .ds-apercu {
@@ -302,9 +231,7 @@
   gap: 0.5rem 1rem;
 }
 
-.ds-apercu-barre .ds-petit-titre {
-  margin-right: auto;
-}
+.ds-apercu-barre .ds-petit-titre { margin-right: auto; }
 
 .ds-groupe {
   display: inline-flex;
@@ -325,18 +252,11 @@
   cursor: pointer;
 }
 
-.ds-bascule[aria-pressed="true"] {
-  background: var(--color-kumo-brand);
-  color: var(--text-color-kumo-inverse, #fff);
-  font-weight: 600;
-}
+.ds-bascule[aria-pressed="true"] { background: var(--color-kumo-brand); color: var(--text-color-kumo-inverse, #fff); font-weight: 600; }
 
 .ds-bascule:focus-visible,
 .ds-bouton:focus-visible,
-.ds-vignette:focus-visible {
-  outline: 2px solid var(--color-kumo-brand);
-  outline-offset: 2px;
-}
+.ds-vignette:focus-visible { outline: 2px solid var(--color-kumo-brand); outline-offset: 2px; }
 
 .ds-ecran {
   overflow: hidden;
@@ -359,9 +279,7 @@
   border-radius: 2rem;
 }
 
-.ds-ecran--telephone .ds-cadre {
-  height: min(78vh, 52.75rem);
-}
+.ds-ecran--telephone .ds-cadre { height: min(78vh, 52.75rem); }
 
 /* La barre d'enregistrement, collee en bas : un seul bouton principal. */
 .ds-barre {
@@ -379,22 +297,12 @@
   background: var(--color-kumo-base);
 }
 
-.ds-statut {
-  margin: 0 auto 0 0;
-  font-size: 0.8125rem;
-  color: var(--text-color-kumo-subtle);
-}
+.ds-statut { margin: 0 auto 0 0; font-size: 0.8125rem; color: var(--text-color-kumo-subtle); }
 
-.ds-statut--ok {
-  color: var(--text-color-kumo-default);
-  font-weight: 600;
-}
+.ds-statut--ok { color: var(--text-color-kumo-default); font-weight: 600; }
 
 .ds-statut--erreur,
-.ds-alerte {
-  color: var(--text-color-kumo-danger, #b42318);
-  font-weight: 600;
-}
+.ds-alerte { color: var(--text-color-kumo-danger, #b42318); font-weight: 600; }
 
 .ds-bouton {
   display: inline-flex;
@@ -411,25 +319,16 @@
   cursor: pointer;
 }
 
-.ds-bouton--second {
-  border-color: var(--color-kumo-line);
-  background: transparent;
-  color: inherit;
-}
+.ds-bouton--second { border-color: var(--color-kumo-line); background: transparent; color: inherit; }
 
-.ds-bouton:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
+.ds-bouton:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* L'APPARENCE N'A QU'UN ECRAN. Dans "Reglages par langue", la couleur, la
  * police, le logo sombre, les tailles et les rayons sont regles ici : leurs
  * lignes y sont cachees. */
 :is(#field-logo_dark),
 div.grid:has(> :is(#field-logo_dark, label[for="field-logo_dark"])),
-div.grid:has(> [data-kumo-part="trigger"]:is([aria-label^="Couleur de la marque"], [aria-label^="Police du site"], [aria-label*="page Design"])) {
-  display: none !important;
-}
+div.grid:has(> [data-kumo-part="trigger"]:is([aria-label^="Couleur de la marque"], [aria-label^="Police du site"], [aria-label*="page Design"])) { display: none !important; }
 /* Les listes de choix d'EmDash ne portent pas d'id stable : elles sont reconnues
  * par le debut de leur nom (le meme dans les graines de tous les sites) ou par
  * "page Design", que portent les cinq champs des tailles et des coins. Jamais plus haut que la rangee du champ (div.grid) : le parent commun de
