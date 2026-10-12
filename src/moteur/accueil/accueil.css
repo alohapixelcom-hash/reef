@@ -1,0 +1,167 @@
+/* src/moteur/accueil/accueil.css - le tableau de bord en tuiles (classes aa-*) et la page d'accueil d'EmDash ramenee a lui.
+ *
+ * Meme regle que les feuilles de la gestion et de la boutique : surfaces,
+ * filets et encres sont les variables natives du back office (blanc en clair,
+ * noir en sombre), l'accent est sa marque (--color-kumo-brand), reglee par
+ * l'habillage du site. Aucune couleur en dur, aucun degrade, aucune lueur :
+ * une tuile qui attend quelque chose prend un filet de l'accent, rien de plus.
+ *
+ * LA PAGE D'ACCUEIL. EmDash 0.38 monte la carte d'une extension tout en bas,
+ * dans une grille a deux colonnes qui ignore `size` (Dashboard.tsx). admin.ts
+ * marque, depuis la tuile elle-meme, la colonne de la page
+ * (data-aloha-accueil), la grille des cartes (data-aloha-accueil-grille), la
+ * carte (data-aloha-accueil-carte) et ses cadres (data-aloha-accueil-cadre).
+ * Sans ces marques (extension absente, script en echec), aucune regle
+ * ci-dessous ne s'applique : la page d'origine reste entiere.
+ */
+
+/* La page : le titre, les avertissements d'EmDash, puis les tuiles. Les
+ * boutons "+ <collection>" (un par collection, au singulier : "+ Billet"),
+ * les compteurs (brouillons, fichiers, utilisateurs), la liste des
+ * collections et l'activite recente laissent la place aux tuiles, qui disent
+ * les memes gestes en mots de client. Les autres cartes (Boutique) restent. */
+[data-aloha-accueil] {
+  display: flex !important;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+[data-aloha-accueil] > * {
+  margin-block: 0 !important;
+}
+[data-aloha-accueil] > :first-child > :not(h1) {
+  display: none !important;
+}
+[data-aloha-accueil] > .grid:not([data-aloha-accueil-grille]) {
+  display: none !important;
+}
+[data-aloha-accueil-carte] {
+  grid-column: 1 / -1;
+  order: -1;
+}
+[data-aloha-accueil-cadre] {
+  padding: 0 !important;
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+[data-aloha-accueil-masque] {
+  display: none !important;
+}
+
+/* Les tuiles */
+.aa-accueil {
+  display: grid;
+  gap: 1.75rem;
+  color: var(--text-color-kumo-default);
+}
+
+.aa-chargement {
+  min-height: 16rem;
+}
+
+.aa-rangee {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.aa-rangee h2 {
+  margin: 0;
+  color: var(--text-color-kumo-subtle);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Une seule trame pour les trois rangees : les tuiles s'alignent d'une rangee
+ * a l'autre (cinq colonnes sur un ecran d'ordinateur, une sur un telephone).
+ * Ce qui demande une action prend deux colonnes des que la place le permet. */
+.aa-grille {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 48rem) {
+  .aa-rangee--actions .aa-grille > li {
+    grid-column: span 2;
+  }
+}
+
+.aa-tuile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+  min-height: 7.5rem;
+  box-sizing: border-box;
+  padding: 1.25rem;
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 1.25rem;
+  background: var(--color-kumo-base);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.aa-tuile:hover {
+  border-color: color-mix(in oklab, var(--color-kumo-brand) 45%, var(--color-kumo-line));
+  box-shadow: 0 6px 18px var(--color-kumo-shadow-drop);
+}
+
+.aa-tuile:focus-visible {
+  outline: 2px solid var(--color-kumo-brand);
+  outline-offset: 2px;
+}
+
+.aa-tuile--attention {
+  border-color: var(--color-kumo-brand);
+}
+
+.aa-tete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.aa-icone {
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--color-kumo-brand);
+}
+
+.aa-nombre {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.aa-tuile--attention .aa-nombre {
+  color: var(--color-kumo-brand);
+}
+
+.aa-titre {
+  margin-top: auto;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.aa-detail {
+  color: var(--text-color-kumo-subtle);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aa-tuile {
+    transition: none;
+  }
+}

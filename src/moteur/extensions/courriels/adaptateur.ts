@@ -41,16 +41,28 @@
 //      par un alias qui rend formulaire.fichiers.ts quand le moteur est eteint ;
 //   6. rejouer le SQL livre (courriels_journal, courriels_reglages) sur la base
 //      en ligne, ou laisser l'extension creer ses tables au premier usage ;
-//   7. declarer la liaison dans le fichier du Worker : "send_email": [{ "name": "EMAIL" }].
+//   7. declarer la liaison dans le fichier du Worker : "send_email": [{ "name": "EMAIL" }] ;
+//   8. Cloudflare Turnstile : poser <Turnstile envoi={envoi} /> (./Turnstile.astro)
+//      ou <Verification envoi={envoi} /> (./Verification.astro) dans chaque
+//      formulaire, puis, dans l'environnement du Worker du moteur, la cle
+//      publique (variable PUBLIC_TURNSTILE_SITE_KEY ou TURNSTILE_SITE_KEY, ou
+//      champ `turnstile` de configuration.ts) et le secret TURNSTILE_SECRET
+//      (ou TURNSTILE_SECRET_KEY). Sans aucune des deux, rien ne change, sauf
+//      `turnstileObligatoire: true` ; une seule des deux ferme la porte
+//      (noyau/turnstile.ts).
 // Rien d'autre : ni dependance, ni secret, ni adresse dans le code.
 import type { Base } from "./noyau/base.ts";
+import { formulaireDeclare, type FormulaireDuSite } from "./noyau/champs.ts";
 import type { Liaison } from "./noyau/envoi.ts";
 import type { OptionsDeLaLettre } from "./noyau/lettre.ts";
+import { type ConfigurationTurnstile, hotesDe, obligatoire, PROTECTION_ABSENTE, type Protection, protectionDe } from "./noyau/turnstile.ts";
 import { CONFIGURATION } from "./configuration.ts";
 
 export interface Hote {
   base: Base | null;
   liaison: Liaison | null;
+  /** Turnstile d'apres le Worker et configuration.ts (noyau/turnstile.ts). */
+  turnstile: Protection;
 }
 
 /** L'adresse ou le formulaire poste : sous /_emdash, que les Workers de la maison ne redirigent jamais. */
@@ -69,6 +81,15 @@ export function lettreDuSite(): OptionsDeLaLettre | null {
   if (typeof brut !== "object" || brut === null) return null;
   const o = brut as OptionsDeLaLettre;
   return typeof o.collection === "string" && typeof o.adresse === "object" && o.adresse !== null ? o : null;
+}
+
+/**
+ * La declaration d'un formulaire du site (champ `formulairesDuSite` de
+ * configuration.ts : champs en plus, nom et message requis), lue sans le type
+ * du site, que les sites d'avant n'ont pas. Null : les quatre champs habituels.
+ */
+export function formulaireDuSite(id: unknown): FormulaireDuSite | null {
+  return formulaireDeclare((CONFIGURATION as { formulairesDuSite?: unknown }).formulairesDuSite, id);
 }
 
 /** La forme d'une base D1, reduite a ce que ce fichier appelle. */
@@ -92,6 +113,13 @@ export function baseD1(d1: D1): Base {
   return base;
 }
 
+// BREVO (extension brevo du socle), QUAND LE SITE L'A : sa cle posee et le
+// service allume, il prend la place de la liaison Cloudflare pour chaque
+// envoi (src/moteur/brevo/transport.ts). Le fichier n'est charge que s'il
+// existe : un site sans Brevo se construit et envoie comme avant.
+type TransportBrevo = { liaisonDuSite?: (env: Record<string, unknown>, base: Base | null, repli: Liaison | null) => Promise<Liaison | null> };
+const TRANSPORT_BREVO = Object.values(import.meta.glob<TransportBrevo>("../../brevo/transport.ts"))[0] ?? null;
+
 function estUneLiaison(valeur: unknown): valeur is Liaison {
   return typeof valeur === "object" && valeur !== null && typeof (valeur as { send?: unknown }).send === "function";
 }
@@ -105,14 +133,39 @@ export async function hote(): Promise<Hote> {
     const plateforme: { env?: Record<string, unknown> } = await import("cloudflare:workers");
     const env = plateforme.env ?? {};
     const d1 = env[CONFIGURATION.base];
-    const liaison = env[CONFIGURATION.liaison];
+    const brute = env[CONFIGURATION.liaison];
+    const base = typeof d1 === "object" && d1 !== null && "prepare" in d1 ? baseD1(d1 as D1) : null;
+    const cloudflare = estUneLiaison(brute) ? brute : null;
+    const liaison = TRANSPORT_BREVO ? ((await (await TRANSPORT_BREVO()).liaisonDuSite?.(env, base, cloudflare)) ?? cloudflare) : cloudflare;
     return {
-      base: typeof d1 === "object" && d1 !== null && "prepare" in d1 ? baseD1(d1 as D1) : null,
-      liaison: estUneLiaison(liaison) ? liaison : null,
+      base,
+      liaison,
+      turnstile: protectionDe(env, CONFIGURATION as ConfigurationTurnstile),
     };
   } catch {
-    return { base: null, liaison: null };
+    return { base: null, liaison: null, turnstile: PROTECTION_ABSENTE };
   }
+}
+
+/** La protection Turnstile du Worker ; absente hors de workerd. */
+export async function turnstile(): Promise<Protection> {
+  return (await hote()).turnstile;
+}
+
+/** La cle publique Turnstile posee dans configuration.ts (champ `turnstile`), ou null. */
+export function cleTurnstile(): string | null {
+  const cle = (CONFIGURATION as ConfigurationTurnstile).turnstile;
+  return typeof cle === "string" && cle.trim() ? cle.trim() : null;
+}
+
+/** Les noms d'hote admis (champ `turnstileHotes` de configuration.ts) ; vide : le nom d'hote n'est pas controle. */
+export function hotesTurnstile(): string[] {
+  return hotesDe(CONFIGURATION as ConfigurationTurnstile);
+}
+
+/** Vrai quand le site exige Turnstile en ligne (champ `turnstileObligatoire` de configuration.ts). */
+export function turnstileExige(): boolean {
+  return obligatoire(CONFIGURATION as ConfigurationTurnstile);
 }
 
 /** Un identifiant de ligne court, triable par date a la seconde pres. */

@@ -6,7 +6,7 @@
 // Les liens des courriels ramenent a l'accueil de la langue de l'abonne
 // (?lettre=confirme|desinscrit|inconnu#lettre-avis).
 //
-//   POST /_emdash/courriels/lettre/inscrire     email, langue, retour, site_web (piege)
+//   POST /_emdash/courriels/lettre/inscrire     email, langue, retour, site_web (piege), cf-turnstile-response (Turnstile, quand il est pose : noyau/turnstile.ts)
 //   GET  /_emdash/courriels/lettre/confirmer?jeton=...
 //   GET  /_emdash/courriels/lettre/desinscrire?jeton=...  (le lien du pied : la page de confirmation)
 //   POST /_emdash/courriels/lettre/desinscrire?jeton=...  confirme=1 (le bouton de cette page : 303 vers l'accueil)
@@ -15,9 +15,16 @@
 // La route vit sous /_emdash/ (voir reception.ts). Astro verifie l'origine
 // d'un POST de formulaire ; le POST en un clic des messageries n'est pas un
 // formulaire (corps List-Unsubscribe=One-Click) et n'a besoin que du jeton.
+//
+// L'INSCRIPTION PASSE LE PIEGE PUIS LA PORTE (noyau/turnstile.ts) AVANT toute
+// ecriture en base et tout envoi : sans jeton, jeton refuse, adresse vide
+// ramenent au formulaire avec leur avis ; GET 405 et protection exigee mais
+// pas posee 503 repondent une page (noyau/garde.ts). La confirmation et la desinscription
+// n'y passent pas : elles portent deja un jeton secret, et le bouton des
+// messageries ne peut pas resoudre un widget.
 import type { APIRoute } from "astro";
 import { getSiteSettings } from "emdash";
-import { hote, lettreDuSite, nouvelId, ROUTE_DE_LA_LETTRE } from "./adaptateur.ts";
+import { hote, hotesTurnstile, lettreDuSite, nouvelId, ROUTE_DE_LA_LETTRE, turnstileExige } from "./adaptateur.ts";
 import { CONFIGURATION } from "./configuration.ts";
 import { IDENTITE } from "./identite.mjs";
 import { lireLesReglages } from "./noyau/base.ts";
@@ -25,9 +32,13 @@ import { type Canal, poster } from "./noyau/canal.ts";
 import { abonneDuJeton, accueilDe, confirmer, demanderLInscription, desinscrire, liensDeLAbonne } from "./noyau/lettre.ts";
 import { CHAMP_CONFIRME, pageDeDesinscription } from "./noyau/page-desinscription.ts";
 import { confirmation } from "./noyau/parution.ts";
+import { reponseDuRefus } from "./noyau/garde.ts";
 import { cheminDeRetour, type Langue } from "./noyau/regles.ts";
+import { controler, type Recuperer, type Refus } from "./noyau/turnstile.ts";
 import { LETTRE_EN } from "./ecrans/lettre.textes.en.ts";
 import { LETTRE_FR } from "./ecrans/lettre.textes.fr.ts";
+import { EN } from "./ecrans/textes.en.ts";
+import { FR } from "./ecrans/textes.fr.ts";
 
 export const prerender = false;
 
@@ -40,6 +51,15 @@ export const ANCRE_DE_L_AVIS = "lettre-avis";
 function retour(chemin: string, avis: AvisDeLaLettre): Response {
   return new Response(null, { status: 303, headers: { Location: `${chemin}?lettre=${avis}#${ANCRE_DE_L_AVIS}`, "Cache-Control": "no-store" } });
 }
+
+/** Un refus de la porte : retour au formulaire avec son avis, ou la page de refus quand il n'y a pas de formulaire ou de protection. */
+function refuser(refus: Refus, langue: Langue, chemin: string): Response {
+  if (refus !== "methode" && refus !== "indisponible") return retour(chemin, refus === "sans-adresse" ? "invalide" : "verification");
+  return reponseDuRefus((langue === "fr" ? FR : EN).visiteur.refus, { langue, refus, lien: refus === "methode" ? "/" : chemin });
+}
+
+/** Le vrai fetch du Worker, sous la forme que la porte appelle. */
+const recuperer: Recuperer = (url, init) => fetch(url, init);
 
 async function nomDuSite(): Promise<string> {
   try {
@@ -55,7 +75,7 @@ function canalDe(locals: unknown): Canal | null {
   return email?.isAvailable() ? (m) => email.send(m, IDENTITE.id) : null;
 }
 
-async function inscrire(request: Request, locals: unknown): Promise<Response> {
+async function inscrire(request: Request, locals: unknown, url: URL): Promise<Response> {
   let brut: Record<string, unknown> = {};
   try {
     brut = Object.fromEntries([...(await request.formData()).entries()].filter(([, v]) => typeof v === "string"));
@@ -66,8 +86,13 @@ async function inscrire(request: Request, locals: unknown): Promise<Response> {
   const langue: Langue = brut.langue === "fr" ? "fr" : "en";
   // Un robot lit la meme phrase qu'un humain, et rien ne part.
   if (typeof brut.site_web === "string" && brut.site_web.trim()) return retour(chemin, "attente");
+  // Turnstile (noyau/turnstile.ts) : un jeton absent ou refuse ne va pas plus loin.
+  const h = await hote();
+  const refus = await controler({ methode: request.method, url, brut, ip: request.headers.get("CF-Connecting-IP"), action: "lettre" }, { protection: h.turnstile, hotes: hotesTurnstile(), exigee: turnstileExige() }, recuperer);
+  if (refus === "indisponible") console.error("Courriels : Turnstile exige ou a moitie pose, inscription refusee en ligne");
+  if (refus) return refuser(refus, langue, chemin);
   const lettre = lettreDuSite();
-  const { base } = await hote();
+  const { base } = h;
   if (!lettre || !base) return retour(chemin, "garde");
   try {
     const demande = await demanderLInscription(base, { adresse: String(brut.email ?? "").slice(0, 254), langue, page: chemin }, Date.now(), nouvelId);
@@ -118,12 +143,13 @@ async function lien(url: URL, geste: "confirmer" | "desinscrire", unClic: boolea
 export const GET: APIRoute = async ({ params, url }) => {
   const geste = params.geste;
   if (geste === "confirmer" || geste === "desinscrire") return lien(url, geste, false);
+  if (geste === "inscrire") return refuser("methode", CONFIGURATION.langue, "/");
   return new Response(null, { status: 303, headers: { Location: "/" } });
 };
 
 export const POST: APIRoute = async ({ params, url, request, locals }) => {
   const geste = params.geste;
-  if (geste === "inscrire") return inscrire(request, locals);
+  if (geste === "inscrire") return inscrire(request, locals, url);
   if (geste === "desinscrire") {
     // Le bouton de la page de confirmation porte confirme=1 : il desinscrit et ramene a l'accueil avec la phrase.
     let confirme = false;

@@ -29,7 +29,12 @@ export interface OptionsDuPlan {
   ajoutees?: () => Promise<string[]>;
   /** Des adresses a retirer, lues a la demande (une entree en noindex) ; elles passent apres les ajouts. */
   exclues?: () => Promise<string[]>;
+  /** Les images de chaque page (adresse de la page vers les adresses de ses photos), lues a la demande : elles partent en image:image (plan d'images de Google). */
+  images?: () => Promise<Record<string, string[]>>;
 }
+
+/** Une adresse dans un texte XML : les caracteres reserves echappes. */
+const xml = (texte: string): string => texte.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 
 /** "src/pages/[...locale]/legal.astro" + params -> "/fr/legal/". */
 export function adresseDeLaPage(page: string, params: Params): string {
@@ -80,6 +85,8 @@ export function planDuSite(options: OptionsDuPlan): APIRoute {
       parSuffixe.get(suffixe)!.set(langue, chemin);
     }
     const absolue = (chemin: string): string => new URL(chemin, base).href;
+    const images = (await options.images?.()) ?? {};
+    const avecImages = Object.values(images).some((liste) => liste.length > 0);
     const urls = chemins.map((chemin) => {
       const langues = parSuffixe.get(decouper(chemin).suffixe)!;
       const liens =
@@ -88,9 +95,13 @@ export function planDuSite(options: OptionsDuPlan): APIRoute {
               .map(([l, c]) => `<xhtml:link rel="alternate" hreflang="${l}" href="${absolue(c)}"/>`)
               .join("")
           : "";
-      return `<url><loc>${absolue(chemin)}</loc>${liens}</url>`;
+      const photos = [...new Set((images[chemin] ?? []).map(absolue))]
+        .map((src) => `<image:image><image:loc>${xml(src)}</image:loc></image:image>`)
+        .join("");
+      return `<url><loc>${xml(absolue(chemin))}</loc>${liens}${photos}</url>`;
     });
-    const xml = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">${urls.join("")}</urlset>`;
-    return new Response(xml, { headers: { "Content-Type": "application/xml; charset=utf-8" } });
+    const espaceImages = avecImages ? ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"' : "";
+    const corps = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml"${espaceImages}>${urls.join("")}</urlset>`;
+    return new Response(corps, { headers: { "Content-Type": "application/xml; charset=utf-8" } });
   };
 }

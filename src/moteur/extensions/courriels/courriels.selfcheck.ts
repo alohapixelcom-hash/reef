@@ -1,4 +1,4 @@
-// src/moteur/extensions/courriels/courriels.selfcheck.ts - self-check de l'extension Courriels : plafonds, masquage, compteur du mois, SQL idempotent, canal d'EmDash (fournisseur et journal), renvoi, DNS, absence d'adresse en dur.
+// src/moteur/extensions/courriels/courriels.selfcheck.ts - self-check de l'extension Courriels : plafonds, masquage, compteur du mois, SQL idempotent, canal d'EmDash (fournisseur et journal), renvoi, DNS, Turnstile, absence d'adresse en dur.
 // Lancer : node --experimental-strip-types src/moteur/extensions/courriels/courriels.selfcheck.ts
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
@@ -7,8 +7,9 @@ import { fileURLToPath } from "node:url";
 import { bilanDuCycle, echecsEnAttente, lignes, preparer, SQL_IDEMPOTENT, type Base } from "./noyau/base.ts";
 import { analyser, interroger, valeursDe } from "./noyau/dns.ts";
 import { type Canal, type Evenement, fournisseur, journaliste, poster } from "./noyau/canal.ts";
-import { type Contexte, erreurEnClair, essai, manques, recevoirContact, renvoyer } from "./noyau/envoi.ts";
+import { type Contexte, erreurEnClair, essai, lireChamps, manques, recevoirContact, renvoyer } from "./noyau/envoi.ts";
 import { cheminDeRetour, debutDuCycle, origineDeLaSource, finDuCycle, langueDeLaRequete, lireReglages, masquer, plafondAtteint, reglagesParDefaut, type Reglages } from "./noyau/regles.ts";
+import { CHAMP_TURNSTILE, controler, protectionDe, protectionPrete, reglageTurnstile, SITEVERIFY, verifierLeJeton, verifierTurnstile } from "./noyau/turnstile.ts";
 import { appliquer, rangee, VUE_PAR_DEFAUT } from "./ecrans/journal.ts";
 import { carte } from "./ecrans/tableau.ts";
 import { versReglages } from "./ecrans/reglages.ts";
@@ -26,6 +27,36 @@ is(masquer("jeanne.dupont@exemple.test"), "j***t@exemple.test", "masque la parti
 is(masquer("jo@exemple.test"), "j*@exemple.test", "une partie locale courte ne se devine pas");
 is(masquer("a@x.test, bob@y.test"), "a*@x.test, b***b@y.test", "une liste se masque adresse par adresse");
 is(masquer("pas-une-adresse"), "***", "ce qui n'est pas une adresse ne sort pas en clair");
+
+// --- Turnstile ----------------------------------------------------------------
+{
+  const recus: { adresse: string; secret: unknown; jeton: unknown; ip: unknown }[] = [];
+  const repondre = (donnees: Record<string, unknown>, ok = true) => async (adresse: string, init: { method: string; body: URLSearchParams }) => {
+    recus.push({ adresse, secret: init.body.get("secret"), jeton: init.body.get("response"), ip: init.body.get("remoteip") });
+    return { ok, json: async () => donnees };
+  };
+  const bon = { success: true, action: "contact", hostname: "boutique.exemple.test" };
+  const attendu = { actions: ["contact"], hotes: ["exemple.test"] };
+  is(await verifierTurnstile("jeton", "secret", "1.2.3.4", attendu, repondre(bon)), true, "un jeton accepte, bonne action, bon hote : passe");
+  is(recus[0], { adresse: SITEVERIFY, secret: "secret", jeton: "jeton", ip: "1.2.3.4" }, "le secret, le jeton et l'adresse IP partent a siteverify");
+  is(await verifierTurnstile("jeton", "secret", null, attendu, repondre({ ...bon, success: false })), false, "un jeton refuse ne passe pas");
+  is(await verifierTurnstile("jeton", "secret", null, attendu, repondre({ ...bon, action: "lettre" })), false, "un jeton signe pour une autre action ne passe pas");
+  is(await verifierTurnstile("jeton", "secret", null, attendu, repondre({ ...bon, hostname: "autre-site.test" })), false, "un jeton obtenu sur un autre site ne passe pas");
+  is(await verifierTurnstile("jeton", "secret", null, attendu, repondre({ ...bon, hostname: "pasexemple.test" })), false, "un nom d'hote qui finit pareil sans etre un sous-domaine ne passe pas");
+  is(await verifierTurnstile("jeton", "secret", null, {}, repondre({ success: true })), true, "sans attente, success suffit");
+  is(await verifierTurnstile("jeton", "secret", null, attendu, repondre(bon, false)), false, "une reponse en erreur ne passe pas");
+  is(await verifierTurnstile("", "secret", null, attendu, repondre(bon)), false, "un jeton vide ne passe pas");
+  is(await verifierTurnstile(undefined, "secret", null, attendu, repondre(bon)), false, "un jeton absent ne passe pas");
+  is(await verifierTurnstile("jeton", "secret", null, attendu, async () => { throw new Error("reseau"); }), false, "une erreur reseau ne passe pas");
+}
+
+// --- Champs en plus d'un formulaire ------------------------------------------
+{
+  const base = { name: "Payet", email: "a@exemple.test", topic: "Devis", message: "Bonjour" };
+  is(lireChamps({ ...base, "plus:Société": "Kaz", "plus:Téléphone": "0262" }).message, "Société : Kaz\nTéléphone : 0262\n\nBonjour", "les champs en plus passent en tete du message");
+  is(lireChamps({ ...base, "plus:Société": "  " }).message, "Bonjour", "un champ en plus vide ne laisse rien");
+  is(lireChamps({ ...base, message: "", "plus:Société": "Kaz" }).message, "", "un champ en plus ne rend pas valide un message vide");
+}
 
 // --- Reglages ---------------------------------------------------------------
 const defaut = reglagesParDefaut();
@@ -242,6 +273,58 @@ if (sqlite) {
   horloge += 2 * 3_600_000;
   const e = await essai(envoi, reglages, "moi@exemple.test", FR, "Vela", "maintenant");
   is([e.etat, envoyes.at(-1)?.from], ["envoye", { email: "site@exemple.test", name: "Vela" }], "l'essai part avec l'expediteur et le nom regles");
+}
+
+// --- Turnstile : la paire, la porte -----------------------------------------
+// Les noms des cles des differents sites sont tous lus ; les deux posees
+// allument la protection, aucune ne change rien, une seule ferme la porte.
+{
+  is(reglageTurnstile({}), null, "Turnstile eteint sans cle ni secret");
+  is(reglageTurnstile({ PUBLIC_TURNSTILE_SITE_KEY: "0xCLE" }), null, "la cle seule ne l'allume pas");
+  is(reglageTurnstile({ TURNSTILE_SECRET: "0xSECRET" }), null, "le secret seul ne l'allume pas");
+  is(reglageTurnstile({ PUBLIC_TURNSTILE_SITE_KEY: " 0xCLE ", TURNSTILE_SECRET: "0xSECRET" }), { cle: "0xCLE", secret: "0xSECRET" }, "la cle et le secret l'allument");
+  is(reglageTurnstile({ TURNSTILE_SITE_KEY: "0xA", TURNSTILE_SECRET_KEY: "0xB" }), { cle: "0xA", secret: "0xB" }, "les noms TURNSTILE_SITE_KEY et TURNSTILE_SECRET_KEY sont lus aussi");
+  is(reglageTurnstile({ TURNSTILE_SECRET: "0xB" }, { turnstile: "0xCONF" }), { cle: "0xCONF", secret: "0xB" }, "la cle publique peut venir de configuration.ts");
+  is(protectionDe({ TURNSTILE_SITE_KEY: "0xA" }).etat, "sans-secret", "cle sans secret : etat sans-secret");
+  is(protectionDe({ TURNSTILE_SECRET: "0xB" }).etat, "sans-cle", "secret sans cle : etat sans-cle");
+  const enLigne = new URL("https://exemple.test/contact/");
+  const local = new URL("http://localhost:4321/contact/");
+  is(protectionPrete(protectionDe({}), enLigne), true, "rien de pose : le formulaire reste branche comme avant");
+  is(protectionPrete(protectionDe({}), enLigne, true), false, "rien de pose mais exige : formulaire inerte en ligne");
+  is(protectionPrete(protectionDe({}), local, true), true, "exige mais en local : l'essai passe");
+  is(protectionPrete(protectionDe({ TURNSTILE_SITE_KEY: "0xA" }), enLigne), false, "a moitie pose : formulaire inerte");
+  const appels: { url: string; corps: Record<string, string> }[] = [];
+  const siteverify =
+    (succes: boolean | "panne", plus: Record<string, unknown> = {}) =>
+    async (url: string, init: { method: "POST"; body: URLSearchParams }) => {
+      appels.push({ url, corps: Object.fromEntries([...init.body.entries()].map(([k, v]) => [k, String(v)])) });
+      if (succes === "panne") throw new Error("reseau");
+      return { ok: true, json: async () => ({ success: succes, "error-codes": succes ? [] : ["invalid-input-response"], ...plus }) };
+    };
+  const active = protectionDe({ PUBLIC_TURNSTILE_SITE_KEY: "0xCLE", TURNSTILE_SECRET: "0xSECRET" });
+  const demande = (brut: Record<string, unknown>, url = enLigne, methode = "POST") => ({ methode, url, brut: { email: "a@exemple.test", ...brut }, ip: "203.0.113.7", action: "contact" });
+  is(await controler(demande({}), { protection: protectionDe({}) }, siteverify(false)), null, "sans cle ni secret, un formulaire sans jeton passe comme avant");
+  is(appels.length, 0, "sans secret, siteverify n'est pas appele");
+  is(await controler(demande({}), { protection: protectionDe({}), exigee: true }, siteverify(true)), "indisponible", "exige et absent en ligne : refus");
+  is(await controler(demande({}), { protection: protectionDe({ TURNSTILE_SECRET: "0xS" }) }, siteverify(true)), "indisponible", "a moitie pose en ligne : refus");
+  is(await controler(demande({}, local), { protection: protectionDe({ TURNSTILE_SECRET: "0xS" }) }, siteverify(true)), null, "a moitie pose en local : l'essai passe");
+  is(await controler(demande({}, enLigne, "GET"), { protection: active }, siteverify(true)), "methode", "une autre methode que POST : refus 405");
+  is(await controler(demande({}), { protection: active }, siteverify(true)), "sans-jeton", "protection active : un jeton absent est refuse");
+  is(await controler(demande({ [CHAMP_TURNSTILE]: "   " }), { protection: active }, siteverify(true)), "sans-jeton", "protection active : un jeton vide est refuse");
+  is(await controler(demande({ [CHAMP_TURNSTILE]: "j", email: " " }), { protection: active }, siteverify(true)), "sans-adresse", "une adresse vide est refusee avant siteverify");
+  is(await controler({ ...demande({ [CHAMP_TURNSTILE]: "j" }), brut: { [CHAMP_TURNSTILE]: "j" } }, { protection: active }, siteverify(true)), "sans-adresse", "une adresse absente aussi");
+  is(appels.length, 0, "un jeton absent ou une adresse vide sont refuses sans appeler siteverify");
+  is(await controler(demande({ [CHAMP_TURNSTILE]: "jeton-faux" }), { protection: active }, siteverify(false)), "jeton-refuse", "une reponse negative de siteverify est refusee");
+  is([appels[0]?.url, appels[0]?.corps], [SITEVERIFY, { secret: "0xSECRET", response: "jeton-faux", remoteip: "203.0.113.7" }], "siteverify recoit le secret, le jeton et l'adresse du visiteur");
+  is(await controler(demande({ [CHAMP_TURNSTILE]: "jeton-bon" }), { protection: active }, siteverify(true)), null, "une reponse positive de siteverify passe");
+  is(await controler(demande({ [CHAMP_TURNSTILE]: "jeton-bon" }), { protection: active }, siteverify(true, { action: "lettre" })), "jeton-refuse", "un jeton signe pour la lettre ne vaut pas pour le contact");
+  is(await controler(demande({ [CHAMP_TURNSTILE]: "jeton-bon" }), { protection: active }, siteverify(true, { action: "" })), null, "un widget sans action n'en signe pas : le jeton passe");
+  is(await controler(demande({ [CHAMP_TURNSTILE]: "jeton-bon" }), { protection: active, hotes: ["exemple.test"] }, siteverify(true, { hostname: "autre.test" })), "jeton-refuse", "un jeton obtenu sur un autre site est refuse");
+  is(await controler(demande({ [CHAMP_TURNSTILE]: "jeton-bon" }), { protection: active }, siteverify("panne")), "jeton-refuse", "siteverify injoignable : refus");
+  is(await controler(demande({ [CHAMP_TURNSTILE]: "x".repeat(2049) }), { protection: active }, siteverify(true)), "jeton-refuse", "un jeton trop long est refuse");
+  is((await verifierLeJeton("j", "s", null, siteverify(false))).ok, false, "verifierLeJeton rend le verdict detaille");
+  is(FR.visiteur.verification.length > 0 && EN.visiteur.verification.length > 0, true, "le refus se lit en francais et en anglais");
+  is(FR.visiteur.sansScript.length > 0 && EN.visiteur.sansScript.length > 0, true, "la phrase sans JavaScript se lit en francais et en anglais");
 }
 
 // --- Aucune adresse en dur --------------------------------------------------

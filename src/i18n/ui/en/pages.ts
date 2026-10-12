@@ -12,7 +12,9 @@
 export const enPages = {
   // --- Accueil -------------------------------------------------------------
   home: {
-    metaTitle: "Reef Notes, a working notebook from an independent web studio",
+    metaTitle: "Reef Notes, a working notebook from a web studio",
+    // La signature courte de la marque : elle allonge un titre de page trop court quand le titre de l'accueil le ferait depasser 60 caracteres (src/js/pageTitle.ts).
+    titleSignature: "Reef Notes, web studio notebook",
     metaDescription:
       "Build logs, load times, typography and the business of running a small web studio. Written in English and French, a few notes a month, by the three people doing the work.",
     eyebrow: "Reef Notes",

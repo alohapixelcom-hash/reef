@@ -16,6 +16,10 @@
 @source not "../moteur/PageLibre.astro";
 /* Le champ "une entree choisie par son nom" du back office : ses classes sont celles de l'administration, pas du site. */
 @source not "../moteur/champs";
+/* Le tableau de bord en tuiles, l'ecran SEO et la carte Photos du back office (socle 1.16.0) : leurs classes et leurs mots sont pour l'administration. */
+@source not "../moteur/accueil";
+@source not "../moteur/seo";
+@source not "../moteur/medias";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

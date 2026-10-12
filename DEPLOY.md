@@ -155,3 +155,28 @@ The photographs of `src/assets/` come from Pexels, under the Pexels licence,
 which allows redistribution. They are not stored in the repository:
 `scripts/covers.mjs` fetches them before every build. [NOTICE.md](NOTICE.md)
 and [PHOTOS.md](PHOTOS.md) say which ones and where from.
+
+## Release 3.9.0 (core 1.16.0)
+
+The domain stays on the front Worker: both Workers are deployed without
+`--domain`, and `workers_dev` and `preview_urls` are false in both files, so
+neither gets another public address. Take a Time Travel bookmark of the
+database first (`npx wrangler d1 time-travel info reef-moteur`).
+
+```bash
+pnpm build:moteur
+npx wrangler deploy -c dist/server/wrangler.json   # the engine
+npx wrangler deploy -c wrangler.frontal.jsonc      # the front Worker
+```
+
+Then the SQL of the release, once, on the database already online (idempotent, no DELETE, no DROP: the blog takes the house label in the sidebar, the home title goes under 60 characters):
+
+```bash
+npx wrangler d1 execute reef-moteur --remote --config wrangler.moteur.jsonc --file=migrations/import-3.9.0-reef.sql
+```
+
+Online check: `/sitemap-index.xml` lists only `/sitemap-moteur.xml`, every
+address of it answers 200 with its own canonical
+(`node scripts/verifier-plan.mjs https://reef.alohapixel.app --anciens`),
+`/sitemap-contenu.xml` and `/sitemap-0.xml` answer 301, `robots.txt` and
+`llms.txt` carry `x-aloha-seo`.

@@ -130,9 +130,9 @@ function plan(adaptateur) {
   ];
   for (const [sorte, nom, unite] of unites) {
     if (!unite) arreter(`${sorte} inconnu dans l'adaptateur : ${nom}`);
-    for (const requis of unite.requiert ?? []) {
-      if (!(adaptateur.modules ?? []).includes(requis)) arreter(`l'extension ${nom} demande le module ${requis}`);
-    }
+    for (const requis of unite.requiert ?? []) if (!(adaptateur.modules ?? []).includes(requis)) arreter(`l'extension ${nom} demande le module ${requis}`);
+    // `avec` : les extensions dont elle lit les tables ou les fichiers (brevo : la boutique et les courriels).
+    for (const voisine of unite.avec ?? []) if (!(adaptateur.extensions ?? []).includes(voisine)) arreter(`l'extension ${nom} demande l'extension ${voisine}`);
     for (const chemin of unite.fichiers) {
       if (exclus.has(chemin)) continue;
       const source = join(unite.racine, chemin);

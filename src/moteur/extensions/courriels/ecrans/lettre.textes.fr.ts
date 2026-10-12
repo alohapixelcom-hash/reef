@@ -64,6 +64,7 @@ export const LETTRE_FR = {
     confirme: "C'est confirmé : vous recevrez les prochains articles. Chaque courriel contient un lien pour vous désinscrire.",
     desinscrit: "Vous êtes désinscrit : vous ne recevrez plus la lettre. Vous pouvez vous réinscrire à tout moment.",
     inconnu: "Ce lien n'est plus valable : il a peut-être déjà servi, ou l'inscription a expiré. Inscrivez-vous à nouveau si vous le souhaitez.",
+    verification: "La vérification anti-robot n'a pas abouti : attendez qu'elle soit validée à côté du bouton (cochez la case si elle le demande), puis inscrivez-vous à nouveau.",
   },
   /* Les courriels. */
   courriels: {

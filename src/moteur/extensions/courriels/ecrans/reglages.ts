@@ -1,5 +1,6 @@
 // src/moteur/extensions/courriels/ecrans/reglages.ts - l'ecran "Reglages des courriels" : adresses, destinataires des formulaires, accuse de reception par langue, plafonds ; un seul bouton pour enregistrer, un pour annuler.
 import { type ErreurDeReglage, type Formulaire, LANGUES, type Reglages, remplir } from "../noyau/regles.ts";
+import type { EtatDeLaProtection } from "../noyau/turnstile.ts";
 import { type Bloc, type Champ, date, type Reponse } from "./blocs.ts";
 import type { Textes } from "./textes.fr.ts";
 
@@ -67,6 +68,16 @@ export interface DonneesReglages {
   saisie: Record<string, unknown> | null;
   bandeau?: Bloc;
   derniere: { quand: number; qui: string } | null;
+  /** L'etat de la paire de cles Turnstile du Worker ; absent : "absente". */
+  protection?: EtatDeLaProtection;
+}
+
+/** Ce que l'ecran dit de la protection anti-robot des formulaires. Pur. */
+export function blocDeLaProtection(t: Textes, etat: EtatDeLaProtection): Extract<Bloc, { type: "banner" }> {
+  const p = t.reglages.protection;
+  if (etat === "active") return { type: "banner", variant: "default", title: p.titre, description: p.active };
+  if (etat === "absente") return { type: "banner", variant: "default", title: p.titre, description: p.absente };
+  return { type: "banner", variant: "alert", title: p.titre, description: p.incomplete(etat === "sans-secret" ? p.secret : p.cle) };
 }
 
 export function reglages(t: Textes, d: DonneesReglages): Reponse {
@@ -76,6 +87,7 @@ export function reglages(t: Textes, d: DonneesReglages): Reponse {
     { type: "header", text: t.pages.reglages },
     { type: "section", text: t.reglages.intro },
     ...(d.bandeau ? [d.bandeau] : []),
+    blocDeLaProtection(t, d.protection ?? "absente"),
     {
       // Un block_id neuf a chaque rendu : les champs du back office ne
       // relisent pas leur valeur initiale une fois montes.

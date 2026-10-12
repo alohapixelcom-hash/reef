@@ -25,7 +25,7 @@
 // action_id, prefixe du nom de l'ecran ("journal:renvoyer"). Rien n'est garde
 // entre deux requetes, sauf la vue du journal de chaque personne (KV).
 import { definePlugin, type PluginCapability, type ResolvedPlugin, type RouteContext } from "emdash";
-import { hote, lettreDuSite, nouvelId, ROUTE_DE_LA_LETTRE } from "./adaptateur.ts";
+import { hote, lettreDuSite, nouvelId, ROUTE_DE_LA_LETTRE, turnstileExige } from "./adaptateur.ts";
 import { CONFIGURATION } from "./configuration.ts";
 import { capacites, CARTES, IDENTITE, PAGE_LETTRE, PAGES } from "./identite.mjs";
 import { type Base, bilanDuCycle, derniereModification, echecsEnAttente, ecrireLesReglages, fournisseurChoisi, lignes, lireLesReglages, uneLigne } from "./noyau/base.ts";
@@ -34,6 +34,7 @@ import { interroger } from "./noyau/dns.ts";
 import { erreurEnClair, essai, renvoyer } from "./noyau/envoi.ts";
 import { articlesPublies, compterLesAbonnes, listeDesAbonnes, parutions, retirer } from "./noyau/lettre.ts";
 import { manquesDeLaLettre, publier } from "./noyau/parution.ts";
+import { protectionPrete } from "./noyau/turnstile.ts";
 import { debutDuCycle, domaineDe, langueDeLaRequete, lireReglages, type Reglages } from "./noyau/regles.ts";
 import type { Bloc, Reponse } from "./ecrans/blocs.ts";
 import { date } from "./ecrans/blocs.ts";
@@ -90,7 +91,7 @@ async function page(ctx: RouteContext): Promise<Reponse> {
     const nomDuSite = ctx.site?.name || CONFIGURATION.nomDuSite;
 
     if (ecran === "widget:courriels" || ecran === "/") {
-      const donnees = { reglages: regl, liaison: !!h.liaison, livreur: await fournisseurChoisi(base), bilan: await bilanDuCycle(base, maintenant, regl.cycle), derniers: await lignes(base, { limite: 5 }), echecs: await echecsEnAttente(base, debutDuCycle(maintenant, regl.cycle)), maintenant };
+      const donnees = { reglages: regl, liaison: !!h.liaison, turnstile: protectionPrete(h.turnstile, new URL(ctx.request.url), turnstileExige()), livreur: await fournisseurChoisi(base), bilan: await bilanDuCycle(base, maintenant, regl.cycle), derniers: await lignes(base, { limite: 5 }), echecs: await echecsEnAttente(base, debutDuCycle(maintenant, regl.cycle)), maintenant };
       return ecran === "/" ? tableau(t, donnees) : carte(t, donnees);
     }
 
@@ -187,6 +188,7 @@ async function page(ctx: RouteContext): Promise<Reponse> {
         nomDuSite,
         saisie,
         derniere: await derniereModification(base),
+        protection: h.turnstile.etat,
         ...(bandeau ? { bandeau } : {}),
       });
       return toast ? { ...rendu, toast } : rendu;

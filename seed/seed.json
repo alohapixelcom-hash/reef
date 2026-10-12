@@ -7,8 +7,8 @@
   "collections": [
     {
       "slug": "posts",
-      "label": "Articles",
-      "labelSingular": "Article",
+      "label": "Articles de blog",
+      "labelSingular": "Article de blog",
       "urlPattern": "/blog/{slug}",
       "supports": ["drafts","revisions","search","seo"],
       "fields": [
@@ -140,7 +140,7 @@
   "bylines": [],
   "content": {
     "sections": [
-      {"id":"sections-hero-en","slug":"hero","locale":"en","status":"published","data":{"page":"Accueil","eyebrow":"Reef Notes","title":"Notes from a small web studio","accent":"small","lede":"What we learn building sites, written down as we go. The notebook, not the portfolio.","cta":"Start reading","cta_secondary":"About the studio","meta_title":"Reef Notes, a working notebook from an independent web studio","meta_description":"Build logs, load times, typography and the business of running a small web studio. Written in English and French, a few notes a month, by the three people doing the work.","arguments":[{"title":"notes published"},{"title":"threads"},{"title":"languages"}]}},
+      {"id":"sections-hero-en","slug":"hero","locale":"en","status":"published","data":{"page":"Accueil","eyebrow":"Reef Notes","title":"Notes from a small web studio","accent":"small","lede":"What we learn building sites, written down as we go. The notebook, not the portfolio.","cta":"Start reading","cta_secondary":"About the studio","meta_title":"Reef Notes, a working notebook from a web studio","meta_description":"Build logs, load times, typography and the business of running a small web studio. Written in English and French, a few notes a month, by the three people doing the work.","arguments":[{"title":"notes published"},{"title":"threads"},{"title":"languages"}]}},
       {"id":"sections-hero-fr","slug":"hero","locale":"fr","translationOf":"sections-hero-en","status":"published","data":{"page":"Accueil","eyebrow":"Reef Notes","title":"Notes d'un petit studio web","accent":"petit","lede":"Ce qu'on apprend en construisant des sites, noté au fur et à mesure. Le carnet, pas le portfolio.","cta":"Commencer à lire","cta_secondary":"À propos du studio","meta_title":"Reef Notes, le carnet de bord d'un studio web indépendant","meta_description":"Journaux de chantier, temps de chargement, typographie et gestion d'un petit studio web. En français et en anglais, quelques notes par mois, écrites par les trois personnes qui font le travail.","arguments":[{"title":"notes publiées"},{"title":"fils"},{"title":"langues"}]}},
       {"id":"sections-bande-sujets-en","slug":"bande-sujets","locale":"en","status":"published","data":{"page":"Accueil","title":"All topics"}},
       {"id":"sections-bande-sujets-fr","slug":"bande-sujets","locale":"fr","translationOf":"sections-bande-sujets-en","status":"published","data":{"page":"Accueil","title":"Tous les sujets"}},

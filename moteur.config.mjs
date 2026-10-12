@@ -9,7 +9,6 @@
 // back office ecrit en base, et la page suivante le montre : aucun build.
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { IDENTITE as ACCUEIL } from "./src/moteur/accueil/identite.mjs";
 import { catalogueDuBackOffice } from "./src/moteur/catalogue-bo.config.mjs";
 import { IDENTITE as DEPLOYER } from "./src/moteur/deployer/identite.mjs";
 import { IDENTITE as CHAMPS } from "./src/moteur/champs/identite.mjs";
@@ -17,6 +16,10 @@ import { capacites, IDENTITE as COURRIELS } from "./src/moteur/extensions/courri
 import { CAPACITES as CAPACITES_GESTION, IDENTITE as GESTION } from "./src/moteur/extensions/gestion/identite.mjs";
 import { PAGES_EN_CACHE, PAGES_GEREES } from "./src/moteur/pages-gerees.mjs";
 import { routesDuCache } from "./src/moteur/routes-du-cache.mjs";
+import { CARTES as CARTES_ACCUEIL, IDENTITE as ACCUEIL } from "./src/moteur/accueil/identite.mjs";
+import { IDENTITE as MEDIAS } from "./src/moteur/medias/identite.mjs";
+import { IDENTITE as SEO, ROUTE_DE_L_INDEX, ROUTE_DU_PLAN } from "./src/moteur/seo/identite.mjs";
+import { planFige } from "./src/moteur/seo/integration.mjs";
 
 const ici = (chemin) => fileURLToPath(new URL(chemin, import.meta.url));
 
@@ -116,7 +119,7 @@ function partageDesPages() {
           const { locales, defaultLocale } = config.i18n ?? { locales: [], defaultLocale: "" };
           const langues = locales.map((l) => (typeof l === "string" ? l : l.path));
           updateConfig({
-            routeRules: { ...routesDuCache(PAGES_EN_CACHE, langues, defaultLocale, regle), "/sitemap-contenu.xml": regle },
+            routeRules: { ...routesDuCache(PAGES_EN_CACHE, langues, defaultLocale, regle), "/sitemap-moteur.xml": regle },
           });
         }
         // Habille le back office aux jetons du theme (voir habillage.ts).
@@ -124,11 +127,16 @@ function partageDesPages() {
         // La langue par defaut du back office n'est plus posee par un
         // middleware : src/worker.moteur.ts applique la regle du socle
         // (langueDuBackOffice) avant Astro, comme Nalu.
-        injectRoute({ pattern: "/sitemap-contenu.xml", entrypoint: ici("./src/moteur/plan-du-site.ts"), prerender: false });
+        // LE PLAN DU SITE VIVANT (extension seo du socle) : /sitemap-moteur.xml
+        // reunit les pages figees du build, le plan des pages gerees
+        // (src/moteur/plan-du-site.ts, repris par src/moteur/seo/site.ts) et
+        // les dates de la base ; l'index ne cite que lui. /sitemap-contenu.xml
+        // n'a plus de route : l'aiguillage du Worker le renvoie en 301.
+        injectRoute({ pattern: ROUTE_DU_PLAN, entrypoint: ici("./src/moteur/seo/sitemap-moteur.ts"), prerender: false });
         // Toutes les pages indexables se rendent a la demande :
         // l'integration sitemap n'a plus de page figee a inventorier et n'ecrit
         // plus l'index. Il est servi ici (voir plan-du-site.index.ts).
-        injectRoute({ pattern: "/sitemap-index.xml", entrypoint: ici("./src/moteur/plan-du-site.index.ts"), prerender: false });
+        injectRoute({ pattern: ROUTE_DE_L_INDEX, entrypoint: ici("./src/moteur/seo/sitemap-index.ts"), prerender: false });
         injectRoute({ pattern: "/version.json", entrypoint: ici("./src/moteur/version.ts"), prerender: false });
         // Le formulaire de contact poste ici quand les courriels sont
         // branches (src/moteur/extensions/courriels/reception.ts).
@@ -219,8 +227,8 @@ async function allume() {
   const cacheObjets = { kv: () => kvCache({ binding: "CACHE" }), memoire: () => memoryCache() }[CACHE_OBJETS ?? ""];
   return {
     alias: alias("emdash"),
-    // Declare dans l'index du plan de site (customSitemaps, astro.config.mjs).
-    plans: ["/sitemap-contenu.xml"],
+    // L'index du plan de site est celui de l'extension seo (/sitemap-index.xml) : rien a declarer a l'integration sitemap.
+    plans: [],
     config: {
       // "server" est ce qu'EmDash attend pour ses propres routes ; le
       // partage ci-dessus refige aussitot toutes les pages non gerees.
@@ -254,16 +262,17 @@ async function allume() {
           // article) : une extension React, sans route ni base,
           // dont le composant est importe par le paquet de l'administration.
           { ...CHAMPS, entrypoint: ici("./src/moteur/champs/extension.ts"), adminEntry: ici("./src/moteur/champs/admin.ts") },
-          // La carte du site sur le tableau de bord : une extension React, son
-          // composant est importe par le paquet de l'administration.
-          {
-            ...ACCUEIL,
-            entrypoint: ici("./src/moteur/accueil/extension.ts"),
-            adminEntry: ici("./src/moteur/accueil/carte.ts"),
-          },
+          // Le tableau de bord en tuiles (extension administrable du socle) : une carte de l'accueil d'EmDash.
+          { ...ACCUEIL, entrypoint: ici("./src/moteur/accueil/extension.ts"), adminEntry: ici("./src/moteur/accueil/admin.ts"), adminWidgets: CARTES_ACCUEIL },
+          // L'ecran SEO du rail : robots.txt, llms.txt, l'etat du plan et l'audit des pages (extension seo du socle).
+          { ...SEO, entrypoint: ici("./src/moteur/seo/extension.ts"), adminEntry: ici("./src/moteur/seo/admin.tsx") },
+          // Les photos converties a l'envoi et la carte Photos du tableau de bord (extension medias du socle).
+          { ...MEDIAS, entrypoint: ici("./src/moteur/medias/extension.ts") },
         ],
       }),
       partageDesPages(),
+      // Le manifeste des pages figees que relit /sitemap-moteur.xml.
+      planFige(),
     ],
   };
 }

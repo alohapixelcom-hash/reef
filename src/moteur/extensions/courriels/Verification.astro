@@ -1,0 +1,68 @@
+---
+// src/moteur/extensions/courriels/Verification.astro - le widget Cloudflare Turnstile d'un formulaire public : visible, dans la langue et le theme de la page ; rien du tout quand la protection est eteinte.
+//
+// A poser DANS le <form>, juste avant le bouton : <Verification envoi={envoi} />.
+// Le widget y depose son champ cf-turnstile-response, que la route verifie
+// avant toute ecriture (noyau/turnstile.ts). Le script de Cloudflare n'est
+// charge que par une page qui rend ce composant avec une cle : les autres
+// pages n'appellent rien chez Cloudflare.
+//
+// THEME : le site passe du clair au sombre par la classe "dark" de <html>,
+// que Turnstile ne lit pas (son theme "auto" suit l'appareil, pas le bouton
+// du site). Le widget est donc rendu avec le theme lu sur <html>, puis rendu
+// a nouveau quand cette classe change.
+//
+// VISIBLE : appearance "always" ; le widget, cree en mode "managed" dans le
+// compte Cloudflare du client, montre sa case et ne demande un geste que s'il
+// doute. "flexible" : il prend la largeur du formulaire, jusqu'a 390 px compris.
+import type { Envoi } from "./formulaire.fichiers.ts";
+import { ADRESSE_DU_SCRIPT } from "./noyau/turnstile.ts";
+
+interface Props {
+  envoi: Envoi | null;
+}
+
+const verification = Astro.props.envoi?.verification ?? null;
+---
+
+{
+  verification && (
+    <Fragment>
+      <div data-aloha-verification data-sitekey={verification.cle} data-language={verification.langue} style="min-height:65px" />
+      <script is:inline>
+        (function () {
+          if (window.alohaVerification) return;
+          var rendus = [];
+          function theme() {
+            return document.documentElement.classList.contains("dark") ? "dark" : "light";
+          }
+          function rendre() {
+            var ts = window.turnstile;
+            if (!ts) return;
+            rendus.forEach(function (id) {
+              try {
+                ts.remove(id);
+              } catch (e) {}
+            });
+            rendus = [];
+            document.querySelectorAll("[data-aloha-verification]").forEach(function (el) {
+              rendus.push(ts.render(el, { sitekey: el.dataset.sitekey, language: el.dataset.language, theme: theme(), appearance: "always", size: "flexible" }));
+            });
+          }
+          window.alohaVerification = function () {
+            var dernier = theme();
+            rendre();
+            new MutationObserver(function () {
+              var t = theme();
+              if (t !== dernier) {
+                dernier = t;
+                rendre();
+              }
+            }).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+          };
+        })();
+      </script>
+      <script is:inline src={ADRESSE_DU_SCRIPT} async defer></script>
+    </Fragment>
+  )
+}

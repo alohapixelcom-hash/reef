@@ -326,3 +326,32 @@ curl -sI https://your-site.example/blog/ | grep -i "cf-cache-status\|cache-tag" 
 # publish a post in the back office, then:
 curl -sI https://your-site.example/blog/ | grep -i cf-cache-status                # MISS again, the post is in the page
 ```
+
+## The live sitemap and the SEO screen (3.9.0)
+
+Engine on, the sitemap is the live one of the core's `seo` extension:
+`/sitemap-moteur.xml`, recomputed at every request, joins the frozen pages read
+in the HTML of the build (`planFige` in `moteur.config.mjs`), the managed pages
+listed by `src/moteur/plan-du-site.ts` (taken in by `depuisUneRoute`), and the
+published entries of the database with their date (free pages enter it; the
+other collections only take their date): `src/moteur/seo/site.ts`. It leaves out
+the `noindex` pages, `seo_no_index` and the sources of active redirects.
+`/sitemap-index.xml` declares only it; `/sitemap.xml`, `/sitemap-0.xml`,
+`/sitemap-contenu.xml` and EmDash's own `/sitemap-<collection>.xml` answer a 301
+to the index. The Worker of the engine settles these addresses before anything
+else (`aiguillerLeSeo` in `src/worker.moteur.ts`), and the front Worker hands
+them to it (`ADRESSES_DU_SEO`). `robots.txt` and `llms.txt` are served from the
+database once they are edited in the « SEO » screen of the back office (header
+`x-aloha-seo: base`), from the build otherwise (`defaut`); the same screen runs
+the page audit (title, description, headings, canonical, hreflang, structured
+data). Photos sent to the media library are converted on upload (`medias`
+extension: orientation, metadata removed, 2560 px at most, AVIF or WebP), and
+the back office opens on a dashboard in tiles. None of this needs SQL: each
+extension creates its tables on first use.
+
+Page titles stay between 30 and 60 characters when they can: a title under 30
+takes a signature of the brand (the home title, otherwise `home.titleSignature`),
+a title over 60 with the brand drops the brand (`src/js/pageTitle.ts`). The
+Organization node of the home page carries a logo: the logo of the site
+settings, otherwise `apple-touch-icon.png` (180 px, made by
+`scripts/favicon.mjs`).

@@ -300,6 +300,37 @@ function checkDocs(file, text) {
   return /@source\s+not\s+["'][^"']*docs\/?["']/.test(text) ? [] : ['Tailwind lit docs/ : ajouter @source not "../../docs"; apres @import "tailwindcss"'];
 }
 
+/**
+ * Regle 10 : la collection du blog s'appelle "Articles de blog" au rail.
+ *
+ * Le libelle d'une collection vient de la graine et devient l'entree du rail
+ * d'EmDash et le bouton "+ ..." de son tableau de bord. Chaque theme avait le
+ * sien ("Billets", "Articles", "Articles du carnet") : le client ne
+ * reconnaissait pas son blog d'un site a l'autre (regle de la maison, 11 octobre 2026).
+ * Le nom PUBLIC de la rubrique reste libre (pages du site, menus) : seule la
+ * graine est tenue. Liste des noms : la meme que COLLECTIONS_DU_BLOG de
+ * accueil/tuiles.ts et que la feuille du rail (socle.selfcheck.mjs compare).
+ */
+const COLLECTIONS_DU_BLOG = ["posts", "blog", "articles", "billets", "carnet", "journal"];
+const BLOG = { label: "Articles de blog", labelSingular: "Article de blog" };
+function checkBlog(file, text) {
+  if (!/(^|\/)seed\/seed\.json$/.test(file)) return [];
+  let graine;
+  try {
+    graine = JSON.parse(text);
+  } catch {
+    return ["graine illisible (JSON invalide)"];
+  }
+  const found = [];
+  for (const c of Array.isArray(graine?.collections) ? graine.collections : []) {
+    if (!COLLECTIONS_DU_BLOG.includes(c?.slug)) continue;
+    for (const [cle, attendu] of Object.entries(BLOG)) {
+      if (c[cle] !== attendu) found.push(`collection "${c.slug}" : ${cle} vaut ${JSON.stringify(c[cle] ?? null)}, attendu "${attendu}" (le nom public du blog reste libre dans les pages du site)`);
+    }
+  }
+  return found;
+}
+
 /* ------------------------------------------------------------------ */
 /* Le rapport                                                          */
 /* ------------------------------------------------------------------ */
@@ -313,6 +344,7 @@ const RULES = [
   { key: "disque", label: "aucun disque lu au rendu", run: checkDisque },
   { key: "plan", label: "plan du site sans import des pages", run: checkPlan },
   { key: "docs", label: "Tailwind ne lit pas docs/", run: checkDocs },
+  { key: "blog", label: "le blog s'appelle Articles de blog", run: checkBlog },
 ];
 
 const families = paletteFamilies();

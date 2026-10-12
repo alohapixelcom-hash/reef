@@ -53,6 +53,9 @@ const schemas = [
   organization({
     name: marque.nom,
     url: siteUrl,
+    // Le logo des reglages du site, sinon l'icone du theme (180 px, carree,
+    // fabriquee au build) : Google demande un logo d'au moins 112 px.
+    logo: new URL(marque.logo?.url ?? "/apple-touch-icon.png", siteUrl).href,
     sameAs: marque.reseaux.length > 0 ? marque.reseaux.map((r) => r.url) : undefined,
   }),
   breadcrumbList([

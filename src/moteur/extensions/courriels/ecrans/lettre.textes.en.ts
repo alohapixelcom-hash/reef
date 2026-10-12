@@ -63,6 +63,7 @@ export const LETTRE_EN: TextesDeLaLettre = {
     confirme: "Confirmed: you will receive the next articles. Every email contains a link to unsubscribe.",
     desinscrit: "You are unsubscribed: you will no longer receive the newsletter. You can sign up again at any time.",
     inconnu: "This link is no longer valid: it may have been used already, or the sign-up expired. Sign up again if you wish.",
+    verification: "The anti-robot check did not go through: wait until it is confirmed next to the button (tick the box if it asks you to), then sign up again.",
   },
   courriels: {
     confirmationSujet: (site: string) => `Confirm your subscription to the ${site} newsletter`,

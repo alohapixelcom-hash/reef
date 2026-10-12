@@ -26,7 +26,8 @@ import "@fontsource-variable/instrument-sans/wght-italic.css";
 import policeAffichage from "@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url";
 import policeTexte from "@fontsource-variable/instrument-sans/files/instrument-sans-latin-wght-normal.woff2?url";
 import siteSettings from "@config/siteSettings.json";
-import { defaultLocale, getAlternates, getLocale, localeMeta, localizePath } from "@i18n";
+import { defaultLocale, fmt, getAlternates, getLocale, localeMeta, localizePath, useTranslations } from "@i18n";
+import { pageTitle } from "@js/pageTitle";
 import { feuilleDeLaPalette } from "@moteur/palette";
 import { identiteDuSite, VARIABLES_DE_POLICE, variablesDeLaPalette } from "@moteur/theme";
 import { feuilleDeLaTypographie, policesDuTheme } from "@moteur/typographie";
@@ -73,8 +74,12 @@ const {
   canonical: canoniqueDonnee,
 } = Astro.props;
 
-// "Titre | Marque", sauf si le titre porte deja la marque (page d'accueil).
-const fullTitle = title.includes(marque.nom) ? title : `${title}${marque.separateur}${marque.nom}`;
+// "Titre | Marque", sauf si le titre porte deja la marque (page d'accueil) ;
+// trop court pour un resultat de recherche, il prend une signature de la
+// marque (le titre de l'accueil, sinon sa signature courte), trop long il la
+// perd : toujours entre 30 et 60 caracteres quand c'est possible (src/js/pageTitle.ts).
+const accueil = useTranslations(Astro).home;
+const fullTitle = pageTitle(title, marque.nom, marque.separateur, [accueil.metaTitle, accueil.titleSignature].map((s) => fmt(s, { brand: marque.nom })));
 
 // Canonical : une seule forme d'URL, celle de trailingSlash "always" dans astro.config.
 // Les routes fichiers (rss.xml, robots.txt) gardent leur extension telle quelle.

@@ -5,6 +5,9 @@
 // deploie. Le theme ne l'embarque pas, et `pnpm check` doit rester a zero
 // moteur eteint. Wrangler verifie la forme de l'export au deploiement.
 import handler, { createScheduledHandler, PluginBridge } from "@emdash-cms/cloudflare/worker";
+import { aiguillerLesMedias } from "./moteur/medias/aiguillage.ts";
+import type { Images } from "./moteur/medias/conversion.ts";
+import { aiguillerLeSeo, d1De } from "./moteur/seo/aiguillage.ts";
 import { langueDuBackOffice } from "./moteur/langue-bo.regles.ts";
 import { barreFinale, estLaPageIntrouvable, planDuSite, reponseAuVisiteur } from "./worker-adresses.ts";
 import { redirectionDeLangue } from "./worker-langue.ts";
@@ -15,6 +18,8 @@ type Fetch = (request: Request, env: unknown, ctx: unknown) => Response | Promis
 
 interface Env {
   ASSETS: { fetch: (request: Request) => Promise<Response> };
+  /** Le liant Cloudflare Images (wrangler.moteur.jsonc) : la conversion des photos a l'envoi. */
+  IMAGES?: Images;
 }
 
 // L'entree du back office, la meme adresse que sur tous les sites de la
@@ -26,7 +31,7 @@ const ENTREE_DU_BACK_OFFICE = /^\/(?:(?:fr\/)?secret-spot|_emdash\/secret-spot)(
 
 // Les plans que le moteur sert lui-meme (src/moteur/plan-du-site*.ts) ; ceux
 // d'EmDash, en doublon, ne sont jamais atteints (voir worker-adresses.ts).
-const PLANS = ["/sitemap-index.xml", "/sitemap-contenu.xml"];
+const PLANS = ["/sitemap-index.xml", "/sitemap-moteur.xml"];
 
 // LA LANGUE DU BACK OFFICE. EmDash 0.38 choisit la langue de son
 // administration a chaque requete : le cookie emdash-locale, puis
@@ -60,6 +65,17 @@ export default {
   // introuvable. La reponse passe enfin par reponseAuVisiteur : page
   // introuvable dans la langue de l'adresse, sans Server-Timing.
   async fetch(request: Request, env: Env, ctx: unknown) {
+    // Les photos envoyees a la Mediatheque, converties avant qu'EmDash les range
+    // (extension medias du socle), puis le SEO : anciens plans en 301, l'index qui
+    // ne cite que /sitemap-moteur.xml, robots.txt et llms.txt depuis la base
+    // (extension seo du socle). llms.txt garde par defaut le texte de sa route
+    // (`rendu`), robots.txt celui du fichier fige (`fichiers`).
+    const suite = async (r: Request) => (handler.fetch as Fetch)(r, env, ctx);
+    const base = d1De(env as unknown as Record<string, unknown>, "DB");
+    const medias = await aiguillerLesMedias(request, { images: env.IMAGES, base, suite });
+    if (medias) return medias;
+    const seo = await aiguillerLeSeo(request, { base, fichiers: env.ASSETS, rendu: { fetch: suite } });
+    if (seo) return seo;
     const chemin = new URL(request.url).pathname;
     if (ENTREE_DU_BACK_OFFICE.test(chemin)) {
       return new Response(null, {

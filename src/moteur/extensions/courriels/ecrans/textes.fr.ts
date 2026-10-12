@@ -35,6 +35,7 @@ export const FR = {
       fournisseur: "confier les courriels à Courriels (Brancher les courriels, étape 3, un clic)",
       expediteur: "l'adresse d'expédition (Réglages des courriels)",
       destinataire: "le destinataire du formulaire de contact (Réglages des courriels)",
+      turnstile: "la vérification anti-robot des formulaires : la clé publique (variable TURNSTILE_SITE_KEY du Worker) et la clé secrète (secret TURNSTILE_SECRET), toutes les deux, à poser par la personne qui a installé le site",
     },
     envoyes: "Envoyés ce mois-ci",
     surInclus: (inclus: number) => `sur ${nombre(inclus)} inclus chez Cloudflare`,
@@ -177,6 +178,15 @@ export const FR = {
     apercu: "Aperçu de l'accusé de réception (ce que lira un visiteur nommé Camille)",
     apercuVisiteur: "Camille",
     derniere: (quand: string, qui: string) => `Dernière modification le ${quand} par ${qui}.`,
+    protection: {
+      titre: "Protection anti-robot (Cloudflare Turnstile)",
+      active: "Allumée : chaque formulaire public montre la case de vérification de Cloudflare, et le site vérifie sa réponse avant d'enregistrer ou d'envoyer quoi que ce soit. Le champ piège et les plafonds restent en place.",
+      absente:
+        "Éteinte : les formulaires marchent, protégés seulement par un champ piège invisible et par les plafonds ci-dessous. Pour l'allumer, la personne qui a installé le site crée un widget Turnstile dans le compte Cloudflare du site, pose sa clé publique (TURNSTILE_SITE_KEY, variable du Worker) et sa clé secrète (TURNSTILE_SECRET_KEY, secret du Worker), puis redéploie.",
+      incomplete: (manque: string) => `Éteinte : il manque ${manque}. Les deux clés viennent du même widget Turnstile ; tant qu'une seule est posée, les formulaires publics sont masqués et refusent les envois : posez la clé manquante, puis redéployez.`,
+      cle: "la clé publique (TURNSTILE_SITE_KEY, variable du Worker)",
+      secret: "la clé secrète (TURNSTILE_SECRET_KEY, secret du Worker)",
+    },
   },
 
   erreurs: {
@@ -195,6 +205,10 @@ export const FR = {
     E_VALIDATION_ERROR: "Cloudflare trouve le courriel mal formé : une adresse n'est sans doute pas valable. Vérifiez les adresses dans « Réglages des courriels ».",
     E_FIELD_MISSING: "Il manque un destinataire, un expéditeur ou un sujet. Vérifiez « Réglages des courriels ».",
     E_CONTENT_TOO_LARGE: "Le courriel dépasse la taille permise par Cloudflare (5 Mo).",
+    E_BREVO_CLE: "Brevo refuse la clé API du site (révoquée, mal copiée, ou adresse IP non autorisée dans Brevo). Ouvrez l'écran Brevo et suivez le pas à pas, puis renvoyez.",
+    E_BREVO_LIMITE: "Brevo demande de ralentir. Attendez une minute, puis renvoyez.",
+    E_BREVO_INJOIGNABLE: "Brevo n'a pas répondu. Renvoyez dans un instant.",
+    E_BREVO_REFUS: "Brevo a refusé le courriel : l'adresse d'expédition n'est sans doute pas vérifiée dans Brevo (Expéditeurs, domaines et IP dédiées). Le détail est sous la ligne.",
     E_INTERNAL_SERVER_ERROR: "Cloudflare est momentanément indisponible. Renvoyez dans quelques minutes.",
     plafond: (quel: Plafond, limite: number) => {
       const fenetre = { heure: "de l'heure", jour: "du jour", destinataire: "par destinataire", mois: "du mois" }[quel];
@@ -207,7 +221,21 @@ export const FR = {
     envoye: "Merci, votre message est bien parti. Nous vous répondons au plus vite.",
     garde: "Votre message n'a pas pu partir tout de suite. Il est conservé de notre côté et nous le lirons dès que possible ; vous pouvez aussi nous écrire directement.",
     invalide: "Il manque une information : vérifiez votre nom, votre adresse et votre message, puis envoyez à nouveau.",
+    verification: "La vérification anti-robot n'a pas abouti : attendez qu'elle soit validée au-dessus du bouton (cochez la case si elle le demande), puis envoyez à nouveau.",
+    sansScript: "Ce formulaire a besoin de JavaScript pour sa vérification anti-robot (Cloudflare Turnstile) : activez JavaScript pour l'envoyer.",
+    refus: {
+      titre: "Le formulaire n'a pas été envoyé",
+      raisons: {
+        methode: "Cette adresse reçoit les formulaires du site : elle ne s'ouvre pas dans un navigateur.",
+        indisponible: "La vérification anti-robot n'est pas encore en place sur ce site : le formulaire ne peut rien recevoir pour l'instant. Réessayez plus tard.",
+        "sans-jeton": "La vérification anti-robot n'a pas été faite : revenez au formulaire, attendez qu'elle soit validée au-dessus du bouton, puis envoyez à nouveau.",
+        "jeton-refuse": "La vérification anti-robot n'a pas abouti ou a expiré : revenez au formulaire et envoyez à nouveau.",
+        "sans-adresse": "Votre adresse électronique manque : revenez au formulaire et indiquez-la.",
+      },
+      retour: "Revenir au formulaire",
+    },
   },
+
 
   courriels: {
     notificationSujet: (sujet: string) => `Nouveau message du site : ${sujet}`,
