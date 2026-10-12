@@ -88,9 +88,11 @@ function lireLesMesures(m: Manifeste, poser: (partiel: Mesures) => void): void {
 const TRACES: Record<Icone, string> = {
   messages: "M4 5h16v11H9l-5 4z",
   commandes: "M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6",
+  produit: "M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2",
   ecrire: "M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4",
   photos: "M3 5h18v14H3zM3 16l5-5 4 4 3-3 6 6M15.5 8.5h.01",
   page: "M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5",
+  design: "M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1.1.2-2.2 1.4-2.2H17a4 4 0 0 0 4-4c0-5.5-4-10-9-10zM7.5 12h.01M10 7.5h.01M15 7.5h.01",
   site: "M14 4h6v6M20 4l-9 9M18 14v6H4V6h6",
   publier: "M12 16V4M7 9l5-5 5 5M4 20h16",
   publication: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8 12l3 3 5-6",

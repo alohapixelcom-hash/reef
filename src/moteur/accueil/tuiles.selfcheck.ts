@@ -35,6 +35,11 @@ is(ids(v.gestes), ["ecrire", "photos", "page", "site", "publier"], "vitrine : le
 is(ids(v.etat), [], "rien de mesure : aucune tuile d'etat");
 const b = tuilesDuSite(BOUTIQUE);
 is(ids(b.actions), ["messages", "commandes"], "boutique : Messages puis Commandes");
+is(ids(b.gestes), ["produit", "ecrire", "photos", "page", "site", "publier"], "boutique : Ajouter un produit en tete des gestes");
+is(b.gestes[0]?.vers, "/content/products/new", "Ajouter un produit ouvre une fiche neuve");
+const d = tuilesDuSite({ ...VITRINE, plugins: { ...VITRINE.plugins, "aloha-design": ext("/") } });
+is(ids(d.gestes), ["ecrire", "photos", "page", "design", "site", "publier"], "avec la page Design : sa tuile, avant Voir le site");
+is(d.gestes.find((t) => t.id === "design")?.vers, "/plugins/aloha-design/", "la tuile Design ouvre la page Design");
 const n = tuilesDuSite(NU);
 is([ids(n.actions), ids(n.gestes)], [[], ["photos", "page", "site"]], "site nu : ni Messages, ni blog, ni bouton de publication");
 is(n.gestes.find((t) => t.id === "page")?.vers, "/content/pages", "sans textes des pages, Modifier une page ouvre les pages");

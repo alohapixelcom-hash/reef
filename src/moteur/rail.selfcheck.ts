@@ -51,31 +51,33 @@ const P = `${A}/plugins`;
 const ORDRE: [string, string][] = [
   ["Tableau de bord", `${A}/`],
   ["Messages", `${P}/aloha-gestion/messages`],
-  ["Ventes (tableau de bord de la boutique)", `${P}/aloha-commerce`],
-  ["Statistiques de la boutique", `${P}/aloha-commerce/statistiques`],
   ["Commandes", `${P}/aloha-commerce/commandes`],
   ["Clients", `${P}/aloha-commerce/clients`],
   ["Livraison", `${P}/aloha-commerce/livraison`],
   ["Produits", `${A}/content/products`],
   ["Stock", `${P}/aloha-stock`],
+  ["Codes promo", `${P}/aloha-commerce/codes`],
+  ["Cartes cadeaux", `${P}/aloha-commerce/cartes`],
+  ["Fidelite", `${P}/aloha-fidelite`],
+  ["Ventes (tableau de bord de la boutique)", `${P}/aloha-commerce`],
+  ["Statistiques de la boutique", `${P}/aloha-commerce/statistiques`],
   ["Articles de blog", `${A}/content/posts`],
   ["Categories du blog", `${A}/taxonomies/category`],
+  ["Une collection propre au site", `${A}/content/projets`],
   ["Pages", `${A}/content/pages`],
   ["Textes des pages", `${A}/content/sections`],
   ["Medias", `${A}/media`],
   ["Medias (extension)", `${P}/aloha-medias`],
-  ["Codes promo", `${P}/aloha-commerce/codes`],
-  ["Cartes cadeaux", `${P}/aloha-commerce/cartes`],
-  ["Fidelite", `${P}/aloha-fidelite`],
+  ["Design", `${P}/aloha-design`],
+  ["Menus", `${A}/menus`],
+  ["SEO", `${P}/aloha-seo`],
+  ["Redirections", `${A}/redirects`],
   ["Courriels", `${P}/aloha-courriels`],
   ["Abonnes de la lettre", `${P}/aloha-gestion/abonnes`],
   ["Journal des courriels", `${P}/aloha-gestion/journal`],
-  ["Menus", `${A}/menus`],
-  ["Redirections", `${A}/redirects`],
-  ["SEO", `${P}/aloha-seo`],
-  ["Colissimo", `${P}/aloha-colissimo`],
   ["Reglages de boutique", `${P}/aloha-commerce/reglages`],
   ["Stripe", `${P}/aloha-commerce/stripe`],
+  ["Colissimo", `${P}/aloha-colissimo`],
   ["Brevo", `${P}/aloha-brevo`],
   ["Parametres", `${A}/settings`],
   ["Utilisateurs", `${A}/users`],
@@ -91,7 +93,8 @@ for (let i = 1; i < ORDRE.length; i++) {
 // L'administration reste sous toute entree inconnue, le reste au-dessus.
 ok(rang(`${A}/content/site`) > parDefaut && rang(`${A}/settings`) > parDefaut, "Reglages par langue et Parametres restent sous une entree inconnue");
 ok(rang(`${P}/aloha-commerce/livraison`) < parDefaut, "la livraison passe avant une entree inconnue");
-is(rang(`${A}/content/une-collection-nouvelle`), 72, "une collection que la liste ne connait pas se range avec les contenus");
+is(rang(`${A}/content/une-collection-nouvelle`), 65, "une collection que la liste ne connait pas se range avec les contenus, avant les pages");
+for (const c of ["rubriques", "sujets"]) is(rang(`${A}/content/${c}`), rang(`${A}/taxonomies/category`), `la collection ${c} se range comme les categories du blog`);
 is(rang(`${P}/une-extension-nouvelle`), parDefaut, "une page d'extension inconnue prend le rang d'attente");
 is(rang(`${A}/`), rang(A), "le tableau de bord, avec ou sans barre finale");
 is(rang(`${P}/aloha-stock/`), rang(`${P}/aloha-stock`), "la racine d'une extension, avec ou sans barre finale");
@@ -131,6 +134,7 @@ const extensions = [
   await pagesDe(["../../../maintenance/src/moteur/maintenance/identite.mjs", "./maintenance/identite.mjs"], () => [{ path: "/", label: "Maintenance" }]),
   await pagesDe(["../../../medias/src/moteur/medias/identite.mjs", "./medias/identite.mjs"], (m) => (m.PAGES as Page[] | undefined) ?? []),
   await pagesDe(["../../../brevo/src/moteur/brevo/identite.mjs", "./brevo/identite.mjs"], (m) => m.PAGES as Page[]),
+  await pagesDe(["../../../design/src/moteur/design/identite.mjs", "./design/identite.mjs"], (m) => [m.PAGE_DESIGN] as Page[]),
 ].filter((e) => e !== null);
 let pagesVues = 0;
 for (const e of extensions) {
@@ -174,14 +178,13 @@ const BOUTIQUE = [
   `${P}/aloha-fidelite`,
   `${P}/aloha-colissimo`,
   `${P}/aloha-maintenance`,
+  `${P}/aloha-design/`,
 ];
 is(
   rejoue(BOUTIQUE),
   [
     "/",
     "/plugins/aloha-gestion/messages",
-    "/plugins/aloha-commerce",
-    "/plugins/aloha-commerce/statistiques",
     "/plugins/aloha-commerce/commandes",
     "/plugins/aloha-commerce/clients",
     "/plugins/aloha-commerce/livraison",
@@ -189,25 +192,28 @@ is(
     "/content/rayons",
     "/plugins/aloha-stock",
     "/plugins/aloha-stock/factures",
+    "/plugins/aloha-commerce/codes",
+    "/plugins/aloha-commerce/cartes",
+    "/plugins/aloha-fidelite",
+    "/plugins/aloha-commerce",
+    "/plugins/aloha-commerce/statistiques",
     "/content/posts",
     "/content/pages",
     "/content/sections",
     "/media",
-    "/plugins/aloha-commerce/codes",
-    "/plugins/aloha-commerce/cartes",
-    "/plugins/aloha-fidelite",
+    "/plugins/aloha-design/",
+    "/menus",
+    "/redirects",
     "/plugins/aloha-courriels",
     "/plugins/aloha-courriels/lettre",
     "/plugins/aloha-gestion/abonnes",
     "/plugins/aloha-gestion/journal",
-    "/menus",
-    "/redirects",
-    "/plugins/aloha-colissimo",
     "/plugins/aloha-commerce/reglages",
     "/plugins/aloha-commerce/stripe",
+    "/plugins/aloha-colissimo",
+    "/plugins/aloha-brevo/",
     "/plugins/aloha-courriels/brancher",
     "/plugins/aloha-courriels/reglages",
-    "/plugins/aloha-brevo/",
     "/content/site",
     "/settings",
     "/users",
@@ -242,16 +248,16 @@ is(
     "/content/blog",
     "/content/rubriques",
     "/content/auteurs",
-    "/content/pages",
-    "/content/sections",
     "/content/integrations",
     "/content/offres",
+    "/content/pages",
+    "/content/sections",
     "/media",
+    "/menus",
+    "/plugins/aloha-seo",
+    "/redirects",
     "/plugins/aloha-courriels",
     "/plugins/aloha-gestion/journal",
-    "/menus",
-    "/redirects",
-    "/plugins/aloha-seo",
     "/content/site",
     "/settings",
     "/users",
@@ -259,5 +265,21 @@ is(
   ],
   "le rail d'un site vitrine saute les ecrans absents et garde l'ordre",
 );
+
+// --- Les rubriques (back-office-rubriques.css, socle 2.0.0) ---------------------
+const rubriques = readFileSync(new URL("./back-office-rubriques.css", import.meta.url), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+const intitules = [...rubriques.matchAll(/:nth-of-type\((\d)\)::(before|after) \{\s*order: (\d+);\s*content: "([^"]+)";/g)].map((m) => ({ nom: m[4], rang: Number(m[3]) }));
+is(intitules.map((r) => r.nom), ["Boutique", "Contenu", "Apparence", "Courriels", "Réglages"], "cinq rubriques, dans l'ordre du rail");
+const entre = (nom: string, avant: string, apres: string) => {
+  const r = intitules.find((x) => x.nom === nom)!.rang;
+  ok(rang(avant) < r && r < rang(apres), `la rubrique ${nom} (${r}) se pose entre ${avant} et ${apres}`);
+};
+entre("Boutique", `${P}/aloha-gestion/messages`, `${P}/aloha-commerce/commandes`);
+entre("Contenu", `${P}/aloha-commerce/statistiques`, `${A}/content/posts`);
+entre("Apparence", `${P}/aloha-medias`, `${P}/aloha-design`);
+entre("Courriels", `${A}/redirects`, `${P}/aloha-courriels`);
+entre("Réglages", `${P}/aloha-gestion/journal`, `${P}/aloha-commerce/reglages`);
+for (const technique of ["/content-types", "/plugins-manager"]) ok(new RegExp(`a\\[href="${A}${technique}"\\][^{]*\\{\\s*display: none !important;`).test(rubriques), `${technique} quitte le rail`);
+ok(/taxonomies\/tag"\]\) ~ \[data-sidebar="menu-item"\]/.test(rubriques), "une taxonomie servie deux fois ne sort qu'une fois");
 
 console.log(`rail.selfcheck : ${checks} verifications passees (${regles.length} adresses rangees, ${pagesVues} pages d'extension relues)`);
