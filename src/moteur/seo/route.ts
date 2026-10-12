@@ -20,13 +20,14 @@
 // rend 503 (Search Console reessaie) plutot qu'un plan ampute qui ferait
 // sortir des pages de l'index.
 import type { APIContext, APIRoute } from "astro";
-import { type Base, d1De, ecrireLigne, lireLesEntrees, lireLesRedirections, lireLigne } from "./base.ts";
+import { type Base, d1De, ecrireLigne, type EntreePubliee, lireLesEntrees, lireLesRedirections, lireLigne } from "./base.ts";
 import type { Fichiers } from "./fichiers.ts";
 import { MANIFESTE_DU_BUILD, ROUTE_DU_PLAN } from "./identite.mjs";
 import {
   assembler,
   cheminDe,
   devinerLesLangues,
+  EN_TETES_DU_PLAN,
   EN_TETES_XML,
   type EntreeDuPlan,
   entreesDepuisXml,
@@ -131,7 +132,14 @@ const enEntrees = (liste: Array<string | EntreeDuPlan>, langues?: Langues): Entr
 /** La source (c) : entrees publiees, noindex et retraits, depuis la base. */
 async function depuisLaBase(base: Base, options: OptionsDuPlanVivant, origine: string | URL) {
   const regles = Object.entries(options.collections ?? {}).map(([collection, r]) => ({ collection, adresse: typeof r === "function" ? r : r.adresse, ajoute: typeof r === "function" ? true : r.ajoute !== false }));
-  const { entrees, manquantes } = await lireLesEntrees(base, regles.map((r) => r.collection));
+  // Les collections et les redirections en meme temps : chaque requete D1 coute un aller-retour.
+  const [{ entrees, manquantes }, lesRedirections] = await Promise.all([lireLesEntrees(base, regles.map((r) => r.collection)), lireLesRedirections(base)]);
+  const parGroupe = new Map<string, EntreePubliee[]>();
+  for (const e of entrees) {
+    if (!e.groupe || e.noindex) continue;
+    const cle = `${e.collection}:${e.groupe}`;
+    parGroupe.set(cle, [...(parGroupe.get(cle) ?? []), e]);
+  }
   const parId = new Map<string, string | null>();
   for (const e of entrees) {
     const regle = regles.find((r) => r.collection === e.collection)!;
@@ -153,7 +161,7 @@ async function depuisLaBase(base: Base, options: OptionsDuPlanVivant, origine: s
     }
     // Une canonique qui pointe ailleurs : cette adresse n'est pas la bonne, elle n'entre pas.
     if (e.canonique && cheminDe(e.canonique.startsWith("/") || /^https?:/i.test(e.canonique) ? e.canonique : `/${e.canonique}`, origine) !== chemin) continue;
-    const freres = e.groupe ? entrees.filter((x) => x.collection === e.collection && x.groupe === e.groupe && !x.noindex) : [];
+    const freres = e.groupe ? (parGroupe.get(`${e.collection}:${e.groupe}`) ?? []) : [];
     const alternatives = freres
       .map((x) => ({ langue: hreflangDe(x.locale ?? "", options.langues), href: parId.get(`${x.collection}:${x.id}`) ?? "" }))
       .filter((a) => a.langue && a.href);
@@ -165,7 +173,7 @@ async function depuisLaBase(base: Base, options: OptionsDuPlanVivant, origine: s
     };
     liste.push(entree);
   }
-  return { ajoutees, datees, noindex, manquantes, redirections: await lireLesRedirections(base) };
+  return { ajoutees, datees, noindex, manquantes, redirections: lesRedirections };
 }
 
 /** Garde le resume du plan quand il a change (une ecriture par changement, pas par requete). */
@@ -211,6 +219,12 @@ export async function calculerLePlan(entree: { base: Base | null; manifeste: Man
   return { entrees, retirees, resume };
 }
 
+/** Le waitUntil du Worker (adaptateur Cloudflare d'Astro), ou null hors Worker. */
+function plusTard(contexte: APIContext): ((promesse: Promise<unknown>) => void) | null {
+  const cf = (contexte.locals as { cfContext?: { waitUntil?: (p: Promise<unknown>) => void } } | undefined)?.cfContext;
+  return typeof cf?.waitUntil === "function" ? cf.waitUntil.bind(cf) : null;
+}
+
 /** La route /sitemap-moteur.xml. */
 export function planVivant(options: OptionsDuPlanVivant = {}): APIRoute {
   return async (contexte) => {
@@ -219,13 +233,22 @@ export function planVivant(options: OptionsDuPlanVivant = {}): APIRoute {
     const base = d1De(env, options.liaison ?? "DB");
     const fichiers = estFichiers(env.ASSETS) ? env.ASSETS : null;
     try {
-      const manifeste = options.manifeste ? await options.manifeste() : await lireLeManifeste(fichiers, origine);
-      const duSite = (await options.aLaDemande?.(contexte)) ?? [];
+      // Le manifeste et les adresses du site en meme temps : deux sources independantes.
+      const [manifeste, duSite] = await Promise.all([
+        options.manifeste ? options.manifeste() : lireLeManifeste(fichiers, origine),
+        options.aLaDemande ? options.aLaDemande(contexte) : Promise.resolve([] as Array<string | EntreeDuPlan>),
+      ]);
       const { entrees, retirees, resume } = await calculerLePlan({ base, manifeste, duSite, options, origine });
-      if (base) await garderLeResume(base, resume);
+      if (base) {
+        // Le resume n'est qu'un affichage de l'ecran SEO : il s'ecrit apres la reponse quand le Worker le permet.
+        const garde = garderLeResume(base, resume);
+        const apres = plusTard(contexte);
+        if (apres) apres(garde);
+        else await garde;
+      }
       return new Response(xmlDuPlan(entrees, origine, options.langues), {
         status: 200,
-        headers: { ...EN_TETES_XML, "x-aloha-plan": `${entrees.length} adresses, ${retirees.length} retirees${manifeste ? "" : ", manifeste du build introuvable"}` },
+        headers: { ...EN_TETES_DU_PLAN, "x-aloha-plan": `${entrees.length} adresses, ${retirees.length} retirees${manifeste ? "" : ", manifeste du build introuvable"}` },
       });
     } catch (erreur) {
       console.error("[aloha-seo] plan indisponible", erreur instanceof Error ? erreur.message : String(erreur));
@@ -235,4 +258,4 @@ export function planVivant(options: OptionsDuPlanVivant = {}): APIRoute {
 }
 
 /** La route /sitemap-index.xml, pour un site qui ne la sert pas depuis l'aiguillage. */
-export const indexDuPlan: APIRoute = ({ site, url }) => new Response(xmlDeLIndex(site ?? url, ROUTE_DU_PLAN), { status: 200, headers: EN_TETES_XML });
+export const indexDuPlan: APIRoute = ({ site, url }) => new Response(xmlDeLIndex(site ?? url, ROUTE_DU_PLAN), { status: 200, headers: EN_TETES_DU_PLAN });

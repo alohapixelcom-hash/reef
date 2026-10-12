@@ -122,6 +122,7 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
  *   25-26    Ventes (tableau de bord de la boutique) et Statistiques
  *   30       Commandes
  *   40       Clients
+ *   45       Livraison (modes, prix au poids, tarifs Colissimo)
  *   50-53    Produits, Rayons, Stock, Factures
  *   60-63    Articles de blog, categories, etiquettes, auteurs
  *   70-72    Pages, Textes des pages, puis toute autre collection du site
@@ -129,7 +130,7 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
  *   90-92    Codes promo, Cartes cadeaux, Fidelite
  *   100-103  Courriels, Lettre d'information, Abonnes, Journal des courriels
  *   110-112  Menus, Redirections, SEO (robots.txt, llms.txt, plan du site)
- *   120-126  Livraison, Colissimo (l'ecran de l'extension colissimo ou celui
+ *   121-126  Colissimo (l'ecran de l'extension colissimo ou celui
  *            de la boutique, jamais les deux), Reglages de boutique, Stripe,
  *            branchement et reglages des courriels, Brevo
  *   129      une entree que cette liste ne connait pas encore : au-dessus de
@@ -188,6 +189,10 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
 /* Clients */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce/clients"]) {
   order: 40 !important;
+}
+/* Livraison : les modes, leurs prix au poids, la recopie des tarifs Colissimo, juste apres les commandes et les clients */
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce/livraison"]) {
+  order: 45 !important;
 }
 /* Produits */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/products"]) {
@@ -278,10 +283,6 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
 /* SEO : robots.txt, llms.txt et l'etat du plan du site, a cote des redirections qui en retirent des adresses */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-seo"], > a[href="/_emdash/admin/plugins/aloha-seo/"]) {
   order: 112 !important;
-}
-/* Livraison */
-[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce/livraison"]) {
-  order: 120 !important;
 }
 /* Colissimo : l'ecran de l'extension colissimo, ou celui de la boutique sur un site qui ne l'a pas */
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-colissimo"], > a[href="/_emdash/admin/plugins/aloha-colissimo/"], > a[href="/_emdash/admin/plugins/aloha-commerce/colissimo"]) {

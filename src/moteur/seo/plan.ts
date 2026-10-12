@@ -61,9 +61,26 @@ export interface Retraits {
   horsDuPlan?: RegExp;
 }
 
+/** Une reponse XML qui ne se garde nulle part : le plan indisponible (503). */
 export const EN_TETES_XML: Record<string, string> = {
   "content-type": "application/xml; charset=utf-8",
   "cache-control": "no-store",
+};
+
+/** Combien de secondes un plan ou l'index peut etre garde (frontal, navigateur, robot). */
+export const GARDE_DU_PLAN = 300;
+
+/**
+ * Les en-tetes du plan vivant et de l'index. Plus de no-store : un plan qui
+ * se recalcule a chaque visite de Google repondait en 9 a 86 s sur les
+ * grandes boutiques (MESURE le 12 octobre 2026), et la Search Console le
+ * declarait illisible. Cinq minutes de garde publique, et le frontal du socle
+ * le garde sous la version du contenu : une publication change la cle, la
+ * copie d'avant ne ressert jamais.
+ */
+export const EN_TETES_DU_PLAN: Record<string, string> = {
+  "content-type": "application/xml; charset=utf-8",
+  "cache-control": `public, max-age=${GARDE_DU_PLAN}`,
 };
 
 const NS_PLAN = "http://www.sitemaps.org/schemas/sitemap/0.9";

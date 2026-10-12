@@ -55,21 +55,30 @@ function decouper(chemin: string): { langue: string; suffixe: string } {
   return autre ? { langue: tete, suffixe: chemin.slice(tete.length + 1) } : { langue: defaultLocale, suffixe: chemin };
 }
 
-/** Les adresses de toutes les pages du plan : pages gerees, pages libres publiees hors noindex, ajouts du site, moins ses exclusions. */
+/**
+ * Les adresses de toutes les pages du plan : pages gerees, pages libres publiees hors noindex, ajouts du site, moins ses exclusions.
+ * Toutes les sources sont lues en meme temps : chacune interroge la base, et
+ * en serie le plan d'une boutique payait leurs allers-retours l'un apres
+ * l'autre. Les ajouts sont demandes avant les exclusions (un site peut garder
+ * la lecture des premiers pour les secondes), puis appliques dans cet ordre.
+ */
 export async function adressesDuPlan(options: OptionsDuPlan): Promise<string[]> {
-  const chemins = new Set<string>();
-  for (const page of PAGES_GEREES) {
+  const pages = PAGES_GEREES.map((page) => {
     const lister = options.chemins[page];
     if (lister === undefined) throw new Error(`Page geree sans chemins dans le plan de site : ${page}`);
-    if (lister === null) continue;
-    for (const params of await lister()) {
-      const chemin = adresseDeLaPage(page, params);
-      if (!options.horsDuPlan?.test(chemin)) chemins.add(chemin);
-    }
-  }
-  for (const l of locales) for (const p of await pagesLibres(l)) if (!p.noindex) chemins.add(`${localePrefix(l)}/${p.slug}/`);
-  for (const ajoutee of (await options.ajoutees?.()) ?? []) chemins.add(ajoutee);
-  for (const exclue of (await options.exclues?.()) ?? []) chemins.delete(exclue);
+    return { page, lister };
+  });
+  const [parPage, libres, ajoutees, exclues] = await Promise.all([
+    Promise.all(pages.map(async ({ page, lister }) => (lister === null ? [] : (await lister()).map((params) => adresseDeLaPage(page, params))))),
+    Promise.all(locales.map(async (l) => (await pagesLibres(l)).filter((p) => !p.noindex).map((p) => `${localePrefix(l)}/${p.slug}/`))),
+    options.ajoutees?.() ?? Promise.resolve([] as string[]),
+    options.exclues?.() ?? Promise.resolve([] as string[]),
+  ]);
+  const chemins = new Set<string>();
+  for (const chemin of parPage.flat()) if (!options.horsDuPlan?.test(chemin)) chemins.add(chemin);
+  for (const chemin of libres.flat()) chemins.add(chemin);
+  for (const ajoutee of ajoutees) chemins.add(ajoutee);
+  for (const exclue of exclues) chemins.delete(exclue);
   return [...chemins].sort();
 }
 
