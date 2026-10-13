@@ -16,7 +16,6 @@
   display: grid;
   gap: 1.5rem;
   max-width: 82rem;
-  padding-bottom: 7rem;
   font-size: 0.875rem;
   color: var(--text-color-kumo-default);
 }
@@ -281,7 +280,27 @@
 
 .ds-ecran--telephone .ds-cadre { height: min(78vh, 52.75rem); }
 
-/* La barre d'enregistrement, collee en bas : un seul bouton principal. */
+/* Sur un grand ecran l'apercu reste en vue pendant le defilement : il tient
+ * entre la barre du haut d'EmDash et la barre d'enregistrement, sans passer
+ * dessous. */
+@media (min-width: 72rem) {
+  .ds-cadre,
+  .ds-ecran--telephone .ds-cadre { height: clamp(22rem, calc(100dvh - 19rem), 52.75rem); }
+}
+
+/* La barre d'enregistrement, collee en bas : un seul bouton principal.
+ *
+ * Dans le back office, ce n'est pas la fenetre qui defile mais le <main>
+ * d'EmDash, et il a une marge interieure (p-6). Une barre `sticky` se cale
+ * sur le bas de cette boite MOINS sa marge : elle flottait 24 a 27 px au-dessus
+ * du bas, le contenu defilait dessous, et en fin de page elle remontait de
+ * toute la marge du bas de l'ecran (7rem) avec du vide sous elle. Sur la page
+ * Design seulement, le <main> perd sa marge du bas : la barre touche le bas de
+ * l'ecran, et elle est le dernier element de la page, a sa place dans le flux
+ * (pas de marge negative) : en fin de defilement elle se pose sous le dernier
+ * reglage, qui reste visible. */
+main:has(> .ds-ecran-page) { padding-bottom: 0; }
+
 .ds-barre {
   position: sticky;
   bottom: 0;
@@ -291,13 +310,24 @@
   align-items: center;
   justify-content: flex-end;
   gap: 0.75rem;
-  margin-top: -5rem;
-  padding: 0.875rem 1rem calc(0.875rem + env(safe-area-inset-bottom, 0px));
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.875rem 0 calc(0.875rem + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--color-kumo-line);
-  background: var(--color-kumo-base);
+  background: var(--color-kumo-elevated, var(--color-kumo-base));
+  box-shadow: 0 -0.75rem 1.5rem -1rem rgb(0 0 0 / 0.25);
 }
 
-.ds-statut { margin: 0 auto 0 0; font-size: 0.8125rem; color: var(--text-color-kumo-subtle); }
+.ds-barre .ds-bouton { flex: 0 1 auto; max-width: 100%; white-space: normal; text-align: center; }
+
+/* Sur un telephone : le statut sur sa ligne, les deux boutons cote a cote dessous. */
+@media (max-width: 40rem) {
+  .ds-barre .ds-statut { flex-basis: 100%; }
+  .ds-barre .ds-bouton { flex: 1 1 auto; justify-content: center; }
+}
+
+.ds-statut { flex: 1 1 12rem; min-width: 0; margin: 0; font-size: 0.8125rem; color: var(--text-color-kumo-subtle); }
 
 .ds-statut--ok { color: var(--text-color-kumo-default); font-weight: 600; }
 

@@ -72,7 +72,7 @@ html:not([lang^="fr"]) [data-sidebar="content"] [data-sidebar="group"]:nth-of-ty
   display: none;
 }
 /* Pas de boutique sur ce site : pas de rubrique Boutique. */
-[data-sidebar="content"]:not(:has(a[href^="/_emdash/admin/plugins/aloha-commerce"], a[href="/_emdash/admin/content/products"], a[href^="/_emdash/admin/plugins/aloha-stock"])) [data-sidebar="group"]:nth-of-type(1)::before,
+[data-sidebar="content"]:not(:has(a[href^="/_emdash/admin/plugins/aloha-commerce"], a[href="/_emdash/admin/content/products"], a[href^="/_emdash/admin/plugins/aloha-produits"], a[href^="/_emdash/admin/plugins/aloha-stock"])) [data-sidebar="group"]:nth-of-type(1)::before,
 /* Pas de courriels : pas de rubrique Courriels. */
 [data-sidebar="content"]:not(:has(a[href^="/_emdash/admin/plugins/aloha-courriels"], a[href="/_emdash/admin/plugins/aloha-gestion/abonnes"], a[href="/_emdash/admin/plugins/aloha-gestion/journal"])) [data-sidebar="group"]:nth-of-type(2)::after,
 /* Rail replie : les icones seules. */

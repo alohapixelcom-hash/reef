@@ -24,6 +24,21 @@ ok(16 * TAILLES_DU_TEXTE.Compacte >= 15, "le texte compact garde 15 px au moins 
 ok(Object.values(RAYONS).every((r) => Number.parseFloat(r.petit) < Number.parseFloat(r.grand)), "un panneau est toujours plus arrondi qu'une carte");
 is(CHAMPS_DU_DESIGN, ["h1_size", "h2_size", "h3_size", "text_size", "radius"], "cinq champs : H1, H2, H3, texte, rayon");
 
+// --- La barre d'enregistrement ------------------------------------------------
+// Le <main> d'EmDash defile et garde une marge interieure : la barre ne touche
+// le bas que si cette page lui retire sa marge du bas, et elle ne recouvre le
+// dernier reglage que si une marge negative la remonte dans la page.
+{
+  const ecran = readFileSync(new URL("./ecran.css", import.meta.url), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+  const regle = (sel: string) => new RegExp(`(^|\\})\\s*${sel.replace(/[.()>:]/g, "\\$&")}\\s*\\{([^}]*)\\}`).exec(ecran)?.[2] ?? "";
+  const barre = regle(".ds-barre");
+  ok(/position:\s*sticky/.test(barre) && /bottom:\s*0/.test(barre), "la barre colle au bas de la zone qui defile");
+  ok(!/margin(-top)?:\s*-/.test(barre), "la barre reste a sa place dans le flux : aucune marge negative ne la remonte sur les reglages");
+  ok(/padding-bottom:\s*0/.test(regle("main:has(> .ds-ecran-page)")), "sur la page Design, le <main> d'EmDash perd sa marge du bas : la barre touche le bas de l'ecran");
+  ok(!/padding-bottom/.test(regle(".ds-ecran-page")), "la page ne garde pas sous la barre un vide qui la fait flotter en fin de defilement");
+  ok(/flex-wrap:\s*wrap/.test(barre) && /max-width:\s*100%/.test(barre), "la barre passe a la ligne au lieu de deborder a droite");
+}
+
 // --- Vide, Standard ou inconnu : aucune feuille --------------------------------
 is(feuilleDuDesign(null), null, "aucune entree : le rendu d'origine");
 is(feuilleDuDesign({}), null, "entree vide : le rendu d'origine");

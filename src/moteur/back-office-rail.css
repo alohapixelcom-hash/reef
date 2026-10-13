@@ -118,7 +118,7 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
  *   20       Messages, juste dessous sur tous les sites, boutique comprise
  *   21       (rubrique Boutique)
  *   30-45    Commandes, Clients, Livraison
- *   50-53    Produits, Rayons, Stock, Factures
+ *   50-53    Produits (collection ou ecran aloha-produits), Rayons, Stock, Factures
  *   54-56    Codes promo, Cartes cadeaux, Fidelite
  *   57-58    Ventes (tableau de bord de la boutique), Statistiques
  *   59       (rubrique Contenu)
@@ -183,8 +183,9 @@ html:not([lang^="fr"]) [data-kumo-component="Select"][data-kumo-part="trigger"] 
 [data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/plugins/aloha-commerce/livraison"]) {
   order: 45 !important;
 }
-/* Produits */
-[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/products"]) {
+/* Produits : la collection d'une boutique EmDash, ou l'ecran aloha-produits
+ * d'une vitrine dont le catalogue vit ailleurs (Shopify, WooCommerce) */
+[data-sidebar="content"] [data-sidebar="menu-item"]:has(> a[href="/_emdash/admin/content/products"], > a[href="/_emdash/admin/plugins/aloha-produits"], > a[href="/_emdash/admin/plugins/aloha-produits/"]) {
   order: 50 !important;
 }
 /* Rayons */
