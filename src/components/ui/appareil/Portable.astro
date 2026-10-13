@@ -1,0 +1,234 @@
+---
+// src/components/ui/appareil/Portable.astro - l'ordinateur portable de la maison, dessine en CSS : arete d'aluminium, verre noir a bord fin, reflet, charniere, socle et ombres ; la capture se pose dans le slot, sous une barre d'adresse facultative.
+//
+// UN SEUL DESSIN. Ce fichier est le meme, octet pour octet, dans alohapixel.com
+// et dans alohapixel.app, et c'est lui que lisent les visuels du catalogue
+// (outils/maquettes de aloha-store) : un appareil change partout ou nulle part.
+//
+// UN PORTABLE GENERIQUE, PAS UN PRODUIT. Aucun logo, aucune encoche, aucune
+// camera, aucune echancrure dans le socle, aucune proportion copiee d'un
+// modele : la licence des ressources de design d'Apple interdit leurs cadres
+// autour d'un site, et la maison ne dessine aucun produit d'une marque
+// (claude/40-APPLE-DESIGN.md). Ce qui fait lire "un ordinateur" est commun a
+// tous : un ecran borde de noir, une charniere, un socle plus large.
+//
+// LA MATIERE NE SUIT PAS LA PAGE. Aluminium et verre sont des melanges de blanc
+// et de noir : aucun hex, aucune couleur de palette, et un appareil ne change
+// pas de teinte quand le visiteur passe en sombre.
+//
+// LES MESURES SUIVENT LA LARGEUR. Le cadre est un conteneur de requete : bord,
+// rayons, socle et ombres sont en `cqi`, donc le meme dessin tient dans une
+// carte de 18 rem comme dans une image de 1 600 px. Seule la barre d'adresse a
+// des bornes en rem : un texte de 4 px ne se lit pas.
+//
+// Decoratif : `aria-hidden`, ce que montre l'ecran est deja ecrit dans la page.
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"div"> & {
+  /** L'hote de la demonstration, ecrit dans une barre de navigateur au-dessus de la capture. Vide : pas de barre. */
+  hote?: string;
+  /** Attributs poses sur l'adresse (les marques de la barre d'edition, par exemple). */
+  adresse?: Record<string, unknown>;
+};
+
+const { class: className, hote = "", adresse = {}, ...rest }: Props = Astro.props;
+---
+
+<div data-slot="portable" class:list={["portable", className]} aria-hidden="true" {...rest}>
+  <div class="portable-capot">
+    <div class="portable-verre">
+      <div class="portable-vitre">
+        {
+          hote && (
+            <div class="portable-barre">
+              <span class="portable-adresse" {...adresse}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                  <rect x="4.5" y="10.5" width="15" height="10" rx="2.5" />
+                  <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" stroke-linecap="round" />
+                </svg>
+                {hote}
+              </span>
+            </div>
+          )
+        }
+        <slot />
+      </div>
+    </div>
+  </div>
+  <div class="portable-charniere"></div>
+  <div class="portable-socle"></div>
+</div>
+
+<style>
+  .portable {
+    --alu-clair: color-mix(in oklab, white 96%, black);
+    --alu: color-mix(in oklab, white 84%, black);
+    --alu-moyen: color-mix(in oklab, white 70%, black);
+    --alu-sombre: color-mix(in oklab, white 46%, black);
+    --verre: color-mix(in oklab, white 5%, black);
+    --verre-bord: color-mix(in oklab, white 14%, black);
+    --ombre-douce: color-mix(in oklab, black 22%, transparent);
+    position: relative;
+    isolation: isolate;
+    container-type: inline-size;
+  }
+
+  /* Le capot : une arete d'aluminium tres fine autour d'un verre noir. Le
+     verre porte le bord de l'ecran, fin et regulier, un peu plus haut en bas. */
+  .portable-capot {
+    position: relative;
+    width: 86%;
+    margin-inline: auto;
+    padding: 0.32cqi;
+    border-radius: 2.5cqi 2.5cqi 0.6cqi 0.6cqi;
+    background: linear-gradient(to bottom, var(--alu-clair), var(--alu) 40%, var(--alu-moyen));
+    box-shadow:
+      0 0 0 0.06cqi var(--alu-sombre),
+      0 2.4cqi 5.5cqi -1.8cqi var(--ombre-douce),
+      0 0.3cqi 0.8cqi -0.2cqi color-mix(in oklab, black 12%, transparent);
+  }
+  .portable-verre {
+    padding: 1.55cqi 1.55cqi 2.35cqi;
+    border-radius: 2.2cqi 2.2cqi 0.35cqi 0.35cqi;
+    background: var(--verre);
+    box-shadow: inset 0 0 0 0.12cqi var(--verre-bord);
+  }
+
+  /* L'ecran : 16/10, la barre d'adresse en haut si elle est la, la capture
+     dans le reste, cadree en haut. */
+  .portable-vitre {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    border-radius: 0.45cqi;
+    background: var(--verre);
+  }
+  .portable-vitre > :global(img),
+  .portable-vitre > :global(picture),
+  .portable-vitre > :global(picture img) {
+    display: block;
+    flex: 1 1 0;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+  /* Le reflet : une lumiere en biais venue d'en haut a gauche, et le filet
+     sombre ou le verre rencontre l'ecran. */
+  .portable-vitre::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background: linear-gradient(
+      116deg,
+      color-mix(in oklab, white 13%, transparent) 0%,
+      color-mix(in oklab, white 5%, transparent) 30%,
+      transparent 46%
+    );
+    box-shadow: inset 0 0 0 0.08cqi color-mix(in oklab, black 50%, transparent);
+  }
+
+  /* La barre de navigateur : un bandeau clair, l'adresse vraie et son cadenas. */
+  .portable-barre {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    height: clamp(1rem, 3.3cqi, 3rem);
+    background: color-mix(in oklab, white 93%, black);
+    border-bottom: 1px solid color-mix(in oklab, black 12%, transparent);
+  }
+  .portable-adresse {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    width: 40%;
+    min-width: 0;
+    height: 62%;
+    padding-inline: 0.8em;
+    border-radius: 999px;
+    background: color-mix(in oklab, white 99%, black);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, black 8%, transparent);
+    color: color-mix(in oklab, white 30%, black);
+    font: 500 clamp(0.5rem, 1.05cqi, 1.1rem) / 1 system-ui, sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .portable-adresse svg {
+    width: 0.9em;
+    height: 0.9em;
+    flex: none;
+  }
+
+  /* La charniere : l'ombre que le capot pose sur le dessus du socle. */
+  .portable-charniere {
+    position: relative;
+    z-index: 1;
+    width: 72%;
+    height: 0.5cqi;
+    margin-inline: auto;
+    border-radius: 0 0 0.5cqi 0.5cqi;
+    background: linear-gradient(to bottom, color-mix(in oklab, white 22%, black), color-mix(in oklab, white 48%, black));
+  }
+
+  /* Le socle, vu de face et un peu d'en haut : le dessus en bande claire, une
+     arete vive, la tranche avant qui s'assombrit vers le bas et vers les bouts,
+     les coins qui s'arrondissent. Pas d'echancrure au centre : elle signe un
+     modele. */
+  .portable-socle {
+    position: relative;
+    height: 2.7cqi;
+    margin-top: -0.5cqi;
+    border-radius: 0.6cqi 0.6cqi 2.6cqi 2.6cqi / 0.6cqi 0.6cqi 2cqi 2cqi;
+    background:
+      linear-gradient(
+        to right,
+        color-mix(in oklab, black 16%, transparent) 0%,
+        transparent 7%,
+        transparent 93%,
+        color-mix(in oklab, black 16%, transparent) 100%
+      ),
+      linear-gradient(
+        to bottom,
+        var(--alu) 0%,
+        var(--alu-clair) 22%,
+        var(--alu-clair) 30%,
+        color-mix(in oklab, white 80%, black) 34%,
+        var(--alu) 52%,
+        var(--alu-moyen) 82%,
+        var(--alu-sombre) 100%
+      );
+    box-shadow:
+      inset 0 0.08cqi 0 color-mix(in oklab, white 80%, transparent),
+      inset 0 -0.12cqi 0 color-mix(in oklab, black 28%, transparent);
+  }
+  /* Deux ombres : le contact, serre et sombre, puis la lumiere ambiante qui
+     s'etale loin sous l'appareil. */
+  .portable-socle::before,
+  .portable-socle::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+  }
+  .portable-socle::before {
+    z-index: -1;
+    inset: 60% 2% auto;
+    height: 2.4cqi;
+    background: radial-gradient(closest-side, color-mix(in oklab, black 62%, transparent), transparent);
+    filter: blur(0.45cqi);
+  }
+  .portable-socle::after {
+    z-index: -2;
+    inset: 30% -3% auto;
+    height: 9cqi;
+    background: radial-gradient(closest-side, color-mix(in oklab, black 26%, transparent), transparent);
+    filter: blur(2.2cqi);
+  }
+</style>

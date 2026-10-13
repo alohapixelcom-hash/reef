@@ -1,0 +1,111 @@
+---
+// src/components/ui/appareil/Telephone.astro - le telephone de la maison, dessine en CSS : un ecran au rapport 9/19,5, une bande de metal fine, un verre noir a bord regulier, un reflet et une ombre ; la capture se pose dans le slot.
+//
+// UN SEUL DESSIN : le meme fichier, octet pour octet, dans alohapixel.com,
+// alohapixel.app et les sept themes (autour de la capture de `pnpm poster`),
+// et lu par les visuels du catalogue (voir Portable.astro).
+//
+// UN TELEPHONE GENERIQUE, PAS UN PRODUIT. Ni encoche, ni ilot, ni camera, ni
+// bouton, ni logo : rien qui designe un modele (claude/40-APPLE-DESIGN.md). Le
+// rapport, le bord fin et les coins doux suffisent a le faire lire comme un
+// telephone, et l'ecran garde tout son haut, la ou vit la barre du site.
+//
+// Memes regles que Portable.astro : de l'aluminium et du verre en melanges de
+// blanc et de noir, des mesures en `cqi` sur un conteneur de requete (le corps
+// porte le dessin, le conteneur ne porte que la largeur), et `aria-hidden`.
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"div">;
+
+const { class: className, ...rest }: Props = Astro.props;
+---
+
+<div data-slot="telephone" class:list={["telephone", className]} aria-hidden="true" {...rest}>
+  <div class="telephone-corps">
+    <div class="telephone-verre">
+      <div class="telephone-vitre">
+        <slot />
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .telephone {
+    --alu-clair: color-mix(in oklab, white 96%, black);
+    --alu: color-mix(in oklab, white 84%, black);
+    --alu-moyen: color-mix(in oklab, white 70%, black);
+    --alu-sombre: color-mix(in oklab, white 46%, black);
+    --verre: color-mix(in oklab, white 5%, black);
+    --verre-bord: color-mix(in oklab, white 14%, black);
+    --ombre-douce: color-mix(in oklab, black 22%, transparent);
+    position: relative;
+    isolation: isolate;
+    container-type: inline-size;
+  }
+
+  /* Le corps : une bande de metal eclairee sur ses tranches, deux ombres
+     portees, la large et la serree. Son rapport (100 / 206,4) est calcule pour
+     que l'ECRAN, une fois le metal et le verre retires (8,8 cqi en tout), ait
+     exactement 9 / 19,5 : celui d'une capture prise a 390 x 844, que rien ne
+     rogne. */
+  .telephone-corps {
+    position: relative;
+    aspect-ratio: 100 / 206.4;
+    padding: 1.1cqi;
+    border-radius: 15.5cqi;
+    background: linear-gradient(
+      to right,
+      var(--alu-sombre) 0%,
+      var(--alu-clair) 2.2%,
+      var(--alu-moyen) 6%,
+      var(--alu) 50%,
+      var(--alu-moyen) 94%,
+      var(--alu-clair) 97.8%,
+      var(--alu-sombre) 100%
+    );
+    box-shadow:
+      inset 0 0 0 0.25cqi color-mix(in oklab, black 30%, transparent),
+      0 0 0 0.25cqi color-mix(in oklab, black 26%, transparent);
+    filter: drop-shadow(0 5cqi 7cqi var(--ombre-douce)) drop-shadow(0 1.2cqi 1.8cqi var(--ombre-douce));
+  }
+  .telephone-verre {
+    height: 100%;
+    padding: 3.3cqi;
+    border-radius: 14.4cqi;
+    background: var(--verre);
+    box-shadow: inset 0 0 0 0.35cqi var(--verre-bord);
+  }
+  .telephone-vitre {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 11.2cqi;
+    background: var(--verre);
+  }
+  /* La capture remplit l'ecran, cadree en haut : prise au rapport de l'ecran,
+     rien n'est rogne. */
+  .telephone-vitre > :global(img),
+  .telephone-vitre > :global(picture),
+  .telephone-vitre > :global(picture img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+  .telephone-vitre::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background: linear-gradient(
+      122deg,
+      color-mix(in oklab, white 15%, transparent) 0%,
+      color-mix(in oklab, white 5%, transparent) 26%,
+      transparent 40%
+    );
+    box-shadow: inset 0 0 0 0.3cqi color-mix(in oklab, black 45%, transparent);
+  }
+</style>
