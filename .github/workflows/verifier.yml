@@ -9,13 +9,27 @@
 name: verifier
 
 concurrency:
-  group: verifier-${{ github.workflow }}-${{ github.ref }}
+  group: verifier-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Economie de minutes (13/10/2026) : la poussee ne rejoue le parcours que sur
+# main ; une branche de travail est verifiee par sa demande de fusion, une
+# seule fois. Un envoi qui ne touche que la documentation ne lance rien : les
+# controles locaux (pnpm lint:house) la couvrent avant chaque envoi.
 on:
   push:
-    branches: ["**"]
+    branches: ["main"]
+    paths-ignore:
+      - "*.md"
+      - "docs/**"
+      - "wiki/**"
+      - ".github/*.md"
   pull_request:
+    paths-ignore:
+      - "*.md"
+      - "docs/**"
+      - "wiki/**"
+      - ".github/*.md"
   workflow_dispatch:
 
 jobs:
@@ -31,6 +45,14 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
+      # Les images optimisees par Astro sont gardees d'une execution a l'autre :
+      # sans ce cache, chaque construction les recalcule toutes.
+      - uses: actions/cache@v4
+        with:
+          path: node_modules/.astro
+          key: astro-images-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'astro.config.mjs') }}-${{ github.sha }}
+          restore-keys: |
+            astro-images-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'astro.config.mjs') }}-
       - run: pnpm build
       - run: pnpm test
       - run: pnpm lint:house

@@ -55,6 +55,7 @@ const EXEMPTIONS = [
     match: /\.json$/,
     why: "JSON n'a pas de commentaires",
   },
+  { rule: "length", match: /(^|\/)socle\.lock\.json$/, why: "manifeste genere par scripts/socle.mjs, une ligne par fichier du socle adopte" },
   {
     rule: "length",
     match: /src\/moteur\/catalogue-bo\.fr\.ts$/,
@@ -85,10 +86,19 @@ function exempt(rule, file) {
 /* Le parcours                                                         */
 /* ------------------------------------------------------------------ */
 
+/** Hors du site (outils d'atelier, releves d'un ancien site) : `house.ignorer` de socle.adaptateur.json, chemins relatifs a la racine. */
+function ignores() {
+  try {
+    const liste = JSON.parse(readFileSync(join(ROOT, "socle.adaptateur.json"), "utf8"))?.house?.ignorer ?? [];
+    return new Set(liste.filter((c) => typeof c === "string" && c !== "" && !c.startsWith("/") && !c.split("/").includes("..")).map((c) => c.replace(/\/+$/, "")));
+  } catch { return new Set(); }
+}
+const IGNORES = ignores();
+
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
-    if (SKIP.has(name)) continue;
     const full = join(dir, name);
+    if (SKIP.has(name) || IGNORES.has(relative(ROOT, full))) continue;
     if (statSync(full).isDirectory()) walk(full, out);
     else if (LINTABLE.test(name)) out.push(full);
   }
@@ -367,7 +377,7 @@ for (const full of files) {
   }
 }
 
-console.log(`Regles de la maison : ${files.length} fichiers, ${RULES.length} regles.`);
+console.log(`Regles de la maison : ${files.length} fichiers, ${RULES.length} regles.${IGNORES.size ? ` Hors du site (house.ignorer) : ${[...IGNORES].join(", ")}.` : ""}`);
 if (families.length) console.log(`Familles de palette lues dans tokens.css : ${families.join(", ")}`);
 
 if (skipped.length) {
