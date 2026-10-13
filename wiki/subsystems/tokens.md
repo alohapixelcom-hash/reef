@@ -115,3 +115,15 @@ astro:after-swap, because the swap replaces the server-rendered `<html>`
 attributes. Tailwind's `dark:` variant is bound to that class by the
 `@custom-variant` in src/styles/global.css, but components written with floor-3
 roles almost never need it.
+
+## The Design page of the back office (4.0.0)
+
+With the engine on, the « Design » page (`src/moteur/design/`, core 2.0.0)
+writes the editor's choices into the `site` entry of each language, and
+`BaseHead.astro` turns them into one more `<style data-aloha-design>` tag
+(`feuilleDuDesign`, `src/moteur/design/echelles.ts`), next to the palette and
+the typeface. Titles change by their tag (`zoom` 0.86 or 1.16), body text by
+the fluid root font size of `global.css`, corners by `--radius-card` and
+`--radius-panel`. Standard sizes and the theme's own corners write no tag, so
+the tokens above keep the theme's rendering. `design.selfcheck.ts`, run by
+`pnpm test`, compares the core's tokens with this theme's two stylesheets.

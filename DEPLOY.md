@@ -156,6 +156,16 @@ which allows redistribution. They are not stored in the repository:
 `scripts/covers.mjs` fetches them before every build. [NOTICE.md](NOTICE.md)
 and [PHOTOS.md](PHOTOS.md) say which ones and where from.
 
+## Release 4.0.0 (core 2.0.0)
+
+Same deployment as 3.9.0 below (Time Travel bookmark of `reef-moteur` first,
+`pnpm build:moteur`, the engine, then the front Worker, never `--domain`), and
+no SQL: the five fields of the « Design » page (`h1_size`, `h2_size`,
+`h3_size`, `text_size`, `radius` of the `site` entry) are added by that page on
+its first save, through EmDash's schema API. Online check: `/version.json` says
+4.0.0, the sidebar of `/_emdash/admin` reads in sections and shows « Design »
+under Appearance.
+
 ## Release 3.9.0 (core 1.16.0)
 
 The domain stays on the front Worker: both Workers are deployed without
