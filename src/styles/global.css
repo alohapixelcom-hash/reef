@@ -154,7 +154,7 @@
    * titre sans serif est l'ornement le plus repandu du web, et il ne dit
    * rien de la marque. */
   .accent-script {
-    @apply text-primary font-normal not-italic;
+    @apply text-primary-text font-normal not-italic;
   }
 
   /* =========================================================================
@@ -180,6 +180,10 @@
     --reef-card-foreground: var(--color-paper-50);
     --reef-primary: var(--color-reef-400);
     --reef-primary-foreground: var(--color-ink-950);
+    /* L'ENCRE du primaire (le mot d'accent des titres) prend le palier 300 :
+     * le turquoise 400 ne tient que 4,25:1 sur le voile de la photo (mesure
+     * par pnpm verify sur l'invitation a s'abonner), il en faut 4,5. */
+    --reef-primary-text: var(--color-reef-300);
     /* Le primaire de la scene est le turquoise 400 du sombre, dans les deux
      * modes : la vague du mot d'accent suit, comme les autres roles. */
     --reef-accent: var(--color-coral-400);

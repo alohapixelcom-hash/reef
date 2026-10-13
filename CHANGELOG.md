@@ -8,6 +8,7 @@
 - The back office sidebar reads in titled sections: the dashboard and Messages first, then Content, Appearance, Emails and Settings; a section with no entry shows no title. The dashboard shortcuts gain « Design ».
 - The live sitemap answers fast: the SEO panels of a collection are read in one database query, `/sitemap-moteur.xml` and the index leave with `Cache-Control: public, max-age=300` and are kept five minutes by the front Worker, purged by a publication. EmDash's `Server-Timing` header no longer reaches visitors.
 - No SQL to run: the five new fields of the `site` entry are added by the Design page on its first save, through EmDash's schema API.
+- The accent word of the titles is written with the primary ink role (`text-primary-text`): turquoise 700 on a light page, the primary itself in dark mode, turquoise 300 on the deep scenes (the photographed bands). On the photograph of the subscription invitation it read at 4.25:1, it now clears the 4.5:1 that WCAG AA asks for text (`pnpm verify`).
 - The version moves to 4.0.0 for the whole family, because the order of the sidebar changes for every editor.
 
 ## 3.9.0 - 2026-10-12
