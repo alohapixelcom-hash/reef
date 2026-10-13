@@ -2,6 +2,11 @@
 
 # Changelog
 
+
+## Next (not released)
+
+- The phone on the home page is now the house phone drawing, `src/components/ui/appareil/Telephone.astro`: aluminium edge and black glass in CSS, thin regular border, a light reflection and a soft cast shadow, no notch, island, camera, button or logo. `PhoneShot.astro` only places the screenshot and sets the width (`--phone-width` still works). The same file draws the phones and laptops of alohapixel.app, alohapixel.com and the catalogue images.
+- `public/reef-iphone-poster.webp` is reshot from the 4.0.0 build in dark mode (the `pnpm poster` capture with the theme's storage key set to dark), so the light page margin no longer draws a second light border inside the glass.
 ## 4.0.0 - 2026-10-13
 
 - Aloha Pixel core 2.0.0 (from 1.16.1). A « Design » page in the back office, under Appearance: the logo and the dark mode logo, the brand colour, the typeface, the size of the main titles, section titles, small titles and body text (Compact, Standard or Generous), the corners (the theme's own, Sharp, Soft or Rounded; buttons stay pills), with a live preview of the home page, light or dark, at desktop or phone width. The choices are saved in the `site` entry of each language. Standard sizes and the theme's own corners write nothing: the public page keeps the theme's exact rendering until someone picks something else.

@@ -1,9 +1,9 @@
 ---
 // src/components/Sections/Global/PhoneShot.astro - le telephone dessine qui montre le premier ecran du site sur mobile.
 //
-// Le cadre est DESSINE, pas photographie : aucune image d'habillage a charger,
-// aucune a licencier, et il se repeint avec le reste le jour ou la couleur de
-// marque change, parce qu'il n'utilise que des roles semantiques.
+// Le cadre est DESSINE, pas photographie : c'est le telephone de la maison
+// (src/components/ui/appareil/Telephone.astro), aluminium et verre en CSS,
+// aucune image d'habillage a charger ni a licencier, aucune marque.
 //
 // Il n'a pas d'encoche, et c'est voulu : elle mangeait le haut de l'ecran,
 // c'est-a-dire exactement ce que ce bloc essaie de montrer. Le cadre et le
@@ -19,9 +19,6 @@
 // elle, le telephone montrerait la demonstration d'origine dans un site
 // devenu celui de son acheteur.
 //
-// `contain: paint` isole le cadre du reste de la page : ce qui se repeint
-// dedans ne force pas le navigateur a reexaminer ce qui l'entoure.
-//
 // Le composant ne pose AUCUNE classe d'affichage. C'est a l'appelant d'ecrire
 // `hidden lg:block` s'il ne veut le cadre que sur grand ecran : une classe
 // d'affichage cuite dans une chaine partagee est le piege connu de la maison,
@@ -36,6 +33,7 @@
 //
 //   <PhoneShot class="hidden [--phone-width:13rem] lg:block" />
 
+import { Telephone } from "@components/ui/appareil";
 import type { Media } from "@moteur/cadre";
 
 interface Props {
@@ -71,56 +69,28 @@ const hasShot = capture !== null || __REEF_CAPTURE_DU_TELEPHONE__;
     qui annoncerait ce cadre ferait lire deux fois le meme site. */}
 {
   hasShot && (
-    <div class:list={["phone", className]} aria-hidden="true">
-      <div class="phone__screen">
-        <img
-          class="phone__shot"
-          src={capture?.src ?? `/${SHOT}`}
-          alt=""
-          width={capture?.width ?? "560"}
-          height={capture?.height ?? "1213"}
-          loading="lazy"
-          decoding="async"
-          data-emdash-ref={annotation}
-        />
-      </div>
-    </div>
+    <Telephone class:list={["phone", className]}>
+      <img
+        src={capture?.src ?? `/${SHOT}`}
+        alt=""
+        width={capture?.width ?? "560"}
+        height={capture?.height ?? "1213"}
+        loading="lazy"
+        decoding="async"
+        data-emdash-ref={annotation}
+      />
+    </Telephone>
   )
 }
 
 <style>
+  /* Le dessin est dans ui/appareil/Telephone.astro, le meme fichier que sur
+     alohapixel.com, alohapixel.app et dans les visuels du catalogue : un
+     appareil generique, sans encoche, ilot ni logo. Ce composant ne fait que
+     poser la capture et borner la largeur. */
   .phone {
-    position: relative;
     width: 100%;
     max-width: var(--phone-width, 17rem);
     margin-inline: auto;
-    aspect-ratio: 9 / 19.5;
-    padding: 0.55rem;
-    border-radius: 2.75rem;
-    background: var(--color-foreground);
-    contain: paint;
-    box-shadow:
-      0 1.5rem 3.5rem -1rem color-mix(in oklab, var(--color-foreground) 45%, transparent),
-      inset 0 0 0 1px color-mix(in oklab, var(--color-background) 22%, transparent);
-  }
-
-  .phone__screen {
-    position: relative;
-    height: 100%;
-    overflow: hidden;
-    border-radius: 2.25rem;
-    background: color-mix(in oklab, var(--color-foreground) 88%, var(--color-background));
-  }
-
-  /* La capture est prise dans un viewport iPhone : son rapport est deja celui
-     de l'ecran, donc `cover` ne recadre rien et le site s'affiche en entier,
-     comme sur un vrai telephone. L'ancrage en haut protege le premier ecran si
-     un jour le cadre change de proportion. */
-  .phone__shot {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top center;
   }
 </style>
