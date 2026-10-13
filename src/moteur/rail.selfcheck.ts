@@ -97,6 +97,7 @@ is(rang(`${A}/content/une-collection-nouvelle`), 65, "une collection que la list
 for (const c of ["rubriques", "sujets"]) is(rang(`${A}/content/${c}`), rang(`${A}/taxonomies/category`), `la collection ${c} se range comme les categories du blog`);
 is(rang(`${P}/une-extension-nouvelle`), parDefaut, "une page d'extension inconnue prend le rang d'attente");
 is(rang(`${A}/`), rang(A), "le tableau de bord, avec ou sans barre finale");
+for (const h of [`${P}/aloha-produits/`, `${P}/aloha-produits`]) is(rang(h), rang(`${A}/content/products`), `l'ecran Produits d'une vitrine (${h}) se range comme la collection products, dans la rubrique Boutique`);
 is(rang(`${P}/aloha-stock/`), rang(`${P}/aloha-stock`), "la racine d'une extension, avec ou sans barre finale");
 // Le blog, sous chacun des six noms que house.mjs reconnait ; aloha-medias, racine comme sous-page.
 for (const c of ["posts", "blog", "articles", "billets", "carnet", "journal"]) is(rang(`${A}/content/${c}`), rang(`${A}/content/posts`), `la collection ${c} se range comme le blog`);
@@ -135,6 +136,8 @@ const extensions = [
   await pagesDe(["../../../medias/src/moteur/medias/identite.mjs", "./medias/identite.mjs"], (m) => (m.PAGES as Page[] | undefined) ?? []),
   await pagesDe(["../../../brevo/src/moteur/brevo/identite.mjs", "./brevo/identite.mjs"], (m) => m.PAGES as Page[]),
   await pagesDe(["../../../design/src/moteur/design/identite.mjs", "./design/identite.mjs"], (m) => [m.PAGE_DESIGN] as Page[]),
+  // L'ecran Produits d'une vitrine (Kona, Nalu) : il vit dans le site, pas dans le socle.
+  await pagesDe(["./produits/identite.mjs"], (m) => m.PAGES as Page[]),
 ].filter((e) => e !== null);
 let pagesVues = 0;
 for (const e of extensions) {

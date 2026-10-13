@@ -266,13 +266,26 @@ export const PROBE = ({ asked }) => {
     }
     return document.body;
   };
-  leaves.forEach((leaf) => { leaf.block = blockOf(leaf.el); });
+  // LA SURCOUCHE FIXE N'EST PAS LA PAGE. Le bandeau de consentement est pose
+  // en position fixe au bas de la fenetre, au-dessus de ce qui s'y trouve : sa
+  // phrase et ses boutons "recouvraient" donc le texte de la page a toutes les
+  // largeurs (116 defauts sur Holo, autant sur chaque site qui le porte), alors
+  // que rien ne se percute, le visiteur lit l'un puis ferme l'autre. On compare
+  // un texte de surcouche a un texte de surcouche, et un texte de page a un
+  // texte de page : deux boutons qui se marchent dessus DANS le bandeau
+  // restent un defaut.
+  const surcouche = (el) => {
+    for (let n = el; n; n = n.parentElement) if (getComputedStyle(n).position === "fixed") return n;
+    return null;
+  };
+  leaves.forEach((leaf) => { leaf.block = blockOf(leaf.el); leaf.fixe = surcouche(leaf.el); });
 
   for (let a = 0; a < leaves.length; a++) {
     for (let c = a + 1; c < leaves.length; c++) {
       const A = leaves[a], B = leaves[c];
       if (A.el.contains(B.el) || B.el.contains(A.el)) continue;
       if (A.block === B.block) continue;
+      if (A.fixe !== B.fixe) continue;
       const ox = Math.min(A.box.r, B.box.r) - Math.max(A.box.x, B.box.x);
       const oy = Math.min(A.box.b, B.box.b) - Math.max(A.box.y, B.box.y);
       // Une boite de ligne est plus haute que ses glyphes : elle porte de quoi
