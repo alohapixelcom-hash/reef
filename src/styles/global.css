@@ -21,6 +21,7 @@
 @source not "../moteur/seo";
 @source not "../moteur/medias";
 @source not "../moteur/design";
+@source not "../moteur/maintenance";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

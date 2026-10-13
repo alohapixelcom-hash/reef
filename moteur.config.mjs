@@ -20,6 +20,7 @@ import { CARTES as CARTES_ACCUEIL, IDENTITE as ACCUEIL } from "./src/moteur/accu
 import { IDENTITE as MEDIAS } from "./src/moteur/medias/identite.mjs";
 import { IDENTITE as SEO, ROUTE_DE_L_INDEX, ROUTE_DU_PLAN } from "./src/moteur/seo/identite.mjs";
 import { IDENTITE as DESIGN } from "./src/moteur/design/identite.mjs";
+import { IDENTITE as MAINTENANCE } from "./src/moteur/maintenance/identite.mjs";
 import { planFige } from "./src/moteur/seo/integration.mjs";
 
 const ici = (chemin) => fileURLToPath(new URL(chemin, import.meta.url));
@@ -269,6 +270,8 @@ async function allume() {
           { ...SEO, entrypoint: ici("./src/moteur/seo/extension.ts"), adminEntry: ici("./src/moteur/seo/admin.tsx") },
           // La page Design du rail : logo, couleur, police, tailles, coins, avec apercu (extension design du socle 2.0.0).
           { ...DESIGN, entrypoint: ici("./src/moteur/design/extension.ts"), adminEntry: ici("./src/moteur/design/admin.tsx") },
+          // Le mode maintenance (socle 1.16.0) : un geste rare, en bas du rail ; la porte est dans le frontal.
+          { ...MAINTENANCE, entrypoint: ici("./src/moteur/maintenance/extension.ts") },
           // Les photos converties a l'envoi et la carte Photos du tableau de bord (extension medias du socle).
           { ...MEDIAS, entrypoint: ici("./src/moteur/medias/extension.ts") },
         ],

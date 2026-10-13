@@ -255,7 +255,16 @@ Les envois de la lettre comptent dans le forfait du mois (écran « Courriels »
 | Page introuvable | Code, titre, texte, trois boutons | « Textes des pages », page « Page introuvable » |
 | Pages ajoutées | Tout | « Pages » |
 
-## 22. Ce qui demande un développeur
+## 22. Mettre le site en maintenance
+
+Rubrique Réglages du rail, écran **Maintenance** (réservé à qui règle le site).
+
+- Cochez « Mise en maintenance », puis Enregistrer : en moins d'une minute, tout visiteur voit la page d'attente. Décochez et enregistrez pour rouvrir le site.
+- La page d'attente se compose dans le même écran : un titre, un sous-titre, un fond (couleur unie, une photo ou une vidéo de la Médiathèque) et, si vous le souhaitez, la date de retour annoncée.
+- Connecté au back office, vous voyez toujours le site normalement, et vous pouvez le modifier pendant la maintenance.
+- Les moteurs de recherche reçoivent une réponse « revenez plus tard » (503) et la page d'attente n'est pas indexée : rien n'est retiré de Google. Le back office, les plans du site, robots.txt et llms.txt restent joignables.
+
+## 23. Ce qui demande un développeur
 
 - l'ordre des blocs d'une autre page que l'accueil, un nouveau type de bloc, la mise en page et le dessin du site ;
 - les textes d'interface génériques (accessibilité, « changer de langue », « ouvrir le menu », « min de lecture », compteurs), le bandeau de cookies ;
