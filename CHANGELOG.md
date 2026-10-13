@@ -2,6 +2,14 @@
 
 # Changelog
 
+## 4.0.0 - 2026-10-13
+
+- Aloha Pixel core 2.0.0 (from 1.16.1). A « Design » page in the back office, under Appearance: the logo and the dark mode logo, the brand colour, the typeface, the size of the main titles, section titles, small titles and body text (Compact, Standard or Generous), the corners (the theme's own, Sharp, Soft or Rounded; buttons stay pills), with a live preview of the home page, light or dark, at desktop or phone width. The choices are saved in the `site` entry of each language. Standard sizes and the theme's own corners write nothing: the public page keeps the theme's exact rendering until someone picks something else.
+- The back office sidebar reads in titled sections: the dashboard and Messages first, then Content, Appearance, Emails and Settings; a section with no entry shows no title. The dashboard shortcuts gain « Design ».
+- The live sitemap answers fast: the SEO panels of a collection are read in one database query, `/sitemap-moteur.xml` and the index leave with `Cache-Control: public, max-age=300` and are kept five minutes by the front Worker, purged by a publication. EmDash's `Server-Timing` header no longer reaches visitors.
+- No SQL to run: the five new fields of the `site` entry are added by the Design page on its first save, through EmDash's schema API.
+- The version moves to 4.0.0 for the whole family, because the order of the sidebar changes for every editor.
+
 ## 3.9.0 - 2026-10-12
 
 - Aloha Pixel core 1.16.1 (from 1.10.0). The live sitemap of the `seo` extension: `/sitemap-moteur.xml`, recomputed at every request (frozen pages, managed pages, free pages and dates from the database), the only sitemap of `/sitemap-index.xml`; `/sitemap.xml`, `/sitemap-0.xml`, `/sitemap-contenu.xml` and EmDash's sitemaps answer a 301 to the index. `robots.txt` and `llms.txt` editable in a « SEO » screen of the back office, with a page audit (title, description, headings, canonical, hreflang, structured data).
