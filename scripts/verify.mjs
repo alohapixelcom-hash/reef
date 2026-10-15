@@ -127,11 +127,23 @@ function serve(dir) {
   return new Promise((done) => server.listen(0, "127.0.0.1", () => done(server)));
 }
 
+// Une redirection d'Astro (`redirects` d'astro.config.mjs) s'ecrit comme une
+// page : un index.html dont la balise meta `refresh` renvoie aussitot ailleurs.
+// Ce n'est pas une page a mesurer, et le navigateur la quitte pendant que le
+// banc la parcourt ("Execution context was destroyed") : elle est comptee a
+// part, et sa cible est mesuree sous sa propre adresse.
+const REDIRECTION = /<meta\s+http-equiv=["']?refresh["']?/i;
+const redirections = [];
+
 function pages(dir, out = []) {
   for (const name of readdirSync(dir)) {
     const full = join(dir, name);
     if (statSync(full).isDirectory()) pages(full, out);
-    else if (name === "index.html") out.push("/" + relative(DIST, full).replace(/index\.html$/, ""));
+    else if (name === "index.html") {
+      const route = "/" + relative(DIST, full).replace(/index\.html$/, "");
+      if (REDIRECTION.test(readFileSync(full, "utf8").slice(0, 2048))) redirections.push(route);
+      else out.push(route);
+    }
   }
   return out.sort();
 }
@@ -287,6 +299,7 @@ server.close();
 /* ------------------------------------------------------------------ */
 
 console.log(`Banc de rendu : ${routes.length} page(s) x ${WIDTHS.length} largeurs (${WIDTHS.join(", ")}px) x ${MODES.length} modes (${MODES.join(", ")}).`);
+if (redirections.length) console.log(`Redirections non mesurees (meta refresh) : ${redirections.length}.`);
 
 if (findings.length === 0) {
   console.log("Aucun defaut de rendu.");

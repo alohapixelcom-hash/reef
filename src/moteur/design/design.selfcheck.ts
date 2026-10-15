@@ -51,7 +51,7 @@ ok(!designDuTheme({ radius: "Net" }), "un rayon choisi change le theme");
 is(multiplier(" clamp(1rem, 2vw, 3rem) ", 1.125), "calc(clamp(1rem, 2vw, 3rem) * 1.125)", "la valeur d'origine garde son clamp, multipliee");
 is(feuilleDuDesign({ h1_size: "Généreuse" }), "h1{zoom:1.16}", "H1 genereux : la balise H1 seule");
 const tout = feuilleDuDesign({ h1_size: "Compacte", h2_size: "Généreuse", h3_size: "Standard", text_size: "Généreuse", radius: "Net" })!;
-is(tout, ":root{--radius-card:0.25rem;--radius-panel:0.5rem}html{font-size:calc(clamp(1rem, 0.95rem + 0.25vw, 1.125rem) * 1.125)}h1{zoom:0.86}h2{zoom:1.16}", "rayons, racine, puis un cran par balise");
+is(tout, ":root{--radius-card:0.25rem;--radius-panel:0.5rem}html{font-size:calc(100% * 1.125)}h1{zoom:0.86}h2{zoom:1.16}", "rayons, racine, puis un cran par balise");
 ok(!tout.includes("h3"), "H3 Standard : sa balise n'est pas ecrite");
 is(feuilleDuDesign({ text_size: "Compacte" }, { ...JETONS_DE_LA_MAISON, racine: null }), "html{font-size:calc(100% * 0.9375)}", "un theme sans racine part de la taille du navigateur");
 is(feuilleDuDesign({ radius: "Arrondi" }, { racine: null, rayons: { "--radius-box": "petit" } }), ":root{--radius-box:1.5rem}", "un theme qui declare ses propres rayons");
@@ -60,9 +60,9 @@ ok(!tout.includes("--radius-pill"), "les boutons restent des pilules");
 
 // --- Le controle des jetons ----------------------------------------------------
 const TOKENS = "@theme {\n  --radius-card: 0.875rem;\n  --radius-panel: 1.25rem;\n}\n@theme inline {\n  --color-background: var(--x);\n}";
-const GLOBALE = "@layer base {\n  html {\n    scroll-behavior: smooth;\n    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);\n  }\n}";
+const GLOBALE = "@layer base {\n  html {\n    scroll-behavior: smooth;\n    font-size: 100%;\n  }\n}";
 is(jetonsInfideles(JETONS_DE_LA_MAISON, TOKENS, GLOBALE), [], "des feuilles fideles ne remontent rien");
-is(jetonsInfideles(JETONS_DE_LA_MAISON, TOKENS, GLOBALE.replace("0.95rem", "1vw")).length, 1, "une racine qui a change est relevee");
+is(jetonsInfideles(JETONS_DE_LA_MAISON, TOKENS, GLOBALE.replace("100%", "clamp(1rem, 0.95rem + 0.25vw, 1.125rem)")).length, 1, "une racine qui a change est relevee");
 is(jetonsInfideles(JETONS_DE_LA_MAISON, TOKENS.replace("--radius-panel", "--radius-plaque"), GLOBALE).length, 1, "un rayon absent est releve");
 is(jetonsInfideles(JETONS_DE_LA_MAISON, TOKENS.replace("@theme {", "@theme inline {"), GLOBALE).length, 2, "un rayon en @theme inline est releve");
 is(jetonsInfideles({ racine: null, rayons: {} }, "", ""), [], "un theme sans racine ni rayon n'a rien a prouver");

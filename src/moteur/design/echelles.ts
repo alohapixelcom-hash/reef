@@ -14,7 +14,9 @@
 // balise elle-meme (sa taille, son interligne, ses marges), ce qu'on demande.
 //
 // LE TEXTE ET LES COINS SUIVENT LES JETONS DE LA MAISON, les memes dans tous
-// les sites : la racine fluide de global.css (html { font-size }) et les deux
+// les sites : la racine de global.css (html { font-size: 100% }, la taille du
+// navigateur depuis la 2.1.0 ; l'ancienne rampe montait a 18 px et donnait
+// l'effet d'un site zoome) et les deux
 // rayons de tokens.css (--radius-card, --radius-panel). Un theme qui s'en
 // ecarte le declare dans son adaptateur (src/moteur/theme.ts,
 // JETONS_DU_DESIGN) ; le self-check du site compare la declaration a ses
@@ -81,7 +83,7 @@ export interface JetonsDuDesign {
 
 /** Les jetons de la maison, ceux de tous les sites du socle (global.css et tokens.css). */
 export const JETONS_DE_LA_MAISON: JetonsDuDesign = {
-  racine: "clamp(1rem, 0.95rem + 0.25vw, 1.125rem)",
+  racine: "100%",
   rayons: { "--radius-card": "petit", "--radius-panel": "grand" },
 };
 

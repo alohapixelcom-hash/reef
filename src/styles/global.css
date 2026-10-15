@@ -56,9 +56,12 @@
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
-    /* Racine legerement fluide : 16px sur mobile, 18px sur les tres grands
-     * ecrans. Tout le texte courant suit, sans une seule media query. */
-    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    /* LA TAILLE DU NAVIGATEUR (socle 2.1.0, 15 octobre 2026). La racine
+     * fluide de la famille montait a 18 px sur un ecran de bureau et donnait
+     * l'effet d'un site zoome a 125 % (Lin des Pyrenees). 100 % laisse le
+     * reglage du lecteur decider, comme le demandent les consignes d'Apple
+     * (Dynamic Type) : 16 px par defaut. Ne jamais remettre de clamp ici. */
+    font-size: 100%;
   }
 
   body {
