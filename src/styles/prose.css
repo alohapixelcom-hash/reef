@@ -154,7 +154,7 @@
     display: block;
     margin-block-start: 0.6em;
     font-family: var(--font-sans);
-    font-size: 0.62em;
+    font-size: max(0.75rem, 0.62em);
     font-style: normal;
     letter-spacing: var(--tracking-optique-xs);
     color: var(--color-muted-foreground);
@@ -303,7 +303,7 @@
     padding-inline: 0.12em;
     color: var(--color-primary);
     font-family: var(--font-sans);
-    font-size: 0.72em;
+    font-size: max(0.75rem, 0.72em);
     font-variant-numeric: lining-nums;
     text-decoration: none;
   }

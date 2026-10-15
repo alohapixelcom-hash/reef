@@ -341,6 +341,10 @@ function checkBlog(file, text) {
   return found;
 }
 
+function checkPetit(file, text) { // Regle 11 : aucun texte sous 12 px (consignes d'Apple, 40-APPLE-DESIGN) ; un em se plancher en max(0.75rem, Xem).
+  if (!/\.(astro|tsx?|css)$/.test(file) || /selfcheck|(^|\/)(docs|rapports)\//.test(file)) return [];
+  return [...text.matchAll(/(?:font-size\s*:\s*|text-\[|fontSize\s*:\s*["'])(\d*\.?\d+)(rem|px|em)\b/g)].filter(([, n, u]) => +n > 0 && (u === "em" ? +n < 0.75 : (u === "rem" ? n * 16 : +n) < 12)).map(([m]) => `texte sous 12 px : ${m} (plancher 0.75rem, ou max(0.75rem, Xem))`);
+}
 /* ------------------------------------------------------------------ */
 /* Le rapport                                                          */
 /* ------------------------------------------------------------------ */
@@ -355,6 +359,7 @@ const RULES = [
   { key: "plan", label: "plan du site sans import des pages", run: checkPlan },
   { key: "docs", label: "Tailwind ne lit pas docs/", run: checkDocs },
   { key: "blog", label: "le blog s'appelle Articles de blog", run: checkBlog },
+  { key: "petit", label: "aucun texte sous 12 px", run: checkPetit },
 ];
 
 const families = paletteFamilies();
