@@ -5,8 +5,8 @@
 -- Le seuil est celui de regles.ts (GRAND_COTE_MAX 2880). Un WebP qui tient
 -- dans le plafond n'est jamais recompresse, quel que soit son poids.
 -- Ce qui sort ici se reprend par la carte Photos du tableau de bord,
--- « Optimiser les photos existantes » : meme cle, original garde sous
--- backups/aloha-medias/<cle>, adresse des pages inchangee.
+-- « Optimiser les photos existantes » : meme cle, adresse des pages
+-- inchangee, aucune copie gardee dans le seau (socle 2.2.6).
 SELECT
   id,
   filename,

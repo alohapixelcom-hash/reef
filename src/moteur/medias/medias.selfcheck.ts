@@ -248,7 +248,7 @@ const iphone = new File([heif("heic", 4032, 3024, 2_000_000)], "IMG_0042.HEIC", 
   const [a] = await base.lire<Record<string, unknown>>("SELECT * FROM media WHERE id = 'A'");
   is([a.storage_key, a.mime_type, a.size, a.width, a.height, a.filename, String(a.content_hash).startsWith("sha1:")], ["A.jpg", "image/webp", 500_000, 2560, 1920, "plage.webp", true], "fiche a jour, cle (donc adresse) inchangee");
   is([objets.get("A.jpg")?.type, objets.get("A.jpg")?.corps.length, objets.get("A.jpg")?.cache], ["image/webp", 500_000, "public, max-age=0, must-revalidate"], "octets remplaces sous la meme cle, servis en image/webp");
-  is([objets.get(`${PREFIXE_DES_ORIGINAUX}A.jpg`)?.corps.length, objets.get(`${PREFIXE_DES_ORIGINAUX}A.jpg`)?.type], [3e6, "image/jpeg"], "l'original est garde sous backups/");
+  is([...objets.keys()].filter((k) => k.startsWith(PREFIXE_DES_ORIGINAUX)).length, 0, "aucune copie de l'original dans le seau");
   is(await restantes(base, t), 2, "le lot suivant reprend ou le precedent s'est arrete");
   is(await reserver(base, "D", t), true, "reservation prise");
   is(await reserver(base, "D", t + 1000), false, "deux clics ne prennent jamais la meme photo");
@@ -307,7 +307,7 @@ const iphone = new File([heif("heic", 4032, 3024, 2_000_000)], "IMG_0042.HEIC", 
   is(b.faites, 1, "photo convertie dans KV");
   const apres = kv.get("K.jpg");
   is([apres?.valeur.byteLength, apres?.metadata?.contentType, apres?.metadata?.cacheControl, apres?.metadata?.size], [400_000, "image/webp", "public, max-age=0, must-revalidate", 400_000], "meme cle, type et taille dans les metadonnees que lit le stockage KV");
-  is([kv.get(`${PREFIXE_DES_ORIGINAUX}K.jpg`)?.valeur.byteLength, kv.get(`${PREFIXE_DES_ORIGINAUX}K.jpg`)?.metadata?.contentType], [3e6, "image/jpeg"], "original garde sous backups/ dans KV");
+  is([...kv.keys()].filter((k) => k.startsWith(PREFIXE_DES_ORIGINAUX)).length, 0, "aucune copie de l'original dans KV");
   const [k] = await base.lire<Record<string, unknown>>("SELECT mime_type, storage_key FROM media WHERE id = 'K'");
   is([k.mime_type, k.storage_key], ["image/webp", "K.jpg"], "fiche a jour, adresse inchangee");
 }

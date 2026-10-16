@@ -17,5 +17,5 @@ export const ROUTE_D_ADRESSE = "/_emdash/api/media/upload-url";
 /** Qui est connecte : EmDash le dit, l'aiguillage le demande avant de depenser une transformation. */
 export const ROUTE_DE_L_UTILISATEUR = "/_emdash/api/auth/me";
 
-/** Ou dort l'original d'une photo deja en base, une fois optimisee : EmDash refuse de servir backups/ (route media/file). */
+/** Ou les versions 1.15.0 a 2.2.5 gardaient l'original d'une photo optimisee par le lot. Depuis la 2.2.6 plus rien n'y est ecrit : le prefixe ne sert qu'a reconnaitre ces anciennes copies, a relever pour qu'un humain les supprime. */
 export const PREFIXE_DES_ORIGINAUX = "backups/aloha-medias/";

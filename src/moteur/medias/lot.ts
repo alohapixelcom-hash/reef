@@ -12,10 +12,10 @@
 // l'en-tete Content-Type (storage/r2.mjs, download). Le nom affiche dans la
 // Mediatheque, lui, prend la bonne extension.
 //
-// RIEN NE SE PERD : l'original est copie a cote, sous backups/aloha-medias/<cle>,
-// avant d'etre remplace. EmDash refuse de servir une cle backups/ (route
-// media/file) : la position GPS de l'original ne redevient pas publique, et
-// le menage de ses sauvegardes ne touche que backups/emdash-backup-*.
+// AUCUNE COPIE DANS LE SEAU (demande de Justin, 16/10/2026 : pas de copies
+// stockees pour rien). L'original n'est remplace que si la conversion a
+// reussi au bon format, et il reste en memoire le temps de mettre la fiche a
+// jour : si la fiche refuse, les octets d'origine sont remis sous la cle.
 //
 // BORNE ET REPRENABLE : un clic traite LOT photos au plus. Chaque photo est
 // reservee dans aloha_medias avant d'etre touchee (deux clics simultanes ne
@@ -23,7 +23,6 @@
 // reprend ou le precedent s'est arrete, meme apres une coupure.
 import { type Base, candidats, empreinte, type MediaEnBase, mettreAJourLaFiche, noter, reserver } from "./base.ts";
 import { convertir, court, type Images } from "./conversion.ts";
-import { PREFIXE_DES_ORIGINAUX } from "./identite.mjs";
 import { decider, ENTREE_MAX, sorteAnnoncee } from "./regles.ts";
 
 /** Choix de la maison, pas une mesure : assez peu pour qu'un clic reponde vite et reste loin des plafonds du Worker. */
@@ -135,11 +134,6 @@ async function traiter(c: Contexte, m: MediaEnBase, bilan: BilanDuLot): Promise<
   if (conversion.etat === "passe") return garder(conversion.raison);
   if (conversion.etat === "echec") return echouer(conversion.detail);
 
-  // L'original a l'abri d'abord ; une copie deja la (lot interrompu) n'est pas ecrasee.
-  const cleDeLOriginal = PREFIXE_DES_ORIGINAUX + m.storage_key;
-  if (!(await c.seau.head(cleDeLOriginal))) {
-    await c.seau.put(cleDeLOriginal, original, { httpMetadata: { contentType: objet.httpMetadata?.contentType ?? m.mime_type } });
-  }
   const remettre = () => c.seau.put(m.storage_key, original, { httpMetadata: { contentType: objet.httpMetadata?.contentType ?? m.mime_type, cacheControl: CACHE_D_UNE_IMAGE } });
   await c.seau.put(m.storage_key, conversion.octets, { httpMetadata: { contentType: conversion.type, cacheControl: CACHE_D_UNE_IMAGE } });
   let changees = 0;

@@ -10,7 +10,7 @@ export const EN: typeof FR = {
   },
   bouton: "Optimize existing photos",
   consigne: (lot: number) =>
-    `${lot} photos at a time: click again until "To review" reaches zero. Photo addresses do not change, and the original is kept aside.`,
+    `${lot} photos at a time: click again until "To review" reaches zero. Photo addresses do not change, and a photo is only replaced when the conversion is lighter and in the right format: no copy is stored.`,
   reserve: "An Editor or Administrator can start the optimization.",
   toutFait: "All photos have been reviewed. The ones you add are optimized on upload, with nothing to do.",
   nonRelie: {
