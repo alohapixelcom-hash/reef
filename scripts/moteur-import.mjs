@@ -37,6 +37,28 @@ function lire(source, fichier) {
 
 const sansLangue = (ref) => String(ref).replace(/^[a-z]{2}\//, "");
 
+/**
+ * Un champ "reference" range l'IDENTIFIANT de l'entree cible, jamais son
+ * adresse : EmDash 0.38 le verifie a l'ecriture et refuse une adresse
+ * ("target ... not found"). Les fichiers disent l'adresse : on la traduit ici,
+ * depuis les entrees de la collection cible dans la langue source (la graine
+ * les cree). L'identifiant de l'entree source est aussi celui de son groupe de
+ * traductions, que le rendu ramene a l'adresse de chaque langue.
+ */
+async function identifiantsParAdresse(collection) {
+  const index = new Map();
+  for await (const entree of client.listAll(collection, { locale: LANGUE_SOURCE })) index.set(entree.slug, entree.id);
+  return index;
+}
+
+/** L'identifiant d'une adresse, ou une erreur qui dit quoi corriger. Rien : rien. */
+function identifiantDe(index, collection, adresse, fichier) {
+  if (adresse === undefined || adresse === null || adresse === "") return undefined;
+  const id = index.get(String(adresse));
+  if (!id) throw new Error(`${fichier} : "${adresse}" n'existe pas dans la collection ${collection} (la graine la remplit).`);
+  return id;
+}
+
 async function dejaLa(locale) {
   const vus = new Map();
   for await (const item of client.listAll("posts", { locale })) vus.set(item.slug, item.id);
@@ -99,6 +121,9 @@ langues.sort((a, b) => (a === LANGUE_SOURCE ? -1 : b === LANGUE_SOURCE ? 1 : a.l
 
 await alignerLeSchema(langues);
 
+const sujets = await identifiantsParAdresse("sujets");
+const auteurs = await identifiantsParAdresse("auteurs");
+
 const sources = new Map();
 let crees = 0;
 let sautes = 0;
@@ -127,8 +152,8 @@ for (const langue of langues) {
         description: meta.description,
         content: versPortableText(fidele(deplier(corps))),
         cover: await couverture(meta.cover, meta.coverAlt, fichier),
-        topic: sansLangue(meta.topic),
-        author: sansLangue(meta.author),
+        topic: identifiantDe(sujets, "sujets", sansLangue(meta.topic), fichier),
+        author: identifiantDe(auteurs, "auteurs", sansLangue(meta.author), fichier),
         tags: meta.tags ?? [],
         featured: meta.featured === true,
         pub_date: new Date(meta.pubDate).toISOString(),
