@@ -26,6 +26,12 @@
 // n'accepte pas le format converti (liste propre a un champ, refus 400
 // INVALID_TYPE) : l'original part tel quel, et c'est inscrit au journal.
 //
+// L'OUTIL MCP media_upload (et tout client de l'API MCP) : EmDash appelle son
+// gestionnaire d'envoi dans le Worker, sans repasser par la route multipart.
+// L'aiguillage lit donc l'appel JSON-RPC (tools/call, media_upload), convertit
+// les octets (base64, ou adresse publique telechargee ici) et les remet dans
+// les arguments, nom et type compris ; EmDash fait le reste.
+//
 // JAMAIS DE TRANSFORMATION POUR UN INCONNU : chaque transformation est
 // facturee (developers.cloudflare.com/images/optimization/binding/). Avant de
 // convertir, l'aiguillage demande a EmDash qui est connecte (/auth/me) ; sans
@@ -34,7 +40,7 @@
 import { convertir, court, type Images, type OptionsDeConversion } from "./conversion.ts";
 import { ROUTE_D_ADRESSE, ROUTE_D_ENVOI, ROUTE_DE_L_UTILISATEUR } from "./identite.mjs";
 import { type Base, noter } from "./base.ts";
-import { peutSeConvertir, sorteAnnoncee, sorteDe } from "./regles.ts";
+import { ENTREE_MAX, peutSeConvertir, sorteAnnoncee, sorteDe } from "./regles.ts";
 
 export { d1De } from "./base.ts";
 
@@ -242,6 +248,92 @@ async function envoiEnUnTemps(request: Request, o: OptionsDeLAiguillage): Promis
   return reponse;
 }
 
+/** La route de l'API MCP d'EmDash 0.38. */
+export const ROUTE_MCP = "/_emdash/api/mcp";
+
+interface AppelMcp {
+  method?: unknown;
+  params?: { name?: unknown; arguments?: Record<string, unknown> };
+}
+
+function estEnvoiMcp(m: unknown): m is AppelMcp & { params: { arguments: Record<string, unknown> } } {
+  const a = m as AppelMcp;
+  return a?.method === "tools/call" && a.params?.name === "media_upload" && typeof a.params.arguments === "object" && a.params.arguments !== null;
+}
+
+function enOctets(b64: string): Uint8Array {
+  const texte = atob(b64.replace(/^data:[^,]*,/, "").replace(/\s+/g, ""));
+  const o = new Uint8Array(texte.length);
+  for (let i = 0; i < texte.length; i += 1) o[i] = texte.charCodeAt(i);
+  return o;
+}
+
+function enBase64(o: Uint8Array): string {
+  let texte = "";
+  for (let i = 0; i < o.length; i += 0x8000) texte += String.fromCharCode(...o.subarray(i, i + 0x8000));
+  return btoa(texte);
+}
+
+/** Les octets d'une adresse publique (jamais celle du site lui-meme), ou null : EmDash les telechargera alors comme d'habitude. */
+async function telecharger(adresse: string, ici: string): Promise<Uint8Array | null> {
+  try {
+    const u = new URL(adresse);
+    if ((u.protocol !== "https:" && u.protocol !== "http:") || u.host === new URL(ici).host) return null;
+    const r = await fetch(u, { headers: { accept: "image/*" } });
+    if (!r.ok || Number(r.headers.get("content-length") ?? 0) > ENTREE_MAX) return null;
+    const o = new Uint8Array(await r.arrayBuffer());
+    return o.length > ENTREE_MAX ? null : o;
+  } catch {
+    return null;
+  }
+}
+
+async function appelMcp(request: Request, o: OptionsDeLAiguillage): Promise<Response | null> {
+  if (!(request.headers.get("content-type") ?? "").toLowerCase().includes("application/json")) return null;
+  let corps: unknown;
+  try {
+    corps = await request.clone().json();
+  } catch {
+    return null;
+  }
+  const cibles = (Array.isArray(corps) ? corps : [corps]).filter(estEnvoiMcp);
+  if (cibles.length === 0 || !(await peutEnvoyer(request, o.suite))) return null;
+  let change = false;
+  for (const appel of cibles) {
+    const a = appel.params.arguments;
+    let octets: Uint8Array | null = null;
+    try {
+      octets = typeof a.base64 === "string" ? enOctets(a.base64) : typeof a.url === "string" ? await telecharger(a.url, request.url) : null;
+    } catch {
+      octets = null;
+    }
+    if (!octets || !peutSeConvertir(sorteDe(octets))) continue;
+    const nom = typeof a.filename === "string" ? a.filename : "photo";
+    const conversion = await convertir(octets, nom, o.images, o);
+    await journaliser(o.base, {
+      media_id: `mcp:${crypto.randomUUID()}`,
+      etat: conversion.etat === "converti" ? "fait" : conversion.etat === "echec" ? "echec" : "garde",
+      origine: "envoi",
+      nom: conversion.etat === "converti" ? conversion.nom : nom,
+      avant: conversion.avant,
+      apres: conversion.etat === "converti" ? conversion.apres : null,
+      format: conversion.etat === "converti" ? conversion.format : null,
+      detail: conversion.etat === "converti" ? "mcp" : `mcp ${conversion.raison}`,
+      quand: new Date((o.maintenant ?? Date.now)()).toISOString(),
+    });
+    if (conversion.etat !== "converti") continue;
+    a.base64 = enBase64(conversion.octets);
+    delete a.url;
+    a.contentType = conversion.type;
+    a.filename = conversion.nom;
+    change = true;
+  }
+  if (!change) return null;
+  const entetes = new Headers(request.headers);
+  entetes.delete("content-length");
+  return o.suite(new Request(request.url, { method: "POST", headers: entetes, body: JSON.stringify(corps) }));
+}
+
 /**
  * La reponse de l'aiguillage pour cette requete, ou null quand elle ne le
  * concerne pas : le Worker continue alors son chemin habituel, requete
@@ -252,5 +344,6 @@ export async function aiguillerLesMedias(request: Request, options: OptionsDeLAi
   const chemin = new URL(request.url).pathname.replace(/\/+$/, "");
   if (chemin === ROUTE_D_ADRESSE) return demandeDAdresse(request, options);
   if (chemin === ROUTE_D_ENVOI) return envoiEnUnTemps(request, options);
+  if (chemin === ROUTE_MCP) return appelMcp(request, options);
   return null;
 }

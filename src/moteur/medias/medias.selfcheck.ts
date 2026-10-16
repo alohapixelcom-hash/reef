@@ -188,6 +188,32 @@ const iphone = new File([heif("heic", 4032, 3024, 2_000_000)], "IMG_0042.HEIC", 
   is(await aiguillerLesMedias(new Request("https://site.test/_emdash/api/media"), { images: liant, base, suite: e.suite }), null, "une lecture de la mediatheque n'est pas aiguillee");
 }
 
+// ---- 4 bis. L'outil MCP media_upload : les octets convertis dans les arguments.
+{
+  const base = sqlite();
+  const recus: Record<string, unknown>[] = [];
+  const suite = (role?: number) => async (r: Request): Promise<Response> => {
+    if (new URL(r.url).pathname === "/_emdash/api/auth/me") return role === undefined ? Response.json({}, { status: 401 }) : Response.json({ data: { role } });
+    recus.push((await r.json()) as Record<string, unknown>);
+    return Response.json({ jsonrpc: "2.0", id: 1, result: {} });
+  };
+  const b64 = (o: Uint8Array) => btoa(String.fromCharCode(...o));
+  const appel = (args: Record<string, unknown>) =>
+    new Request("https://site.test/_emdash/api/mcp", {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: "Bearer jeton" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "media_upload", arguments: args } }),
+    });
+  const liant = fauxLiant({ "image/webp": webp(2880, 2160, 30_000) });
+  const r = await aiguillerLesMedias(appel({ filename: "IMG_7.jpg", base64: b64(jpeg(4032, 3024, 50_000)), contentType: "image/jpeg" }), { images: liant, base, suite: suite(30), maintenant: () => T0 });
+  const a = (recus.at(-1) as { params: { arguments: Record<string, unknown> } }).params.arguments;
+  is([r?.status, a.filename, a.contentType, typeof a.base64 === "string" && atob(a.base64 as string).length], [200, "IMG_7.webp", "image/webp", 30_000], "MCP : EmDash recoit le WebP, son nom et son type");
+  is(await aiguillerLesMedias(appel({ filename: "IMG_8.jpg", base64: b64(jpeg(4032, 3024, 50_000)), contentType: "image/jpeg" }), { images: liant, base, suite: suite() }), null, "MCP sans session : rien n'est converti, la requete part telle quelle");
+  const autre = new Request("https://site.test/_emdash/api/mcp", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/call", params: { name: "content_list", arguments: {} } }) });
+  is(await aiguillerLesMedias(autre, { images: liant, base, suite: suite(30) }), null, "MCP : un autre outil n'est pas aiguille");
+  is(await aiguillerLesMedias(appel({ filename: "logo.gif", base64: b64(gif), contentType: "image/gif" }), { images: liant, base, suite: suite(30) }), null, "MCP : un GIF passe tel quel");
+}
+
 // ---- 5. Le lot, sur une base SQLite aux colonnes d'EmDash 0.38 et un faux seau.
 {
   const base = sqlite();
