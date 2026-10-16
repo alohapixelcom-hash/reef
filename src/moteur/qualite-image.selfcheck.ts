@@ -2,7 +2,7 @@
 // Lancer : node --experimental-strip-types src/moteur/qualite-image.selfcheck.ts
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
-import { QUALITE_DU_BUILD, avecQualiteDuBuild } from "./qualite-image.ts";
+import { PLANCHER_HD, QUALITE_DU_BUILD, avecQualiteDuBuild, avecQualiteHD } from "./qualite-image.ts";
 
 let checks = 0;
 function is(actual: unknown, expected: unknown, message: string): void {
@@ -42,5 +42,21 @@ is("quality" in avecQualiteDuBuild({}), false, "sans format : rien");
 const entree = { format: "webp" };
 avecQualiteDuBuild(entree);
 is("quality" in entree, false, "l'objet recu reste intact");
+
+// Le plancher HD des images rendues a la demande.
+const hd = (options: { format?: string; quality?: unknown }): unknown => avecQualiteHD(options).quality;
+is(hd({ format: "webp" }), 85, "webp sans qualite : le plancher");
+is(hd({ format: "avif" }), 80, "avif sans qualite : le plancher");
+is(hd({ format: "webp", quality: 75 }), 85, "une qualite basse remonte au plancher");
+is(hd({ format: "avif", quality: 50 }), 80, "avif 50 remonte a 80");
+is(hd({ format: "webp", quality: "60" }), 85, "une qualite chiffree en texte remonte aussi");
+is(hd({ format: "webp", quality: 92 }), 92, "une qualite plus haute reste la sienne");
+is(hd({ format: "avif", quality: "high" }), "high", "une qualite nommee reste la sienne");
+is("quality" in avecQualiteHD({ format: "png" }), false, "png : pas de qualite inventee");
+is(Object.values(PLANCHER_HD).every((v) => v >= 80), true, "aucun plancher sous 80");
+for (const f of ["webp", "jpeg", "jpg", "avif"]) is(PLANCHER_HD[f] >= QUALITE_DU_BUILD[f], true, `${f} : le plancher n'est jamais sous le build`);
+const e2 = { format: "webp", quality: 60 };
+avecQualiteHD(e2);
+is(e2.quality, 60, "l'objet recu reste intact (plancher)");
 
 console.log(`qualite-image.selfcheck : ${checks} verifications passees.`);

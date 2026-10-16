@@ -41,7 +41,7 @@ export const EN: typeof FR = {
     svg: "SVG",
     anime: "animated image",
     avif: "already AVIF",
-    "webp-leger": "already light",
+    "webp-leger": "already WebP",
     "trop-lourd": "over 20 MB",
     "sans-liaison": "conversion not connected",
     "plus-lourd": "conversion was heavier",

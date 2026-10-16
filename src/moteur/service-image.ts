@@ -1,4 +1,4 @@
-// src/moteur/service-image.ts - moteur allume : le service d'image des pages rendues a la demande, celui de l'adapter Cloudflare plus la qualite du build dans chaque adresse /_image.
+// src/moteur/service-image.ts - moteur allume : le service d'image des pages rendues a la demande, celui de l'adapter Cloudflare plus une qualite jamais sous le plancher HD dans chaque adresse /_image.
 //
 // POSE PAR ALIAS, PAS PAR image.service. moteur.config.mjs redirige vers ce
 // fichier le module "@astrojs/cloudflare/image-service-workerd", que l'adapter
@@ -13,17 +13,17 @@
 // SEULE getURL CHANGE, ET ELLE NE SERT QU'A LA DEMANDE. Une page figee recoit
 // l'adresse de ses images d'Astro (addStaticImage, les fichiers de /_astro/),
 // sans passer par getURL ; une page rendue a la demande recoit celle-ci, qui
-// porte desormais q=. Le reste est la copie du service de l'adapter (14.3) :
+// porte desormais q=, jamais sous le plancher HD (qualite-image.ts). Le reste est la copie du service de l'adapter (14.3) :
 // le service de base d'Astro, et une transformation qui rend l'image telle
 // quelle, puisque c'est le liant IMAGES qui encode (/_image).
 import { baseService } from "astro/assets";
 import type { LocalImageService } from "astro";
-import { avecQualiteDuBuild } from "./qualite-image";
+import { avecQualiteHD } from "./qualite-image";
 
 const service: LocalImageService = {
   ...baseService,
   getURL(options, imageConfig, logger) {
-    return baseService.getURL(avecQualiteDuBuild(options), imageConfig, logger);
+    return baseService.getURL(avecQualiteHD(options), imageConfig, logger);
   },
   async transform(inputBuffer, transform) {
     return { data: inputBuffer, format: transform.format };

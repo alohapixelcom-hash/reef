@@ -42,7 +42,7 @@ export const FR = {
     svg: "SVG",
     anime: "image animée",
     avif: "déjà en AVIF",
-    "webp-leger": "déjà légère",
+    "webp-leger": "déjà en WebP",
     "trop-lourd": "plus de 20 Mo",
     "sans-liaison": "conversion non reliée",
     "plus-lourd": "la conversion pesait plus",

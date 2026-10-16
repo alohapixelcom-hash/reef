@@ -1,4 +1,4 @@
-// src/moteur/qualite-image.ts - la qualite d'encodage des images rendues a la demande : celle que sharp applique au build statique, ecrite dans l'adresse.
+// src/moteur/qualite-image.ts - la qualite d'encodage des images rendues a la demande : jamais moins que le plancher HD, ecrite dans l'adresse /_image.
 //
 // LE DEFAUT MESURE EN LIGNE. Au build, aucune image du
 // site ne declare de qualite : le service sharp d'Astro laisse alors sharp
@@ -31,4 +31,38 @@ export function avecQualiteDuBuild<T extends { format?: string; quality?: unknow
   if (options.quality !== undefined && options.quality !== null && options.quality !== "") return options;
   const qualite = options.format ? QUALITE_DU_BUILD[options.format] : undefined;
   return qualite === undefined ? options : { ...options, quality: qualite };
+}
+
+/**
+ * LE PLANCHER HD DES IMAGES RENDUES A LA DEMANDE (demande de Justin, 16/10/2026 :
+ * « du HD et aucune image pixelisee »). A la demande, c'est le liant
+ * Cloudflare Images qui encode, pas sharp : a la meme valeur il lisse plus.
+ * Regarde a l'oeil le 16/10/2026 (deux photos Pexels en pleine resolution,
+ * vrai liant, crops a 100 % et a 300 %) : WebP 80 efface le grain fin d'une
+ * eau calme, 85 ne se distingue plus de la reference a 100 % ; AVIF 70 lisse
+ * le sable et le feuillage, 80 non. Toute qualite chiffree plus basse,
+ * declaree par un composant ou heritee du build, remonte a ce plancher.
+ */
+export const PLANCHER_HD: Readonly<Record<string, number>> = {
+  webp: 85,
+  jpeg: 85,
+  jpg: 85,
+  avif: 80,
+};
+
+/**
+ * Les options d'une image rendue a la demande, avec une qualite jamais sous
+ * le plancher HD : absente, elle prend le plancher ; chiffree et plus basse,
+ * elle y remonte ; chiffree et plus haute, ou nommee ("high"), elle reste la
+ * sienne. Un format sans plancher (png, gif, svg) ne recoit rien. L'objet
+ * recu n'est pas modifie.
+ */
+export function avecQualiteHD<T extends { format?: string; quality?: unknown }>(options: T): T {
+  const plancher = options.format ? PLANCHER_HD[options.format] : undefined;
+  if (plancher === undefined) return options;
+  const q = options.quality;
+  if (typeof q === "string" && q !== "" && Number.isNaN(Number(q))) return options;
+  const chiffre = q === undefined || q === null || q === "" ? undefined : Number(q);
+  if (chiffre !== undefined && chiffre >= plancher) return options;
+  return { ...options, quality: plancher };
 }

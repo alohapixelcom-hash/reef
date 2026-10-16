@@ -50,12 +50,12 @@ is(dimensionsDe(webp(2560, 1707)), { largeur: 2560, hauteur: 1707 }, "dimensions
 is(dimensionsDe(heif("heic", 4032, 3024)), { largeur: 4032, hauteur: 3024 }, "HEIC en tuiles : la plus grande boite ispe");
 is(dimensionsDe(gif), { largeur: 10, hauteur: 10 }, "dimensions d'un GIF");
 is([webpAnime(webp(10, 10, 0, true)), webpAnime(webp(10, 10))], [true, false], "WebP anime reconnu");
-is(dimensionsReduites({ largeur: 4032, hauteur: 3024 }), { largeur: 2560, hauteur: 1920 }, "reduction a 2560 px");
+is(dimensionsReduites({ largeur: 4032, hauteur: 3024 }), { largeur: 2880, hauteur: 2160 }, "reduction a 2880 px");
 is(dimensionsReduites({ largeur: 800, hauteur: 600 }), { largeur: 800, hauteur: 600 }, "jamais d'agrandissement");
 
 // ---- 2. La decision.
 const entree = (o: Uint8Array, anime = false) => ({ sorte: sorteDe(o), taille: o.length, dimensions: dimensionsDe(o), anime });
-is(decider(entree(jpeg(4032, 3024, 3e6))), { action: "convertir", formats: ["webp"], grandCote: 2560 }, "photo d'iPhone : au-dela de 1200 px, WebP seul");
+is(decider(entree(jpeg(4032, 3024, 3e6))), { action: "convertir", formats: ["webp"], grandCote: 2880 }, "photo d'iPhone : au-dela de 1200 px, WebP seul");
 is(decider(entree(jpeg(800, 600, 3e5))), { action: "convertir", formats: ["avif", "webp"], grandCote: 800 }, "petite photo : AVIF puis WebP");
 is(decider(entree(jpeg(800, 600, 3e5)), { avif: false }).action === "convertir" && decider(entree(jpeg(800, 600, 3e5)), { avif: false }), { action: "convertir", formats: ["webp"], grandCote: 800 }, "avif: false ne demande que le WebP");
 is(decider(entree(heif("heic", 4032, 3024, 2e6))).action, "convertir", "HEIC d'iPhone converti");
@@ -63,8 +63,9 @@ for (const [o, raison] of [[gif, "gif"], [svg, "svg"], [heif("avif", 900, 600, 1
   is(decider(entree(o)), { action: "passer", raison }, `passe tel quel : ${raison}`);
 }
 is(decider(entree(webp(10, 10, 100, true), true)), { action: "passer", raison: "anime" }, "WebP anime passe tel quel");
-is(decider(entree(webp(2000, 1500, 2e6))).action, "convertir", "WebP trop lourd repris");
+is(decider(entree(webp(2000, 1500, 2e6))), { action: "passer", raison: "webp-leger" }, "WebP lourd mais dans le plafond : jamais recompresse");
 is(decider(entree(webp(4000, 3000, 5e5))).action, "convertir", "WebP trop grand repris");
+is(decider(entree(webp(2880, 1920, 5e5))).action, "passer", "WebP de 2880 px : dans le plafond");
 is(decider({ sorte: "jpeg", taille: 21 * 1024 * 1024, dimensions: null, anime: false }), { action: "passer", raison: "trop-lourd" }, "au-dela des 20 Mo du liant, l'original passe");
 is(essaiRetenu({ sorte: "jpeg", taille: 1000 }, { demande: "avif", recue: "avif", taille: 400 }), true, "AVIF plus leger retenu");
 is(essaiRetenu({ sorte: "png", taille: 1000 }, { demande: "avif", recue: "avif", taille: 1200 }), false, "AVIF plus lourd refuse");
@@ -82,11 +83,11 @@ function fauxLiant(r: Reglage): Images & { appels: string[] } {
     appels,
     input: () => ({
       transform: (t) => {
-        assert.deepEqual(t, { width: 2560, height: 2560, fit: "scale-down" });
+        assert.deepEqual(t, { width: 2880, height: 2880, fit: "scale-down" });
         return {
           output: async ({ format, quality }) => {
             appels.push(format);
-            assert.equal(quality, format === "image/avif" ? 70 : 82, "la qualite part toujours au liant");
+            assert.equal(quality, format === "image/avif" ? 80 : 90, "la qualite part toujours au liant");
             const v = r[format];
             if (!v || v instanceof Error) throw v ?? new Error("9520 format");
             return { contentType: () => format, image: () => new Response(v.slice()).body as ReadableStream<Uint8Array> };

@@ -1,4 +1,4 @@
-// src/moteur/medias/conversion.ts - convertir une photo par le liant Cloudflare Images : orientation corrigee, metadonnees retirees, 2560 px au plus, AVIF ou WebP ; l'original reste la reponse a tout echec.
+// src/moteur/medias/conversion.ts - convertir une photo par le liant Cloudflare Images : orientation corrigee, metadonnees retirees, 2880 px au plus, AVIF ou WebP ; l'original reste la reponse a tout echec.
 //
 // CE QUE FAIT LE LIANT, SELON LA DOCUMENTATION DE CLOUDFLARE (lue le
 // 11/10/2026, developers.cloudflare.com/images/optimization/features/) :
@@ -10,8 +10,8 @@
 //   fit "scale-down" : "never upscales the image" ; c'est le defaut, on
 //   l'ecrit quand meme pour que la regle se lise dans le code.
 //   quality : TOUJOURS posee (QUALITE de regles.ts). La documentation annonce
-//   un defaut de 85, mais le liant rend sans elle un WebP presque sans perte,
-//   57 fois plus lourd (mesure du 16/10/2026, voir regles.ts).
+//   un defaut de 85, mais le liant rend sans elle un WebP presque sans perte
+//   (mesure du 16/10/2026, voir regles.ts).
 //
 // JAMAIS DE PERTE POUR LE CLIENT : aucune exception ne sort d'ici. Liant
 // absent, erreur, format rendu inattendu, sortie plus lourde : le resultat dit
