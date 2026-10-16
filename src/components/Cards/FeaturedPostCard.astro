@@ -134,12 +134,13 @@ const auteur = annotationsDeLaFiche(author);
           <Image
             src={post.data.cover}
             alt={post.data.coverAlt ?? ""}
-            widths={[640, 1024]}
+            widths={[640, 1024, 2048]}
             sizes="(min-width: 1024px) 40vw, 100vw"
             class="h-full min-h-56 w-full object-cover"
             loading="eager"
             decoding="async"
             {...annotation(post, "cover")}
+            quality={85}
           />
         ) : (
           <div

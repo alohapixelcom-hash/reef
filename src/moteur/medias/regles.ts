@@ -19,16 +19,33 @@
 export type Sorte = "jpeg" | "png" | "heic" | "webp" | "avif" | "gif" | "svg" | "autre";
 export type FormatDeSortie = "avif" | "webp";
 
-/** Demande du client : jamais plus de 2560 px sur le grand cote, jamais d'agrandissement. */
-export const GRAND_COTE_MAX = 2560;
+/**
+ * Demande de Justin (16/10/2026) : de la HD, aucune image pixelisee. Le
+ * fichier range est la source de toutes les variantes /_image : il doit
+ * couvrir une photo pleine largeur de 1440 px sur un ecran Retina (2x), soit
+ * 2880 px. Jamais d'agrandissement : une photo plus petite garde sa taille.
+ */
+export const GRAND_COTE_MAX = 2880;
 /** Cloudflare : dimension maximale d'une image AVIF (page des limites). Au-dela, on ne demande meme pas l'AVIF. */
 export const LIMITE_AVIF = 1200;
 /** Cloudflare : taille maximale de ce que .input() accepte. */
 export const ENTREE_MAX = 20 * 1024 * 1024;
-/** Choix de la maison, pas une mesure : un WebP plus lourd que ca est repris meme s'il tient deja dans 2560 px. */
-export const WEBP_LOURD = 1024 * 1024;
 
 export const TYPES: Record<FormatDeSortie, string> = { avif: "image/avif", webp: "image/webp" };
+
+/**
+ * La qualite demandee au liant, toujours ecrite : sans elle, le liant rend un
+ * WebP presque sans perte (mesure du 16/10/2026 : 2 Mo au lieu de 36 Ko pour
+ * la meme photo). Le fichier range est un ORIGINAL de travail, que chaque
+ * variante /_image recompresse : il doit donc rester tres proche de la photo
+ * envoyee. Choisi a l'oeil le 16/10/2026 sur deux photos Pexels en pleine
+ * resolution (6000 x 4484 et 5472 x 3648), reduites a 2880 px par le vrai
+ * liant, crops a 100 % et a 300 % : WebP 80 efface le grain fin d'une eau
+ * calme (PSNR 37,2 dB), 85 en garde une partie (38,6 dB), 90 ne se distingue
+ * plus de la reference (41,1 dB) ; AVIF 70 lisse le sable et le feuillage,
+ * 80 non. La qualite passe avant le poids (WebP 90 a 2880 px : 1,3 a 1,6 Mo).
+ */
+export const QUALITE: Record<FormatDeSortie, number> = { avif: 80, webp: 90 };
 
 const texte = (o: Uint8Array, debut: number, fin: number): string => String.fromCharCode(...o.subarray(debut, fin));
 const u16be = (o: Uint8Array, i: number): number => (o[i] << 8) | o[i + 1];
@@ -215,7 +232,10 @@ export function decider(e: Entree, options: { avif?: boolean } = {}): Decision {
   if (e.sorte === "avif") return { action: "passer", raison: "avif" };
   if (e.anime) return { action: "passer", raison: "anime" };
   if (e.taille > ENTREE_MAX) return { action: "passer", raison: "trop-lourd" };
-  if (e.sorte === "webp" && e.dimensions && Math.max(e.dimensions.largeur, e.dimensions.hauteur) <= GRAND_COTE_MAX && e.taille <= WEBP_LOURD) {
+  // JAMAIS DE DOUBLE COMPRESSION : un WebP qui tient deja dans le plafond
+  // n'est pas reencode, quel que soit son poids ; seul un WebP trop grand
+  // est repris, parce qu'il faut le reduire.
+  if (e.sorte === "webp" && e.dimensions && Math.max(e.dimensions.largeur, e.dimensions.hauteur) <= GRAND_COTE_MAX) {
     return { action: "passer", raison: "webp-leger" };
   }
   const grandCote = grandCoteDeSortie(e.dimensions);

@@ -50,12 +50,12 @@ is(dimensionsDe(webp(2560, 1707)), { largeur: 2560, hauteur: 1707 }, "dimensions
 is(dimensionsDe(heif("heic", 4032, 3024)), { largeur: 4032, hauteur: 3024 }, "HEIC en tuiles : la plus grande boite ispe");
 is(dimensionsDe(gif), { largeur: 10, hauteur: 10 }, "dimensions d'un GIF");
 is([webpAnime(webp(10, 10, 0, true)), webpAnime(webp(10, 10))], [true, false], "WebP anime reconnu");
-is(dimensionsReduites({ largeur: 4032, hauteur: 3024 }), { largeur: 2560, hauteur: 1920 }, "reduction a 2560 px");
+is(dimensionsReduites({ largeur: 4032, hauteur: 3024 }), { largeur: 2880, hauteur: 2160 }, "reduction a 2880 px");
 is(dimensionsReduites({ largeur: 800, hauteur: 600 }), { largeur: 800, hauteur: 600 }, "jamais d'agrandissement");
 
 // ---- 2. La decision.
 const entree = (o: Uint8Array, anime = false) => ({ sorte: sorteDe(o), taille: o.length, dimensions: dimensionsDe(o), anime });
-is(decider(entree(jpeg(4032, 3024, 3e6))), { action: "convertir", formats: ["webp"], grandCote: 2560 }, "photo d'iPhone : au-dela de 1200 px, WebP seul");
+is(decider(entree(jpeg(4032, 3024, 3e6))), { action: "convertir", formats: ["webp"], grandCote: 2880 }, "photo d'iPhone : au-dela de 1200 px, WebP seul");
 is(decider(entree(jpeg(800, 600, 3e5))), { action: "convertir", formats: ["avif", "webp"], grandCote: 800 }, "petite photo : AVIF puis WebP");
 is(decider(entree(jpeg(800, 600, 3e5)), { avif: false }).action === "convertir" && decider(entree(jpeg(800, 600, 3e5)), { avif: false }), { action: "convertir", formats: ["webp"], grandCote: 800 }, "avif: false ne demande que le WebP");
 is(decider(entree(heif("heic", 4032, 3024, 2e6))).action, "convertir", "HEIC d'iPhone converti");
@@ -63,8 +63,9 @@ for (const [o, raison] of [[gif, "gif"], [svg, "svg"], [heif("avif", 900, 600, 1
   is(decider(entree(o)), { action: "passer", raison }, `passe tel quel : ${raison}`);
 }
 is(decider(entree(webp(10, 10, 100, true), true)), { action: "passer", raison: "anime" }, "WebP anime passe tel quel");
-is(decider(entree(webp(2000, 1500, 2e6))).action, "convertir", "WebP trop lourd repris");
+is(decider(entree(webp(2000, 1500, 2e6))), { action: "passer", raison: "webp-leger" }, "WebP lourd mais dans le plafond : jamais recompresse");
 is(decider(entree(webp(4000, 3000, 5e5))).action, "convertir", "WebP trop grand repris");
+is(decider(entree(webp(2880, 1920, 5e5))).action, "passer", "WebP de 2880 px : dans le plafond");
 is(decider({ sorte: "jpeg", taille: 21 * 1024 * 1024, dimensions: null, anime: false }), { action: "passer", raison: "trop-lourd" }, "au-dela des 20 Mo du liant, l'original passe");
 is(essaiRetenu({ sorte: "jpeg", taille: 1000 }, { demande: "avif", recue: "avif", taille: 400 }), true, "AVIF plus leger retenu");
 is(essaiRetenu({ sorte: "png", taille: 1000 }, { demande: "avif", recue: "avif", taille: 1200 }), false, "AVIF plus lourd refuse");
@@ -82,10 +83,11 @@ function fauxLiant(r: Reglage): Images & { appels: string[] } {
     appels,
     input: () => ({
       transform: (t) => {
-        assert.deepEqual(t, { width: 2560, height: 2560, fit: "scale-down" });
+        assert.deepEqual(t, { width: 2880, height: 2880, fit: "scale-down" });
         return {
-          output: async ({ format }) => {
+          output: async ({ format, quality }) => {
             appels.push(format);
+            assert.equal(quality, format === "image/avif" ? 80 : 90, "la qualite part toujours au liant");
             const v = r[format];
             if (!v || v instanceof Error) throw v ?? new Error("9520 format");
             return { contentType: () => format, image: () => new Response(v.slice()).body as ReadableStream<Uint8Array> };
@@ -186,6 +188,32 @@ const iphone = new File([heif("heic", 4032, 3024, 2_000_000)], "IMG_0042.HEIC", 
   is(await aiguillerLesMedias(new Request("https://site.test/_emdash/api/media"), { images: liant, base, suite: e.suite }), null, "une lecture de la mediatheque n'est pas aiguillee");
 }
 
+// ---- 4 bis. L'outil MCP media_upload : les octets convertis dans les arguments.
+{
+  const base = sqlite();
+  const recus: Record<string, unknown>[] = [];
+  const suite = (role?: number) => async (r: Request): Promise<Response> => {
+    if (new URL(r.url).pathname === "/_emdash/api/auth/me") return role === undefined ? Response.json({}, { status: 401 }) : Response.json({ data: { role } });
+    recus.push((await r.json()) as Record<string, unknown>);
+    return Response.json({ jsonrpc: "2.0", id: 1, result: {} });
+  };
+  const b64 = (o: Uint8Array) => btoa(String.fromCharCode(...o));
+  const appel = (args: Record<string, unknown>) =>
+    new Request("https://site.test/_emdash/api/mcp", {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: "Bearer jeton" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "media_upload", arguments: args } }),
+    });
+  const liant = fauxLiant({ "image/webp": webp(2880, 2160, 30_000) });
+  const r = await aiguillerLesMedias(appel({ filename: "IMG_7.jpg", base64: b64(jpeg(4032, 3024, 50_000)), contentType: "image/jpeg" }), { images: liant, base, suite: suite(30), maintenant: () => T0 });
+  const a = (recus.at(-1) as { params: { arguments: Record<string, unknown> } }).params.arguments;
+  is([r?.status, a.filename, a.contentType, typeof a.base64 === "string" && atob(a.base64 as string).length], [200, "IMG_7.webp", "image/webp", 30_000], "MCP : EmDash recoit le WebP, son nom et son type");
+  is(await aiguillerLesMedias(appel({ filename: "IMG_8.jpg", base64: b64(jpeg(4032, 3024, 50_000)), contentType: "image/jpeg" }), { images: liant, base, suite: suite() }), null, "MCP sans session : rien n'est converti, la requete part telle quelle");
+  const autre = new Request("https://site.test/_emdash/api/mcp", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/call", params: { name: "content_list", arguments: {} } }) });
+  is(await aiguillerLesMedias(autre, { images: liant, base, suite: suite(30) }), null, "MCP : un autre outil n'est pas aiguille");
+  is(await aiguillerLesMedias(appel({ filename: "logo.gif", base64: b64(gif), contentType: "image/gif" }), { images: liant, base, suite: suite(30) }), null, "MCP : un GIF passe tel quel");
+}
+
 // ---- 5. Le lot, sur une base SQLite aux colonnes d'EmDash 0.38 et un faux seau.
 {
   const base = sqlite();
@@ -220,7 +248,7 @@ const iphone = new File([heif("heic", 4032, 3024, 2_000_000)], "IMG_0042.HEIC", 
   const [a] = await base.lire<Record<string, unknown>>("SELECT * FROM media WHERE id = 'A'");
   is([a.storage_key, a.mime_type, a.size, a.width, a.height, a.filename, String(a.content_hash).startsWith("sha1:")], ["A.jpg", "image/webp", 500_000, 2560, 1920, "plage.webp", true], "fiche a jour, cle (donc adresse) inchangee");
   is([objets.get("A.jpg")?.type, objets.get("A.jpg")?.corps.length, objets.get("A.jpg")?.cache], ["image/webp", 500_000, "public, max-age=0, must-revalidate"], "octets remplaces sous la meme cle, servis en image/webp");
-  is([objets.get(`${PREFIXE_DES_ORIGINAUX}A.jpg`)?.corps.length, objets.get(`${PREFIXE_DES_ORIGINAUX}A.jpg`)?.type], [3e6, "image/jpeg"], "l'original est garde sous backups/");
+  is([...objets.keys()].filter((k) => k.startsWith(PREFIXE_DES_ORIGINAUX)).length, 0, "aucune copie de l'original dans le seau");
   is(await restantes(base, t), 2, "le lot suivant reprend ou le precedent s'est arrete");
   is(await reserver(base, "D", t), true, "reservation prise");
   is(await reserver(base, "D", t + 1000), false, "deux clics ne prennent jamais la meme photo");
@@ -279,7 +307,7 @@ const iphone = new File([heif("heic", 4032, 3024, 2_000_000)], "IMG_0042.HEIC", 
   is(b.faites, 1, "photo convertie dans KV");
   const apres = kv.get("K.jpg");
   is([apres?.valeur.byteLength, apres?.metadata?.contentType, apres?.metadata?.cacheControl, apres?.metadata?.size], [400_000, "image/webp", "public, max-age=0, must-revalidate", 400_000], "meme cle, type et taille dans les metadonnees que lit le stockage KV");
-  is([kv.get(`${PREFIXE_DES_ORIGINAUX}K.jpg`)?.valeur.byteLength, kv.get(`${PREFIXE_DES_ORIGINAUX}K.jpg`)?.metadata?.contentType], [3e6, "image/jpeg"], "original garde sous backups/ dans KV");
+  is([...kv.keys()].filter((k) => k.startsWith(PREFIXE_DES_ORIGINAUX)).length, 0, "aucune copie de l'original dans KV");
   const [k] = await base.lire<Record<string, unknown>>("SELECT mime_type, storage_key FROM media WHERE id = 'K'");
   is([k.mime_type, k.storage_key], ["image/webp", "K.jpg"], "fiche a jour, adresse inchangee");
 }

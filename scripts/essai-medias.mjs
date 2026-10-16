@@ -135,7 +135,7 @@ try {
     const original = await MEDIA.get(`backups/aloha-medias/${cle}`);
     constat(ligne.storage_key === cle, `${nom} : cle inchangee (${cle}), donc adresse inchangee`);
     constat(objet.httpMetadata?.contentType === ligne.mime_type && ligne.mime_type !== type, `${nom} : ${type} devenu ${ligne.mime_type}, ${poids(octets.length)} > ${poids(ligne.size)}`);
-    constat(original && original.size === octets.length, `${nom} : original garde sous backups/aloha-medias/`);
+    constat(original === null, `${nom} : aucune copie sous backups/aloha-medias/`);
   }
   const relance = await optimiserUnLot({ base, seau: MEDIA, images: IMAGES, maintenant: Date.now });
   constat(relance.examinees === 0, "un second clic ne reprend aucune photo deja traitee");

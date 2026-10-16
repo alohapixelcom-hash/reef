@@ -15,6 +15,10 @@
 // photo qu'elle remplace, passee par l'appelant.
 import { getImage } from "astro:assets";
 import { type Media, positionFocale } from "./cadre";
+import { PLANCHER_HD } from "./qualite-image";
+
+// La qualite de chaque variante : le plancher HD du rendu a la demande (qualite-image.ts).
+const QUALITE_HD = PLANCHER_HD.webp;
 
 interface Props {
   media: Media;
@@ -41,14 +45,25 @@ const absolue = new URL(media.src ?? "", Astro.url).href;
 const largeur = typeof media.width === "number" ? media.width : undefined;
 const hauteur = typeof media.height === "number" ? media.height : undefined;
 
-// Les largeurs demandees ne depassent pas celle du fichier : au-dela on
-// etirerait, en payant les octets en plus.
-const largeurs = largeur ? widths.filter((w) => w <= largeur) : [];
+// LES ECRANS RETINA (demande de Justin, 16/10/2026 : « du HD et aucune image
+// pixelisee »). Un ecran 2x affiche la plus grande largeur demandee avec deux
+// fois plus de pixels : une variante au double de cette largeur, 2880 px au
+// plus (une photo pleine largeur de 1440 px), est donc ajoutee. Les largeurs
+// ne depassent jamais celle du fichier : au-dela on etirerait, et l'image
+// serait floue en plus d'etre plus lourde.
+const RETINA_MAX = 2880;
+const plusGrande = widths.length > 0 ? Math.max(...widths) : 0;
+const retina = plusGrande > 0 ? [Math.min(plusGrande * 2, RETINA_MAX)] : [];
+const demandees = [...new Set([...widths, ...retina])].sort((a, b) => a - b);
+// Un fichier plus etroit que la variante Retina sert sa propre largeur en
+// haut de la liste : toute la definition disponible, sans etirer.
+const sousLeFichier = largeur ? demandees.filter((w) => w <= largeur) : [];
+const largeurs = largeur && demandees.some((w) => w > largeur) && !sousLeFichier.includes(largeur) ? [...sousLeFichier, largeur] : sousLeFichier;
 let src = media.src ?? "";
 let srcset: string | undefined;
 if (largeur && hauteur) {
   try {
-    const image = await getImage({ src: absolue, width: largeur, height: hauteur, widths: largeurs.length > 0 ? largeurs : [largeur], sizes, format: "webp", quality: 75 });
+    const image = await getImage({ src: absolue, width: largeur, height: hauteur, widths: largeurs.length > 0 ? largeurs : [largeur], sizes, format: "webp", quality: QUALITE_HD });
     src = image.src;
     srcset = image.srcSet.attribute || undefined;
   } catch {

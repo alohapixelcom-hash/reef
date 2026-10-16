@@ -1,4 +1,4 @@
-// src/moteur/medias/conversion.ts - convertir une photo par le liant Cloudflare Images : orientation corrigee, metadonnees retirees, 2560 px au plus, AVIF ou WebP ; l'original reste la reponse a tout echec.
+// src/moteur/medias/conversion.ts - convertir une photo par le liant Cloudflare Images : orientation corrigee, metadonnees retirees, 2880 px au plus, AVIF ou WebP ; l'original reste la reponse a tout echec.
 //
 // CE QUE FAIT LE LIANT, SELON LA DOCUMENTATION DE CLOUDFLARE (lue le
 // 11/10/2026, developers.cloudflare.com/images/optimization/features/) :
@@ -9,7 +9,9 @@
 // comprise) et deja tournee : on ne lit ni n'ecrit l'EXIF ici.
 //   fit "scale-down" : "never upscales the image" ; c'est le defaut, on
 //   l'ecrit quand meme pour que la regle se lise dans le code.
-//   quality : non posee, Cloudflare applique son defaut ("The default is 85").
+//   quality : TOUJOURS posee (QUALITE de regles.ts). La documentation annonce
+//   un defaut de 85, mais le liant rend sans elle un WebP presque sans perte
+//   (mesure du 16/10/2026, voir regles.ts).
 //
 // JAMAIS DE PERTE POUR LE CLIENT : aucune exception ne sort d'ici. Liant
 // absent, erreur, format rendu inattendu, sortie plus lourde : le resultat dit
@@ -24,6 +26,7 @@ import {
   type FormatDeSortie,
   GRAND_COTE_MAX,
   nomAvecExtension,
+  QUALITE,
   type Raison,
   type Sorte,
   sorteDe,
@@ -81,7 +84,7 @@ async function essayer(images: Images, octets: Uint8Array, format: FormatDeSorti
     const rendu = await images
       .input(flux(octets))
       .transform({ width: GRAND_COTE_MAX, height: GRAND_COTE_MAX, fit: "scale-down" })
-      .output({ format: TYPES[format] });
+      .output({ format: TYPES[format], quality: QUALITE[format] });
     const sortie = new Uint8Array(await new Response(rendu.image()).arrayBuffer());
     return { essai: { demande: format, recue: sortie.length ? sorteDe(sortie) : null, taille: sortie.length }, sortie, erreur: null };
   } catch (e) {

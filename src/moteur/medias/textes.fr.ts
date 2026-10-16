@@ -11,7 +11,7 @@ export const FR = {
   },
   bouton: "Optimiser les photos existantes",
   consigne: (lot: number) =>
-    `Par lots de ${lot} photos : recliquez jusqu'à ce que le compteur « À examiner » tombe à zéro. L'adresse des photos ne change pas, et l'original est gardé de côté.`,
+    `Par lots de ${lot} photos : recliquez jusqu'à ce que le compteur « À examiner » tombe à zéro. L'adresse des photos ne change pas, et une photo n'est remplacée que si la conversion est plus légère et au bon format : aucune copie n'est stockée.`,
   reserve: "Une personne au rôle Éditeur ou Administrateur peut lancer l'optimisation.",
   toutFait: "Toutes les photos ont été examinées. Celles que vous ajoutez sont optimisées dès l'envoi, sans rien faire.",
   nonRelie: {
@@ -42,7 +42,7 @@ export const FR = {
     svg: "SVG",
     anime: "image animée",
     avif: "déjà en AVIF",
-    "webp-leger": "déjà légère",
+    "webp-leger": "déjà en WebP",
     "trop-lourd": "plus de 20 Mo",
     "sans-liaison": "conversion non reliée",
     "plus-lourd": "la conversion pesait plus",
