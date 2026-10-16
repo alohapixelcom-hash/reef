@@ -102,13 +102,14 @@ const after = at >= 0 ? title.slice(at + accent.length) : "";
         <Image
           src={heroVague}
           alt=""
-          widths={[720, 1200, 1800]}
+          widths={[720, 1200, 1800, 2880]}
           sizes="100vw"
           loading="lazy"
           decoding="async"
           class="pointer-events-none absolute inset-0 -z-30 size-full object-cover object-[center_78%]"
           aria-hidden="true"
           {...ed.champ("image")}
+          quality={85}
         />
       )
     }

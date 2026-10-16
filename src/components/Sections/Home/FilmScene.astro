@@ -99,8 +99,8 @@ interface Props {
 // Les deux recadrages, fabriques au build a partir de la meme source 4K :
 // paysage pour les grands ecrans, portrait pour les telephones, ou une image
 // paysage devrait etre agrandie 1,6 fois pour couvrir.
-const affichePaysage = await getImage({ src: filmPoster, width: 1920, height: 1080, format: "webp" });
-const affichePortrait = await getImage({ src: filmPoster, width: 608, height: 1080, fit: "cover", position: "center", format: "webp" });
+const affichePaysage = await getImage({ src: filmPoster, width: 1920, height: 1080, format: "webp", quality: 85 });
+const affichePortrait = await getImage({ src: filmPoster, width: 608, height: 1080, fit: "cover", position: "center", format: "webp", quality: 85 });
 
 // Moteur allume : la video et son affiche choisies dans le back office (entree
 // "studio", champs video et video_poster) passent avant celles du theme ; une

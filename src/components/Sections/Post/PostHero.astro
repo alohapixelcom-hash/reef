@@ -180,13 +180,14 @@ const auteur = annotationsDeLaFiche(author);
         <Image
           src={cover}
           alt={coverAlt ?? ""}
-          widths={[720, 1080, 1440]}
+          widths={[720, 1080, 1440, 2880]}
           sizes="(min-width: 80rem) 72rem, 100vw"
           class="rounded-card shadow-float measure-wide mx-auto w-full object-cover"
           loading="eager"
           fetchpriority="high"
           decoding="async"
           {...annotation(post, "cover")}
+          quality={85}
         />
       </figure>
     )
