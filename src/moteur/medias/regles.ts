@@ -30,6 +30,18 @@ export const WEBP_LOURD = 1024 * 1024;
 
 export const TYPES: Record<FormatDeSortie, string> = { avif: "image/avif", webp: "image/webp" };
 
+/**
+ * La qualite demandee au liant, toujours ecrite : sans elle, le liant rend un
+ * WebP presque sans perte. MESURE le 16/10/2026 sur le vrai liant (compte
+ * Aloha Pixel, photo d'essai fabriquee, 1600 x 2560) : WebP sans qualite
+ * 2 093 134 octets (PSNR 53,7 dB), WebP 82 36 470 octets (45,4 dB) ; sur une
+ * photo de 750 x 1200 : AVIF sans qualite 14 448 octets (47,0 dB), AVIF 70
+ * 10 674 octets (45,1 dB), WebP 82 14 480 octets (44,4 dB). Au-dela de 40 dB
+ * l'ecart ne se voit pas a l'oeil : 82 et 70 sont le choix de la maison,
+ * l'equilibre entre poids et finesse.
+ */
+export const QUALITE: Record<FormatDeSortie, number> = { avif: 70, webp: 82 };
+
 const texte = (o: Uint8Array, debut: number, fin: number): string => String.fromCharCode(...o.subarray(debut, fin));
 const u16be = (o: Uint8Array, i: number): number => (o[i] << 8) | o[i + 1];
 const u16le = (o: Uint8Array, i: number): number => o[i] | (o[i + 1] << 8);

@@ -84,8 +84,9 @@ function fauxLiant(r: Reglage): Images & { appels: string[] } {
       transform: (t) => {
         assert.deepEqual(t, { width: 2560, height: 2560, fit: "scale-down" });
         return {
-          output: async ({ format }) => {
+          output: async ({ format, quality }) => {
             appels.push(format);
+            assert.equal(quality, format === "image/avif" ? 70 : 82, "la qualite part toujours au liant");
             const v = r[format];
             if (!v || v instanceof Error) throw v ?? new Error("9520 format");
             return { contentType: () => format, image: () => new Response(v.slice()).body as ReadableStream<Uint8Array> };
